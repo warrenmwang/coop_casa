@@ -2,12 +2,18 @@ import cartoonNeighborhood from "../images/cartoonNeighborhood.jpg"
 
 const stats = [
   { name: 'Offices Worldwide', value: '1' },
-  { name: 'Percentage of Individual Owned', value: '100%' },
+  { name: 'Individual Ownership', value: '100%' },
   { name: 'Dark Patterns and Hidden Fees', value: '0' },
-  { name: 'Fucks Given', value: '0' },
+  { name: 'Current Active Members', value: '4' },
 ]
 
 export default function HeaderSection() {
+
+  const textColor1 = 'black'
+  const block1ClassName = `text-4xl font-bold tracking-tight text-${textColor1} sm:text-6xl`
+  const textColor2 = 'black'
+  const block2ClassName = `mt-6 text-lg leading-8 text-${textColor2}-300`
+
   return (
     <div className="relative isolate overflow-hidden bg-gray-900 py-24 sm:py-32">
       {/* background image */}
@@ -21,9 +27,9 @@ export default function HeaderSection() {
 
         {/* main text */}
         <div className="mx-auto max-w-2xl lg:mx-0 bg-white/30 backdrop-blur-md p-6 rounded-lg">
-          <h2 className="text-4xl font-bold tracking-tight text-black sm:text-6xl">Connecting Communities, Empowering Ownership</h2>
-          <p className="mt-6 text-lg leading-8 text-black-300">
-          Your Pivotal Platform for Shared Land Ownership, Alternative Housing, Legal Guidance, and Collaborative Home Solutions in the Face of the Housing Crisis
+          <h2 className={block1ClassName}>Connecting Communities, Empowering Ownership</h2>
+          <p className={block2ClassName}>
+            Your Pivotal Platform for Shared Land Ownership, Alternative Housing, Legal Guidance, and Collaborative Home Solutions in the Face of the Housing Crisis
           </p>
         </div>
 

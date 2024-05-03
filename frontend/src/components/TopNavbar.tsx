@@ -6,11 +6,9 @@ import profileImg from "../images/profile.jpg"
 import coopImg from "../images/coopAlt1.svg"
 
 const navigation = [
-  { name: 'Main', href: '#', current: true },
-  { name: 'Organizations', href: '#', current: false },
-  { name: 'Consultations', href: '#', current: false },
   { name: 'Homes', href: '#', current: false },
   { name: 'Map', href: '#', current: false},
+  { name: 'About', href: '/about', current: false },
 ]
 
 function classNames(...classes: (string | undefined | null | false)[]) {
@@ -38,18 +36,22 @@ const TopNavbar: React.FC = () => {
               </div>
               <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
                 <div className="flex flex-shrink-0 items-center">
-                  <img
-                    className="h-8 w-auto"
-                    src={coopImg}
-                    alt="Your Company"
-                  />
+                  <Link
+                    to="/" 
+                  >
+                    <img
+                      className="h-8 w-auto"
+                      src={coopImg}
+                      alt="Your Company"
+                    />
+                  </Link>
                 </div>
                 <div className="hidden sm:ml-6 sm:block">
                   <div className="flex space-x-4">
                     {navigation.map((item) => (
-                      <a
+                      <Link
                         key={item.name}
-                        href={item.href}
+                        to={item.href}
                         className={classNames(
                           item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
                           'rounded-md px-3 py-2 text-sm font-medium'
@@ -57,7 +59,7 @@ const TopNavbar: React.FC = () => {
                         aria-current={item.current ? 'page' : undefined}
                       >
                         {item.name}
-                      </a>
+                      </Link>
                     ))}
                   </div>
                 </div>
@@ -71,7 +73,6 @@ const TopNavbar: React.FC = () => {
                       <span className="sr-only">Open user menu</span>
                       <img
                         className="h-8 w-8 rounded-full"
-                        // src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
                         src={profileImg}
                         alt=""
                       />
@@ -116,13 +117,13 @@ const TopNavbar: React.FC = () => {
             </div>
           </div>
 
+          {/* Mobile view buttons */}
           <Disclosure.Panel className="sm:hidden">
             <div className="space-y-1 px-2 pb-3 pt-2">
               {navigation.map((item) => (
-                <Disclosure.Button
+                <Link
                   key={item.name}
-                  as="a"
-                  href={item.href}
+                  to={item.href}
                   className={classNames(
                     item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
                     'block rounded-md px-3 py-2 text-base font-medium'
@@ -130,7 +131,7 @@ const TopNavbar: React.FC = () => {
                   aria-current={item.current ? 'page' : undefined}
                 >
                   {item.name}
-                </Disclosure.Button>
+                </Link>
               ))}
             </div>
           </Disclosure.Panel>
