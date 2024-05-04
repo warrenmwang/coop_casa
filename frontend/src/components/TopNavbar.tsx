@@ -16,6 +16,8 @@ function classNames(...classes: (string | undefined | null | false)[]) {
 }
 
 const TopNavbar: React.FC = () => {
+  const googleAuthLink = "http://localhost:8080/auth/google";
+
   return (
     <Disclosure as="nav" className="bg-gray-800">
       {({ open }) => (
@@ -91,21 +93,10 @@ const TopNavbar: React.FC = () => {
                       <Menu.Item>
                         {({ active }) => (
                           <Link
-                            to="#"
+                            to={googleAuthLink}
                             className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
                           >
-                            Sign In
-                          </Link>
-                        )}
-                      </Menu.Item>
-                      <Menu.Item>
-                        {({ active }) => (
-                          <Link
-                            // to="/createAccount" // NOT READY
-                            to="#"
-                            className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
-                          >
-                            Create Account
+                            Log in with Google
                           </Link>
                         )}
                       </Menu.Item>
