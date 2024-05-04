@@ -7,7 +7,6 @@ const About : React.FC = () => {
     <div>
       <TopNavbar></TopNavbar>
         <div>About The Team</div>
-
       <Footer></Footer>
     </div>
   )

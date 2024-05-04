@@ -6,8 +6,8 @@ import profileImg from "../images/profile.jpg"
 import coopImg from "../images/coopAlt1.svg"
 
 const navigation = [
-  { name: 'Homes', href: '#', current: false },
-  { name: 'Map', href: '#', current: false},
+  { name: 'Communities', href: '/communities', current: false },
+  { name: 'Map', href: '/map', current: false},
   { name: 'About', href: '/about', current: false },
 ]
 
