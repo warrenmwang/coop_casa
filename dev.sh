@@ -5,8 +5,13 @@ frontend() {
     npm start
 }
 
+backend() {
+    cd backend
+    make watch
+}
+
 main(){
-    frontend
+    frontend & backend
 }
 
 main

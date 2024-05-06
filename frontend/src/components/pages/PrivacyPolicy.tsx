@@ -1,6 +1,6 @@
 import React from "react";
-import TopNavbar from "./TopNavbar";
-import Footer from "./Footer";
+import TopNavbar from "../structure/TopNavbar";
+import Footer from "../structure/Footer";
 
 const PrivacyPolicy : React.FC = () => {
   return(
@@ -12,4 +12,4 @@ const PrivacyPolicy : React.FC = () => {
   )
 }
 
-export default PrivacyPolicy
+export default PrivacyPolicy;

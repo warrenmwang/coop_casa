@@ -1,4 +1,4 @@
-import cartoonNeighborhood from "../images/cartoonNeighborhood.jpg"
+import cartoonNeighborhood from "../../images/cartoonNeighborhood.jpg"
 
 const stats = [
   { name: 'Offices Worldwide', value: '1' },

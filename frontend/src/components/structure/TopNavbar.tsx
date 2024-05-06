@@ -2,8 +2,8 @@ import React, { Fragment } from 'react'
 import { Link } from 'react-router-dom'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
-import profileImg from "../images/profile.jpg"
-import coopImg from "../images/coopAlt1.svg"
+import defaultProfileImg from "../../images/profile.jpg"
+import coopImg from "../../images/coopAlt1.svg"
 
 const navigation = [
   { name: 'Communities', href: '/communities', current: false },
@@ -15,7 +15,11 @@ function classNames(...classes: (string | undefined | null | false)[]) {
   return classes.filter(Boolean).join(' ')
 }
 
-const TopNavbar: React.FC = () => {
+interface TopNavBarArgs {
+  profileImg?: string;
+}
+
+const TopNavbar: React.FC<TopNavBarArgs> = ({ profileImg = defaultProfileImg}) => {
   const googleAuthLink = "http://localhost:8080/auth/google";
 
   return (

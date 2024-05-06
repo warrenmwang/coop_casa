@@ -1,6 +1,6 @@
 import React from "react";
-import Footer from "./Footer";
-import TopNavbar from "./TopNavbar";
+import Footer from "../structure/Footer";
+import TopNavbar from "../structure/TopNavbar";
 
 const About : React.FC = () => {
   return(

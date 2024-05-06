@@ -1,6 +1,6 @@
 import React from "react";
-import Title from "./Title";
-import SearchBar from "./SearchBar";
+import Title from "../structure/Title";
+import SearchBar from "../structure/SearchBar";
 
 const gradientBackground = "linear-gradient(to left, #40c0ff, #1482b8)"
 

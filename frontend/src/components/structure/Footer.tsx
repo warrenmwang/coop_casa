@@ -15,6 +15,9 @@ const Footer : React.FC = () => {
                 <Link to="/privacy-policy" className="hover:underline me-4 md:me-6">Privacy Policy</Link>
             </li>
             <li>
+                <Link to="/tos" className="hover:underline me-4 md:me-6">Terms of Service</Link>
+            </li>
+            <li>
                 <Link to="/contact" className="hover:underline">Contact</Link>
             </li>
         </ul>

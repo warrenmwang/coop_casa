@@ -1,9 +1,9 @@
 import React from "react";
-import SearchCommunities from "./SearchCommunities";
-import SearchLocations from "./SearchLocations";
-import TopNavbar from "./TopNavbar";
-import Footer from "./Footer";
-import Title from "./Title";
+import SearchCommunities from "../structure/SearchCommunities";
+import SearchLocations from "../structure/SearchLocations";
+import TopNavbar from "../structure/TopNavbar";
+import Footer from "../structure/Footer";
+import Title from "../structure/Title";
 
 // TODO: this should pretty much replace everything in the main section of the page
 // once the user logs in / creates an account.
