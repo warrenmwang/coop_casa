@@ -13,11 +13,7 @@ import (
 	"github.com/markbates/goth/providers/google"
 )
 
-const (
-	key    = "UgQYB96bNuxTCi6PhUWeylwF1Z4="
-	MaxAge = 86400 * 30 // 30 days
-	IsProd = false
-)
+const MaxAge = 86400 * 30 // 30 days
 
 func NewAuth() {
 	err := godotenv.Load()
@@ -29,7 +25,17 @@ func NewAuth() {
 	googleClientId := os.Getenv("GOOGLE_CLIENT_ID")
 	googleClientSecret := os.Getenv("GOOGLE_CLIENT_SECRET")
 
+	key := os.Getenv("AUTH_KEY_SECRET")
+	IsProd, err := strconv.ParseBool(os.Getenv("IS_PROD"))
+	if err != nil {
+		fmt.Println("Error parsing IS_PROD var", err)
+		return
+	}
+
 	store := sessions.NewCookieStore([]byte(key))
+	store.MaxAge(MaxAge)
+	store.Options.HttpOnly = true
+	store.Options.Secure = IsProd
 
 	gothic.Store = store
 

@@ -13,8 +13,11 @@ import (
 )
 
 type Server struct {
-	port         int
-	frontendPort int
+	port          int
+	frontendPort  int
+	jwtSignSecret string
+	IsProd        bool
+	DEBUG         bool
 
 	db database.Service
 }
@@ -22,9 +25,16 @@ type Server struct {
 func NewServer() *http.Server {
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
 	frontendPort, _ := strconv.Atoi(os.Getenv("FRONTENDPORT"))
+	jwtSignSecret := os.Getenv("JWT_SIGN_SECRET")
+	IsProd, _ := strconv.ParseBool(os.Getenv("IS_PROD"))
+	DEBUG, _ := strconv.ParseBool(os.Getenv("DEBUG_FLAG"))
+
 	NewServer := &Server{
-		port:         port,
-		frontendPort: frontendPort,
+		port:          port,
+		frontendPort:  frontendPort,
+		jwtSignSecret: jwtSignSecret,
+		IsProd:        IsProd,
+		DEBUG:         DEBUG,
 
 		db: database.New(),
 	}
