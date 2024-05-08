@@ -211,13 +211,14 @@ func (s *Server) authLoginHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) authLogoutHandler(w http.ResponseWriter, r *http.Request) {
-	// endpoint: HOST:PORT/auth/logout/{provider}
+	// Endpoint: HOST:PORT/auth/logout/{provider}
 	// Logout endpoint for OAuth
 
-	// insert the provider context
+	// Insert the provider context
 	provider := chi.URLParam(r, "provider")
 	r = r.WithContext(context.WithValue(context.Background(), "provider", provider))
 
+	// Logout oauth
 	gothic.Logout(w, r)
 	w.Header().Set("Location", "/")
 	w.WriteHeader(http.StatusTemporaryRedirect)
@@ -246,14 +247,14 @@ func (s *Server) apiLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	userId, ok := claims["user_id"].(string)
 	if !ok {
-		log.Fatalf("value userId not string: %v\n", userId)
-		respondWithError(w, 401, fmt.Errorf("value userId not in string: %v", userId))
+		log.Printf("value userId not string: %v\n", userId)
+		respondWithError(w, 401, fmt.Errorf("Cannot login with given token. Sign in again."))
 	}
 
 	email, ok := claims["email"].(string)
 	if !ok {
-		log.Fatalf("value email not string: %v\n", email)
-		respondWithError(w, 401, fmt.Errorf("value email not in string: %v", email))
+		log.Printf("value email not string: %v\n", email)
+		respondWithError(w, 401, fmt.Errorf("Cannot login with given token. Sign in again."))
 	}
 
 	returnVal := returnValue{

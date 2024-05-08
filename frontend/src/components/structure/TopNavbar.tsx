@@ -6,12 +6,6 @@ import defaultProfileImg from "../../images/profile.jpg"
 import coopImg from "../../images/coopAlt1.svg"
 import { AuthData } from '../../auth/AuthWrapper'
 
-const navigation = [
-  { name: 'Communities', href: '/communities', current: false },
-  { name: 'Map', href: '/map', current: false},
-  { name: 'About', href: '/about', current: false },
-]
-
 function classNames(...classes: (string | undefined | null | false)[]) {
   return classes.filter(Boolean).join(' ')
 }
@@ -24,7 +18,14 @@ const TopNavbar: React.FC<TopNavBarArgs> = ({ profileImg = defaultProfileImg}) =
   const googleOAuthLink = "http://localhost:8080/auth/google";
 
   const auth = AuthData();
-  const { authenticated, login, logout } = auth;
+  const { authenticated, logout } = auth;
+
+  const navigation = [
+    ...(authenticated ? [ { name: 'Dashboard', href: '/dashboard', current: false}] : []),
+    { name: 'Communities', href: '/communities', current: false },
+    { name: 'Map', href: '/map', current: false},
+    ...(authenticated ? [ { name: 'Account Settings', href: '/account-settings', current: false}] : []),
+  ]
 
   return (
     <Disclosure as="nav" className="bg-gray-800">

@@ -7,19 +7,10 @@ import Title from "../structure/Title";
 
 import { AuthData } from '../../auth/AuthWrapper'
 
-// TODO: this should pretty much replace everything in the main section of the page
-// once the user logs in / creates an account.
 const Dashboard: React.FC = () => {
 
   const auth = AuthData();
-  const { user, login } = auth;
-
-  useEffect(() => {
-    const handleLogin = async () => {
-      await login();
-    }
-    handleLogin()
-  }, []) // empty array dependency to tell useEffect hook to call login only at first render.
+  const { user } = auth;
 
   const email = user.email
   

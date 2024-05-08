@@ -1,12 +1,13 @@
 import React from "react";
 import TopNavbar from "../structure/TopNavbar";
 import Footer from "../structure/Footer";
+import Title from "../structure/Title";
 
 const Map : React.FC = () => {
   return (
     <div>
       <TopNavbar></TopNavbar>
-      <h1>Map placeholder.</h1>
+      <Title title="Map" description="Use the interactive map below to locate and keep track of interesting places!"></Title>
       <h2>
         So this needs to be a balance between privacy and being useful.
         Perhaps we will need 2 versions of this map.

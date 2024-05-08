@@ -79,10 +79,13 @@ const AuthWrapper: React.FC<{children: ReactNode}> = ({ children }) => {
 
       if (!response.ok) {
         // TODO: error popup that tells the user that something went wrong and they need to logout again.
+      } else {
+        window.location.href = '/'
       }
+
     } catch(error) {
       // TODO: handle error if sonmething went wrong in this async call
-      console.log('Error during lout:', error);
+      console.log('Error during logout:', error);
     }
   }
 

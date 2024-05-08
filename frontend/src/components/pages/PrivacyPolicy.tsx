@@ -1,12 +1,13 @@
 import React from "react";
 import TopNavbar from "../structure/TopNavbar";
 import Footer from "../structure/Footer";
+import Title from "../structure/Title";
 
 const PrivacyPolicy : React.FC = () => {
   return(
     <div>
       <TopNavbar></TopNavbar>
-      <h1>Privacy Policy Page</h1>
+      <Title title="Privacy Policy" description=""></Title>
       <Footer></Footer>
     </div>
   )

@@ -1,13 +1,13 @@
 import React from "react";
 import TopNavbar from "../structure/TopNavbar";
 import Footer from "../structure/Footer";
+import Title from "../structure/Title";
 
 const Contact : React.FC = () => {
   return (
     <div>
       <TopNavbar></TopNavbar>
-      <h1>Contact Us</h1>
-      <p>TBD.</p>
+      <Title title="Contact" description="Please find the contact information of our head of human resources below."></Title>
       <Footer></Footer>
     </div>
   );
