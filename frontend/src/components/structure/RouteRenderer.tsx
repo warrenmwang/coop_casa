@@ -11,7 +11,7 @@ import TermsOfService from '../pages/TermsOfService';
 
 
 import { AuthData } from '../../auth/AuthWrapper'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import AccountSettings from "../pages/AccountSettings";
 
 const RouteRenderer : React.FC = () => {
@@ -38,6 +38,7 @@ const RouteRenderer : React.FC = () => {
         <Route path="/contact" element={<Contact />} />
         { authenticated && <Route path="/dashboard" element={<Dashboard />} /> }
         { authenticated && <Route path="/account-settings" element={<AccountSettings />} /> }
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
 
