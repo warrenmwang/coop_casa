@@ -9,21 +9,24 @@ import PrivacyPolicy from './components/pages/PrivacyPolicy';
 import TermsOfService from './components/pages/TermsOfService';
 
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import AuthWrapper from './auth/AuthWrapper';
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/communities" element={<Communities />} />
-        <Route path="/map" element={<Map />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-        <Route path="/tos" element={<TermsOfService />} />
-        <Route path="/contact" element={<Contact />} />
-      </Routes>
-    </Router>
+    <AuthWrapper>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/communities" element={<Communities />} />
+          <Route path="/map" element={<Map />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/tos" element={<TermsOfService />} />
+          <Route path="/contact" element={<Contact />} />
+        </Routes>
+      </Router>
+    </AuthWrapper>
   );
 }
 

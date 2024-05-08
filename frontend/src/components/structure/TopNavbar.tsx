@@ -4,6 +4,7 @@ import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import defaultProfileImg from "../../images/profile.jpg"
 import coopImg from "../../images/coopAlt1.svg"
+import { AuthData } from '../../auth/AuthWrapper'
 
 const navigation = [
   { name: 'Communities', href: '/communities', current: false },
@@ -20,7 +21,10 @@ interface TopNavBarArgs {
 }
 
 const TopNavbar: React.FC<TopNavBarArgs> = ({ profileImg = defaultProfileImg}) => {
-  const googleAuthLink = "http://localhost:8080/auth/google";
+  const googleOAuthLink = "http://localhost:8080/auth/google";
+
+  const auth = AuthData();
+  const { authenticated, login, logout } = auth;
 
   return (
     <Disclosure as="nav" className="bg-gray-800">
@@ -94,16 +98,31 @@ const TopNavbar: React.FC<TopNavBarArgs> = ({ profileImg = defaultProfileImg}) =
                     leaveTo="transform opacity-0 scale-95"
                   >
                     <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                      <Menu.Item>
-                        {({ active }) => (
-                          <Link
-                            to={googleAuthLink}
-                            className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
-                          >
-                            Log in with Google
-                          </Link>
-                        )}
-                      </Menu.Item>
+                      {authenticated ? (
+                        // render logout if user logged in
+                        <Menu.Item>
+                          {({ active }) => (
+                            <button
+                              onClick={logout} 
+                              className={classNames(active ? 'bg-gray-100' : '', 'block w-full text-left px-4 py-2 text-sm text-gray-700')}
+                            >
+                              Logout
+                            </button>
+                          )}
+                        </Menu.Item>
+                      ) : (
+                        // render login otherwise
+                        <Menu.Item>
+                          {({ active }) => (
+                            <Link
+                              to={googleOAuthLink}
+                              className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
+                            >
+                              Log in with Google
+                            </Link>
+                          )}
+                        </Menu.Item>
+                      )}
                     </Menu.Items>
                   </Transition>
                 </Menu> 
