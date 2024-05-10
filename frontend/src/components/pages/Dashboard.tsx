@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import SearchCommunities from "../structure/SearchCommunities";
 import SearchLocations from "../structure/SearchLocations";
 import TopNavbar from "../structure/TopNavbar";

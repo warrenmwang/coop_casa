@@ -38,7 +38,8 @@ const RouteRenderer : React.FC = () => {
         <Route path="/contact" element={<Contact />} />
         { authenticated && <Route path="/dashboard" element={<Dashboard />} /> }
         { authenticated && <Route path="/account-settings" element={<AccountSettings />} /> }
-        <Route path="*" element={<Navigate to="/" replace />} />
+        {/* Catch all route for non-existent routes */}
+        {/* <Route path="*" element={<Navigate to="/" replace />} /> */}
       </Routes>
     </Router>
 

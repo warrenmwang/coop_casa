@@ -22,8 +22,6 @@ const AuthContext = createContext<AuthContextType>({
   logout: () => Promise.resolve(),
 })
 
-// const AuthContext = createContext<AuthContextType>(AuthContext);
-
 export const AuthData = () => useContext(AuthContext)
 
 // wrapper to provide the auth state context throughout all components

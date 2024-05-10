@@ -16,6 +16,7 @@ interface TopNavBarArgs {
 
 const TopNavbar: React.FC<TopNavBarArgs> = ({ profileImg = defaultProfileImg}) => {
   const googleOAuthLink = "http://localhost:8080/auth/google";
+  const accountSettingsLink = "/account-settings";
 
   const auth = AuthData();
   const { authenticated, logout } = auth;
@@ -24,7 +25,6 @@ const TopNavbar: React.FC<TopNavBarArgs> = ({ profileImg = defaultProfileImg}) =
     ...(authenticated ? [ { name: 'Dashboard', href: '/dashboard', current: false}] : []),
     { name: 'Communities', href: '/communities', current: false },
     { name: 'Map', href: '/map', current: false},
-    ...(authenticated ? [ { name: 'Account Settings', href: '/account-settings', current: false}] : []),
   ]
 
   return (
@@ -99,6 +99,7 @@ const TopNavbar: React.FC<TopNavBarArgs> = ({ profileImg = defaultProfileImg}) =
                     leaveTo="transform opacity-0 scale-95"
                   >
                     <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                      {/* login or logout button*/}
                       {authenticated ? (
                         // render logout if user logged in
                         <Menu.Item>
@@ -124,6 +125,18 @@ const TopNavbar: React.FC<TopNavBarArgs> = ({ profileImg = defaultProfileImg}) =
                           )}
                         </Menu.Item>
                       )}
+                      { /* authed: account settings */}
+                      {authenticated &&
+                        <Menu.Item>
+                          {({ active }) => (
+                            <Link
+                              to={accountSettingsLink}
+                              className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
+                            >
+                              Account Settings
+                            </Link>
+                          )}
+                        </Menu.Item>}
                     </Menu.Items>
                   </Transition>
                 </Menu> 
