@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, ReactNode } from "react";
+import { API_HOST, API_PORT } from "../config";
 
 interface User {
   userId: string;
@@ -33,7 +34,7 @@ const AuthWrapper: React.FC<{children: ReactNode}> = ({ children }) => {
   // login the user
   const login = async () => {
 
-    const apiLoginLink = "http://localhost:8080/api/login"
+    const apiLoginLink = `${API_HOST}:${API_PORT}/api/login`
     
     try {
       // try to login with the token in browser
@@ -70,7 +71,7 @@ const AuthWrapper: React.FC<{children: ReactNode}> = ({ children }) => {
   // hit the logout api endpoint
   const logout = async () => {
     try {
-      const response = await fetch('http://localhost:8080/api/logout', {
+      const response = await fetch(`${API_HOST}:${API_PORT}/api/logout`, {
         method: 'GET', 
         credentials: 'include',
       });

@@ -183,7 +183,7 @@ func (s *Server) getAuthCallbackHandler(w http.ResponseWriter, r *http.Request) 
 	})
 
 	// Redirect to dashboard page
-	http.Redirect(w, r, fmt.Sprintf("http://localhost:%d/dashboard", s.frontendPort), http.StatusFound)
+	http.Redirect(w, r, fmt.Sprintf("%s:%d/dashboard", s.host, s.frontendPort), http.StatusFound)
 }
 
 // Endpoint: HOST:PORT/auth/{provider}
@@ -221,7 +221,7 @@ func (s *Server) apiLoginHandler(w http.ResponseWriter, r *http.Request) {
 	// after they have gotten their JWT
 
 	// Set CORS headers
-	w.Header().Set("Access-Control-Allow-Origin", fmt.Sprintf("http://localhost:%v", s.frontendPort))
+	w.Header().Set("Access-Control-Allow-Origin", fmt.Sprintf("%s:%v", s.host, s.frontendPort))
 	w.Header().Set("Access-Control-Allow-Methods", "GET")
 	w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
 	w.Header().Set("Access-Control-Allow-Credentials", "true")
@@ -263,7 +263,7 @@ func (s *Server) apiLogoutHandler(w http.ResponseWriter, r *http.Request) {
 	// in the past.
 
 	// Set CORS headers
-	w.Header().Set("Access-Control-Allow-Origin", fmt.Sprintf("http://localhost:%v", s.frontendPort))
+	w.Header().Set("Access-Control-Allow-Origin", fmt.Sprintf("%s:%v", s.host, s.frontendPort))
 	w.Header().Set("Access-Control-Allow-Methods", "GET")
 	w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
 	w.Header().Set("Access-Control-Allow-Credentials", "true")

@@ -1,5 +1,14 @@
 #!/bin/bash
 
+# While we don't need sudo permissions for any of the commands,
+# checking whether we are root or not will prevent us from trying to 
+# run this script on dev machine, which we assume the user is not logged in
+# as root.
+if [ "$EUID" -ne 0 ]; then
+    echo "Not root user, assume not on deployment server. Exiting."
+    exit 1
+fi
+
 # Build frontend
 cd frontend
 /root/.nvm/versions/node/v21.6.1/bin/npm run build

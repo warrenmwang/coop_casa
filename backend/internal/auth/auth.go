@@ -32,6 +32,13 @@ func NewAuth() {
 		return
 	}
 
+	var host string
+	if IsProd {
+		host = os.Getenv("PROD_HOST")
+	} else {
+		host = os.Getenv("DEV_HOST")
+	}
+
 	store := sessions.NewCookieStore([]byte(key))
 	store.MaxAge(MaxAge)
 	store.Options.HttpOnly = true
@@ -41,6 +48,6 @@ func NewAuth() {
 
 	// list of providers that we want our application to accept oauth connections from
 	goth.UseProviders(
-		google.New(googleClientId, googleClientSecret, fmt.Sprintf("http://localhost:%d/auth/google/callback", port)),
+		google.New(googleClientId, googleClientSecret, fmt.Sprintf("%s:%d/auth/google/callback", host, port)),
 	)
 }

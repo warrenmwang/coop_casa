@@ -16,6 +16,7 @@ type Server struct {
 	port          int
 	frontendPort  int
 	jwtSignSecret string
+	host          string
 	IsProd        bool
 	DEBUG         bool
 
@@ -29,10 +30,18 @@ func NewServer() *http.Server {
 	IsProd, _ := strconv.ParseBool(os.Getenv("IS_PROD"))
 	DEBUG, _ := strconv.ParseBool(os.Getenv("DEBUG_FLAG"))
 
+	var host string
+	if IsProd {
+		host = os.Getenv("PROD_HOST")
+	} else {
+		host = os.Getenv("DEV_HOST")
+	}
+
 	NewServer := &Server{
 		port:          port,
 		frontendPort:  frontendPort,
 		jwtSignSecret: jwtSignSecret,
+		host:          host,
 		IsProd:        IsProd,
 		DEBUG:         DEBUG,
 
