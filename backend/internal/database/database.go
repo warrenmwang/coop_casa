@@ -20,15 +20,13 @@ type service struct {
 	db *sql.DB
 }
 
-var (
-	database = os.Getenv("DB_DATABASE")
-	password = os.Getenv("DB_PASSWORD")
-	username = os.Getenv("DB_USERNAME")
-	port     = os.Getenv("DB_PORT")
-	host     = os.Getenv("DB_HOST")
-)
-
 func New() Service {
+	database := os.Getenv("DB_DATABASE")
+	password := os.Getenv("DB_PASSWORD")
+	username := os.Getenv("DB_USERNAME")
+	port := os.Getenv("DB_PORT")
+	host := os.Getenv("DB_HOST")
+
 	connStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", username, password, host, port, database)
 	db, err := sql.Open("pgx", connStr)
 	if err != nil {

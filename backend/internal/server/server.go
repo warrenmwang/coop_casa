@@ -13,10 +13,10 @@ import (
 )
 
 type Server struct {
-	port          int
-	frontendPort  int
-	jwtSignSecret string
-	host          string
+	Port          int
+	FrontendPort  int
+	JwtSignSecret string
+	Host          string
 	IsProd        bool
 	DEBUG         bool
 
@@ -38,10 +38,10 @@ func NewServer() *http.Server {
 	}
 
 	NewServer := &Server{
-		port:          port,
-		frontendPort:  frontendPort,
-		jwtSignSecret: jwtSignSecret,
-		host:          host,
+		Port:          port,
+		FrontendPort:  frontendPort,
+		JwtSignSecret: jwtSignSecret,
+		Host:          host,
 		IsProd:        IsProd,
 		DEBUG:         DEBUG,
 
@@ -50,7 +50,7 @@ func NewServer() *http.Server {
 
 	// Declare Server config
 	server := &http.Server{
-		Addr:         fmt.Sprintf(":%d", NewServer.port),
+		Addr:         fmt.Sprintf(":%d", NewServer.Port),
 		Handler:      NewServer.RegisterRoutes(),
 		IdleTimeout:  time.Minute,
 		ReadTimeout:  10 * time.Second,

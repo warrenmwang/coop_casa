@@ -2,12 +2,10 @@ package auth
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"strconv"
 
 	"github.com/gorilla/sessions"
-	"github.com/joho/godotenv"
 	"github.com/markbates/goth"
 	"github.com/markbates/goth/gothic"
 	"github.com/markbates/goth/providers/google"
@@ -16,11 +14,6 @@ import (
 const MaxAge = 86400 * 30 // 30 days
 
 func NewAuth() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
-
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
 	googleClientId := os.Getenv("GOOGLE_CLIENT_ID")
 	googleClientSecret := os.Getenv("GOOGLE_CLIENT_SECRET")

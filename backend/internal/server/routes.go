@@ -45,7 +45,7 @@ func respondWithError(w http.ResponseWriter, code int, err error) {
 	log.Println("responded with err:", err.Error())
 }
 
-func (s *Server) generateToken(user User, expireTime time.Time) (string, error) {
+func (s *Server) GenerateToken(user User, expireTime time.Time) (string, error) {
 	// generate a JWT
 
 	// Define token claims
@@ -59,7 +59,7 @@ func (s *Server) generateToken(user User, expireTime time.Time) (string, error) 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	// Sign token with a string
-	tokenString, err := token.SignedString([]byte(s.jwtSignSecret))
+	tokenString, err := token.SignedString([]byte(s.JwtSignSecret))
 	if err != nil {
 		return "", fmt.Errorf("error in generateToken: %v", err.Error())
 	}
@@ -67,32 +67,25 @@ func (s *Server) generateToken(user User, expireTime time.Time) (string, error) 
 	return tokenString, nil
 }
 
-func (s *Server) validateTokenAndGetClaims(r *http.Request) (jwt.MapClaims, error) {
+func (s *Server) ValidateTokenAndGetClaims(tokenString string) (jwt.MapClaims, error) {
 	// Gets the JWT and validates it. If valid, return the claims.
 	// Return an error if invalid.
-
-	// Read JWT from HttpOnly Cookie
-	cookie, err := r.Cookie("token")
-	if err != nil {
-		return nil, fmt.Errorf("error in validateTokenAndGetClaims for reading cookie: %v", err.Error())
-	}
-	tokenString := cookie.Value
 
 	// Validate JWT
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
-		return []byte(s.jwtSignSecret), nil
+		return []byte(s.JwtSignSecret), nil
 	})
 
 	if err != nil {
-		return nil, fmt.Errorf("error in validateTokenAndGetClaims for parsing jwt: %v", err.Error())
+		return nil, fmt.Errorf("error for parsing jwt: %v", err.Error())
 	}
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		// Token is valid. Access the claims here.
-		fmt.Printf("Token is valid. User ID: %v, Expires at %v\n", claims["user_id"], claims["exp"])
+		// fmt.Printf("Token is valid. User ID: %v, Expires at %v\n", claims["user_id"], claims["exp"])
 		return claims, nil
 	} else {
 		return nil, fmt.Errorf("invalid token")
@@ -167,7 +160,7 @@ func (s *Server) getAuthCallbackHandler(w http.ResponseWriter, r *http.Request) 
 		UserId: gothUser.UserID,
 		Email:  gothUser.Email,
 	}
-	tokenSigned, err := s.generateToken(user, expireTime)
+	tokenSigned, err := s.GenerateToken(user, expireTime)
 	if err != nil {
 		log.Fatalf("Unable to sign token with err: %s\n", err.Error())
 	}
@@ -183,7 +176,7 @@ func (s *Server) getAuthCallbackHandler(w http.ResponseWriter, r *http.Request) 
 	})
 
 	// Redirect to dashboard page
-	http.Redirect(w, r, fmt.Sprintf("%s:%d/dashboard", s.host, s.frontendPort), http.StatusFound)
+	http.Redirect(w, r, fmt.Sprintf("%s:%d/dashboard", s.Host, s.FrontendPort), http.StatusFound)
 }
 
 // Endpoint: HOST:PORT/auth/{provider}
@@ -221,12 +214,19 @@ func (s *Server) apiLoginHandler(w http.ResponseWriter, r *http.Request) {
 	// after they have gotten their JWT
 
 	// Set CORS headers
-	w.Header().Set("Access-Control-Allow-Origin", fmt.Sprintf("%s:%v", s.host, s.frontendPort))
+	w.Header().Set("Access-Control-Allow-Origin", fmt.Sprintf("%s:%v", s.Host, s.FrontendPort))
 	w.Header().Set("Access-Control-Allow-Methods", "GET")
 	w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
 	w.Header().Set("Access-Control-Allow-Credentials", "true")
 
-	claims, err := s.validateTokenAndGetClaims(r)
+	// Read JWT from HttpOnly Cookie
+	cookie, err := r.Cookie("token")
+	if err != nil {
+		respondWithError(w, 404, fmt.Errorf("no token in cookie in request: %v", err.Error()))
+	}
+	tokenString := cookie.Value
+
+	claims, err := s.ValidateTokenAndGetClaims(tokenString)
 	if err != nil {
 		respondWithError(w, 401, err)
 	}
@@ -239,13 +239,13 @@ func (s *Server) apiLoginHandler(w http.ResponseWriter, r *http.Request) {
 	userId, ok := claims["user_id"].(string)
 	if !ok {
 		log.Printf("value userId not string: %v\n", userId)
-		respondWithError(w, 401, fmt.Errorf("Cannot login with given token. Sign in again."))
+		respondWithError(w, 401, fmt.Errorf("cannot login with given token, sign in again"))
 	}
 
 	email, ok := claims["email"].(string)
 	if !ok {
 		log.Printf("value email not string: %v\n", email)
-		respondWithError(w, 401, fmt.Errorf("Cannot login with given token. Sign in again."))
+		respondWithError(w, 401, fmt.Errorf("cannot login with given token, sign in again"))
 	}
 
 	returnVal := returnValue{
@@ -263,7 +263,7 @@ func (s *Server) apiLogoutHandler(w http.ResponseWriter, r *http.Request) {
 	// in the past.
 
 	// Set CORS headers
-	w.Header().Set("Access-Control-Allow-Origin", fmt.Sprintf("%s:%v", s.host, s.frontendPort))
+	w.Header().Set("Access-Control-Allow-Origin", fmt.Sprintf("%s:%v", s.Host, s.FrontendPort))
 	w.Header().Set("Access-Control-Allow-Methods", "GET")
 	w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
 	w.Header().Set("Access-Control-Allow-Credentials", "true")
