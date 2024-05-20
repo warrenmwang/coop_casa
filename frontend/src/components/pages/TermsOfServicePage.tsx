@@ -3,7 +3,7 @@ import Title from "../structure/Title";
 import TopNavbar from "../structure/TopNavbar";
 import Footer from "../structure/Footer";
 
-const TermsOfService : React.FC = () => {
+const TermsOfServicePage : React.FC = () => {
   return(
     <div>
       <TopNavbar></TopNavbar>
@@ -16,4 +16,4 @@ const TermsOfService : React.FC = () => {
   )
 }
 
-export default TermsOfService;
+export default TermsOfServicePage;

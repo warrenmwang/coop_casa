@@ -9,8 +9,10 @@ interface User {
 interface AuthContextType {
   user: User;
   authenticated: boolean;
+  accountIsSetup: boolean;
   login: () => Promise<void>;
   logout: () => Promise<void>;
+  setAccountIsSetup: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -19,8 +21,10 @@ const AuthContext = createContext<AuthContextType>({
     email: ''
   },
   authenticated: false,
+  accountIsSetup: false,
   login: () => Promise.resolve(), 
   logout: () => Promise.resolve(),
+  setAccountIsSetup: () => {},
 })
 
 export const AuthData = () => useContext(AuthContext)
@@ -30,6 +34,7 @@ const AuthWrapper: React.FC<{children: ReactNode}> = ({ children }) => {
 
   const [ user, setUser ] = useState({userId: '', email: ''})
   const [ authenticated, setAuthenticated ] = useState(false)
+  const [ accountIsSetup, setAccountIsSetup ] = useState(false)
 
   // login the user
   const login = async () => {
@@ -89,7 +94,7 @@ const AuthWrapper: React.FC<{children: ReactNode}> = ({ children }) => {
   }
 
   return(
-    <AuthContext.Provider value={{user, authenticated, login, logout}}>
+    <AuthContext.Provider value={{user, authenticated, accountIsSetup, login, logout, setAccountIsSetup}}>
       {children}
     </AuthContext.Provider>
   )

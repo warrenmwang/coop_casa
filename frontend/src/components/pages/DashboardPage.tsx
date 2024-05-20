@@ -6,18 +6,21 @@ import Footer from "../structure/Footer";
 import Title from "../structure/Title";
 
 import { AuthData } from '../../auth/AuthWrapper'
+import AccountSetup from "../structure/AccountSetup";
 
-const Dashboard: React.FC = () => {
+// Dashboard is only showed when user is authed.
+const DashboardPage: React.FC = () => {
 
   const auth = AuthData();
-  const { user } = auth;
+  const { user, accountIsSetup } = auth;
 
-  const email = user.email
-  
+  const email = user.email;
+ 
   return (
     <div>
       <TopNavbar></TopNavbar>
       <Title title="Dashboard" description={`Welcome ${email}`}></Title>
+      {!accountIsSetup && <AccountSetup />}
       <SearchCommunities></SearchCommunities>
       <SearchLocations></SearchLocations>
       <Footer></Footer>
@@ -25,4 +28,4 @@ const Dashboard: React.FC = () => {
   )
 }
 
-export default Dashboard;
+export default DashboardPage;

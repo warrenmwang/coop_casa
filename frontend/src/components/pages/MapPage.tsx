@@ -3,7 +3,7 @@ import TopNavbar from "../structure/TopNavbar";
 import Footer from "../structure/Footer";
 import Title from "../structure/Title";
 
-const Map : React.FC = () => {
+const MapPage : React.FC = () => {
   return (
     <div>
       <TopNavbar></TopNavbar>
@@ -22,4 +22,4 @@ const Map : React.FC = () => {
   )
 }
 
-export default Map;
+export default MapPage;

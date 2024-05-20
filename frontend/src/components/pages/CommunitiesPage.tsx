@@ -3,7 +3,7 @@ import TopNavbar from "../structure/TopNavbar";
 import Footer from "../structure/Footer";
 import Title from "../structure/Title";
 
-const Communities : React.FC = () => {
+const CommunitiesPage : React.FC = () => {
   return (
     <div>
       <TopNavbar></TopNavbar>
@@ -14,4 +14,4 @@ const Communities : React.FC = () => {
   )
 }
 
-export default Communities;
+export default CommunitiesPage;

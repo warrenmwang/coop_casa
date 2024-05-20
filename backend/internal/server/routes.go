@@ -223,12 +223,14 @@ func (s *Server) apiLoginHandler(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("token")
 	if err != nil {
 		respondWithError(w, 404, fmt.Errorf("no token in cookie in request: %v", err.Error()))
+		return
 	}
 	tokenString := cookie.Value
 
 	claims, err := s.ValidateTokenAndGetClaims(tokenString)
 	if err != nil {
 		respondWithError(w, 401, err)
+		return
 	}
 
 	type returnValue struct {
@@ -240,12 +242,14 @@ func (s *Server) apiLoginHandler(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		log.Printf("value userId not string: %v\n", userId)
 		respondWithError(w, 401, fmt.Errorf("cannot login with given token, sign in again"))
+		return
 	}
 
 	email, ok := claims["email"].(string)
 	if !ok {
 		log.Printf("value email not string: %v\n", email)
 		respondWithError(w, 401, fmt.Errorf("cannot login with given token, sign in again"))
+		return
 	}
 
 	returnVal := returnValue{

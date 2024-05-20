@@ -3,7 +3,7 @@ import TopNavbar from "../structure/TopNavbar";
 import Footer from "../structure/Footer";
 import Title from "../structure/Title";
 
-const Contact : React.FC = () => {
+const ContactPage : React.FC = () => {
   return (
     <div>
       <TopNavbar></TopNavbar>
@@ -13,4 +13,4 @@ const Contact : React.FC = () => {
   );
 }
 
-export default Contact;
+export default ContactPage;

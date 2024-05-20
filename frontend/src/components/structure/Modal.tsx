@@ -51,8 +51,7 @@ const Modal: React.FC<ModalProps> = ({ onClose, children }) => {
     >
       <div
         ref={modalContentRef}
-        className="modal-content relative top-20 mx-auto p-5 border w-11/12 md:w-2/3 lg:w-1/2 shadow-lg rounded-md bg-white transition-transform durati
-on-200"
+        className="modal-content relative top-20 mx-auto p-5 border w-11/12 md:w-2/3 lg:w-1/2 shadow-lg rounded-md bg-white transition-transform duration-200"
       >
         {children}
         <div className="items-center px-4 py-3">

@@ -7,7 +7,7 @@ import Card from "../structure/Card";
 
 import profileImg from "../../images/profile.jpg"
 
-const Home: React.FC = () => {
+const HomePage: React.FC = () => {
   return (
     <div>
       <TopNavBar></TopNavBar>
@@ -30,4 +30,4 @@ const Home: React.FC = () => {
   );
 }
 
-export default Home; 
+export default HomePage; 

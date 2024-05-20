@@ -4,7 +4,7 @@ import Footer from "../structure/Footer";
 import Title from "../structure/Title";
 import { AuthData } from "../../auth/AuthWrapper";
 
-const AccountSettings : React.FC = () => {
+const AccountSettingsPage : React.FC = () => {
 
   const auth = AuthData();
   const { user } = auth;
@@ -19,4 +19,4 @@ const AccountSettings : React.FC = () => {
   )
 }
 
-export default AccountSettings;
+export default AccountSettingsPage;

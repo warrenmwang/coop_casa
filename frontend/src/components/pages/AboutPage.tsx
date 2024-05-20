@@ -3,7 +3,7 @@ import Footer from "../structure/Footer";
 import TopNavbar from "../structure/TopNavbar";
 import Title from "../structure/Title";
 
-const About : React.FC = () => {
+const AboutPage : React.FC = () => {
   return(
     <div>
       <TopNavbar></TopNavbar>
@@ -17,4 +17,4 @@ const About : React.FC = () => {
   )
 }
 
-export default About;
+export default AboutPage;

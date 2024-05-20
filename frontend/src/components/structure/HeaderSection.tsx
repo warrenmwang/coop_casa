@@ -1,10 +1,10 @@
 import cartoonNeighborhood from "../../images/cartoonNeighborhood.jpg"
 
 const stats = [
-  { name: 'Offices Worldwide', value: '1' },
   { name: 'Individual Ownership', value: '100%' },
   { name: 'Dark Patterns and Hidden Fees', value: '0' },
-  { name: 'Current Active Members', value: '4' },
+  { name: 'Office Worldwide', value: '1'},
+  { name: 'Active Members', value: '4' },
 ]
 
 export default function HeaderSection() {

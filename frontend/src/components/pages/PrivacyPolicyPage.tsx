@@ -3,7 +3,7 @@ import TopNavbar from "../structure/TopNavbar";
 import Footer from "../structure/Footer";
 import Title from "../structure/Title";
 
-const PrivacyPolicy : React.FC = () => {
+const PrivacyPolicyPage : React.FC = () => {
   return(
     <div>
       <TopNavbar></TopNavbar>
@@ -35,4 +35,4 @@ Donec rutrum finibus viverra. Pellentesque et nisi vitae diam pellentesque porta
   )
 }
 
-export default PrivacyPolicy;
+export default PrivacyPolicyPage;

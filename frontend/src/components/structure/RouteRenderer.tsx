@@ -1,18 +1,19 @@
 import React, { useEffect } from "react";
 
-import Home from '../pages/Home';
-import About from '../pages/About';
-import Dashboard from '../pages/Dashboard';
-import Contact from '../pages/Contact';
-import Communities from '../pages/Communities';
-import Map from '../pages/Map';
-import PrivacyPolicy from '../pages/PrivacyPolicy';
-import TermsOfService from '../pages/TermsOfService';
+import HomePage from '../pages/HomePage';
+import AboutPage from '../pages/AboutPage';
+import DashboardPage from '../pages/DashboardPage';
+import ContactPage from '../pages/ContactPage';
+import CommunitiesPage from '../pages/CommunitiesPage';
+import MapPage from '../pages/MapPage';
+import PrivacyPolicyPage from '../pages/PrivacyPolicyPage';
+import TermsOfServicePage from '../pages/TermsOfServicePage';
 
 
 import { AuthData } from '../../auth/AuthWrapper'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import AccountSettings from "../pages/AccountSettings";
+import AccountSettingsPage from "../pages/AccountSettingsPage";
+import AccountSetupPage from "../pages/AccountSetupPage";
 
 const RouteRenderer : React.FC = () => {
 
@@ -29,15 +30,16 @@ const RouteRenderer : React.FC = () => {
   return(
     <Router>
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/communities" element={<Communities />} />
-        <Route path="/map" element={<Map />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-        <Route path="/tos" element={<TermsOfService />} />
-        <Route path="/contact" element={<Contact />} />
-        { authenticated && <Route path="/dashboard" element={<Dashboard />} /> }
-        { authenticated && <Route path="/account-settings" element={<AccountSettings />} /> }
+        <Route path="/" element={<HomePage />} />
+        <Route path="/communities" element={<CommunitiesPage />} />
+        <Route path="/map" element={<MapPage />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+        <Route path="/tos" element={<TermsOfServicePage />} />
+        <Route path="/contact" element={<ContactPage />} />
+        { authenticated && <Route path="/dashboard" element={<DashboardPage />} /> }
+        { authenticated && <Route path="/account-settings" element={<AccountSettingsPage />} /> }
+        { authenticated && <Route path="/account-setup" element={<AccountSetupPage />} /> }
         {/* Catch all route for non-existent routes */}
         {/* <Route path="*" element={<Navigate to="/" replace />} /> */}
       </Routes>
