@@ -1,6 +1,6 @@
-# Project backend
+# Coop.casa Backend
 
-One Paragraph of project description goes here
+REST API that manages user and group information for the coop.casa app. All user data is stored in the database.
 
 ## Getting Started
 
