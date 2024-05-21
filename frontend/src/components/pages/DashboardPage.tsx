@@ -1,6 +1,6 @@
 import React from "react";
 import SearchCommunities from "../structure/SearchCommunities";
-import SearchLocations from "../structure/SearchLocations";
+import SearchProperties from "../structure/SearchProperties";
 import TopNavbar from "../structure/TopNavbar";
 import Footer from "../structure/Footer";
 import Title from "../structure/Title";
@@ -21,8 +21,7 @@ const DashboardPage: React.FC = () => {
       <TopNavbar></TopNavbar>
       <Title title="Dashboard" description={`Welcome ${email}`}></Title>
       {!accountIsSetup && <AccountSetup />}
-      <SearchCommunities></SearchCommunities>
-      <SearchLocations></SearchLocations>
+      { accountIsSetup && <SearchCommunities/> && <SearchProperties/> }
       <Footer></Footer>
     </div>
   )

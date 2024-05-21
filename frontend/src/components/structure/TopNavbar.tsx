@@ -25,6 +25,7 @@ const TopNavbar: React.FC<TopNavBarArgs> = ({ profileImg = defaultProfileImg}) =
   const navigation = [
     ...(authenticated ? [ { name: 'Dashboard', href: '/dashboard', current: false}] : []),
     { name: 'Communities', href: '/communities', current: false },
+    { name: 'Properties', href: '/properties', current: false},
     { name: 'Map', href: '/map', current: false},
   ]
 
