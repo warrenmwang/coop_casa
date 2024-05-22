@@ -1,6 +1,7 @@
 package database
 
 import (
+	"backend/internal/database/sqlc"
 	"context"
 	"database/sql"
 	"fmt"
@@ -17,7 +18,8 @@ type Service interface {
 }
 
 type service struct {
-	db *sql.DB
+	db         *sql.DB
+	db_queries *sqlc.Queries
 }
 
 func New() Service {
@@ -27,12 +29,20 @@ func New() Service {
 	port := os.Getenv("DB_PORT")
 	host := os.Getenv("DB_HOST")
 
+	// Raw sql connection
 	connStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", username, password, host, port, database)
 	db, err := sql.Open("pgx", connStr)
 	if err != nil {
 		log.Fatal(err)
 	}
-	s := &service{db: db}
+
+	// Instantiate the sqlc queries object for querying
+	db_queries := sqlc.New(db)
+
+	s := &service{
+		db:         db,
+		db_queries: db_queries,
+	}
 	return s
 }
 

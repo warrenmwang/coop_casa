@@ -1,72 +1,104 @@
-import React from "react";
+import React, { useState } from "react";
 import Title from "../structure/Title";
 import TopNavbar from "../structure/TopNavbar";
 import Footer from "../structure/Footer";
 
-// TODO: 
-const AccountSetupPage : React.FC = () => {
-  return(
-    <div>
-      <TopNavbar></TopNavbar>
-      <Title title="Account Setup" description="Please provide some information about yourself to be able to use this platform and connect with others!"></Title>
+import { AccountSetupPageFormData } from "../../types/AccountSetup";
+import { accountSetupSubmit } from "../../api/api";
 
-      <form className="w-full max-w-lg block p-1 content-center">
-        <div className="flex flex-wrap -mx-3 mb-6">
-          <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-            <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-first-name">
-              First Name
-            </label>
-            <input className="appearance-none block w-full bg-gray-200 text-gray-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white" id="grid-first-name" type="text" placeholder="Jane"/>
-            <p className="text-red-500 text-xs italic">Please fill out this field.</p>
-          </div>
-          <div className="w-full md:w-1/2 px-3">
-            <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-last-name">
-              Last Name
-            </label>
-            <input className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="grid-last-name" type="text" placeholder="Doe"/>
-          </div>
-        </div>
-        <div className="flex flex-wrap -mx-3 mb-6">
-          <div className="w-full px-3">
-            <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-password">
-              Password
-            </label>
-            <input className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="grid-password" type="password" placeholder="******************"/>
-            <p className="text-gray-600 text-xs italic">Make it as long and as crazy as you'd like</p>
-          </div>
-        </div>
-        <div className="flex flex-wrap -mx-3 mb-2">
-          <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-            <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-city">
-              City
-            </label>
-            <input className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="grid-city" type="text" placeholder="Albuquerque"/>
-          </div>
-          <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-            <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-state">
-              State
-            </label>
-            <div className="relative">
-              <select className="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="grid-state">
-                <option>New Mexico</option>
-                <option>Missouri</option>
-                <option>Texas</option>
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-              </div>
+const interestsOptions = ["Reading", "Traveling", "Cooking", "Swimming", "Gaming", "Sports", "Music", "Art", "Technology"];
+
+const AccountSetupPage: React.FC = () => {
+  const [formData, setFormData] = useState<AccountSetupPageFormData>({
+    firstName: "",
+    lastName: "",
+    birthdate: "",
+    avatar: null,
+    location: "",
+    interests: []
+  });
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { id, value } = e.target;
+    setFormData(prevState => ({
+      ...prevState,
+      [id]: value
+    }));
+  };
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { files } = e.target;
+    if (files && files[0]) {
+      setFormData(prevState => ({
+        ...prevState,
+        avatar: files[0]
+      }));
+    }
+  };
+
+  const handleInterestsChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedOptions = Array.from(e.target.selectedOptions, option => option.value);
+    setFormData(prevState => ({
+      ...prevState,
+      interests: selectedOptions
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    accountSetupSubmit(formData);
+  };
+
+  return (
+    <div>
+      <TopNavbar />
+      <Title title="Account Setup" description="Please provide some information about yourself to be able to use this platform and connect with others!" />
+      <div className="flex justify-center items-center min-h-screen">
+        <form className="w-full max-w-lg block p-1" onSubmit={handleSubmit}>
+          <div className="flex flex-wrap -mx-3 mb-6">
+            <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+              <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="firstName">First Name</label>
+              <input className="appearance-none block w-full bg-gray-200 text-gray-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white" id="firstName" type="text" placeholder="Jane" value={formData.firstName} onChange={handleChange} />
+              <p className="text-red-500 text-xs italic">Please fill out this field.</p>
+            </div>
+            <div className="w-full md:w-1/2 px-3">
+              <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="lastName">Last Name</label>
+              <input className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="lastName" type="text" placeholder="Doe" value={formData.lastName} onChange={handleChange} />
             </div>
           </div>
-          <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-            <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-zip">
-              Zip
-            </label>
-            <input className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="grid-zip" type="text" placeholder="90210"/>
+          <div className="flex flex-wrap -mx-3 mb-6">
+            <div className="w-full px-3">
+              <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="birthdate">Birthdate</label>
+              <input className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="birthdate" type="date" value={formData.birthdate} onChange={handleChange} />
+            </div>
+            <div className="w-full px-3">
+              <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="location">Current Location</label>
+              <input className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="location" type="text" placeholder="City, State" value={formData.location} onChange={handleChange} />
+            </div>
+            <div className="w-full px-3">
+              <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="avatar">Avatar Image</label>
+              <input className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="avatar" type="file" onChange={handleAvatarChange} />
+            </div>
+            <div className="w-full px-3">
+              <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="interests">Interests</label>
+              <select multiple className="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="interests" onChange={handleInterestsChange}>
+                {interestsOptions.map(interest => (
+                  <option key={interest} value={interest}>{interest}</option>
+                ))}
+              </select>
+            </div>
           </div>
-        </div>
-      </form>
-
-      <Footer></Footer>
+          <div className="w-full px-3">
+            <button type="submit" className="bg-blue-500 text-white py-2 px-4 rounded" disabled={isSubmitting}>
+              {isSubmitting ? "Submitting..." : "Submit"}
+            </button>
+          </div>
+        </form>
+      </div>
+      <Footer />
     </div>
   );
 }

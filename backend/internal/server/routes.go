@@ -117,7 +117,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 // ---------------------------------------------------------------
 // handlers
 
-// Endpoint: HOST:PORT/
+// Endpoint: GET HOST:PORT/
 func (s *Server) HelloWorldHandler(w http.ResponseWriter, r *http.Request) {
 	resp := make(map[string]string)
 	resp["message"] = "Hello World"
@@ -130,13 +130,13 @@ func (s *Server) HelloWorldHandler(w http.ResponseWriter, r *http.Request) {
 	_, _ = w.Write(jsonResp)
 }
 
-// Endpoint: HOST:PORT/health
+// Endpoint: GET HOST:PORT/health
 func (s *Server) healthHandler(w http.ResponseWriter, r *http.Request) {
 	jsonResp, _ := json.Marshal(s.db.Health())
 	_, _ = w.Write(jsonResp)
 }
 
-// Endpoint: HOST:PORT/auth/{provider}/callback
+// Endpoint: GET HOST:PORT/auth/{provider}/callback
 func (s *Server) getAuthCallbackHandler(w http.ResponseWriter, r *http.Request) {
 	// Callback function called by the OAuth provider after the user logs in on their page.
 	// Finish auth, create JWT, and save it into a cookie.
@@ -179,7 +179,7 @@ func (s *Server) getAuthCallbackHandler(w http.ResponseWriter, r *http.Request) 
 	http.Redirect(w, r, fmt.Sprintf("%s:%d/dashboard", s.Host, s.FrontendPort), http.StatusFound)
 }
 
-// Endpoint: HOST:PORT/auth/{provider}
+// Endpoint: GET HOST:PORT/auth/{provider}
 func (s *Server) authLoginHandler(w http.ResponseWriter, r *http.Request) {
 	// insert the provider context
 	provider := chi.URLParam(r, "provider")
@@ -194,7 +194,7 @@ func (s *Server) authLoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Endpoint: HOST:PORT/auth/logout/{provider}
+// Endpoint: GET HOST:PORT/auth/logout/{provider}
 func (s *Server) authLogoutHandler(w http.ResponseWriter, r *http.Request) {
 	// Logout endpoint for OAuth
 
@@ -208,7 +208,7 @@ func (s *Server) authLogoutHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusTemporaryRedirect)
 }
 
-// Endpoint: HOST:PORT/api/login
+// Endpoint: GET HOST:PORT/api/login
 func (s *Server) apiLoginHandler(w http.ResponseWriter, r *http.Request) {
 	// API login handler is used to check if the user is logged in
 	// after they have gotten their JWT
@@ -227,6 +227,7 @@ func (s *Server) apiLoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	tokenString := cookie.Value
 
+	// Check if JWT is valid and get claims
 	claims, err := s.ValidateTokenAndGetClaims(tokenString)
 	if err != nil {
 		respondWithError(w, 401, err)
@@ -260,7 +261,7 @@ func (s *Server) apiLoginHandler(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, 200, returnVal)
 }
 
-// Endpoint: HOST:PORT/api/logout
+// Endpoint: GET HOST:PORT/api/logout
 func (s *Server) apiLogoutHandler(w http.ResponseWriter, r *http.Request) {
 	// API logout handler is used to logout the user by expiring their JWT
 	// do that by setting a new token in the http-only cookie with an expiration date

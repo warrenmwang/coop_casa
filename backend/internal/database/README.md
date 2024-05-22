@@ -1,25 +1,31 @@
 # Database README
-## Last Updated: 05/19/2024
+## Last Updated: 05/22/2024
 
 Location for overall design and high-level documentation.
 In-depth documentation will exist as comments for the respective functions.
 
 ## Database Schema
 
+The database schema is written using types from PostgreSQL.
+Most values are self-explanatory, with detailed justification for some fields provided for clarity.
+
 ### Users
-- id: int, primary key
+- id: `serial`, primary key
+    unique integer for primary key logical construct
+- user_id: int
     unique user id, openID from oauth should be unique, check.
 - email: string
-- first name: string
-- last name: string
-- birthdate: string
+- first_name: string
+- last_name: string
+- gender: string
+- birthdate: `timestamp with time zone`
     format MM-DD-YYYY
-- joindate: string
-    format something like MM-DD-YYYY:HH-MM-SS 
+- created_at: `timestamp with time zone`
+    timestamp of when the user first logged in / created their account
 - avatar_img: string
     base64 encoded string
-- locations: string
-    stringified list of locations that they marked as being interested in
+- location: string
+    current location 
 - interests: string
     stringified list of topics of interest that they are marked as things that they
     want to bond over with other people

@@ -1,10 +1,6 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 import { API_HOST, API_PORT } from "../config";
-
-interface User {
-  userId: string;
-  email: string;
-}
+import { User } from "../types/User";
 
 interface AuthContextType {
   user: User;
