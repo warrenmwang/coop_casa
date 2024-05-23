@@ -9,6 +9,8 @@ import (
 	"github.com/markbates/goth"
 	"github.com/markbates/goth/gothic"
 	"github.com/markbates/goth/providers/google"
+
+	_ "github.com/joho/godotenv/autoload"
 )
 
 const MaxAge = 86400 * 30 // 30 days

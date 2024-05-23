@@ -16,8 +16,6 @@ import (
 )
 
 // ---------------------------------------------------------------
-// utility functions that require info from the server type
-// this is an ugly way to organize, but fuck it.
 
 type errorBody struct {
 	Error string `json:"error"`
@@ -28,7 +26,7 @@ type User struct {
 	Email  string
 }
 
-// handles http requests and return json
+// Handles http requests and return json
 func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
@@ -39,15 +37,14 @@ func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 	w.Write(response)
 }
 
-// wrapper for respondWithJSON for sending errors as the interface used to be converted to json
+// Wrapper for respondWithJSON for sending errors as the interface used to be converted to json
 func respondWithError(w http.ResponseWriter, code int, err error) {
 	respondWithJSON(w, code, errorBody{Error: err.Error()})
 	log.Println("responded with err:", err.Error())
 }
 
+// Generates a JWT for a user attempting login
 func (s *Server) GenerateToken(user User, expireTime time.Time) (string, error) {
-	// generate a JWT
-
 	// Define token claims
 	claims := jwt.MapClaims{}
 	claims["authorized"] = true
@@ -115,7 +112,6 @@ func (s *Server) RegisterRoutes() http.Handler {
 }
 
 // ---------------------------------------------------------------
-// handlers
 
 // Endpoint: GET HOST:PORT/
 func (s *Server) HelloWorldHandler(w http.ResponseWriter, r *http.Request) {
@@ -185,7 +181,23 @@ func (s *Server) authLoginHandler(w http.ResponseWriter, r *http.Request) {
 	provider := chi.URLParam(r, "provider")
 	r = r.WithContext(context.WithValue(context.Background(), "provider", provider))
 
+	// TODO: I'm not sure what this is actually doing here?
 	// try to get the user without re-authenticating
+
+	var userTemplate = `
+	<p><a href="/logout/{{.Provider}}">logout</a></p>
+	<p>Name: {{.Name}} [{{.LastName}}, {{.FirstName}}]</p>
+	<p>Email: {{.Email}}</p>
+	<p>NickName: {{.NickName}}</p>
+	<p>Location: {{.Location}}</p>
+	<p>AvatarURL: {{.AvatarURL}} <img src="{{.AvatarURL}}"></p>
+	<p>Description: {{.Description}}</p>
+	<p>UserID: {{.UserID}}</p>
+	<p>AccessToken: {{.AccessToken}}</p>
+	<p>ExpiresAt: {{.ExpiresAt}}</p>
+	<p>RefreshToken: {{.RefreshToken}}</p>
+	`
+
 	if gothUser, err := gothic.CompleteUserAuth(w, r); err == nil {
 		t, _ := template.New("foo").Parse(userTemplate)
 		t.Execute(w, gothUser)
@@ -282,17 +294,3 @@ func (s *Server) apiLogoutHandler(w http.ResponseWriter, r *http.Request) {
 		Secure:   s.IsProd,
 	})
 }
-
-var userTemplate = `
-<p><a href="/logout/{{.Provider}}">logout</a></p>
-<p>Name: {{.Name}} [{{.LastName}}, {{.FirstName}}]</p>
-<p>Email: {{.Email}}</p>
-<p>NickName: {{.NickName}}</p>
-<p>Location: {{.Location}}</p>
-<p>AvatarURL: {{.AvatarURL}} <img src="{{.AvatarURL}}"></p>
-<p>Description: {{.Description}}</p>
-<p>UserID: {{.UserID}}</p>
-<p>AccessToken: {{.AccessToken}}</p>
-<p>ExpiresAt: {{.ExpiresAt}}</p>
-<p>RefreshToken: {{.RefreshToken}}</p>
-`
