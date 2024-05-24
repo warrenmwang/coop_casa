@@ -18,7 +18,6 @@ type Server struct {
 	JwtSignSecret string
 	Host          string
 	IsProd        bool
-	DEBUG         bool
 
 	db database.Service
 }
@@ -28,7 +27,6 @@ func NewServer() *http.Server {
 	frontendPort, _ := strconv.Atoi(os.Getenv("FRONTENDPORT"))
 	jwtSignSecret := os.Getenv("JWT_SIGN_SECRET")
 	IsProd, _ := strconv.ParseBool(os.Getenv("IS_PROD"))
-	DEBUG, _ := strconv.ParseBool(os.Getenv("DEBUG_FLAG"))
 
 	var host string
 	if IsProd {
@@ -43,7 +41,6 @@ func NewServer() *http.Server {
 		JwtSignSecret: jwtSignSecret,
 		Host:          host,
 		IsProd:        IsProd,
-		DEBUG:         DEBUG,
 
 		db: database.New(),
 	}
