@@ -3,7 +3,7 @@ import React from 'react';
 interface CardProps {
   title: string;
   imageUrl: string;
-  description: string;
+  description: React.ReactNode;
   reverse ?: boolean;
 }
 
@@ -17,7 +17,7 @@ const Card: React.FC<CardProps> = ({ title, imageUrl, description, reverse = fal
       </div>
       <div className="flex-grow ml-4">
         <h2 className="text-lg font-bold">{title}</h2>
-        <p className="text-gray-600">{description}</p>
+        {description}
       </div>
     </div>
   );
