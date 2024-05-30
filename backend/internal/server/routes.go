@@ -2,7 +2,9 @@ package server
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -89,11 +91,62 @@ func (s *Server) ValidateTokenAndGetClaims(tokenString string) (jwt.MapClaims, e
 	}
 }
 
+// Returns the userId from the http cookie in the request, if present (if the user is authed)
+// If something goes wrong in here, we should assume a response http code 401 for unauthorized.
+func (s *Server) getAuthedUserId(w http.ResponseWriter, r *http.Request) (string, error) {
+	// Read JWT from HttpOnly Cookie
+	cookie, err := r.Cookie("token")
+	if err != nil {
+		return "", fmt.Errorf("no token in cookie in request: %v", err.Error())
+	}
+	tokenString := cookie.Value
+
+	// Check if JWT is valid and get claims
+	claims, err := s.ValidateTokenAndGetClaims(tokenString)
+	if err != nil {
+		return "", err
+	}
+
+	// Get User ID to insert into the right place in the DB
+	userId, ok := claims["user_id"].(string)
+	if !ok {
+		return "", fmt.Errorf("cannot login with given token, sign in again")
+	}
+
+	return userId, nil
+}
+
+// ---------------------------------------------------------------
+// MIDDLEWARES
+
+func (s *Server) corsMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		origin := fmt.Sprintf("%s:%v", s.Host, s.FrontendPort)
+		log.Printf("Setting Access-Control-Allow-Origin to %s", origin)
+
+		// Set CORS headers
+		w.Header().Set("Access-Control-Allow-Origin", origin)
+
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+		w.Header().Set("Access-Control-Allow-Credentials", "true")
+
+		// Handle cors preflight if method is OPTIONS
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+		// Otherwise pass to the handler
+		next.ServeHTTP(w, r)
+	})
+}
+
 // ---------------------------------------------------------------
 
 func (s *Server) RegisterRoutes() http.Handler {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
+	r.Use(s.corsMiddleware)
 
 	r.Get("/", s.HelloWorldHandler)
 
@@ -108,6 +161,10 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.Get("/api/login", s.apiLoginHandler)
 
 	r.Get("/api/logout", s.apiLogoutHandler)
+
+	r.Get("/api/account/setup", s.apiIsAccountSetupHandler)
+	r.Post("/api/account/setup", s.apiAccountSetupHandler)
+
 	return r
 }
 
@@ -151,11 +208,29 @@ func (s *Server) getAuthCallbackHandler(w http.ResponseWriter, r *http.Request) 
 	// Define token lifetime to be a day
 	expireTime := time.Now().Add(time.Hour * 24)
 
-	// Generate token with user info
+	// Create User struct with identifying user info from OAuth
 	user := User{
 		UserId: gothUser.UserID,
 		Email:  gothUser.Email,
 	}
+
+	// Create new user in DB if this is their first time in the database
+	_, err = s.db.GetUser(user.UserId)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			// this user is not recorded in db, then it is the first time they have logged in to app.
+			// create new user for them
+			_, err = s.db.CreateUser(user.UserId, user.Email)
+			if err != nil {
+				log.Fatalf("Unable to create new user in database with err: %s\n", err.Error())
+			}
+		} else {
+			log.Fatalf("Error in GetUser in oauth callback function: %s\n", err.Error())
+		}
+	}
+	// If err was nil user is already in db, just return with token
+
+	// Generate token with user info
 	tokenSigned, err := s.GenerateToken(user, expireTime)
 	if err != nil {
 		log.Fatalf("Unable to sign token with err: %s\n", err.Error())
@@ -220,16 +295,19 @@ func (s *Server) authLogoutHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusTemporaryRedirect)
 }
 
+/*
+	All handler functions prefixed with `api` should be thought of
+	as "authed" endpoints. They require that the http request being handled
+	to have a JWT that authenticates a user's action.
+
+	Currently (05/25/2024) the only way to receive a valid JWT from the server
+	is to login using the Google OAuth Provider.
+*/
+
 // Endpoint: GET HOST:PORT/api/login
 func (s *Server) apiLoginHandler(w http.ResponseWriter, r *http.Request) {
 	// API login handler is used to check if the user is logged in
 	// after they have gotten their JWT
-
-	// Set CORS headers
-	w.Header().Set("Access-Control-Allow-Origin", fmt.Sprintf("%s:%v", s.Host, s.FrontendPort))
-	w.Header().Set("Access-Control-Allow-Methods", "GET")
-	w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
-	w.Header().Set("Access-Control-Allow-Credentials", "true")
 
 	// Read JWT from HttpOnly Cookie
 	cookie, err := r.Cookie("token")
@@ -279,12 +357,6 @@ func (s *Server) apiLogoutHandler(w http.ResponseWriter, r *http.Request) {
 	// do that by setting a new token in the http-only cookie with an expiration date
 	// in the past.
 
-	// Set CORS headers
-	w.Header().Set("Access-Control-Allow-Origin", fmt.Sprintf("%s:%v", s.Host, s.FrontendPort))
-	w.Header().Set("Access-Control-Allow-Methods", "GET")
-	w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
-	w.Header().Set("Access-Control-Allow-Credentials", "true")
-
 	http.SetCookie(w, &http.Cookie{
 		Name:     "token",
 		Value:    "",
@@ -294,3 +366,98 @@ func (s *Server) apiLogoutHandler(w http.ResponseWriter, r *http.Request) {
 		Secure:   s.IsProd,
 	})
 }
+
+// Endpoint: GET HOST:PORT/api/account/setup
+func (s *Server) apiIsAccountSetupHandler(w http.ResponseWriter, r *http.Request) {
+	// Returns a JSON with the boolean information about if the account is setup or not
+	// true for is setup, false for not setup.
+
+	// Authenticate user and get their userId
+	userId, err := s.getAuthedUserId(w, r)
+	if err != nil {
+		respondWithError(w, 401, err)
+		return
+	}
+
+	userFirstName, err := s.db.GetUserFirstName(userId)
+	if err != nil {
+		respondWithError(w, 500, err)
+		return
+	}
+
+	type returnValue struct {
+		IsSetup bool `json:"isSetup"`
+	}
+
+	returnVal := returnValue{
+		IsSetup: userFirstName.Valid,
+	}
+
+	respondWithJSON(w, 200, returnVal)
+}
+
+// Endpoint: POST HOST:PORT/api/account/setup
+func (s *Server) apiAccountSetupHandler(w http.ResponseWriter, r *http.Request) {
+	// Receive the User account information as a JSON
+	// Destructure into an interface
+	// Encrypt (salt and hash)
+	// Save to DB
+	// Redirect frontend to Dashboard again.
+
+	// Authenticate user and get their userId
+	userId, err := s.getAuthedUserId(w, r)
+	if err != nil {
+		respondWithError(w, 405, err)
+	}
+
+	// Get account information from body
+	type AccountSetupPageForm struct {
+		FirstName string `json:"firstName"`
+		LastName  string `json:"lastName"`
+		BirthDate string `json:"birthDate"`
+		Gender    string `json:"gender"`
+		Avatar    string `json:"avatar"`
+		Location  string `json:"location"`
+		Interests string `json:"interests"`
+	}
+	var formData AccountSetupPageForm
+	err = json.NewDecoder(r.Body).Decode(&formData)
+	if err != nil {
+		respondWithError(w, 400, err)
+		return
+	}
+
+	// Update the user in the DB with the new info
+	err = s.db.UpdateUser(
+		userId,
+		formData.FirstName,
+		formData.LastName,
+		formData.BirthDate,
+		formData.Gender,
+		formData.Location,
+		formData.Interests,
+		formData.Avatar,
+	)
+	if err != nil {
+		respondWithError(w, 500, err)
+		return
+	}
+
+	// Account setup complete, respond with ok
+	w.WriteHeader(200)
+}
+
+// // Endpoint: GET HOST:PORT/api/account
+// func (s *Server) apiAccountHandler(w http.ResponseWriter, r *http.Request) {
+// 	// Returns the user data based on the userId in the auth token
+
+// 	// Authenticate user and get their userId
+// 	userId, err := s.getAuthedUserId(w, r)
+// 	if err != nil {
+// 		respondWithError(w, 405, err)
+// 	}
+
+// 	sqlcUser, err := s.db.GetUser(userId)
+
+// 	// TODO:
+// }

@@ -10,12 +10,13 @@ import (
 
 type User struct {
 	ID        int32
-	UserID    sql.NullInt32
-	Email     sql.NullString
+	UserID    string
+	Email     string
 	FirstName sql.NullString
 	LastName  sql.NullString
 	BirthDate sql.NullTime
 	Gender    sql.NullString
+	Avatar    sql.NullString
 	Location  sql.NullString
 	Interests sql.NullString
 	CreatedAt sql.NullTime
