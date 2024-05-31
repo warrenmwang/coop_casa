@@ -6,6 +6,7 @@ package sqlc
 
 import (
 	"database/sql"
+	"time"
 )
 
 type User struct {
@@ -14,10 +15,16 @@ type User struct {
 	Email     string
 	FirstName sql.NullString
 	LastName  sql.NullString
-	BirthDate sql.NullTime
+	BirthDate sql.NullString
 	Gender    sql.NullString
-	Avatar    sql.NullString
 	Location  sql.NullString
 	Interests sql.NullString
-	CreatedAt sql.NullTime
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}
+
+type UserAvatar struct {
+	ID     int32
+	UserID string
+	Avatar sql.NullString
 }

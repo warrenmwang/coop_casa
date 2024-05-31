@@ -136,7 +136,6 @@ func (s *Server) getAuthedUserId(w http.ResponseWriter, r *http.Request) (string
 func (s *Server) corsMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		origin := fmt.Sprintf("%s:%v", s.Host, s.FrontendPort)
-		log.Printf("Setting Access-Control-Allow-Origin to %s", origin)
 
 		// Set CORS headers
 		w.Header().Set("Access-Control-Allow-Origin", origin)
@@ -236,7 +235,7 @@ func (s *Server) getAuthCallbackHandler(w http.ResponseWriter, r *http.Request) 
 		if errors.Is(err, sql.ErrNoRows) {
 			// this user is not recorded in db, then it is the first time they have logged in to app.
 			// create new user for them
-			_, err = s.db.CreateUser(user.UserId, user.Email)
+			err = s.db.CreateUser(user.UserId, user.Email)
 			if err != nil {
 				log.Fatalf("Unable to create new user in database with err: %s\n", err.Error())
 			}

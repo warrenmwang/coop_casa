@@ -3,10 +3,8 @@ package utils
 import (
 	"crypto/aes"
 	"crypto/cipher"
-	"crypto/rand"
+	"crypto/md5"
 	"encoding/base64"
-	"fmt"
-	"io"
 	"time"
 )
 
@@ -30,17 +28,13 @@ func Encrypt(plaintext, key string) (string, error) {
 		return "", err
 	}
 
-	gcm, err := cipher.NewGCM(block)
-	if err != nil {
-		return "", err
-	}
+	// Use a fixed IV (initialization vector)
+	iv := md5.Sum([]byte(key)) // Using MD5 hash of the key as the IV
+	ciphertext := make([]byte, len(plaintext))
 
-	nonce := make([]byte, gcm.NonceSize())
-	if _, err = io.ReadFull(rand.Reader, nonce); err != nil {
-		return "", err
-	}
+	stream := cipher.NewCFBEncrypter(block, iv[:])
+	stream.XORKeyStream(ciphertext, []byte(plaintext))
 
-	ciphertext := gcm.Seal(nonce, nonce, []byte(plaintext), nil)
 	return base64.StdEncoding.EncodeToString(ciphertext), nil
 }
 
@@ -56,21 +50,12 @@ func Decrypt(ciphertext, key string) (string, error) {
 		return "", err
 	}
 
-	gcm, err := cipher.NewGCM(block)
-	if err != nil {
-		return "", err
-	}
+	// Use the same fixed IV (initialization vector)
+	iv := md5.Sum([]byte(key))
+	plaintext := make([]byte, len(data))
 
-	nonceSize := gcm.NonceSize()
-	if len(data) < nonceSize {
-		return "", fmt.Errorf("ciphertext too short")
-	}
-
-	nonce, ciphertextData := data[:nonceSize], data[nonceSize:]
-	plaintext, err := gcm.Open(nil, nonce, ciphertextData, nil)
-	if err != nil {
-		return "", err
-	}
+	stream := cipher.NewCFBDecrypter(block, iv[:])
+	stream.XORKeyStream(plaintext, data)
 
 	return string(plaintext), nil
 }
