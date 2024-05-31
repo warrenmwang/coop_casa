@@ -66,6 +66,20 @@ func (s *Server) GenerateToken(user User, expireTime time.Time) (string, error) 
 	return tokenString, nil
 }
 
+// Invalidate the token in the browser from the request
+func (s *Server) InvalidateToken(w http.ResponseWriter) {
+	// Expire their JWT by by setting a new token in the http-only cookie with an expiration date
+	// in the past.
+	http.SetCookie(w, &http.Cookie{
+		Name:     "token",
+		Value:    "",
+		Path:     "/",
+		Expires:  time.Unix(0, 0),
+		HttpOnly: true,
+		Secure:   s.IsProd,
+	})
+}
+
 func (s *Server) ValidateTokenAndGetClaims(tokenString string) (jwt.MapClaims, error) {
 	// Gets the JWT and validates it. If valid, return the claims.
 	// Return an error if invalid.
@@ -164,6 +178,8 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 	r.Get("/api/account/setup", s.apiIsAccountSetupHandler)
 	r.Post("/api/account/setup", s.apiAccountSetupHandler)
+
+	r.Delete("/api/account/delete", s.apiDeleteAccountHandler)
 
 	return r
 }
@@ -282,6 +298,7 @@ func (s *Server) authLoginHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // Endpoint: GET HOST:PORT/auth/logout/{provider}
+// TODO: I don't think this is used. Figure out where to use this?
 func (s *Server) authLogoutHandler(w http.ResponseWriter, r *http.Request) {
 	// Logout endpoint for OAuth
 
@@ -353,18 +370,8 @@ func (s *Server) apiLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 // Endpoint: GET HOST:PORT/api/logout
 func (s *Server) apiLogoutHandler(w http.ResponseWriter, r *http.Request) {
-	// API logout handler is used to logout the user by expiring their JWT
-	// do that by setting a new token in the http-only cookie with an expiration date
-	// in the past.
-
-	http.SetCookie(w, &http.Cookie{
-		Name:     "token",
-		Value:    "",
-		Path:     "/",
-		Expires:  time.Unix(0, 0),
-		HttpOnly: true,
-		Secure:   s.IsProd,
-	})
+	// API logout handler is used to logout the user by invalidating their JWT.
+	s.InvalidateToken(w)
 }
 
 // Endpoint: GET HOST:PORT/api/account/setup
@@ -461,3 +468,27 @@ func (s *Server) apiAccountSetupHandler(w http.ResponseWriter, r *http.Request) 
 
 // 	// TODO:
 // }
+
+func (s *Server) apiDeleteAccountHandler(w http.ResponseWriter, r *http.Request) {
+	// Delete a user account given their userId from the token
+
+	// Get userId of current user
+	userId, err := s.getAuthedUserId(w, r)
+	if err != nil {
+		respondWithError(w, 401, err)
+		return
+	}
+
+	// Delete account from database
+	err = s.db.DeleteUser(userId)
+	if err != nil {
+		respondWithError(w, 401, err)
+		return
+	}
+
+	// Invalidate their token
+	s.InvalidateToken(w)
+
+	// Return response ok
+	w.WriteHeader(200)
+}

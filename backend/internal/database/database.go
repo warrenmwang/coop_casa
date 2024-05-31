@@ -20,6 +20,7 @@ type Service interface {
 	GetUser(userId string) (sqlc.User, error)
 	UpdateUser(userId, first_name, last_name, birth_date, gender, location, interests, avatar string) error
 	GetUserFirstName(userId string) (sql.NullString, error)
+	DeleteUser(userId string) error
 }
 
 type service struct {
@@ -157,4 +158,11 @@ func (s *service) UpdateUser(userId, first_name, last_name, birth_date, gender, 
 	}
 
 	return nil
+}
+
+// Attempt to delete user identified by their userId
+func (s *service) DeleteUser(userId string) error {
+	ctx := context.Background()
+	err := s.db_queries.DeleteUser(ctx, userId)
+	return err
 }

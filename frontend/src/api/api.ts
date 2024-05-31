@@ -92,3 +92,28 @@ export const accountSetupSubmit = async ( formData : AccountSetupPageFormData ) 
 
   return returnVal;
 };
+
+// Account Settings
+
+// Delete Account Function
+export const accountDelete = async ( ) : Promise<boolean> => {
+
+  const accountDeleteLink = `${API_HOST}:${API_PORT}/api/account/delete`;
+  var returnVal : boolean = false;
+
+  try {
+    const response = await fetch(accountDeleteLink, {
+      method: "DELETE", 
+      credentials: "include",
+    })
+
+    if (response.ok) {
+      returnVal = true;
+    }
+
+  } catch(error) {
+    alert(`Error during account deletion: ${error}`)
+  }
+
+  return returnVal;
+}
