@@ -1,6 +1,7 @@
 package server
 
 import (
+	"backend/internal/database"
 	"context"
 	"database/sql"
 	"encoding/json"
@@ -98,7 +99,6 @@ func (s *Server) ValidateTokenAndGetClaims(tokenString string) (jwt.MapClaims, e
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		// Token is valid. Access the claims here.
-		// fmt.Printf("Token is valid. User ID: %v, Expires at %v\n", claims["user_id"], claims["exp"])
 		return claims, nil
 	} else {
 		return nil, fmt.Errorf("invalid token")
@@ -171,14 +171,16 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 	r.Get("/auth/logout/{provider}", s.authLogoutHandler)
 
-	r.Get("/api/login", s.apiLoginHandler)
-
 	r.Get("/api/logout", s.apiLogoutHandler)
 
-	r.Get("/api/account/setup", s.apiIsAccountSetupHandler)
-	r.Post("/api/account/setup", s.apiAccountSetupHandler)
+	// get account details
+	r.Get("/api/account", s.apiGetAccountDetailsHandler)
 
-	r.Delete("/api/account/delete", s.apiDeleteAccountHandler)
+	// delete account
+	r.Delete("/api/account", s.apiDeleteAccountHandler)
+
+	// update account details
+	r.Post("/api/account/update", s.apiUpdateAccountDetailsHandler)
 
 	return r
 }
@@ -320,113 +322,77 @@ func (s *Server) authLogoutHandler(w http.ResponseWriter, r *http.Request) {
 	is to login using the Google OAuth Provider.
 */
 
-// Endpoint: GET HOST:PORT/api/login
-func (s *Server) apiLoginHandler(w http.ResponseWriter, r *http.Request) {
-	// API login handler is used to check if the user is logged in
-	// after they have gotten their JWT
-
-	// Read JWT from HttpOnly Cookie
-	cookie, err := r.Cookie("token")
-	if err != nil {
-		respondWithError(w, 404, fmt.Errorf("no token in cookie in request: %v", err.Error()))
-		return
-	}
-	tokenString := cookie.Value
-
-	// Check if JWT is valid and get claims
-	claims, err := s.ValidateTokenAndGetClaims(tokenString)
-	if err != nil {
-		respondWithError(w, 401, err)
-		return
-	}
-
-	type returnValue struct {
-		UserId string `json:"userId"`
-		Email  string `json:"email"`
-	}
-
-	userId, ok := claims["user_id"].(string)
-	if !ok {
-		log.Printf("value userId not string: %v\n", userId)
-		respondWithError(w, 401, fmt.Errorf("cannot login with given token, sign in again"))
-		return
-	}
-
-	email, ok := claims["email"].(string)
-	if !ok {
-		log.Printf("value email not string: %v\n", email)
-		respondWithError(w, 401, fmt.Errorf("cannot login with given token, sign in again"))
-		return
-	}
-
-	returnVal := returnValue{
-		UserId: userId,
-		Email:  email,
-	}
-
-	respondWithJSON(w, 200, returnVal)
-}
-
 // Endpoint: GET HOST:PORT/api/logout
 func (s *Server) apiLogoutHandler(w http.ResponseWriter, r *http.Request) {
 	// API logout handler is used to logout the user by invalidating their JWT.
 	s.InvalidateToken(w)
 }
 
-// Endpoint: GET HOST:PORT/api/account/setup
-func (s *Server) apiIsAccountSetupHandler(w http.ResponseWriter, r *http.Request) {
-	// Returns a JSON with the boolean information about if the account is setup or not
-	// true for is setup, false for not setup.
-
-	// Authenticate user and get their userId
-	userId, err := s.getAuthedUserId(w, r)
-	if err != nil {
-		respondWithError(w, 401, err)
-		return
-	}
-
-	userFirstName, err := s.db.GetUserFirstName(userId)
-	if err != nil {
-		respondWithError(w, 500, err)
-		return
-	}
-
-	type returnValue struct {
-		IsSetup bool `json:"isSetup"`
-	}
-
-	returnVal := returnValue{
-		IsSetup: userFirstName.Valid,
-	}
-
-	respondWithJSON(w, 200, returnVal)
-}
-
-// Endpoint: POST HOST:PORT/api/account/setup
-func (s *Server) apiAccountSetupHandler(w http.ResponseWriter, r *http.Request) {
-	// Receive the User account information as a JSON
-	// Destructure into an interface
-	// Encrypt (salt and hash)
-	// Save to DB
-	// Redirect frontend to Dashboard again.
+// Endpoint: GET HOST:PORT/api/account
+func (s *Server) apiGetAccountDetailsHandler(w http.ResponseWriter, r *http.Request) {
+	// Returns the user data based on the userId in the auth token
 
 	// Authenticate user and get their userId
 	userId, err := s.getAuthedUserId(w, r)
 	if err != nil {
 		respondWithError(w, 405, err)
+		return
 	}
 
-	// Get account information from body
-	type AccountSetupPageForm struct {
-		FirstName string `json:"firstName"`
-		LastName  string `json:"lastName"`
-		BirthDate string `json:"birthDate"`
-		Gender    string `json:"gender"`
-		Avatar    string `json:"avatar"`
-		Location  string `json:"location"`
-		Interests string `json:"interests"`
+	// Get user account details
+	/*
+		type User struct {
+			ID        int32
+			UserID    string
+			Email     string
+			FirstName sql.NullString
+			LastName  sql.NullString
+			BirthDate sql.NullString
+			Gender    sql.NullString
+			Location  sql.NullString
+			Interests sql.NullString
+			CreatedAt time.Time
+			UpdatedAt time.Time
+		}
+	*/
+	userDetails, err := s.db.GetUser(userId)
+	if err != nil {
+		respondWithError(w, 405, err)
+		return
 	}
-	var formData AccountSetupPageForm
+
+	// Get user avatar image
+	userAvatar, err := s.db.GetUserAvatar(userId)
+	if err != nil {
+		respondWithError(w, 405, err)
+		return
+	}
+
+	// Return user details and user avatar in a json
+	respondWithJSON(w, 200, database.User_New{
+		UserID:    userDetails.UserID,
+		Email:     userDetails.Email,
+		FirstName: userDetails.FirstName.String,
+		LastName:  userDetails.LastName.String,
+		BirthDate: userDetails.BirthDate.String,
+		Gender:    userDetails.Gender.String,
+		Location:  userDetails.Location.String,
+		Interests: userDetails.Interests.String,
+		Avatar:    userAvatar,
+	})
+}
+
+// Endpoint: POST HOST:PORT/api/account/update
+func (s *Server) apiUpdateAccountDetailsHandler(w http.ResponseWriter, r *http.Request) {
+	// Authenticate user
+	_, err := s.getAuthedUserId(w, r)
+	if err != nil {
+		respondWithError(w, 405, err)
+		return
+	}
+
+	// Update the user account with the given details
+	var formData database.User_New
 	err = json.NewDecoder(r.Body).Decode(&formData)
 	if err != nil {
 		respondWithError(w, 400, err)
@@ -434,16 +400,7 @@ func (s *Server) apiAccountSetupHandler(w http.ResponseWriter, r *http.Request) 
 	}
 
 	// Update the user in the DB with the new info
-	err = s.db.UpdateUser(
-		userId,
-		formData.FirstName,
-		formData.LastName,
-		formData.BirthDate,
-		formData.Gender,
-		formData.Location,
-		formData.Interests,
-		formData.Avatar,
-	)
+	err = s.db.UpdateUser(formData)
 	if err != nil {
 		respondWithError(w, 500, err)
 		return
@@ -453,21 +410,7 @@ func (s *Server) apiAccountSetupHandler(w http.ResponseWriter, r *http.Request) 
 	w.WriteHeader(200)
 }
 
-// // Endpoint: GET HOST:PORT/api/account
-// func (s *Server) apiAccountHandler(w http.ResponseWriter, r *http.Request) {
-// 	// Returns the user data based on the userId in the auth token
-
-// 	// Authenticate user and get their userId
-// 	userId, err := s.getAuthedUserId(w, r)
-// 	if err != nil {
-// 		respondWithError(w, 405, err)
-// 	}
-
-// 	sqlcUser, err := s.db.GetUser(userId)
-
-// 	// TODO:
-// }
-
+// Endpoint: DELETE HOST:PORT/api/account
 func (s *Server) apiDeleteAccountHandler(w http.ResponseWriter, r *http.Request) {
 	// Delete a user account given their userId from the token
 

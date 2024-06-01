@@ -21,11 +21,23 @@ import (
 	_ "github.com/joho/godotenv/autoload"
 )
 
+type User_New struct {
+	UserID    string `json:"userId"`
+	Email     string `json:"email"`
+	FirstName string `json:"firstName"`
+	LastName  string `json:"lastName"`
+	BirthDate string `json:"birthDate"`
+	Gender    string `json:"gender"`
+	Location  string `json:"location"`
+	Interests string `json:"interests"`
+	Avatar    string `json:"avatar"`
+}
+
 type Service interface {
 	Health() map[string]string
 	CreateUser(userId, email string) error
 	GetUser(userId string) (sqlc.User, error)
-	UpdateUser(userId, first_name, last_name, birth_date, gender, location, interests, avatar string) error
+	UpdateUser(updatedUserData User_New) error
 	GetUserFirstName(userId string) (sql.NullString, error)
 	DeleteUser(userId string) error
 	GetUserAvatar(userId string) (string, error)
@@ -276,8 +288,17 @@ func (s *service) GetUserFirstName(userId string) (sql.NullString, error) {
 	return userFirstName_decrypted, nil
 }
 
-func (s *service) UpdateUser(userId, first_name, last_name, birth_date, gender, location, interests, avatar string) error {
+func (s *service) UpdateUser(updatedUserData User_New) error {
 	ctx := context.Background()
+
+	userId := updatedUserData.UserID
+	first_name := updatedUserData.FirstName
+	last_name := updatedUserData.LastName
+	birth_date := updatedUserData.BirthDate
+	gender := updatedUserData.Gender
+	location := updatedUserData.Location
+	interests := updatedUserData.Interests
+	avatar := updatedUserData.Avatar
 
 	// Encrypt all user information
 	userId_encrypted, err := s.encryptString(userId)
@@ -350,6 +371,20 @@ func (s *service) UpdateUser(userId, first_name, last_name, birth_date, gender, 
 // Attempt to delete user identified by their userId
 func (s *service) DeleteUser(userId string) error {
 	ctx := context.Background()
-	err := s.db_queries.DeleteUser(ctx, userId)
+
+	// Encrypt user id
+	userId_encrypted, err := s.encryptString(userId)
+	if err != nil {
+		return err
+	}
+
+	// Delete the user with the matching encrypyted id
+	err = s.db_queries.DeleteUser(ctx, userId_encrypted)
+	if err != nil {
+		return err
+	}
+
+	// Delete the user's avatar with the matching encrypted id
+	err = s.db_queries.DeleteUserAvatar(ctx, userId_encrypted)
 	return err
 }

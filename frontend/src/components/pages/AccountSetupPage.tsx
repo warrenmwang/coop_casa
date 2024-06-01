@@ -4,8 +4,10 @@ import Title from "../structure/Title";
 import TopNavbar from "../structure/TopNavbar";
 import Footer from "../structure/Footer";
 
-import { AccountSetupPageFormData } from "../../types/AccountSetup";
-import { accountSetupSubmit } from "../../api/api";
+import { fileToBase64 } from "../../utils/utils";
+import { User } from "../../types/User";
+import { updateUserAccountDetails } from "../../api/api";
+import { AuthData } from "../../auth/AuthWrapper";
 
 const interestsOptions = ["Reading", 
                           "Traveling", 
@@ -23,18 +25,13 @@ const interestsOptions = ["Reading",
                           "Dance"];
 
 const AccountSetupPage: React.FC = () => {
+  const auth = AuthData();
+  const { user, setUser } = auth;
+
   const navigate = useNavigate();
 
   // Define the form data state to store user input
-  const [formData, setFormData] = useState<AccountSetupPageFormData>({
-    firstName: "",
-    lastName: "",
-    birthdate: "",
-    gender: "",
-    avatar: null,
-    location: "",
-    interests: []
-  });
+  const [formData, setFormData] = useState<User>(user);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setMyMap] = useState<Map<string, boolean>>(new Map<string, boolean>()); // if any key value in errors is true, then there is a problem.
@@ -61,28 +58,30 @@ const AccountSetupPage: React.FC = () => {
     setError(id, false);
   };
 
-  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = e.target;
     if (files && files[0]) {
       const file = files[0];
       const validImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/bmp', 'image/webp'];
+      const maxFileSize = 5 * 1024 * 1024; // 5 MB
 
-      // Check file is not too large (5 Mb)
+      // Check file size
+      if (file.size > maxFileSize) {
+        alert('File size should not exceed 5 MB.');
+        e.target.value = ''; // Clear the input value to allow re-upload
+        return;
+      }
 
       // Check file format is valid
       if (validImageTypes.includes(file.type)) {
         // File is valid, save data and update errors
+        const avatarBase64 = await fileToBase64(file)
         setFormData(prevState => ({
           ...prevState,
-          avatar: file
+          avatar: avatarBase64
         }));
         setError("avatar", false);
       } else {
-        // File is invalid, invalidate user input update error and make an alert to user
-        setFormData(prevState => ({
-          ...prevState,
-          avatar: null
-        }));
         setError("avatar", true);
         alert('Please upload a valid image file (JPEG, PNG, GIF, BMP, or WEBP).');
         e.target.value = ''; // Clear the input value to allow re-upload
@@ -94,12 +93,18 @@ const AccountSetupPage: React.FC = () => {
     // Add a selected interest to the selectedInterests list state
     const { value, checked } = e.target;
 
-    let updatedInterests : string[];
+    // Start with current interests
+    let updatedInterests : string = formData.interests;
 
     if (checked) {
-      updatedInterests = [...formData.interests, value];
+      // Append the new value to the current interests in format: 
+      // interest1, interest2, interest3
+      // so only commas inbetween values with no trailing comma
+      updatedInterests = `${updatedInterests},${value}`
     } else {
-      updatedInterests = formData.interests.filter(oldValues => oldValues !== value);
+      // Remove the unchecked interest from the interests string
+      const interestsArray = updatedInterests.split(',').filter(interest => interest !== value)
+      updatedInterests = interestsArray.join(',')
     }
 
     setFormData(prevState => ({
@@ -111,28 +116,34 @@ const AccountSetupPage: React.FC = () => {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    // Prevent the default form submission behavior
     e.preventDefault();
 
-    // Don't submit if there are any errors
-    let incompleteFlag = false;
-    errors.forEach((value, key) => {
-      if (value) {
-        incompleteFlag = true;
-      }
-    });
-
-    if (incompleteFlag) {
-      // User has not filled out all required fields
+    // Check for errors
+    const hasErrors = Array.from(errors.values()).some(value => value);
+    if (hasErrors) {
       alert("Fill out required fields.");
-    } else {
-      // User has filled out all required fields
-      // Set submitting state true, then call submit function to hit api, then await backend to redirect
-      setIsSubmitting(true);
-      var status = await accountSetupSubmit(formData);
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Save data into the Auth context user
+      setUser(formData);
+
+      // Save user data into the backend
+      const status = await updateUserAccountDetails(formData);
       if (status) {
-        navigate("/dashboard")
+        navigate("/dashboard");
+        // window.location.reload();
+      } else {
+        alert("Unable to setup account, please try again.");
       }
+    } catch (error) {
+      console.error("Error during form submission:", error);
+      alert("An error occurred. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -186,15 +197,15 @@ const AccountSetupPage: React.FC = () => {
             <div className="w-full px-3">
               <label
                 className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-                htmlFor="birthdate"
+                htmlFor="birthDate"
               >
                 Birthdate <span className="text-red-500">*</span>
               </label>
               <input 
                 className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
-                id="birthdate"
+                id="birthDate"
                 type="date"
-                value={formData.birthdate}
+                value={formData.birthDate}
                 onChange={handleChange}
                 required
               />

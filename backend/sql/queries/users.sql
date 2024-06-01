@@ -39,3 +39,6 @@ WHERE user_id = $1;
 
 -- name: DeleteUser :exec
 DELETE FROM users WHERE user_id = $1;
+
+-- name: DeleteUserAvatar :exec
+DELETE FROM user_avatars WHERE user_id = $1;

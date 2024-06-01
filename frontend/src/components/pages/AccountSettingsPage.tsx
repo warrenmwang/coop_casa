@@ -1,81 +1,108 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import TopNavbar from "../structure/TopNavbar";
 import Footer from "../structure/Footer";
 import Title from "../structure/Title";
 import Modal from "../structure/Modal";
-import { AuthData } from "../../auth/AuthWrapper";
-import { accountDelete } from "../../api/api";
+import AccountSettingsForm from "../structure/AccountSettingsForm";
+import { AuthData, EmptyUser } from "../../auth/AuthWrapper";
+import { accountDelete, getUserAccountDetails } from "../../api/api";
 import { useNavigate } from "react-router-dom";
 
 const AccountSettingsPage : React.FC = () => {
 
   const auth = AuthData();
-  const { user } = auth;
-  const email = user.email;
+  const { user, setUser } = auth;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleDeleteAccount = async () => {
+
+    // Clear the user data in the auth context
+    setUser(EmptyUser)
+
     try {
       // Ping backend
-      await accountDelete();
-      // Redirect to home after account deletion
-      navigate("/");
-      // Refresh window
-      window.location.reload();
+      const ok = await accountDelete();
+      if (!ok) {
+        // Account was not deleted for some reason
+        alert("Error in deleting account. Try again.")
+      } else {
+        // Redirect to home after account deletion
+        navigate("/");
+        // Refresh window
+        window.location.reload();
+      }
     } catch (error) {
       console.error("Failed to delete account:", error);
     }
   };
 
+  useEffect(() => {
+    const foo = async () => {
+      try {
+        // Get the user account information
+        const userDetails = await getUserAccountDetails()
+        if (userDetails !== undefined) {
+          // Save user details in auth context to be usable in all parts of application
+          setUser(userDetails)
+        } else {
+          throw new Error("user details is undefined")
+        }
+      } catch (error) {
+        alert( error )
+      }
+    }
+    foo();
+  }, []) // call once at page render
+
   return(
     <div>
       <TopNavbar></TopNavbar>
-        <Title title="Account Settings" description={`Settings for account with email: ${email}`}></Title>
+        <Title title="Account Settings" description="All your account information in one place."></Title>
 
-        {/* Show current user details, allowing them to change values here */}
+        <div className="justify-center items-center mx-auto">
+          <AccountSettingsForm user={user} setUser={setUser} />
 
-        {/* Save changes button */}
+          {/* Danger Zone Warning */}
 
-        {/* Danger Zone Warning */}
-
-        {/* Account Deletion Option */}
-        {/* Should prompt the user with a popup to confirm that they want to really delete their account, and another button
-            to let them confirm or cancel operation.
-        */}
-        <div className="mt-8 p-4 border-t border-red-500">
-          <h2 className="text-xl font-bold text-red-600">Danger Zone</h2>
-          <p className="text-red-600">Deleting your account is irreversible. Please be certain.</p>
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-          >
-            Delete Account
-          </button>
-        </div>
-
-        {/* Account Deletion Confirmation Modal */}
-        <Modal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          title="Confirm Account Deletion"
-        >
-          <p>Are you sure you want to delete your account? This action cannot be undone.</p>
-          <div className="mt-4">
+          {/* Account Deletion Option */}
+          {/* Should prompt the user with a popup to confirm that they want to really delete their account, and another button
+              to let them confirm or cancel operation.
+          */}
+          <div className="mt-8 p-4 border-t border-red-500">
+            <h2 className="text-xl font-bold text-red-600">Danger Zone</h2>
+            <p className="text-red-600">Deleting your account is irreversible. Please be certain.</p>
             <button
-              onClick={handleDeleteAccount}
-              className="mr-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+              onClick={() => setIsModalOpen(true)}
+              className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
             >
-              Confirm
-            </button>
-            <button
-              onClick={() => setIsModalOpen(false)}
-              className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-            >
-              Cancel
+              Delete Account
             </button>
           </div>
-        </Modal>
+
+          {/* Account Deletion Confirmation Modal */}
+          <Modal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            title="Confirm Account Deletion"
+          >
+            <p>Are you sure you want to delete your account? This action cannot be undone.</p>
+            <div className="mt-4">
+              <button
+                onClick={handleDeleteAccount}
+                className="mr-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+              >
+                Confirm
+              </button>
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+              >
+                Cancel
+              </button>
+            </div>
+          </Modal>
+        </div>
 
       <Footer></Footer>
     </div>

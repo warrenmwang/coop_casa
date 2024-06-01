@@ -5,22 +5,29 @@ import { User } from "../types/User";
 interface AuthContextType {
   user: User;
   authenticated: boolean;
-  accountIsSetup: boolean;
   login: () => Promise<void>;
   logout: () => Promise<void>;
-  setAccountIsSetup: React.Dispatch<React.SetStateAction<boolean>>;
+  setUser: React.Dispatch<React.SetStateAction<User>>;
+}
+
+export const EmptyUser : User = {
+  userId: '',
+  email: '',
+  firstName: '',
+  lastName: '',
+  birthDate: '',
+  gender: '',
+  location: '',
+  interests: '',
+  avatar: ''
 }
 
 const AuthContext = createContext<AuthContextType>({
-  user: {
-    userId: '',
-    email: ''
-  },
+  user: EmptyUser,
   authenticated: false,
-  accountIsSetup: false,
   login: () => Promise.resolve(), 
   logout: () => Promise.resolve(),
-  setAccountIsSetup: () => {},
+  setUser: () => {}
 })
 
 export const AuthData = () => useContext(AuthContext)
@@ -28,30 +35,38 @@ export const AuthData = () => useContext(AuthContext)
 // wrapper to provide the auth state context throughout all components
 const AuthWrapper: React.FC<{children: ReactNode}> = ({ children }) => {
 
-  const [ user, setUser ] = useState({userId: '', email: ''})
+  const [ user, setUser ] = useState({
+    userId: '',
+    email: '',
+    firstName: '',
+    lastName: '',
+    birthDate: '',
+    gender: '',
+    location: '',
+    interests: '',
+    avatar: ''
+  })
   const [ authenticated, setAuthenticated ] = useState(false)
-  const [ accountIsSetup, setAccountIsSetup ] = useState(false)
 
   // login the user
   const login = async () => {
 
-    const apiLoginLink = `${API_HOST}:${API_PORT}/api/login`
+    const link = `${API_HOST}:${API_PORT}/api/account`
     
     try {
       // try to login with the token in browser
-      const response = await fetch(apiLoginLink, {
+      const response = await fetch(link, {
         method: 'GET', 
         credentials: 'include', // include the HTTP-only cookie
       });
 
       if (response.ok) {
-        const data = await response.json();
+        const data = (await response.json()) as User;
 
-        // set user 
-        setUser({
-          userId: data.userId,
-          email: data.email
-        });
+        // Set user 
+        setUser(data)
+
+        console.log(data)
 
         // set authenticated
         setAuthenticated(true);
@@ -71,6 +86,10 @@ const AuthWrapper: React.FC<{children: ReactNode}> = ({ children }) => {
 
   // hit the logout api endpoint
   const logout = async () => {
+    // Clear the auth context user data
+    setUser(EmptyUser)
+
+    // Logout the user in the api backend as well
     try {
       const response = await fetch(`${API_HOST}:${API_PORT}/api/logout`, {
         method: 'GET', 
@@ -90,7 +109,7 @@ const AuthWrapper: React.FC<{children: ReactNode}> = ({ children }) => {
   }
 
   return(
-    <AuthContext.Provider value={{user, authenticated, accountIsSetup, login, logout, setAccountIsSetup}}>
+    <AuthContext.Provider value={{user, authenticated,login, logout, setUser}}>
       {children}
     </AuthContext.Provider>
   )
