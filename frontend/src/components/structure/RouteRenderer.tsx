@@ -16,6 +16,7 @@ import AccountSettingsPage from "../pages/AccountSettingsPage";
 import AccountSetupPage from "../pages/AccountSetupPage";
 import PropertiesPage from "../pages/PropertiesPage";
 import TextSkeleton from "./TextSkeleton";
+import AttributionsPage from "../pages/AttributionsPage";
 
 const RouteRenderer : React.FC = () => {
 
@@ -45,6 +46,7 @@ const RouteRenderer : React.FC = () => {
         <Route path="/about" element={<AboutPage />} />
         <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
         <Route path="/tos" element={<TermsOfServicePage />} />
+        <Route path="/attributions" element={<AttributionsPage />} />
         <Route path="/contact" element={<ContactPage />} />
         { authenticated ? (
           <>

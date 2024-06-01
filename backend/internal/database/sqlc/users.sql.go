@@ -86,18 +86,6 @@ func (q *Queries) GetUserAvatar(ctx context.Context, userID string) (sql.NullStr
 	return avatar, err
 }
 
-const getUserFirstName = `-- name: GetUserFirstName :one
-SELECT first_name FROM users
-WHERE user_id = $1
-`
-
-func (q *Queries) GetUserFirstName(ctx context.Context, userID string) (sql.NullString, error) {
-	row := q.db.QueryRowContext(ctx, getUserFirstName, userID)
-	var first_name sql.NullString
-	err := row.Scan(&first_name)
-	return first_name, err
-}
-
 const updateUser = `-- name: UpdateUser :exec
 UPDATE users
 SET 

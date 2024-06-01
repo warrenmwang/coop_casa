@@ -66,8 +66,6 @@ const AuthWrapper: React.FC<{children: ReactNode}> = ({ children }) => {
         // Set user 
         setUser(data)
 
-        console.log(data)
-
         // set authenticated
         setAuthenticated(true);
 

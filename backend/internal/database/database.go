@@ -38,7 +38,6 @@ type Service interface {
 	CreateUser(userId, email string) error
 	GetUser(userId string) (sqlc.User, error)
 	UpdateUser(updatedUserData User_New) error
-	GetUserFirstName(userId string) (sql.NullString, error)
 	DeleteUser(userId string) error
 	GetUserAvatar(userId string) (string, error)
 }
@@ -259,33 +258,6 @@ func (s *service) GetUserAvatar(userId string) (string, error) {
 
 	// Return decrypted user's avatar image (base64 encoded string)
 	return avatar_decrypted.String, nil
-}
-
-func (s *service) GetUserFirstName(userId string) (sql.NullString, error) {
-	// Get the user's first_name by the user Id if they exist, if not return with error
-	ctx := context.Background()
-
-	// Encrypt userId
-	userId_encrypted, err := s.encryptString(userId)
-	if err != nil {
-		return sql.NullString{}, err
-	}
-
-	// Search using the userId id to see if user has their first name set (means they have gone through
-	// the setup process before)
-	userFirstName_encrypted, err := s.db_queries.GetUserFirstName(ctx, userId_encrypted)
-	if err != nil {
-		return sql.NullString{}, err
-	}
-
-	// Decrypt data
-	userFirstName_decrypted, err := s.decryptNullString(userFirstName_encrypted)
-	if err != nil {
-		return sql.NullString{}, err
-	}
-
-	// Return decrypted user's first name
-	return userFirstName_decrypted, nil
 }
 
 func (s *service) UpdateUser(updatedUserData User_New) error {

@@ -18,6 +18,9 @@ const Footer : React.FC = () => {
                 <Link to="/tos" className="hover:underline me-4 md:me-6">Terms of Service</Link>
             </li>
             <li>
+                <Link to="/attributions" className="hover:underline me-4 md:me-6">Attributions</Link>
+            </li>
+            <li>
                 <Link to="/contact" className="hover:underline">Contact</Link>
             </li>
         </ul>

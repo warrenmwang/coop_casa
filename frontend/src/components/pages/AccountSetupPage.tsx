@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import Autosuggest from 'react-autosuggest';
 import Title from "../structure/Title";
 import TopNavbar from "../structure/TopNavbar";
 import Footer from "../structure/Footer";
 
+import { MAX_TEXT_INPUT_LENGTH, validateUserAvatarInput, validateUserTextInput } from "../../utils/inputValidation";
 import { fileToBase64 } from "../../utils/utils";
 import { User } from "../../types/User";
 import { updateUserAccountDetails } from "../../api/api";
@@ -25,32 +27,76 @@ const interestsOptions = ["Reading",
                           "Dance"];
 
 const AccountSetupPage: React.FC = () => {
-  const auth = AuthData();
-  const { user, setUser } = auth;
+  const auth = AuthData()
+  const { user, setUser } = auth
 
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   // Define the form data state to store user input
-  const [formData, setFormData] = useState<User>(user);
+  const [formData, setFormData] = useState<User>(user)
+  const [suggestions, setSuggestions] = useState<{ city: string; state: string; }[]>([])
+  const [locations, setLocations] = useState<{ city: string; state: string }[]>([])
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setMyMap] = useState<Map<string, boolean>>(new Map<string, boolean>()); // if any key value in errors is true, then there is a problem.
 
   const setError = (key: string, value: boolean) => {
     setMyMap(prevMap => {
-      const newMap = new Map(prevMap);
-      newMap.set(key, value);
-      return newMap;
+      const newMap = new Map(prevMap)
+      newMap.set(key, value)
+      return newMap
     })
   }
 
   // Set interests error to true at first render
   useEffect(() => {
     setError("interests", true);
-  }, []);
+  }, [])
 
+  // ------- For location suggestions -------
+  // Fetch the json data for the us cities for auto suggestions in the location input
+  useEffect(() => {
+    fetch('/data/us_cities.json')
+      .then(response => response.json())
+      .then(data => setLocations(data))
+      .catch(error => console.error('Error fetching city data:', error))
+  }, [])
+
+  // Function to get suggestions based on input value
+  const getSuggestions = (value: string) => {
+    const inputValue = value.trim().toLowerCase();
+    const inputLength = inputValue.length;
+
+    return inputLength === 0
+      ? []
+      : locations.filter(
+          loc =>
+            loc.city.toLowerCase().slice(0, inputLength) === inputValue ||
+            loc.state.toLowerCase().slice(0, inputLength) === inputValue
+        );
+  };
+
+  // Function to get suggestion value
+  const getSuggestionValue = (suggestion: { city: string; state: string }) =>
+    `${suggestion.city}, ${suggestion.state}`;
+
+  // Function to render suggestions
+  const renderSuggestion = (suggestion: { city: string; state: string }) => (
+    <div>
+      {suggestion.city}, {suggestion.state}
+    </div>
+  );
+  // ------- For location suggestions -------
+
+  // Handles changes for text fields
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { id, value } = e.target;
+
+    // Validate user input, if not valid break
+    if (!validateUserTextInput(id, value)) {
+      return 
+    }
+
     setFormData(prevState => ({
       ...prevState,
       [id]: value
@@ -58,36 +104,44 @@ const AccountSetupPage: React.FC = () => {
     setError(id, false);
   };
 
+  const handleLocationChange = (event: React.FormEvent<HTMLElement>, { newValue }: { newValue: string }) => {
+    const target = event.target as HTMLInputElement
+    setFormData(prevState => ({
+      ...prevState,
+      location: newValue
+    }));
+    setError(target.id, false);
+  };
+
+  const onSuggestionsFetchRequested = ({ value }: { value: string }) => {
+    setSuggestions(getSuggestions(value));
+  };
+
+  const onSuggestionsClearRequested = () => {
+    setSuggestions([]);
+  };
+
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = e.target;
     if (files && files[0]) {
       const file = files[0];
-      const validImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/bmp', 'image/webp'];
-      const maxFileSize = 5 * 1024 * 1024; // 5 MB
 
-      // Check file size
-      if (file.size > maxFileSize) {
-        alert('File size should not exceed 5 MB.');
-        e.target.value = ''; // Clear the input value to allow re-upload
-        return;
-      }
-
-      // Check file format is valid
-      if (validImageTypes.includes(file.type)) {
-        // File is valid, save data and update errors
-        const avatarBase64 = await fileToBase64(file)
-        setFormData(prevState => ({
-          ...prevState,
-          avatar: avatarBase64
-        }));
-        setError("avatar", false);
-      } else {
+      // Validate avatar image upload
+      if (!validateUserAvatarInput(file)) {
         setError("avatar", true);
-        alert('Please upload a valid image file (JPEG, PNG, GIF, BMP, or WEBP).');
+        alert('Please upload a valid image file (JPEG, PNG, or GIF).');
         e.target.value = ''; // Clear the input value to allow re-upload
       }
+
+      // Save validated avatar upload
+      const avatarBase64 = await fileToBase64(file)
+      setFormData(prevState => ({
+        ...prevState,
+        avatar: avatarBase64
+      }));
+      setError("avatar", false);
     }
-  };
+  }
 
   const handleInterestsChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     // Add a selected interest to the selectedInterests list state
@@ -153,6 +207,7 @@ const AccountSetupPage: React.FC = () => {
       <Title title="Account Setup" description="Please provide some information about yourself to be able to use this platform and connect with others!" />
       <div className="flex justify-center items-center min-h-full">
         <form className="w-full max-w-lg block p-1" onSubmit={handleSubmit}>
+          {/* First and Last Name */}
           <div className="flex flex-wrap -mx-3 mb-6">
             {/* First Name */}
             <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
@@ -169,6 +224,7 @@ const AccountSetupPage: React.FC = () => {
                 placeholder="Jane"
                 value={formData.firstName}
                 onChange={handleChange}
+                maxLength={MAX_TEXT_INPUT_LENGTH}
                 required
               />
             </div>
@@ -187,6 +243,7 @@ const AccountSetupPage: React.FC = () => {
                 placeholder="Doe"
                 value={formData.lastName}
                 onChange={handleChange}
+                maxLength={MAX_TEXT_INPUT_LENGTH}
                 required
               />
             </div>
@@ -245,20 +302,36 @@ const AccountSetupPage: React.FC = () => {
               >
                 Location <span className="text-red-500">*</span>
               </label>
-              <input
-                className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
-                id="location"
-                type="text"
-                placeholder="City, State"
-                value={formData.location}
-                onChange={handleChange}
-                required
+              <Autosuggest
+                suggestions={suggestions}
+                onSuggestionsFetchRequested={onSuggestionsFetchRequested}
+                onSuggestionsClearRequested={onSuggestionsClearRequested}
+                getSuggestionValue={getSuggestionValue}
+                renderSuggestion={renderSuggestion}
+                inputProps={{
+                  id: 'location',
+                  placeholder: 'City, State',
+                  value: formData.location,
+                  onChange: handleLocationChange,
+                  className: 'appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white',
+                  required: true
+                }}
               />
             </div>
 
             {/* Avatar Image */}
             <div className="w-full px-3">
-              <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="avatar">Avatar Image</label>
+              <label
+                className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
+                htmlFor="avatar"
+              >
+                Avatar Image
+              </label>
+              {formData.avatar && (
+                <div className="mb-3">
+                  <img src={formData.avatar} alt="Avatar" className="w-32 h-32 rounded-full object-cover" />
+                </div>
+              )}
               <input 
                 className="appearance-none block w-full bg-gray-200 text-gray-700 border 'border-gray-200' rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
                 id="avatar"

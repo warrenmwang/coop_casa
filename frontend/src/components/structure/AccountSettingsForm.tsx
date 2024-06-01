@@ -13,50 +13,50 @@ const AccountSettingsForm: React.FC<{ user: User, setUser: React.Dispatch<React.
   }, [user]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
+    const { id, value } = e.target;
     setFormData({
       ...formData,
-      [name]: value,
+      [id]: value,
     });
     setIsChanged(true);
   };
 
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-  const { files } = e.target;
-  if (files && files[0]) {
-    const file = files[0];
-    const validImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/bmp', 'image/webp'];
-    const maxFileSize = 5 * 1024 * 1024; // 5 MB
+    const { files } = e.target;
+    if (files && files[0]) {
+      const file = files[0];
+      const validImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/bmp', 'image/webp'];
+      const maxFileSize = 5 * 1024 * 1024; // 5 MB
 
-    // Check file size
-    if (file.size > maxFileSize) {
-      alert('File size should not exceed 5 MB.');
-      e.target.value = ''; // Clear the input value to allow re-upload
-      return;
-    }
-
-    // Check file format is valid
-    if (validImageTypes.includes(file.type)) {
-      try {
-        const base64String = await fileToBase64(file as AvatarType);
-
-        // File is valid, save data and update errors
-        setFormData(prevState => ({
-          ...prevState,
-          avatar: base64String
-        }));
-        setIsChanged(true);
-      } catch (error) {
-        console.error("Error converting file to base64:", error);
-        alert('There was an error processing the file. Please try again.');
+      // Check file size
+      if (file.size > maxFileSize) {
+        alert('File size should not exceed 5 MB.');
+        e.target.value = ''; // Clear the input value to allow re-upload
+        return;
       }
-    } else {
-      // File is invalid, invalidate user input update error and make an alert to user
-      alert('Please upload a valid image file (JPEG, PNG, GIF, BMP, or WEBP).');
-      e.target.value = ''; // Clear the input value to allow re-upload
+
+      // Check file format is valid
+      if (validImageTypes.includes(file.type)) {
+        try {
+          const base64String = await fileToBase64(file as AvatarType);
+
+          // File is valid, save data and update errors
+          setFormData(prevState => ({
+            ...prevState,
+            avatar: base64String
+          }));
+          setIsChanged(true);
+        } catch (error) {
+          console.error("Error converting file to base64:", error);
+          alert('There was an error processing the file. Please try again.');
+        }
+      } else {
+        // File is invalid, invalidate user input update error and make an alert to user
+        alert('Please upload a valid image file (JPEG, PNG, GIF, BMP, or WEBP).');
+        e.target.value = ''; // Clear the input value to allow re-upload
+      }
     }
-  }
-};
+  };
 
   const handleSaveChanges = async () => {
     // Save data in auth context user
@@ -82,7 +82,7 @@ const AccountSettingsForm: React.FC<{ user: User, setUser: React.Dispatch<React.
         </label>
         <input
           type="email"
-          name="email"
+          id="email"
           value={formData.email}
           onChange={handleChange}
           className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
@@ -94,7 +94,7 @@ const AccountSettingsForm: React.FC<{ user: User, setUser: React.Dispatch<React.
         </label>
         <input
           type="text"
-          name="firstName"
+          id="firstName"
           value={formData.firstName}
           onChange={handleChange}
           className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
@@ -106,7 +106,7 @@ const AccountSettingsForm: React.FC<{ user: User, setUser: React.Dispatch<React.
         </label>
         <input
           type="text"
-          name="lastName"
+          id="lastName"
           value={formData.lastName}
           onChange={handleChange}
           className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
@@ -118,7 +118,7 @@ const AccountSettingsForm: React.FC<{ user: User, setUser: React.Dispatch<React.
         </label>
         <input
           type="date"
-          name="birthDate"
+          id="birthDate"
           value={formData.birthDate}
           onChange={handleChange}
           className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
@@ -130,7 +130,6 @@ const AccountSettingsForm: React.FC<{ user: User, setUser: React.Dispatch<React.
         </label>
         <select
           id="gender"
-          name="gender"
           className="appearance-none block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
           onChange={handleChange}
           value={formData.gender}
@@ -151,7 +150,7 @@ const AccountSettingsForm: React.FC<{ user: User, setUser: React.Dispatch<React.
         </label>
         <input
           type="text"
-          name="location"
+          id="location"
           value={formData.location}
           onChange={handleChange}
           className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
@@ -163,7 +162,7 @@ const AccountSettingsForm: React.FC<{ user: User, setUser: React.Dispatch<React.
         </label>
         <input
           type="text"
-          name="interests"
+          id="interests"
           value={formData.interests}
           onChange={handleChange}
           className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
