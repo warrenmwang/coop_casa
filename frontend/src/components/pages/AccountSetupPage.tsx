@@ -42,6 +42,13 @@ const AccountSetupPage: React.FC = () => {
     }
   }, [])
 
+  const handleClearAvatarImage = () => {
+    setFormData(prevState => ({
+      ...prevState,
+      avatar: ""
+    }))
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -141,6 +148,15 @@ const AccountSetupPage: React.FC = () => {
               id="avatar"
               value={formData.avatar}
             />
+            {/* Clear Image Button */}
+            {formData.avatar && (
+                <button
+                  onClick={handleClearAvatarImage}
+                  className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                >
+                  Clear Image
+                </button>
+            )}
 
             {/* Interests Multiple Choice Check Boxes */}
             <InterestsInput 
