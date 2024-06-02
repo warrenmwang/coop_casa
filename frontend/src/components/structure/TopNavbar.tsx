@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react'
+import React, { Fragment, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
@@ -11,16 +11,23 @@ function classNames(...classes: (string | undefined | null | false)[]) {
   return classes.filter(Boolean).join(' ')
 }
 
-interface TopNavBarArgs {
-  profileImg?: string;
-}
-
-const TopNavbar: React.FC<TopNavBarArgs> = ({ profileImg = defaultProfileImg}) => {
+const TopNavbar: React.FC = () => {
   const googleOAuthLink = `${API_HOST}:${API_PORT}/auth/google`;
   const accountSettingsLink = "/account-settings";
 
-  const auth = AuthData();
-  const { authenticated, logout } = auth;
+  const auth = AuthData()
+  const { logout } = auth
+
+  const [ authenticated, setAuthenticated ] = useState<boolean>(false)
+  const [ profileImg, setProfileImg ] = useState<string>(defaultProfileImg)
+
+  useEffect(() => {
+    const { user, authenticated } = auth
+    setAuthenticated(authenticated)
+    if (user.avatar !== "") {
+      setProfileImg(user.avatar)
+    }
+  },[])
 
   const navigation = [
     ...(authenticated ? [ { name: 'Dashboard', href: '/dashboard', current: false}] : []),

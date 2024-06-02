@@ -1,27 +1,21 @@
 export const MAX_TEXT_INPUT_LENGTH = 100
 const MAX_AVATAR_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 
-export const validateUserTextInput = (id:string, value:string) : boolean => {
-  // Validates the user input
-  // Return true for valid, else false
-
+export const validateTextLength = (value : string) : boolean => {
   // Check if the value length exceeds our MAX_TEXT_INPUT_LENGTH characters
-  if (value.length > MAX_TEXT_INPUT_LENGTH) {
-    return false // Do not update the state if the length exceeds 100 characters
-  }
-  
-  // If birthDate field, ensure it is valid
-  // If the field is the birthDate, validate the date format
-  if (id === "birthDate") {
-    const datePattern = /^\d{4}-\d{2}-\d{2}$/ // YYYY-MM-DD format
-    if (!datePattern.test(value)) {
-      return false // Do not update the state if the date format is invalid
-    }
-  }
+  return value.length <= MAX_TEXT_INPUT_LENGTH
+}
 
-  
+export const validateDate = (value : string) : boolean => {
+  // Validate the date format via regular expression
+  const datePattern = /^\d{4}-\d{2}-\d{2}$/ // YYYY-MM-DD format
+  return datePattern.test(value)
+}
 
-  return true
+export const validateEmail = (value : string) : boolean => {
+  // Validate email format via regular expression
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  return emailRegex.test(value)
 }
 
 export const validateUserAvatarInput = (file : File) : boolean => {
