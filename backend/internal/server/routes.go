@@ -107,7 +107,7 @@ func (s *Server) ValidateTokenAndGetClaims(tokenString string) (jwt.MapClaims, e
 
 // Returns the userId from the http cookie in the request, if present (if the user is authed)
 // If something goes wrong in here, we should assume a response http code 401 for unauthorized.
-func (s *Server) getAuthedUserId(w http.ResponseWriter, r *http.Request) (string, error) {
+func (s *Server) getAuthedUserId(r *http.Request) (string, error) {
 	// Read JWT from HttpOnly Cookie
 	cookie, err := r.Cookie("token")
 	if err != nil {
@@ -333,7 +333,7 @@ func (s *Server) apiGetAccountDetailsHandler(w http.ResponseWriter, r *http.Requ
 	// Returns the user data based on the userId in the auth token
 
 	// Authenticate user and get their userId
-	userId, err := s.getAuthedUserId(w, r)
+	userId, err := s.getAuthedUserId(r)
 	if err != nil {
 		respondWithError(w, 405, err)
 		return
@@ -385,7 +385,7 @@ func (s *Server) apiGetAccountDetailsHandler(w http.ResponseWriter, r *http.Requ
 // Endpoint: POST HOST:PORT/api/account/update
 func (s *Server) apiUpdateAccountDetailsHandler(w http.ResponseWriter, r *http.Request) {
 	// Authenticate user
-	_, err := s.getAuthedUserId(w, r)
+	_, err := s.getAuthedUserId(r)
 	if err != nil {
 		respondWithError(w, 405, err)
 		return
@@ -415,7 +415,7 @@ func (s *Server) apiDeleteAccountHandler(w http.ResponseWriter, r *http.Request)
 	// Delete a user account given their userId from the token
 
 	// Get userId of current user
-	userId, err := s.getAuthedUserId(w, r)
+	userId, err := s.getAuthedUserId(r)
 	if err != nil {
 		respondWithError(w, 401, err)
 		return

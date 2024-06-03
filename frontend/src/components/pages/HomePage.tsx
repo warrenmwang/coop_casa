@@ -4,7 +4,6 @@ import Footer from "../structure/Footer";
 import Card from "../structure/Card";
 
 import profileImg from "../../images/profile.jpg"
-import Title from "../structure/Title";
 import PropertiesHomeBanner from "../structure/PropertiesHomeBanner";
 import CommunitiesHomeBanner from "../structure/CommunitiesHomeBanner";
 

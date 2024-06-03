@@ -7,19 +7,19 @@ import AccountSettingsForm from "../structure/AccountSettingsForm";
 import { AuthData, EmptyUser } from "../../auth/AuthWrapper";
 import { accountDelete, getUserAccountDetails } from "../../api/api";
 import { useNavigate } from "react-router-dom";
+import TextSkeleton from "../structure/TextSkeleton";
 
 const AccountSettingsPage : React.FC = () => {
 
-  const auth = AuthData();
-  const { user, setUser } = auth;
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const navigate = useNavigate();
+  const auth = AuthData()
+  const { user, setUser } = auth
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const navigate = useNavigate()
 
   const handleDeleteAccount = async () => {
-
     // Clear the user data in the auth context
     setUser(EmptyUser)
-
     try {
       // Ping backend
       const ok = await accountDelete();
@@ -28,17 +28,17 @@ const AccountSettingsPage : React.FC = () => {
         alert("Error in deleting account. Try again.")
       } else {
         // Redirect to home after account deletion
-        navigate("/");
+        navigate("/")
         // Refresh window
-        window.location.reload();
+        window.location.reload()
       }
     } catch (error) {
-      console.error("Failed to delete account:", error);
+      console.error("Failed to delete account:", error)
     }
   };
 
   useEffect(() => {
-    const foo = async () => {
+    const fetchUserDetails = async () => {
       try {
         // Get the user account information
         const userDetails = await getUserAccountDetails()
@@ -50,16 +50,19 @@ const AccountSettingsPage : React.FC = () => {
         }
       } catch (error) {
         alert( error )
+      } finally {
+        setLoading(false)
       }
     }
-    foo();
-  }, []) // call once at page render
+    fetchUserDetails();
+  }, [setUser]) // call once at page render
 
   return(
     <div>
       <TopNavbar></TopNavbar>
         <Title title="Account Settings" description="All your account information in one place."></Title>
 
+        { !loading && 
         <div className="justify-center items-center mx-auto">
           <AccountSettingsForm user={user} setUser={setUser} />
 
@@ -103,6 +106,7 @@ const AccountSettingsPage : React.FC = () => {
             </div>
           </Modal>
         </div>
+        }
 
       <Footer></Footer>
     </div>

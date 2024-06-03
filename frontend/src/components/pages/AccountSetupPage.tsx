@@ -40,7 +40,7 @@ const AccountSetupPage: React.FC = () => {
     if (formData.interests === "") {
       setError("interests", true);
     }
-  }, [])
+  }, [formData.interests])
 
   const handleClearAvatarImage = () => {
     setFormData(prevState => ({

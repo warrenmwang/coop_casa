@@ -20,7 +20,7 @@ const DashboardPage: React.FC = () => {
     const { user } = auth;
     setEmail(user.email)
     setAccountIsSetup(user.firstName !== "")
-  }, [])
+  }, [auth])
  
   return (
     <div>

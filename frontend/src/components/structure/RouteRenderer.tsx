@@ -26,11 +26,16 @@ const RouteRenderer : React.FC = () => {
 
   useEffect(() => {
     const handleLogin = async () => {
-      await login();
-      setLoading(false);
+      try {
+        await login();
+      } catch (error) {
+        alert(error)
+      } finally {
+        setLoading(false);
+      }
     }
     handleLogin()
-  }, []) // empty array dependency to tell useEffect hook to call login only at first render.
+  }, []) // call once at component mount / first render
 
   if (loading) {
     return <TextSkeleton/>

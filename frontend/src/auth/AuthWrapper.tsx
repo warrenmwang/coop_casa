@@ -107,7 +107,7 @@ const AuthWrapper: React.FC<{children: ReactNode}> = ({ children }) => {
   }
 
   return(
-    <AuthContext.Provider value={{user, authenticated,login, logout, setUser}}>
+    <AuthContext.Provider value={{user, authenticated,login, logout, setUser }}>
       {children}
     </AuthContext.Provider>
   )
