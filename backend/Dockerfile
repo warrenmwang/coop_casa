@@ -1,6 +1,9 @@
 # Use Go Image
 FROM golang:1.22
 
+# Install PostgreSQL client (to ensure db is up before running migrations)
+RUN apt-get update && apt-get install -y postgresql-client
+
 # Define app directory
 WORKDIR /app
 

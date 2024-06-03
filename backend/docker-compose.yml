@@ -36,7 +36,7 @@ services:
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
     command: >
-      sh -c "./goose_migrate.sh up && ./main"
+      sh -c "./goose_migrate.sh && ./main"
 
 volumes:
   beta_psql_volume:

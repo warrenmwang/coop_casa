@@ -54,7 +54,11 @@ jobs:
             export REACT_APP_API_PORT=${{ secrets.REACT_APP_API_PORT }}
 
             # Define the node package manager bin we should use
-            export NPM_BIN=/home/${USER}/.nvm/versions/node/v21.6.1/bin/npm
+            # export NPM_BIN=/home/${USER}/.nvm/versions/node/v21.6.1/bin/npm
+            export NVM_DIR=~/.nvm
+            source ~/.nvm/nvm.sh
+            
+            export NPM_BIN=npm
 
             # Install node modules if not present
             if [ ! -d "node_modules" ]; then
