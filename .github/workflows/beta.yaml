@@ -45,7 +45,7 @@ jobs:
             
             # Run backend as a docker orchestration (2 containers -- app and db)
             docker compose build
-            docker compose up -d
+            docker compose up -d --remove-orphans
 
             # Change to Frontend Dir and Export Env Vars
             cd ../frontend
