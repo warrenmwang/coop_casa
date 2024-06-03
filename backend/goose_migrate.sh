@@ -1,16 +1,8 @@
 #!/bin/bash
 
-# Manual run of database migrations (new schema)
-# Should only be used for dev purposes, thus gitignored.
+# Database migration script for deployment
 
-# Read variables from .env if file exists
-# File will be non-existent in production environment and we 
-# expect the environment variables to already be set by Github Actions
-if [ -e ".env" ]; then
-    source .env
-fi
-
-# Conduct the db up migration for the development db
+# Setup migration directory and database conn url variables
 GOOSE_MIGRATION_DIR="/app/sql/schema"
 GOOSE_DATABASE_URL="postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_DATABASE}"
 
@@ -38,3 +30,5 @@ if [ $? -ne 0 ]; then
 else
   echo "Goose migrations applied successfully"
 fi
+
+echo "Running main binary now."

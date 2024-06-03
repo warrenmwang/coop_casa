@@ -10,7 +10,7 @@ services:
     volumes:
       - beta_psql_volume:/var/lib/postgresql/beta_data
 
-  goapp:
+  beta_goapp:
     build: .
     depends_on: 
       - beta_psql_db
