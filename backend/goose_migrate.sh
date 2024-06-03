@@ -16,7 +16,7 @@ GOOSE_DATABASE_URL="postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_POR
 
 # Wait for the PostgreSQL container to be ready
 echo "Waiting for PostgreSQL to start..."
-while ! pg_isready -h postgres -p 5432 -q -U postgres; do
+while ! pg_isready -h $DB_HOST -p $DB_PORT -q -U $DB_USERNAME; do
   sleep 1
 done
 echo "PostgreSQL started"
