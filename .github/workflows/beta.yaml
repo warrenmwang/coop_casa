@@ -22,7 +22,7 @@ jobs:
             USER=${{ secrets.USERNAME }}
             
             # Pull repo source
-            cd /${USER}/deployment_repos/coop/src
+            cd /home/${USER}/deployment_repos/coop/src
             git checkout beta-deploy
             git pull origin beta-deploy
 
