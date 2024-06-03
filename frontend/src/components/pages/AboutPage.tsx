@@ -3,6 +3,10 @@ import Footer from "../structure/Footer";
 import TopNavbar from "../structure/TopNavbar";
 import Title from "../structure/Title";
 import Card from "../structure/Card";
+import elizabeth_img from "../../images/elizabeth.jpeg"
+import warren_img from "../../images/warren.png"
+import gloria_img from "../../images/gloria.jpeg"
+import barbara_img from "../../images/barbara.jpeg"
 
 const AboutPage : React.FC = () => {
   return(
@@ -23,28 +27,26 @@ const AboutPage : React.FC = () => {
         <br/><br/>
         We combine the social connectivity that makes us human with finding a place to live. Find a place to live that you can call your home without renting or knowing that it is temporary and not yours. You will OWN your home with your friends and community. Find your community and be a property owner today without doing it alone. Coop, connecting communities empowering ownership.
 
-        <Title title="Meet The Team" description="Please find the contact information of our team below."></Title>
+        <Title title="Meet The Team"></Title>
         <Card
           title="Elizabeth Addo"
           description={
             <div>
               <p className="text-gray-600" style={{fontWeight: "bold"}}>Head of Human Resources</p>
               <p className="text-gray-600">With a rich palette of interests ranging from film and creative writing to screenwriting, computer science, and community engagement, I am eager to bring my blend of creative insight and technical acumen to a team that values transformative ideas and is committed to making a difference through their work.</p>
-              
             </div>
           }
-          imageUrl="https://media.licdn.com/dms/image/D4E35AQE8_Jx2CTvlDQ/profile-framedphoto-shrink_800_800/0/1710781782337?e=1717261200&v=beta&t=K3gwDt31i6_dtQPCE31eGwE4NdOcVdCK3S8VJN2Y5AI"
+          imageUrl={elizabeth_img}
         />
         <Card 
           title="Warren Wang"
           description={
             <div>
               <p className="text-gray-600" style={{fontWeight: "bold"}}>Lead Web Developer</p>
-              <p className="text-gray-600">With a desire to bring value into people's lives at low to no monetary costs, I was inspired by the team's vision for Coop. I designed and maintain the Coop web app.</p>
+              <p className="text-gray-600">With a desire to bring value into people's lives at low to no monetary costs, I was inspired by the other founders' vision for Coop and wanted to apply my skillset to their mission. I am the sole developer for the Coop web app.</p>
             </div>
-
           }
-          imageUrl="https://media.licdn.com/dms/image/D5635AQFM_p4MiTbGzQ/profile-framedphoto-shrink_400_400/0/1697384548966?e=1717264800&v=beta&t=CRDzdajn6dXL46Qcouap0Yus3b4cqHvbd5AN4nNWwZM"
+          imageUrl={warren_img}
         />
         <Card
           title="Gloria Sporea"
@@ -52,10 +54,9 @@ const AboutPage : React.FC = () => {
             <div>
               <p className="text-gray-600" style={{fontWeight: "bold"}}>Head of Marketing and Event Organization</p>
               <p className="text-gray-600">With a passion for learning and exploring the natural world, I am pursuing a Bachelor of Science degree in Biology at Bucknell University. I am also interested in marketing and diversity, and I have developed relevant skills and knowledge through my work experience on campus.</p>
-        
             </div>
           }
-          imageUrl="https://media.licdn.com/dms/image/C4E03AQEajVIRh_wsiw/profile-displayphoto-shrink_800_800/0/1640909911428?e=1721865600&v=beta&t=OW5IMekFnXJU0wZiSZqjT9pjulQMX1dBpS7Imy1FT28"
+          imageUrl={gloria_img}
         />
         <Card
           title="Barbara Wankollie"
@@ -65,12 +66,9 @@ const AboutPage : React.FC = () => {
               <p className="text-gray-600">Member of the class of 2025, majoring in International Relation, and Women and Gender Studies. Freeman scholar and SHE-CAN Scholar. Student Intern at Griot Institute for Black Life and culture. Student assistant for Alumina House, Bucknell University.</p>
             </div>
           }
-          imageUrl="https://media.licdn.com/dms/image/D5603AQEc809UB_L13A/profile-displayphoto-shrink_800_800/0/1665966828846?e=1721865600&v=beta&t=2zwhe8VY1ayXsTDeNw5E0QOWWlzUDRKevSS86DGMMP8"
+          imageUrl={barbara_img}
         />
       </div>
-
-      
-
       <Footer></Footer>
     </div>
   )

@@ -16,18 +16,8 @@ const TopNavbar: React.FC = () => {
   const accountSettingsLink = "/account-settings";
 
   const auth = AuthData()
-  const { logout } = auth
-
-  const [ authenticated, setAuthenticated ] = useState<boolean>(false)
-  const [ profileImg, setProfileImg ] = useState<string>(defaultProfileImg)
-
-  useEffect(() => {
-    const { user, authenticated } = auth
-    setAuthenticated(authenticated)
-    if (user.avatar !== "") {
-      setProfileImg(user.avatar)
-    }
-  },[])
+  const { user, authenticated, logout } = auth
+  const profileImg = user.avatar !== "" ? user.avatar : defaultProfileImg
 
   const navigation = [
     ...(authenticated ? [ { name: 'Dashboard', href: '/dashboard', current: false}] : []),
