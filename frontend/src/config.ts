@@ -21,4 +21,4 @@ if (!API_HOST_TMP || !API_PORT_TMP) {
 const API_HOST : string = API_HOST_TMP;
 const API_PORT : number = parseInt(API_PORT_TMP);
 
-export { API_HOST, API_PORT };
+export { API_HOST, API_PORT, IS_PROD };

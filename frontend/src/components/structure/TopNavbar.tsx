@@ -5,15 +5,13 @@ import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import defaultProfileImg from "../../images/profile.jpg"
 import coopImg from "../../images/coopAlt1.svg"
 import { AuthData } from '../../auth/AuthWrapper'
-import { API_HOST, API_PORT } from '../../config'
+import { googleOAuthLink, accountSettingsLink } from '../../urls'
 
 function classNames(...classes: (string | undefined | null | false)[]) {
   return classes.filter(Boolean).join(' ')
 }
 
 const TopNavbar: React.FC = () => {
-  const googleOAuthLink = `${API_HOST}:${API_PORT}/auth/google`;
-  const accountSettingsLink = "/account-settings";
 
   const auth = AuthData()
   const { user, authenticated, logout } = auth

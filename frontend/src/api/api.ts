@@ -3,18 +3,17 @@
 */
 
 import { MaybeUser, User } from "../types/User";
-import { API_HOST, API_PORT } from "../config";
+import { api_account_Link, api_account_update_Link } from "../urls";
 
 // Account Settings
 
 // Delete Account Function
 export const accountDelete = async ( ) : Promise<boolean> => {
 
-  const accountDeleteLink = `${API_HOST}:${API_PORT}/api/account`;
   var returnVal : boolean = false;
 
   try {
-    const response = await fetch(accountDeleteLink, {
+    const response = await fetch(api_account_Link, {
       method: "DELETE", 
       credentials: "include",
     })
@@ -32,11 +31,10 @@ export const accountDelete = async ( ) : Promise<boolean> => {
 
 // Query for user account information
 export const getUserAccountDetails = async () : Promise<MaybeUser> => {
-  const getUserAccountDetailsLink = `${API_HOST}:${API_PORT}/api/account`
   var returnVal : MaybeUser = undefined
 
   try {
-    const response = await fetch(getUserAccountDetailsLink, {
+    const response = await fetch(api_account_Link, {
       method: "GET",
       headers: {
         'Accept': 'application/json'
@@ -59,11 +57,10 @@ export const getUserAccountDetails = async () : Promise<MaybeUser> => {
 // Update Account Details
 export const updateUserAccountDetails = async (newUserData : User) : Promise<boolean> => {
   var returnVal : boolean = false;
-  const updateUserAccountDetailsLink = `${API_HOST}:${API_PORT}/api/account/update`
 
   try {
 
-    const response = await fetch(updateUserAccountDetailsLink, {
+    const response = await fetch(api_account_update_Link, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"

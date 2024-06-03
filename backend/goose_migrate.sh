@@ -15,7 +15,7 @@ echo "PostgreSQL started"
 
 # Wait for the database to be available
 echo "Waiting for database to be available..."
-until PGPASSWORD=$DB_PASSWORD psql -h $DB_HOST -U $DB_USERNAME -d $DB_DATABASE -c '\l' | grep $DB_DATABASE > /dev/null; do
+until PGPASSWORD=$DB_PASSWORD psql -h $DB_HOST -p $DB_PORT -U $DB_USERNAME -d $DB_DATABASE -c '\l' | grep $DB_DATABASE > /dev/null; do
   sleep 1
 done
 echo "Database is available"

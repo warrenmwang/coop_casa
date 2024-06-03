@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, ReactNode } from "react";
-import { API_HOST, API_PORT } from "../config";
 import { User } from "../types/User";
+import { api_account_Link, api_logout_Link } from "../urls";
 
 interface AuthContextType {
   user: User;
@@ -51,11 +51,9 @@ const AuthWrapper: React.FC<{children: ReactNode}> = ({ children }) => {
   // login the user
   const login = async () => {
 
-    const link = `${API_HOST}:${API_PORT}/api/account`
-    
     try {
       // try to login with the token in browser
-      const response = await fetch(link, {
+      const response = await fetch(api_account_Link, {
         method: 'GET', 
         credentials: 'include', // include the HTTP-only cookie
       });
@@ -89,7 +87,7 @@ const AuthWrapper: React.FC<{children: ReactNode}> = ({ children }) => {
 
     // Logout the user in the api backend as well
     try {
-      const response = await fetch(`${API_HOST}:${API_PORT}/api/logout`, {
+      const response = await fetch(api_logout_Link, {
         method: 'GET', 
         credentials: 'include',
       });
