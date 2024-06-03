@@ -30,4 +30,3 @@ main
 
 # Development tool scripts
 psql_connect.sh
-goose_migrate.sh

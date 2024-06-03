@@ -1,24 +1,44 @@
 version: '3.8'
 
 services:
-  psql:
+  beta_psql_db:
     image: postgres:latest
     environment:
       POSTGRES_DB: ${DB_DATABASE}
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "${DB_PORT}:5432"
+      - "${DB_PORT}:${DB_PORT}"
     volumes:
-      - psql_volume:/var/lib/postgresql/data
-  
-  # TODO: dockerize the main go app
-  # goapp:
-  #   build: .
-  #   deponds_on: 
-  #     - psql
-  #   environment:
-  #     - name=value
+      - beta_psql_volume:/var/lib/postgresql/beta_data
+
+  goapp:
+    build: .
+    depends_on: 
+      - beta_psql_db
+    ports:
+      - "${PORT}:${PORT}"
+    environment:
+      PORT: ${PORT}
+      FRONTENDPORT: ${FRONTENDPORT}
+
+      IS_PROD: ${IS_PROD}
+      PROD_HOST: ${PROD_HOST}
+
+      JWT_SIGN_SECRET: ${JWT_SIGN_SECRET}
+      AUTH_KEY_SECRET: ${AUTH_KEY_SECRET}
+      DB_ENCRYPT_KEY_SECRET: ${DB_ENCRYPT_KEY_SECRET}
+
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+    command: >
+      sh -c "./goose_migrate.sh up && ./main"
 
 volumes:
-  psql_volume:
+  beta_psql_volume:

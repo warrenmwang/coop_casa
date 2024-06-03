@@ -8,9 +8,9 @@ WORKDIR /app
 COPY go.mod go.sum ./
 
 # Download Go module dependencies
-RUN go mod download
+RUN go mod download && go mod verify
 
-# Install Goose to run start up database migration
+# Install Goose
 RUN go install github.com/pressly/goose/v3/cmd/goose@latest
 
 # Copy the rest of the application's source code
