@@ -16,7 +16,6 @@ import (
 const MaxAge = 86400 * 30 // 30 days
 
 func NewAuth() {
-	port, _ := strconv.Atoi(os.Getenv("PORT"))
 	googleClientId := os.Getenv("GOOGLE_CLIENT_ID")
 	googleClientSecret := os.Getenv("GOOGLE_CLIENT_SECRET")
 
@@ -28,10 +27,14 @@ func NewAuth() {
 	}
 
 	var host string
+	var callbackURL string
 	if IsProd {
 		host = os.Getenv("PROD_HOST")
+		callbackURL = fmt.Sprintf("%s/auth/google/callback", host)
 	} else {
 		host = os.Getenv("DEV_HOST")
+		port, _ := strconv.Atoi(os.Getenv("PORT"))
+		callbackURL = fmt.Sprintf("%s:%d/auth/google/callback", host, port)
 	}
 
 	store := sessions.NewCookieStore([]byte(key))
@@ -43,6 +46,6 @@ func NewAuth() {
 
 	// list of providers that we want our application to accept oauth connections from
 	goth.UseProviders(
-		google.New(googleClientId, googleClientSecret, fmt.Sprintf("%s:%d/auth/google/callback", host, port)),
+		google.New(googleClientId, googleClientSecret, callbackURL),
 	)
 }

@@ -264,6 +264,8 @@ func (s *Server) getAuthCallbackHandler(w http.ResponseWriter, r *http.Request) 
 	})
 
 	// Redirect to dashboard page
+	// NOTE: even in production environment, as long as frontend port is set properly
+	// to say 443 for htpps, this redirect should work.
 	http.Redirect(w, r, fmt.Sprintf("%s:%d/dashboard", s.Host, s.FrontendPort), http.StatusFound)
 }
 

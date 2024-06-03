@@ -126,12 +126,12 @@ const TopNavbar: React.FC = () => {
                         // render login otherwise
                         <Menu.Item>
                           {({ active }) => (
-                            <Link
-                              to={googleOAuthLink}
+                            <a 
+                              href={googleOAuthLink}
                               className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
                             >
                               Log in with Google
-                            </Link>
+                            </a>
                           )}
                         </Menu.Item>
                       )}
