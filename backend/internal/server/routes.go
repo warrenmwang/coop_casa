@@ -161,23 +161,28 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.Use(middleware.Logger)
 	r.Use(s.corsMiddleware)
 
+	// API uptime check
 	r.Get("/", s.HelloWorldHandler)
 
+	// DB uptime check
 	r.Get("/health", s.healthHandler)
 
+	// Oauth callback
 	r.Get("/auth/{provider}/callback", s.getAuthCallbackHandler)
 
+	// Being Oauth login
 	r.Get("/auth/{provider}", s.authLoginHandler)
 
+	// Logout
 	r.Get("/api/logout", s.apiLogoutHandler)
 
-	// get account details
+	// Get account details
 	r.Get("/api/account", s.apiGetAccountDetailsHandler)
 
-	// delete account
+	// Delete account
 	r.Delete("/api/account", s.apiDeleteAccountHandler)
 
-	// update account details
+	// Update account details
 	r.Post("/api/account/update", s.apiUpdateAccountDetailsHandler)
 
 	return r
