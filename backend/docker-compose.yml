@@ -6,7 +6,7 @@ services:
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "${DB_PORT}:${DB_PORT}"
+      - "5432:${DB_PORT}"
     volumes:
       - beta_psql_volume:/var/lib/postgresql/beta_data
 
