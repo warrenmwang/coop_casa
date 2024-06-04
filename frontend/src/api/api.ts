@@ -5,6 +5,8 @@
 import { MaybeUser, User } from "../types/User";
 import { api_account_Link, api_account_update_Link, api_logout_Link } from "../urls";
 
+type GetUserAccountDetailsAPIResponse = [number, MaybeUser]
+
 // Delete Account Function
 export const accountDelete = async ( ) : Promise<boolean> => {
   // Return true for ok, else false for not ok response
@@ -30,8 +32,8 @@ export const accountDelete = async ( ) : Promise<boolean> => {
 }
 
 // Query for user account information
-export const getUserAccountDetails = async () : Promise<MaybeUser> => {
-  var returnVal : MaybeUser = undefined
+export const getUserAccountDetails = async () : Promise<GetUserAccountDetailsAPIResponse> => {
+  var returnVal : GetUserAccountDetailsAPIResponse = [444, undefined]
 
   try {
     const response = await fetch(api_account_Link, {
@@ -43,8 +45,11 @@ export const getUserAccountDetails = async () : Promise<MaybeUser> => {
     })
     
     if (response.ok) {
-      returnVal = (await response.json()) as MaybeUser
-    } 
+      returnVal = [response.status, (await response.json()) as MaybeUser]
+    } else if (response.status === 405) {
+      // Allow 405 to go thru bc 405 just means invalid token, which happens a lot
+      returnVal = [response.status, undefined]
+    }
   } catch (error) {
     alert(`Error during request user details: ${error}`)
   }

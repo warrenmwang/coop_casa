@@ -57,9 +57,9 @@ const AuthWrapper: React.FC<{children: ReactNode}> = ({ children }) => {
   const login = async () => {
     if (!loggedInInitial) {
       const responseData = await getUserAccountDetails()
-      if (responseData) {
+      if (responseData[0] === 200) {
         // Convert received data to User type
-        const userData = responseData as User
+        const userData = responseData[1] as User
 
         // Set user data in auth context user state
         setUser(userData)
@@ -75,14 +75,16 @@ const AuthWrapper: React.FC<{children: ReactNode}> = ({ children }) => {
 
   // hit the logout api endpoint
   const logout = async () => {
-    // Clear the auth context user data
-    setUser(EmptyUser)
-
     // Log out the user in api and oauth
     const ok = await logoutUser()
     if (!ok) {
       alert("Error during logout. Please try logging out again.")
     }
+
+    // Clear the auth context user data
+    setUser(EmptyUser)
+
+    setAuthenticated(false)
     
     // Redirect to home page
     window.location.replace("/")

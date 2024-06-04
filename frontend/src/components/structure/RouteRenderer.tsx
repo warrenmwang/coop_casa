@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 import HomePage from '../pages/HomePage';
@@ -15,7 +15,6 @@ import { AuthData } from '../../auth/AuthWrapper'
 import AccountSettingsPage from "../pages/AccountSettingsPage";
 import AccountSetupPage from "../pages/AccountSetupPage";
 import PropertiesPage from "../pages/PropertiesPage";
-import TextSkeleton from "./TextSkeleton";
 import AttributionsPage from "../pages/AttributionsPage";
 
 const RouteRenderer : React.FC = () => {
@@ -38,7 +37,7 @@ const RouteRenderer : React.FC = () => {
       }
       handleLogin()
     }
-  }, []) // call once at component mount / first render
+  }, [login, loggedInInitial, setLoggedInInitial]) // call once at component mount / first render
 
   return(
     <Router>
