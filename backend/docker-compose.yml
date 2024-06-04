@@ -6,7 +6,7 @@ services:
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "${DB_PORT}:5432" # host : container
+      - "${EXTERNAL_DB_PORT}:${DB_PORT}" # host : container
     volumes:
       - beta_psql_volume:/var/lib/postgresql/beta_data
 

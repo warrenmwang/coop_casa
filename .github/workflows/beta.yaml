@@ -35,6 +35,7 @@ jobs:
             export JWT_SIGN_SECRET=${{ secrets.JWT_SIGN_SECRET }}
             export AUTH_KEY_SECRET=${{ secrets.AUTH_KEY_SECRET }}
             export DB_ENCRYPT_KEY_SECRET=${{ secrets.DB_ENCRYPT_KEY_SECRET }}
+            export EXTERNAL_DB_PORT=${{ secrets.EXTERNAL_DB_PORT }}
             export DB_HOST=${{ secrets.DB_HOST }}
             export DB_PORT=${{ secrets.DB_PORT }}
             export DB_DATABASE=${{ secrets.DB_DATABASE }}
