@@ -169,8 +169,6 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 	r.Get("/auth/{provider}", s.authLoginHandler)
 
-	r.Get("/auth/logout/{provider}", s.authLogoutHandler)
-
 	r.Get("/api/logout", s.apiLogoutHandler)
 
 	// get account details
@@ -300,21 +298,6 @@ func (s *Server) authLoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Endpoint: GET HOST:PORT/auth/logout/{provider}
-// TODO: I don't think this is used. Figure out where to use this?
-func (s *Server) authLogoutHandler(w http.ResponseWriter, r *http.Request) {
-	// Logout endpoint for OAuth
-
-	// Insert the provider context
-	provider := chi.URLParam(r, "provider")
-	r = r.WithContext(context.WithValue(context.Background(), "provider", provider))
-
-	// Logout oauth
-	gothic.Logout(w, r)
-	w.Header().Set("Location", "/")
-	w.WriteHeader(http.StatusTemporaryRedirect)
-}
-
 /*
 	All handler functions prefixed with `api` should be thought of
 	as "authed" endpoints. They require that the http request being handled
@@ -326,8 +309,20 @@ func (s *Server) authLogoutHandler(w http.ResponseWriter, r *http.Request) {
 
 // Endpoint: GET HOST:PORT/api/logout
 func (s *Server) apiLogoutHandler(w http.ResponseWriter, r *http.Request) {
-	// API logout handler is used to logout the user by invalidating their JWT.
+	// Logout function that completes the oauth logout and invalidate the user's auth token
+
+	// Invalidate their JWT.
 	s.InvalidateToken(w)
+
+	// Complete logout for oauth
+	// Insert the provider context
+	provider := chi.URLParam(r, "provider")
+	r = r.WithContext(context.WithValue(context.Background(), "provider", provider))
+
+	// Logout oauth
+	gothic.Logout(w, r)
+	w.Header().Set("Location", "/")
+	w.WriteHeader(http.StatusTemporaryRedirect)
 }
 
 // Endpoint: GET HOST:PORT/api/account

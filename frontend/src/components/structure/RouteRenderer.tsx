@@ -29,7 +29,8 @@ const RouteRenderer : React.FC = () => {
       try {
         await login();
       } catch (error) {
-        alert(error)
+        console.error("Error during login: ", error)
+        alert("Login failed. Please try again.")
       } finally {
         setLoading(false);
       }

@@ -72,6 +72,7 @@ const AuthWrapper: React.FC<{children: ReactNode}> = ({ children }) => {
         // redirect to oauth login to get new jwt, backend will just redirect to dashboard page to keep it simple
         // console.log("going to google oauth")
         // window.location.href = googleAuthLink;
+        console.log(`Got not ok response from login: ${response}`)
       }
     } catch(error) {
       // TODO: handle the error if something went wrong in this async call
