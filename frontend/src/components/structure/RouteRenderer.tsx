@@ -21,26 +21,24 @@ import AttributionsPage from "../pages/AttributionsPage";
 const RouteRenderer : React.FC = () => {
 
   const auth = AuthData();
-  const { authenticated, login } = auth;
-  const [loading, setLoading] = useState(true);
+  const { loggedInInitial, authenticated, login, setLoggedInInitial } = auth;
+  
 
   useEffect(() => {
-    const handleLogin = async () => {
-      try {
-        await login();
-      } catch (error) {
-        console.error("Error during login: ", error)
-        alert("Login failed. Please try again.")
-      } finally {
-        setLoading(false);
+    if (!loggedInInitial) {
+      const handleLogin = async () => {
+        try {
+          await login();
+        } catch (error) {
+          console.error("Error during login: ", error)
+          alert("Login failed. Please try again.")
+        } finally {
+          setLoggedInInitial(true)
+        }
       }
+      handleLogin()
     }
-    handleLogin()
   }, []) // call once at component mount / first render
-
-  if (loading) {
-    return <TextSkeleton/>
-  }
 
   return(
     <Router>

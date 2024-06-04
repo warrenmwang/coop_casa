@@ -1,13 +1,15 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 import { User } from "../types/User";
-import { api_account_Link, api_logout_Link } from "../urls";
+import { getUserAccountDetails, logoutUser } from "../api/api";
 
 interface AuthContextType {
   user: User;
   authenticated: boolean;
+  loggedInInitial: boolean;
   login: () => Promise<void>;
   logout: () => Promise<void>;
   setUser: React.Dispatch<React.SetStateAction<User>>;
+  setLoggedInInitial: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const EmptyUser : User = {
@@ -25,9 +27,11 @@ export const EmptyUser : User = {
 const AuthContext = createContext<AuthContextType>({
   user: EmptyUser,
   authenticated: false,
+  loggedInInitial: false,
   login: () => Promise.resolve(), 
   logout: () => Promise.resolve(),
-  setUser: () => {}
+  setUser: () => {},
+  setLoggedInInitial: () => {}
 })
 
 export const AuthData = () => useContext(AuthContext)
@@ -47,37 +51,25 @@ const AuthWrapper: React.FC<{children: ReactNode}> = ({ children }) => {
     avatar: ''
   })
   const [ authenticated, setAuthenticated ] = useState(false)
+  const [loggedInInitial, setLoggedInInitial] = useState(false);
 
   // login the user
   const login = async () => {
+    if (!loggedInInitial) {
+      const responseData = await getUserAccountDetails()
+      if (responseData) {
+        // Convert received data to User type
+        const userData = responseData as User
 
-    try {
-      // try to login with the token in browser
-      const response = await fetch(api_account_Link, {
-        method: 'GET', 
-        credentials: 'include', // include the HTTP-only cookie
-      });
+        // Set user data in auth context user state
+        setUser(userData)
 
-      if (response.ok) {
-        const data = (await response.json()) as User;
+        // Set authenticated to true, allow rendering of authenticated endpoints
+        setAuthenticated(true)
 
-        // Set user 
-        setUser(data)
-
-        // set authenticated
-        setAuthenticated(true);
-
-      } else {
-        // current browser jwt invalid 
-        // redirect to oauth login to get new jwt, backend will just redirect to dashboard page to keep it simple
-        // console.log("going to google oauth")
-        // window.location.href = googleAuthLink;
-        console.log(`Got not ok response from login: ${response}`)
+        // Set loggedInInitial to true, to prevent refreshes to conduct redundant logins
+        setLoggedInInitial(true)
       }
-    } catch(error) {
-      // TODO: handle the error if something went wrong in this async call
-      console.log('Error during login:', error);
-      // window.location.href = googleAuthLink;
     }
   }
 
@@ -86,27 +78,18 @@ const AuthWrapper: React.FC<{children: ReactNode}> = ({ children }) => {
     // Clear the auth context user data
     setUser(EmptyUser)
 
-    // Logout the user in the api backend as well
-    try {
-      const response = await fetch(api_logout_Link, {
-        method: 'GET', 
-        credentials: 'include',
-      });
-
-      if (!response.ok) {
-        // TODO: error popup that tells the user that something went wrong and they need to logout again.
-      } else {
-        window.location.href = '/'
-      }
-
-    } catch(error) {
-      // TODO: handle error if sonmething went wrong in this async call
-      console.log('Error during logout:', error);
+    // Log out the user in api and oauth
+    const ok = await logoutUser()
+    if (!ok) {
+      alert("Error during logout. Please try logging out again.")
     }
+    
+    // Redirect to home page
+    window.location.replace("/")
   }
 
   return(
-    <AuthContext.Provider value={{user, authenticated,login, logout, setUser }}>
+    <AuthContext.Provider value={{user, authenticated, loggedInInitial, login, logout, setUser, setLoggedInInitial }}>
       {children}
     </AuthContext.Provider>
   )
