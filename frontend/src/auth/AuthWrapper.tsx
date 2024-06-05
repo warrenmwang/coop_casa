@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 import { User } from "../types/User";
-import { getUserAccountDetails, logoutUser } from "../api/api";
+import { apiGetUserAccountDetails, apiLogoutUser } from "../api/api";
 
 interface AuthContextType {
   user: User;
@@ -10,6 +10,7 @@ interface AuthContextType {
   logout: () => Promise<void>;
   setUser: React.Dispatch<React.SetStateAction<User>>;
   setLoggedInInitial: React.Dispatch<React.SetStateAction<boolean>>;
+  setAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const EmptyUser : User = {
@@ -31,7 +32,8 @@ const AuthContext = createContext<AuthContextType>({
   login: () => Promise.resolve(), 
   logout: () => Promise.resolve(),
   setUser: () => {},
-  setLoggedInInitial: () => {}
+  setLoggedInInitial: () => {},
+  setAuthenticated: () => {}
 })
 
 export const AuthData = () => useContext(AuthContext)
@@ -56,16 +58,13 @@ const AuthWrapper: React.FC<{children: ReactNode}> = ({ children }) => {
   // login the user
   const login = async () => {
     if (!loggedInInitial) {
-      const responseData = await getUserAccountDetails()
+      const responseData = await apiGetUserAccountDetails()
       if (responseData[0] === 200) {
         // Convert received data to User type
         const userData = responseData[1] as User
 
         // Set user data in auth context user state
         setUser(userData)
-
-        // Set authenticated to true, allow rendering of authenticated endpoints
-        setAuthenticated(true)
 
         // Set loggedInInitial to true, to prevent refreshes to conduct redundant logins
         setLoggedInInitial(true)
@@ -75,23 +74,26 @@ const AuthWrapper: React.FC<{children: ReactNode}> = ({ children }) => {
 
   // hit the logout api endpoint
   const logout = async () => {
+    // console.log("logout")
     // Log out the user in api and oauth
-    const ok = await logoutUser()
+    const ok = await apiLogoutUser()
     if (!ok) {
       alert("Error during logout. Please try logging out again.")
     }
 
     // Clear the auth context user data
     setUser(EmptyUser)
+    // console.log("user set to empty")
 
     setAuthenticated(false)
+    // console.log("authenticated set to false")
     
     // Redirect to home page
     window.location.replace("/")
   }
 
   return(
-    <AuthContext.Provider value={{user, authenticated, loggedInInitial, login, logout, setUser, setLoggedInInitial }}>
+    <AuthContext.Provider value={{user, authenticated, loggedInInitial, login, logout, setUser, setLoggedInInitial, setAuthenticated }}>
       {children}
     </AuthContext.Provider>
   )

@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"text/template"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -76,6 +75,7 @@ func (s *Server) InvalidateToken(w http.ResponseWriter) {
 		Value:    "",
 		Path:     "/",
 		Expires:  time.Unix(0, 0),
+		MaxAge:   -1,
 		HttpOnly: true,
 		Secure:   s.IsProd,
 	})
@@ -154,7 +154,7 @@ func (s *Server) corsMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-// ---------------------------------------------------------------
+// ------------------------ ALL ROUTES -------------------------------
 
 func (s *Server) RegisterRoutes() http.Handler {
 	r := chi.NewRouter()
@@ -168,13 +168,16 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.Get("/health", s.healthHandler)
 
 	// Oauth callback
-	r.Get("/auth/{provider}/callback", s.getAuthCallbackHandler)
+	r.Get("/auth/{provider}/callback", s.authCallbackHandler)
 
 	// Being Oauth login
 	r.Get("/auth/{provider}", s.authLoginHandler)
 
+	// Simple auth check
+	r.Get("/auth/check", s.authCheckHandler)
+
 	// Logout
-	r.Get("/api/logout", s.apiLogoutHandler)
+	r.Get("/auth/logout", s.authLogoutHandler)
 
 	// Get account details
 	r.Get("/api/account", s.apiGetAccountDetailsHandler)
@@ -188,7 +191,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	return r
 }
 
-// ---------------------------------------------------------------
+// --------------------------- UPTIME CHECKS --------------------------------
 
 // Endpoint: GET HOST:PORT/
 func (s *Server) HelloWorldHandler(w http.ResponseWriter, r *http.Request) {
@@ -209,9 +212,11 @@ func (s *Server) healthHandler(w http.ResponseWriter, r *http.Request) {
 	_, _ = w.Write(jsonResp)
 }
 
+// ----------------------- AUTH -----------------------------------
+
 // Endpoint: GET HOST:PORT/auth/{provider}/callback
-func (s *Server) getAuthCallbackHandler(w http.ResponseWriter, r *http.Request) {
-	// Callback function called by the OAuth provider after the user logs in on their page.
+func (s *Server) authCallbackHandler(w http.ResponseWriter, r *http.Request) {
+	// Callback function called by the OAuth provider after the user initializes oauth process.
 	// Finish auth, create JWT, and save it into a cookie.
 
 	// Insert the provider context
@@ -266,10 +271,10 @@ func (s *Server) getAuthCallbackHandler(w http.ResponseWriter, r *http.Request) 
 		Secure:   s.IsProd,
 	})
 
-	// Redirect to dashboard page
+	// Redirect to oauth callback page
 	// NOTE: even in production environment, as long as frontend port is set properly
 	// to say 443 for htpps, this redirect should work.
-	http.Redirect(w, r, fmt.Sprintf("%s:%d/dashboard", s.Host, s.FrontendPort), http.StatusFound)
+	http.Redirect(w, r, fmt.Sprintf("%s:%d/oauth-callback", s.Host, s.FrontendPort), http.StatusFound)
 }
 
 // Endpoint: GET HOST:PORT/auth/{provider}
@@ -278,42 +283,43 @@ func (s *Server) authLoginHandler(w http.ResponseWriter, r *http.Request) {
 	provider := chi.URLParam(r, "provider")
 	r = r.WithContext(context.WithValue(context.Background(), "provider", provider))
 
-	// TODO: I'm not sure what this is actually doing here?
-	// try to get the user without re-authenticating
-
-	var userTemplate = `
-	<p><a href="/logout/{{.Provider}}">logout</a></p>
-	<p>Name: {{.Name}} [{{.LastName}}, {{.FirstName}}]</p>
-	<p>Email: {{.Email}}</p>
-	<p>NickName: {{.NickName}}</p>
-	<p>Location: {{.Location}}</p>
-	<p>AvatarURL: {{.AvatarURL}} <img src="{{.AvatarURL}}"></p>
-	<p>Description: {{.Description}}</p>
-	<p>UserID: {{.UserID}}</p>
-	<p>AccessToken: {{.AccessToken}}</p>
-	<p>ExpiresAt: {{.ExpiresAt}}</p>
-	<p>RefreshToken: {{.RefreshToken}}</p>
-	`
-
-	if gothUser, err := gothic.CompleteUserAuth(w, r); err == nil {
-		t, _ := template.New("foo").Parse(userTemplate)
-		t.Execute(w, gothUser)
+	if _, err := gothic.CompleteUserAuth(w, r); err == nil {
+		// User is already authenticated
+		// We don't actually expect the code to ever reach this point because our app
+		// will hit the /auth/check endpoint instead of this auth/{provider}
+		// endpoint to check if the user is still logged in or not based off of the JWT
+		// expiration, therefore, if we ever reach this state something has gone wrong and we
+		// should return error explaining that we need to check logic flow again.
+		respondWithError(w, 500, errors.New("something went wrong with logic flow in code, should not have reached this point in /auth/{provider}"))
 	} else {
+		// User is not authed, initialize the auth process
 		gothic.BeginAuthHandler(w, r)
 	}
 }
 
-/*
-	All handler functions prefixed with `api` should be thought of
-	as "authed" endpoints. They require that the http request being handled
-	to have a JWT that authenticates a user's action.
+// Endpoint: GET HOST:PORT/auth/check
+func (s *Server) authCheckHandler(w http.ResponseWriter, r *http.Request) {
+	// return a json with the account status being authed or not as a bool
+	// true for yes authed, false for no
+	type returnVal struct {
+		AccountIsAuthed bool `json:"accountIsAuthed"`
+	}
 
-	Currently (05/25/2024) the only way to receive a valid JWT from the server
-	is to login using the Google OAuth Provider.
-*/
+	// Simple check to see if user has a valid JWT
+	_, err := s.getAuthedUserId(r)
+	if err != nil {
+		respondWithJSON(w, 200, returnVal{
+			AccountIsAuthed: false,
+		})
+	} else {
+		respondWithJSON(w, 200, returnVal{
+			AccountIsAuthed: true,
+		})
+	}
+}
 
-// Endpoint: GET HOST:PORT/api/logout
-func (s *Server) apiLogoutHandler(w http.ResponseWriter, r *http.Request) {
+// Endpoint: GET HOST:PORT/auth/logout
+func (s *Server) authLogoutHandler(w http.ResponseWriter, r *http.Request) {
 	// Logout function that completes the oauth logout and invalidate the user's auth token
 
 	// Invalidate their JWT.
@@ -326,9 +332,18 @@ func (s *Server) apiLogoutHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Logout oauth
 	gothic.Logout(w, r)
-	w.Header().Set("Location", "/")
 	w.WriteHeader(http.StatusTemporaryRedirect)
 }
+
+// ----------------------- API -----------------------------------
+/*
+	All handler functions prefixed with `api` should be thought of
+	as "authed" endpoints. They require that the http request being handled
+	to have a JWT that authenticates a user's action.
+
+	Currently (05/25/2024) the only way to receive a valid JWT from the server
+	is to login using the Google OAuth Provider.
+*/
 
 // Endpoint: GET HOST:PORT/api/account
 func (s *Server) apiGetAccountDetailsHandler(w http.ResponseWriter, r *http.Request) {

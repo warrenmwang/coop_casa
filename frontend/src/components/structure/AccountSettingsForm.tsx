@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { User } from "../../types/User";
-import { updateUserAccountDetails } from "../../api/api";
+import { apiUpdateUserAccountDetails } from "../../api/api";
 import InterestsInput from "./InterestsInput";
 import LocationInput from "./LocationInput";
 import GenderInput from "../structure/GenderInput";
@@ -19,9 +19,9 @@ const AccountSettingsForm: React.FC<{ user: User, setUser: React.Dispatch<React.
     // Save data in auth context user
     setUser(formData);
     // Save data in the database
-    const ok = await updateUserAccountDetails(formData);
-    if (!ok) {
-      alert("Please try submitting again.")
+    const responseCode = await apiUpdateUserAccountDetails(formData);
+    if (responseCode !== 200) {
+      alert(`Please try submitting again. Returned with response code ${responseCode}`)
     }
     setIsChanged(false);
   };

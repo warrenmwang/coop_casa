@@ -5,7 +5,7 @@ import TopNavbar from "../structure/TopNavbar";
 import Footer from "../structure/Footer";
 
 import { User } from "../../types/User";
-import { updateUserAccountDetails } from "../../api/api";
+import { apiUpdateUserAccountDetails } from "../../api/api";
 import { AuthData } from "../../auth/AuthWrapper";
 
 import '../../styles/font.css'
@@ -66,12 +66,11 @@ const AccountSetupPage: React.FC = () => {
       setUser(formData);
 
       // Save user data into the backend
-      const status = await updateUserAccountDetails(formData);
-      if (status) {
+      const status = await apiUpdateUserAccountDetails(formData);
+      if (status === 200) {
         navigate("/dashboard");
-        // window.location.reload();
       } else {
-        alert("Unable to setup account, please try again.");
+        alert(`Unable to setup account, please try again. Returned with status code ${status}`);
       }
     } catch (error) {
       console.error("Error during form submission:", error);
@@ -144,7 +143,7 @@ const AccountSetupPage: React.FC = () => {
             <ImageInput 
               setFormData={setFormData}
               setError={setError}
-              label="Avatar Image"
+              label="Avatar Image (Max size 5 MiB)"
               id="avatar"
               value={formData.avatar}
             />

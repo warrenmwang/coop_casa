@@ -1,5 +1,5 @@
 export const MAX_TEXT_INPUT_LENGTH = 100
-const MAX_AVATAR_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
+const MAX_AVATAR_FILE_SIZE = 5 * 1024 * 1024; // 5 MiB
 
 export const validateTextLength = (value : string) : boolean => {
   // Check if the value length exceeds our MAX_TEXT_INPUT_LENGTH characters
@@ -23,7 +23,7 @@ export const validateUserAvatarInput = (file : File) : boolean => {
 
   // Check file size
   if (file.size > MAX_AVATAR_FILE_SIZE) {
-    alert('File size should not exceed 5 MB.');
+    alert('File size should not exceed 5 MiB.');
     return false
   }
 

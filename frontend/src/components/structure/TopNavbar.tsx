@@ -5,7 +5,7 @@ import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import defaultProfileImg from "../../images/profile.jpg"
 import coopImg from "../../images/coopAlt1.svg"
 import { AuthData } from '../../auth/AuthWrapper'
-import { googleOAuthLink, accountSettingsLink } from '../../urls'
+import { api_auth_googleOAuthLink, accountSettingsPageLink } from '../../urls'
 
 function classNames(...classes: (string | undefined | null | false)[]) {
   return classes.filter(Boolean).join(' ')
@@ -101,7 +101,7 @@ const TopNavbar: React.FC = () => {
                         <Menu.Item>
                           {({ active }) => (
                             <Link
-                              to={accountSettingsLink}
+                              to={accountSettingsPageLink}
                               className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
                             >
                               Account Settings
@@ -127,7 +127,7 @@ const TopNavbar: React.FC = () => {
                         <Menu.Item>
                           {({ active }) => (
                             <a 
-                              href={googleOAuthLink}
+                              href={api_auth_googleOAuthLink}
                               className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
                             >
                               Log in with Google

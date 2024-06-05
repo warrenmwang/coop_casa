@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import TopNavbar from "../structure/TopNavbar";
 import Footer from "../structure/Footer";
 import Title from "../structure/Title";
 import Modal from "../structure/Modal";
 import AccountSettingsForm from "../structure/AccountSettingsForm";
 import { AuthData, EmptyUser } from "../../auth/AuthWrapper";
-import { accountDelete } from "../../api/api";
+import { apiAccountDelete } from "../../api/api";
 import { useNavigate } from "react-router-dom";
 
 const AccountSettingsPage : React.FC = () => {
@@ -20,7 +20,7 @@ const AccountSettingsPage : React.FC = () => {
     setUser(EmptyUser)
     try {
       // Ping backend
-      const ok = await accountDelete();
+      const ok = await apiAccountDelete();
       if (!ok) {
         // Account was not deleted for some reason
         alert("Error in deleting account. Try again.")
