@@ -2,10 +2,22 @@
   Functions used to interact with the backend API.
 */
 
-import { MaybeUser, User } from "../types/User";
+import { useEffect, useState } from "react";
+import { NullUser, User } from "../types/User";
+import { BoolAndError } from "../types/Api";
 import { api_account_Link, api_account_update_Link, api_auth_check_link, api_auth_logout_Link } from "../urls";
 
-type GetUserAccountDetailsAPIResponse = [number, MaybeUser]
+
+type GetUserAccountDetailsAPIResponse = [number, NullUser]
+
+const checkFetch = (response : Response) => {
+  // source: https://www.youtube.com/watch?v=b8DaQrxshu0
+  if (!response.ok) {
+    throw Error(response.statusText + " - " + response.url)
+  }
+  return response
+}
+
 
 // Delete Account Function
 export const apiAccountDelete = async ( ) : Promise<boolean> => {
@@ -32,30 +44,30 @@ export const apiAccountDelete = async ( ) : Promise<boolean> => {
 }
 
 // Query for user account information
-export const apiGetUserAccountDetails = async () : Promise<GetUserAccountDetailsAPIResponse> => {
-  var returnVal : GetUserAccountDetailsAPIResponse = [444, undefined]
+// export const apiGetUserAccountDetails = async () : Promise<GetUserAccountDetailsAPIResponse> => {
+//   var returnVal : GetUserAccountDetailsAPIResponse = [444, undefined]
 
-  try {
-    const response = await fetch(api_account_Link, {
-      method: "GET",
-      headers: {
-        "Accept": "application/json"
-      },
-      credentials: "include"
-    })
+//   try {
+//     const response = await fetch(api_account_Link, {
+//       method: "GET",
+//       headers: {
+//         "Accept": "application/json"
+//       },
+//       credentials: "include"
+//     })
     
-    if (response.ok) {
-      returnVal = [response.status, (await response.json()) as MaybeUser]
-    } else if (response.status === 405) {
-      // Allow 405 to go thru bc 405 just means invalid token, which happens a lot
-      returnVal = [response.status, undefined]
-    }
-  } catch (error) {
-    alert(`Received error during get user details: ${error}`)
-  }
+//     if (response.ok) {
+//       returnVal = [response.status, (await response.json()) as NullUser]
+//     } else if (response.status === 405) {
+//       // Allow 405 to go thru bc 405 just means invalid token, which happens a lot
+//       returnVal = [response.status, undefined]
+//     }
+//   } catch (error) {
+//     alert(`Received error during get user details: ${error}`)
+//   }
 
-  return returnVal;
-}
+//   return returnVal;
+// }
 
 // Update Account Details
 export const apiUpdateUserAccountDetails = async (newUserData : User) : Promise<number> => {
@@ -148,4 +160,77 @@ export const apiAuthCheck = async () : Promise<boolean> => {
   }
 
   return returnVal
+}
+
+type AccIsAuthedType = boolean | null;
+interface useAPIAuthCheckReturnValues {
+  accountIsAuthed: AccIsAuthedType;
+  loading: boolean;
+}
+
+
+export const useAPIAuthCheck = () : useAPIAuthCheckReturnValues => {
+
+  const [accountIsAuthed, setAccountIsAuthed] = useState<AccIsAuthedType>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    fetch(api_auth_check_link, {
+      method: "GET",
+      signal: controller.signal,
+      headers: {
+        "Accept": "application/json"
+      }, 
+      credentials: "include"
+    })
+    .then(checkFetch)
+    .then(response => response.json())
+    .then(data => {
+      const accIsAuthed = data.accountIsAuthed as boolean;
+      setAccountIsAuthed(accIsAuthed);
+      setLoading(false);
+    })
+    .catch((err) => {console.error(err)});
+
+    return () => controller.abort();
+  }, []);
+
+  return { accountIsAuthed, loading };
+};
+
+interface useAPIGetUserAccountReturnValues {
+  user: NullUser;
+  loading: boolean;
+}
+
+export const useAPIGetUserAccount = () : useAPIGetUserAccountReturnValues => {
+  const [loading, setLoading] = useState<boolean>(true);
+  const [user, setUser] = useState<NullUser>(null);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    fetch(api_account_Link, {
+      method: "GET",
+      headers: {
+        "Accept": "application/json",
+      },
+      credentials: "include",
+      signal: controller.signal
+    })
+    .then(checkFetch)
+    .then(response => response.json()) 
+    .then(data => {
+      const userData = data as NullUser;
+      setLoading(false);
+      setUser(userData);
+    })
+    .catch((err) => console.error(err));
+
+    return () => controller.abort();
+  }, []);
+
+  return { user, loading}
 }

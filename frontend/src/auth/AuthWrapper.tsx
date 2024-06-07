@@ -1,15 +1,12 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 import { User } from "../types/User";
-import { apiGetUserAccountDetails, apiLogoutUser } from "../api/api";
+import { apiLogoutUser } from "../api/api";
 
 interface AuthContextType {
   user: User;
   authenticated: boolean;
-  loggedInInitial: boolean;
-  login: () => Promise<void>;
   logout: () => Promise<void>;
   setUser: React.Dispatch<React.SetStateAction<User>>;
-  setLoggedInInitial: React.Dispatch<React.SetStateAction<boolean>>;
   setAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
@@ -28,11 +25,8 @@ export const EmptyUser : User = {
 const AuthContext = createContext<AuthContextType>({
   user: EmptyUser,
   authenticated: false,
-  loggedInInitial: false,
-  login: () => Promise.resolve(), 
   logout: () => Promise.resolve(),
   setUser: () => {},
-  setLoggedInInitial: () => {},
   setAuthenticated: () => {}
 })
 
@@ -53,24 +47,6 @@ const AuthWrapper: React.FC<{children: ReactNode}> = ({ children }) => {
     avatar: ''
   })
   const [ authenticated, setAuthenticated ] = useState(false)
-  const [loggedInInitial, setLoggedInInitial] = useState(false);
-
-  // login the user
-  const login = async () => {
-    if (!loggedInInitial) {
-      const responseData = await apiGetUserAccountDetails()
-      if (responseData[0] === 200) {
-        // Convert received data to User type
-        const userData = responseData[1] as User
-
-        // Set user data in auth context user state
-        setUser(userData)
-
-        // Set loggedInInitial to true, to prevent refreshes to conduct redundant logins
-        setLoggedInInitial(true)
-      }
-    }
-  }
 
   // hit the logout api endpoint
   const logout = async () => {
@@ -93,7 +69,15 @@ const AuthWrapper: React.FC<{children: ReactNode}> = ({ children }) => {
   }
 
   return(
-    <AuthContext.Provider value={{user, authenticated, loggedInInitial, login, logout, setUser, setLoggedInInitial, setAuthenticated }}>
+    <AuthContext.Provider value={
+      {
+        user, 
+        authenticated, 
+        logout,
+        setUser,
+        setAuthenticated
+      }
+    }>
       {children}
     </AuthContext.Provider>
   )

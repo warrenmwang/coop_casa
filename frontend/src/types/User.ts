@@ -1,5 +1,5 @@
 
-export type MaybeUser = User | undefined
+export type NullUser = User | null
 
 export interface User {
   userId: string;

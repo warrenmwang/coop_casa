@@ -1,27 +1,24 @@
-import React, { useEffect } from "react"
+import React from "react"
 import { AuthData } from "../../auth/AuthWrapper"
+import { User } from "../../types/User"
+import { useAPIGetUserAccount } from "../../api/api"
 
 // The only purpose of this component is to separately query for the
 // user details at initial load time. This component is invisible.
 const LoginUserComp : React.FC = () => {
 
   const auth = AuthData()
-  const {login} = auth
+  const { setUser} = auth
 
-  useEffect(() => {
-    const handleLoginUser = async () => {
-      try {
-        // console.log("loginusercomp")
-        await login()
-      } catch(error) {
-        // console.log(`Couldn't get user data at initial login.`)
+  const getUserAccount = useAPIGetUserAccount();
+    if (!getUserAccount.loading) {
+      if (getUserAccount.user !== null) {
+        setUser((getUserAccount.user as User))
       }
     }
-    handleLoginUser()
-  }, [login]) // only run once at comp render
 
   return(
-    <div></div>
+    <></>
   )
 }
 

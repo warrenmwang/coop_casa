@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import React from "react"
 import { Routes, Route, Navigate } from 'react-router-dom'
 
 import HomePage from '../pages/HomePage'
@@ -16,7 +16,7 @@ import AccountSetupPage from "../pages/AccountSetupPage"
 import PropertiesPage from "../pages/PropertiesPage"
 import AttributionsPage from "../pages/AttributionsPage"
 import { aboutPageLink, attributionsPageLink, communitiesPageLink, contactPageLink, homePageLink, mapPageLink, oauthCallBackPageLink, privacypolicyPageLink, propertiesPageLink, termsOfServicePageLink, dashboardPageLink, accountSettingsPageLink, accountSetupPageLink } from "../../urls"
-import { apiAuthCheck } from "../../api/api"
+import { useAPIAuthCheck } from "../../api/api"
 
 const OAuthCallbackPage = React.lazy(() => import("../pages/OAuthCallbackPage"))
 
@@ -24,23 +24,15 @@ const RouteRenderer : React.FC = () => {
   const auth = AuthData()
   const { authenticated, setAuthenticated } = auth
 
-  useEffect(() => {
-    const handleAuthCheck = async () => {
-      try {
-        // Do a simple check auth to determine whether ok to render authed
-        // endpoints
-        // console.log("route renderer")
-        const ok = await apiAuthCheck()
-        if (ok && authenticated !== true) {
-          setAuthenticated(true)
-        } 
-      } catch (error) {
-        console.error("Error during login: ", error)
-        alert("Login failed. Please try again.")
-      } 
+  const apiAuthCheckResult = useAPIAuthCheck();
+  if (!apiAuthCheckResult.loading) {
+    if (apiAuthCheckResult.accountIsAuthed) {
+      // authed, set authenticated state to true, to render the authed routes
+      setAuthenticated(true);
+    } else {
+      setAuthenticated(false);
     }
-    handleAuthCheck()
-  }, [authenticated, setAuthenticated]) // call once at component mount / first render
+  }
 
   return(
     <Routes>
@@ -62,13 +54,13 @@ const RouteRenderer : React.FC = () => {
         </>
       ) : (
         <>
-          <Route path={dashboardPageLink} element={<Navigate to="/" replace />} />
-          <Route path={accountSettingsPageLink} element={<Navigate to="/" replace />} />
-          <Route path={accountSetupPageLink} element={<Navigate to="/" replace />} />
+          <Route path={dashboardPageLink} element={<Navigate to={homePageLink} replace />} />
+          <Route path={accountSettingsPageLink} element={<Navigate to={homePageLink} replace />} />
+          <Route path={accountSetupPageLink} element={<Navigate to={homePageLink} replace />} />
         </>
       )}
       {/* Catch all route for non-existent routes */}
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="*" element={<Navigate to={homePageLink} replace />} />
     </Routes>
   )
 }

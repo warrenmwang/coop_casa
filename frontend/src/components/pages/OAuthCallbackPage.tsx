@@ -1,31 +1,30 @@
-import React, { useEffect } from "react"
+import React from "react"
 import { useNavigate } from "react-router-dom"
 import TextSkeleton from "../structure/TextSkeleton"
-import { apiAuthCheck } from "../../api/api"
+import { useAPIAuthCheck } from "../../api/api"
+import { dashboardPageLink, homePageLink } from "../../urls";
 
 interface OAuthCallbackPageArgs {
-  setAuthenticated: React.Dispatch<React.SetStateAction<boolean>>
+  setAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const OAuthCallbackPage: React.FC<OAuthCallbackPageArgs> = ({ setAuthenticated }) => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    const checkAuthStatus = async () => {
-      const ok = await apiAuthCheck()
-      if (ok) {
-        setAuthenticated(true) // Set authenticated to true to ensure route renderer updates
-        navigate("/dashboard") // Redirect to the dashboard or any other authenticated route
-      } else {
-        setAuthenticated(false)
-        navigate("/") // Redirect to home if not authenticated
-      }
+  const apiAuthCheckResult = useAPIAuthCheck();
+  if (!apiAuthCheckResult.loading){
+    if (apiAuthCheckResult.accountIsAuthed) {
+      // authed
+      setAuthenticated(true);
+      navigate(dashboardPageLink);
+    } else {
+      // not authed
+      setAuthenticated(false);
+      navigate(homePageLink);
     }
-
-    checkAuthStatus()
-  }, [navigate, setAuthenticated])
-
-  return <TextSkeleton/>
+  }
+  
+  return <TextSkeleton/>;
 }
 
-export default OAuthCallbackPage
+export default OAuthCallbackPage;
