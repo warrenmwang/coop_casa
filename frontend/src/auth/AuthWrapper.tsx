@@ -20,7 +20,7 @@ export const EmptyUser : User = {
   location: '',
   interests: '',
   avatar: ''
-}
+};
 
 const AuthContext = createContext<AuthContextType>({
   user: EmptyUser,
@@ -45,10 +45,10 @@ const AuthWrapper: React.FC<{children: ReactNode}> = ({ children }) => {
     location: '',
     interests: '',
     avatar: ''
-  })
-  const [ authenticated, setAuthenticated ] = useState(false)
+  });
+  const [ authenticated, setAuthenticated ] = useState(false);
 
-  // hit the logout api endpoint
+  // Define the function to logout the user
   const logout = async () => {
     // console.log("logout")
     // Log out the user in api and oauth
@@ -66,7 +66,7 @@ const AuthWrapper: React.FC<{children: ReactNode}> = ({ children }) => {
     
     // Redirect to home page
     window.location.replace("/")
-  }
+  };
 
   return(
     <AuthContext.Provider value={
@@ -80,7 +80,7 @@ const AuthWrapper: React.FC<{children: ReactNode}> = ({ children }) => {
     }>
       {children}
     </AuthContext.Provider>
-  )
+  );
 }
 
 export default AuthWrapper;

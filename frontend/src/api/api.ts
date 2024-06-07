@@ -4,11 +4,8 @@
 
 import { useEffect, useState } from "react";
 import { NullUser, User } from "../types/User";
-import { BoolAndError } from "../types/Api";
 import { api_account_Link, api_account_update_Link, api_auth_check_link, api_auth_logout_Link } from "../urls";
-
-
-type GetUserAccountDetailsAPIResponse = [number, NullUser]
+import { AuthData } from "../auth/AuthWrapper";
 
 const checkFetch = (response : Response) => {
   // source: https://www.youtube.com/watch?v=b8DaQrxshu0
@@ -17,7 +14,6 @@ const checkFetch = (response : Response) => {
   }
   return response
 }
-
 
 // Delete Account Function
 export const apiAccountDelete = async ( ) : Promise<boolean> => {
@@ -126,52 +122,47 @@ export const apiLogoutUser = async () : Promise<boolean> => {
 // Simple auth check ping to backend
 // Returns true for authed
 // else false for not
-export const apiAuthCheck = async () : Promise<boolean> => {
+// export const apiAuthCheck = async () : Promise<boolean> => {
 
-  // console.log("apiAuthCheck")
+//   // console.log("apiAuthCheck")
 
-  var returnVal : boolean = false
+//   var returnVal : boolean = false
 
-  try {
-    const response = await fetch(api_auth_check_link, {
-      method: "GET",
-      headers: {
-        "Accept": "application/json"
-      },
-      credentials: "include" // Include cookies in the request
-    })
+//   try {
+//     const response = await fetch(api_auth_check_link, {
+//       method: "GET",
+//       headers: {
+//         "Accept": "application/json"
+//       },
+//       credentials: "include" // Include cookies in the request
+//     })
 
-    // console.log(`apiAuthCheck response:`, response)
+//     // console.log(`apiAuthCheck response:`, response)
 
-    if (response.ok) {
-      const responseJSON = await response.json()
-      returnVal = responseJSON.accountIsAuthed as boolean
-    } 
+//     if (response.ok) {
+//       const responseJSON = await response.json()
+//       returnVal = responseJSON.accountIsAuthed as boolean
+//     } 
 
-    // console.log(`apiAuthCheck returnVal: ${returnVal}`)
+//     // console.log(`apiAuthCheck returnVal: ${returnVal}`)
 
-  } catch (error) {
-    // TODO: well fuck it, just don't alert when this fails
-    // bc i don't have a fucking clue why we encounter the erroneous
-    // TypeError: Failed to fetch
-    // But the app still works if we ignore this so whatever bruh.
+//   } catch (error) {
+//     // TODO: well fuck it, just don't alert when this fails
+//     // bc i don't have a fucking clue why we encounter the erroneous
+//     // TypeError: Failed to fetch
+//     // But the app still works if we ignore this so whatever bruh.
 
-    // alert(`Error checking auth status: ${error}`)
-  }
+//     // alert(`Error checking auth status: ${error}`)
+//   }
 
-  return returnVal
-}
+//   return returnVal
+// }
 
-type AccIsAuthedType = boolean | null;
-interface useAPIAuthCheckReturnValues {
-  accountIsAuthed: AccIsAuthedType;
-  loading: boolean;
-}
+export const useAPIAuthCheck = () : boolean => {
+  // Assuming that all components are under the global Auth Context
+  const auth = AuthData();
+  const { setAuthenticated } = auth;
 
-
-export const useAPIAuthCheck = () : useAPIAuthCheckReturnValues => {
-
-  const [accountIsAuthed, setAccountIsAuthed] = useState<AccIsAuthedType>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
@@ -189,25 +180,23 @@ export const useAPIAuthCheck = () : useAPIAuthCheckReturnValues => {
     .then(response => response.json())
     .then(data => {
       const accIsAuthed = data.accountIsAuthed as boolean;
-      setAccountIsAuthed(accIsAuthed);
       setLoading(false);
+      setAuthenticated(accIsAuthed)
     })
     .catch((err) => {console.error(err)});
 
     return () => controller.abort();
   }, []);
 
-  return { accountIsAuthed, loading };
+  return loading;
 };
 
-interface useAPIGetUserAccountReturnValues {
-  user: NullUser;
-  loading: boolean;
-}
+export const useAPIGetUserAccount = () : boolean => {
+  // Assuming that all components are under the global Auth Context
+  const auth = AuthData();
+  const { setUser } = auth;
 
-export const useAPIGetUserAccount = () : useAPIGetUserAccountReturnValues => {
   const [loading, setLoading] = useState<boolean>(true);
-  const [user, setUser] = useState<NullUser>(null);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -224,13 +213,15 @@ export const useAPIGetUserAccount = () : useAPIGetUserAccountReturnValues => {
     .then(response => response.json()) 
     .then(data => {
       const userData = data as NullUser;
+      if (userData !== null) {
+        setUser(userData as User);
+      }
       setLoading(false);
-      setUser(userData);
     })
     .catch((err) => console.error(err));
 
     return () => controller.abort();
   }, []);
 
-  return { user, loading}
+  return loading;
 }

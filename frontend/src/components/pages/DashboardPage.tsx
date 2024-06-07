@@ -12,15 +12,9 @@ import AccountSetup from "../structure/AccountSetup";
 const DashboardPage: React.FC = () => {
 
   const auth = AuthData();
-
-  const [email, setEmail] = useState('placeholder');
-  const [accountIsSetup, setAccountIsSetup] = useState(false);
-
-  useEffect(() => {
-    const { user } = auth;
-    setEmail(user.email)
-    setAccountIsSetup(user.firstName !== "")
-  }, [auth])
+  const { user } = auth;
+  const email = user.email;
+  const accountIsSetup = (user.firstName !== "");
  
   return (
     <div>

@@ -22,17 +22,9 @@ const OAuthCallbackPage = React.lazy(() => import("../pages/OAuthCallbackPage"))
 
 const RouteRenderer : React.FC = () => {
   const auth = AuthData()
-  const { authenticated, setAuthenticated } = auth
+  const { authenticated } = auth
 
-  const apiAuthCheckResult = useAPIAuthCheck();
-  if (!apiAuthCheckResult.loading) {
-    if (apiAuthCheckResult.accountIsAuthed) {
-      // authed, set authenticated state to true, to render the authed routes
-      setAuthenticated(true);
-    } else {
-      setAuthenticated(false);
-    }
-  }
+  const loading = useAPIAuthCheck();
 
   return(
     <Routes>
@@ -45,7 +37,7 @@ const RouteRenderer : React.FC = () => {
       <Route path={termsOfServicePageLink} element={<TermsOfServicePage />} />
       <Route path={attributionsPageLink} element={<AttributionsPage />} />
       <Route path={contactPageLink} element={<ContactPage />} />
-      <Route path={oauthCallBackPageLink} element={<OAuthCallbackPage setAuthenticated={setAuthenticated}/>} />
+      <Route path={oauthCallBackPageLink} element={<OAuthCallbackPage/>} />
       { authenticated ? (
         <>
           <Route path={dashboardPageLink} element={<DashboardPage />} />
