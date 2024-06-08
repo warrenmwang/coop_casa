@@ -23,8 +23,8 @@ type Server struct {
 }
 
 func NewServer() *http.Server {
-	port, _ := strconv.Atoi(os.Getenv("PORT"))
-	frontendPort, _ := strconv.Atoi(os.Getenv("FRONTENDPORT"))
+	port, _ := strconv.Atoi(os.Getenv("BACKEND_PORT"))
+	frontendPort, _ := strconv.Atoi(os.Getenv("FRONTEND_PORT"))
 	jwtSignSecret := os.Getenv("JWT_SIGN_SECRET")
 	IsProd, _ := strconv.ParseBool(os.Getenv("IS_PROD"))
 

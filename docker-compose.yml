@@ -1,0 +1,88 @@
+services:
+  proxy: 
+    build: ./proxy
+    networks:
+      - frontend
+      - backend
+    environment:
+      FRONTEND_PORT: ${FRONTEND_PORT}
+      BACKEND_PORT: ${BACKEND_PORT}
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - beta_psql_db
+      - beta_go_backend
+      - beta_ts_frontend
+
+  beta_psql_db:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    networks:
+      - backend
+    ports:
+      - "${DB_PORT}:${DB_PORT}" # external : internal
+    volumes:
+      - beta_psql_volume:/var/lib/postgresql/data # external : internal
+
+  beta_go_backend:
+    build: ./backend
+    restart: always
+    depends_on: 
+      - beta_psql_db
+    networks:
+      - backend
+    ports:
+      - "${BACKEND_PORT}:${BACKEND_PORT}" # external : internal
+    environment:
+      BACKEND_PORT: ${BACKEND_PORT}
+      FRONTEND_PORT: ${FRONTEND_PORT}
+
+      IS_PROD: ${IS_PROD}
+      PROD_HOST: ${PROD_HOST}
+
+      JWT_SIGN_SECRET: ${JWT_SIGN_SECRET}
+      AUTH_KEY_SECRET: ${AUTH_KEY_SECRET}
+      DB_ENCRYPT_KEY_SECRET: ${DB_ENCRYPT_KEY_SECRET}
+
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+    command: >
+      sh -c "./goose_migrate.sh && ./main"
+  
+  beta_ts_frontend:
+    build: ./frontend
+    restart: always
+    depends_on:
+      - beta_go_backend
+    networks:
+      - frontend
+    ports:
+      - "${FRONTEND_PORT}:${FRONTEND_PORT}" # external : internal
+    environment:
+      REACT_APP_IS_PROD: ${REACT_APP_IS_PROD}
+      REACT_APP_API_PROD_HOST: ${REACT_APP_API_PROD_HOST}
+      REACT_APP_API_PORT: ${REACT_APP_API_PORT}
+    command: >
+      serve -s build -l ${FRONTEND_PORT}
+
+volumes:
+  beta_psql_volume:
+
+networks:
+  frontend:
+    name: beta_coop_frontend_nw
+    driver: bridge
+  backend:
+    name: beta_coop_backend_nw
+    driver: bridge

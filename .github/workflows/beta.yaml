@@ -26,12 +26,12 @@ jobs:
             git checkout beta-deploy
             git pull origin beta-deploy
 
-            # Change to Backend Dir and Export Env Vars
-            cd backend
+            # Export Env Vars
+            # BACKEND
             export IS_PROD=true
             export PROD_HOST=${{ secrets.PROD_HOST }}
-            export PORT=${{ secrets.PORT }}
-            export FRONTENDPORT=${{ secrets.FRONTENDPORT }}
+            export BACKEND_PORT=${{ secrets.BACKEND_PORT }}
+            export FRONTEND_PORT=${{ secrets.FRONTEND_PORT }}
             export JWT_SIGN_SECRET=${{ secrets.JWT_SIGN_SECRET }}
             export AUTH_KEY_SECRET=${{ secrets.AUTH_KEY_SECRET }}
             export DB_ENCRYPT_KEY_SECRET=${{ secrets.DB_ENCRYPT_KEY_SECRET }}
@@ -43,33 +43,12 @@ jobs:
             export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
             export GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
             export GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
-            
-            # Run backend as a docker orchestration (2 containers -- app and db)
-            docker compose build
-            docker compose up -d --remove-orphans
 
-            # Change to Frontend Dir and Export Env Vars
-            cd ../frontend
+            # FRONTEND
             export REACT_APP_IS_PROD=true
             export REACT_APP_API_PROD_HOST=${{ secrets.REACT_APP_API_PROD_HOST }}
             export REACT_APP_API_PORT=${{ secrets.REACT_APP_API_PORT }}
 
-            # Define the node package manager bin we should use
-            # export NPM_BIN=/home/${USER}/.nvm/versions/node/v21.6.1/bin/npm
-            export NVM_DIR=~/.nvm
-            source ~/.nvm/nvm.sh
-            
-            export NPM_BIN=npm
-
-            # Install node modules if not present
-            if [ ! -d "node_modules" ]; then
-              $NPM_BIN install
-            fi
-            
-            # Build frontend 
-            $NPM_BIN run build
-
-            # Move frontend build to nginx serve location
-            rm -rf /var/www/beta.coop.casa/*
-            mv build/* /var/www/beta.coop.casa/
-            cd ..
+            # Run all as docker orchestration (db, backend, frontend, proxy)
+            docker compose build
+            docker compose up -d --remove-orphans
