@@ -5,8 +5,8 @@ services:
       - frontend
       - backend
     environment:
-      FRONTEND_PORT: ${FRONTEND_PORT}
-      BACKEND_PORT: ${BACKEND_PORT}
+      INTERNAL_FRONTEND_PORT: ${INTERNAL_FRONTEND_PORT}
+      INTERNAL_BACKEND_PORT: ${INTERNAL_BACKEND_PORT}
     ports:
       - "${EXTERNAL_PROXY_PORT}:80"
     depends_on:
@@ -23,8 +23,6 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     networks:
       - backend
-    ports:
-      - "${DB_PORT}:${DB_PORT}" # external : internal
     volumes:
       - beta_psql_volume:/var/lib/postgresql/data # external : internal
 
@@ -35,11 +33,9 @@ services:
       - beta_psql_db
     networks:
       - backend
-    ports:
-      - "${BACKEND_PORT}:${BACKEND_PORT}" # external : internal
     environment:
-      BACKEND_PORT: ${BACKEND_PORT}
-      FRONTEND_PORT: ${FRONTEND_PORT}
+      INTERNAL_BACKEND_PORT: ${INTERNAL_BACKEND_PORT}
+      EXTERNAL_FRONTEND_PORT: ${EXTERNAL_FRONTEND_PORT}
 
       IS_PROD: ${IS_PROD}
       PROD_HOST: ${PROD_HOST}
@@ -60,20 +56,19 @@ services:
       sh -c "./goose_migrate.sh && ./main"
   
   beta_ts_frontend:
-    build: ./frontend
+    build: 
+      context: ./frontend
+      args:
+        REACT_APP_IS_PROD: ${REACT_APP_IS_PROD}
+        REACT_APP_API_PROD_HOST: ${REACT_APP_API_PROD_HOST}
+        REACT_APP_API_PORT: ${REACT_APP_API_PORT}
     restart: always
     depends_on:
       - beta_go_backend
     networks:
       - frontend
-    ports:
-      - "${FRONTEND_PORT}:${FRONTEND_PORT}" # external : internal
-    environment:
-      REACT_APP_IS_PROD: ${REACT_APP_IS_PROD}
-      REACT_APP_API_PROD_HOST: ${REACT_APP_API_PROD_HOST}
-      REACT_APP_API_PORT: ${REACT_APP_API_PORT}
     command: >
-      serve -s build -l ${FRONTEND_PORT}
+      serve -s build -l ${INTERNAL_FRONTEND_PORT}
 
 volumes:
   beta_psql_volume:

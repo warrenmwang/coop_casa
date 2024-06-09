@@ -28,6 +28,3 @@ tmp/
 # Project build
 main
 
-# Development tool scripts
-psql_connect.sh
-manual_goose_migrate.sh

@@ -4,11 +4,11 @@ http {
     client_max_body_size 10M; # 10 Mebibytes max body size
 
     upstream frontend {
-        server beta_ts_frontend:${FRONTEND_PORT}; 
+        server beta_ts_frontend:${INTERNAL_FRONTEND_PORT}; 
     }
 
     upstream backend {
-        server beta_go_backend:${BACKEND_PORT}; 
+        server beta_go_backend:${INTERNAL_BACKEND_PORT}; 
     }
 
     server {

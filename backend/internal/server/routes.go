@@ -135,10 +135,8 @@ func (s *Server) getAuthedUserId(r *http.Request) (string, error) {
 
 func (s *Server) corsMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		origin := fmt.Sprintf("%s:%v", s.Host, s.FrontendPort)
-
 		// Set CORS headers
-		w.Header().Set("Access-Control-Allow-Origin", origin)
+		w.Header().Set("Access-Control-Allow-Origin", s.FrontendOrigin)
 
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
@@ -272,9 +270,7 @@ func (s *Server) authCallbackHandler(w http.ResponseWriter, r *http.Request) {
 	})
 
 	// Redirect to oauth callback page
-	// NOTE: even in production environment, as long as frontend port is set properly
-	// to say 443 for htpps, this redirect should work.
-	http.Redirect(w, r, fmt.Sprintf("%s:%d/oauth-callback", s.Host, s.FrontendPort), http.StatusFound)
+	http.Redirect(w, r, fmt.Sprintf("%s/oauth-callback", s.FrontendOrigin), http.StatusFound)
 }
 
 // Endpoint: GET HOST:PORT/auth/{provider}
