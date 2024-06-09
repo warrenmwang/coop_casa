@@ -30,12 +30,16 @@ jobs:
 
             # Proxy
             export EXTERNAL_PROXY_PORT=${{ secrets.EXTERNAL_PROXY_PORT }}
+
+            # Both Proxy and Frontend
             export INTERNAL_FRONTEND_PORT=${{ secrets.INTERNAL_FRONTEND_PORT }}
 
             # Both Proxy and Backend
             export INTERNAL_BACKEND_PORT=${{ secrets.INTERNAL_BACKEND_PORT }}
 
             # Backend
+            export EXTERNAL_FRONTEND_PORT=${{ secrets.EXTERNAL_FRONTEND_PORT }}
+
             export IS_PROD=true
             export PROD_HOST=${{ secrets.PROD_HOST }}
 
