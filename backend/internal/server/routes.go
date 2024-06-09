@@ -156,8 +156,11 @@ func (s *Server) corsMiddleware(next http.Handler) http.Handler {
 
 func (s *Server) RegisterRoutes() http.Handler {
 	r := chi.NewRouter()
-	r.Use(middleware.Logger)
-	r.Use(s.corsMiddleware)
+
+	// Middlewares
+	r.Use(middleware.Logger)  // stdout logger
+	r.Use(middleware.NoCache) // dont cache responses (especially important to get up to date api/auth responses)
+	r.Use(s.corsMiddleware)   // set headers for CORS
 
 	// API uptime check
 	r.Get("/", s.HelloWorldHandler)
