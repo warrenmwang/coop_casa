@@ -1,7 +1,7 @@
 services:
   coop_casa_beta_proxy: 
     build: ./proxy
-    container_name: coop_casa_beta_proxy
+    container_name: coop_casa_beta_proxy_name
     networks:
       - frontend
       - backend
