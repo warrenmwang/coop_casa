@@ -22,7 +22,7 @@ jobs:
             USER=${{ secrets.USERNAME }}
             
             # Pull repo source
-            cd /home/${USER}/deployment_repos/coop/src
+            cd /home/${USER}/deployment_repos/coop/coop_casa
             git checkout beta-deploy
             git pull origin beta-deploy
 
@@ -35,7 +35,6 @@ jobs:
             export JWT_SIGN_SECRET=${{ secrets.JWT_SIGN_SECRET }}
             export AUTH_KEY_SECRET=${{ secrets.AUTH_KEY_SECRET }}
             export DB_ENCRYPT_KEY_SECRET=${{ secrets.DB_ENCRYPT_KEY_SECRET }}
-            export EXTERNAL_DB_PORT=${{ secrets.EXTERNAL_DB_PORT }}
             export DB_HOST=${{ secrets.DB_HOST }}
             export DB_PORT=${{ secrets.DB_PORT }}
             export DB_DATABASE=${{ secrets.DB_DATABASE }}
@@ -48,6 +47,9 @@ jobs:
             export REACT_APP_IS_PROD=true
             export REACT_APP_API_PROD_HOST=${{ secrets.REACT_APP_API_PROD_HOST }}
             export REACT_APP_API_PORT=${{ secrets.REACT_APP_API_PORT }}
+
+            # PROXY
+            export EXTERNAL_PROXY_PORT=${{ secrets.EXTERNAL_PROXY_PORT }}
 
             # Run all as docker orchestration (db, backend, frontend, proxy)
             docker compose build
