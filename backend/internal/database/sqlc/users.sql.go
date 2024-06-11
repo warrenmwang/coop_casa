@@ -12,11 +12,11 @@ import (
 
 const createUser = `-- name: CreateUser :exec
 WITH new_user AS (
-  INSERT INTO users (user_id, email)
-  VALUES ($1, $2)
-  RETURNING user_id
+    INSERT INTO users (user_id, email)
+    VALUES ($1, $2)
+    RETURNING user_id
 )
-INSERT INTO user_avatars (user_id, avatar)
+INSERT INTO users_avatars (user_id, avatar)
 SELECT user_id, $3
 FROM new_user
 `
@@ -42,7 +42,7 @@ func (q *Queries) DeleteUser(ctx context.Context, userID string) error {
 }
 
 const deleteUserAvatar = `-- name: DeleteUserAvatar :exec
-DELETE FROM user_avatars WHERE user_id = $1
+DELETE FROM users_avatars WHERE user_id = $1
 `
 
 func (q *Queries) DeleteUserAvatar(ctx context.Context, userID string) error {
@@ -75,7 +75,7 @@ func (q *Queries) GetUser(ctx context.Context, userID string) (User, error) {
 }
 
 const getUserAvatar = `-- name: GetUserAvatar :one
-SELECT avatar FROM user_avatars
+SELECT avatar FROM users_avatars
 WHERE user_id = $1
 `
 
@@ -123,8 +123,10 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) error {
 }
 
 const updateUserAvatar = `-- name: UpdateUserAvatar :exec
-UPDATE user_avatars
-SET avatar = $2
+UPDATE users_avatars
+SET
+    avatar = $2,
+    updated_at = CURRENT_TIMESTAMP
 WHERE user_id = $1
 `
 

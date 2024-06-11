@@ -355,7 +355,7 @@ func (s *Server) apiGetAccountDetailsHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	// Get user account details
+	// Get user account details (as of 06/11/2024)
 	/*
 		type User struct {
 			ID        int32

@@ -9,6 +9,34 @@ import (
 	"time"
 )
 
+type PropertiesImage struct {
+	ID         int32
+	PropertyID string
+	Images     sql.NullString
+	UpdatedAt  time.Time
+}
+
+type Property struct {
+	ID              int32
+	PropertyID      string
+	Name            string
+	Description     sql.NullString
+	Address1        string
+	Address2        sql.NullString
+	City            string
+	State           string
+	Zipcode         string
+	Country         string
+	NumBedrooms     int16
+	NumToilets      int16
+	NumShowersBaths int16
+	CostDollars     int64
+	CostCents       int16
+	MiscNote        sql.NullString
+	CreatedAt       time.Time
+	UpdatedAt       time.Time
+}
+
 type User struct {
 	ID        int32
 	UserID    string
@@ -23,8 +51,9 @@ type User struct {
 	UpdatedAt time.Time
 }
 
-type UserAvatar struct {
-	ID     int32
-	UserID string
-	Avatar sql.NullString
+type UsersAvatar struct {
+	ID        int32
+	UserID    string
+	Avatar    sql.NullString
+	UpdatedAt time.Time
 }

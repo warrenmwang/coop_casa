@@ -13,12 +13,13 @@ CREATE TABLE users (
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE user_avatars (
+CREATE TABLE users_avatars (
     id SERIAL PRIMARY KEY,
     user_id TEXT NOT NULL UNIQUE,
-    avatar TEXT
+    avatar TEXT,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- +goose Down
 DROP TABLE users;
-DROP TABLE user_avatars;
+DROP TABLE users_avatars;

@@ -9,10 +9,12 @@ In-depth documentation will exist as comments for the respective functions.
 The database schema is written using types from PostgreSQL.
 Most values are self-explanatory, with detailed justification for some fields provided for clarity.
 
-### Users
+Note, all user data is encrypted by the backend service before being stored to disk as an extra layer of security. Therefore, all sensitive user data will be stored as strings. Only "non-sensitive" data will be stored in their raw format, such as the row's logical primary key, created_at timestamp, and updated_at timestamp.
+
+### `users`
 - id: `serial`, primary key
     unique integer for primary key logical construct
-- user_id: int
+- user_id: string
     unique user id, openID from oauth should be unique, check.
 - email: string
 - first_name: string
@@ -20,15 +22,20 @@ Most values are self-explanatory, with detailed justification for some fields pr
 - gender: string
 - birthdate: `timestamp with time zone`
     format MM-DD-YYYY
-- created_at: `timestamp with time zone`
-    timestamp of when the user first logged in / created their account
-- avatar_img: string
-    base64 encoded string
 - location: string
     current location 
 - interests: string
     stringified list of topics of interest that they are marked as things that they
     want to bond over with other people
+- created_at: `timestamp with time zone`
+    timestamp of when the user first logged in / created their account
+- updated_at: `timestamp with time zone`
+    timestamp of when the user details were updated
+
+### `user_avatars`
+- user_id: string
+- avatar_img: string
+    base64 encoded string of the user's avatar
  
 ### Groups
 - id: int, primary key
@@ -56,19 +63,32 @@ This table contains the total set of properties that exist on the Coop platform.
 Schema: 
 - id: int, primary key
     unique property id
-- listing_date: string
-    format something like MM-DD-YYYY:HH-MM-SS 
+- property_id: string unique
+    probably will be a UUID
 - name: string
     name of the property
-- location: string
-    location where this property resides
-- num_bedrooms: int
+- description: string
+    description of the property if provided 
+- address_1: string
+    address 1 string
+- address_2: string
+    address 2 string
+- city: string
+- state: string
+- zipcode: string
+- country: string
+    for now anticipate this to just be USA ? 
+- num_bedrooms: `smallint`
+    value range [-32768 to +32767]
     number of bedrooms in this property
-- num_toilets: int
+- num_toilets: `smallint`
+    value range [-32768 to +32767]
     number of toilets in this property
-- num_showers_baths: int
+- num_showers_baths: `smallint`
+    value range [-32768 to +32767]
     number of showers or baths in this property (count them together)
-- cost_dollars: int
+- cost_dollars: `bigint`
+    value range [-9223372036854775808 to +9223372036854775807]
     cost that the list has set for this property in USD
     only the dollar portion
     would like to avoid using float, so store cents as separate quantity
@@ -76,12 +96,18 @@ Schema:
 - cost_cents: int
     remaining fractional dollar cost of the property in cents, value range [0, 1, ..., 99]
     NOTE: total cost of a property is [cost_dollars + 0.01 * cost_cents]
-- description: string
-    description of the property if provided 
-- images: list of strings
-    list of the base64 encoded images of the property provided by the lister
 - misc_note: string
     any further notes made by the property lister
+- created_at: `timestamp with time zone`
+    timestamp of when the user first logged in / created their account
+- updated_at: `timestamp with time zone`
+    timestamp of when the user details were updated
+
+### `properties_images`
+- id `serial primary key`
+- property_id
+- images: list of strings
+    list of the base64 encoded images of the property provided by the lister
 
 ### Interested_Users
 Define the total set of users $U$. 

@@ -1,10 +1,10 @@
 -- name: CreateUser :exec
 WITH new_user AS (
-  INSERT INTO users (user_id, email)
-  VALUES ($1, $2)
-  RETURNING user_id
+    INSERT INTO users (user_id, email)
+    VALUES ($1, $2)
+    RETURNING user_id
 )
-INSERT INTO user_avatars (user_id, avatar)
+INSERT INTO users_avatars (user_id, avatar)
 SELECT user_id, $3
 FROM new_user;
 
@@ -21,12 +21,14 @@ SET
 WHERE user_id = $1;
 
 -- name: UpdateUserAvatar :exec
-UPDATE user_avatars
-SET avatar = $2
+UPDATE users_avatars
+SET
+    avatar = $2,
+    updated_at = CURRENT_TIMESTAMP
 WHERE user_id = $1;
 
 -- name: GetUserAvatar :one
-SELECT avatar FROM user_avatars
+SELECT avatar FROM users_avatars
 WHERE user_id = $1;
 
 -- name: GetUser :one
@@ -37,4 +39,4 @@ WHERE user_id = $1;
 DELETE FROM users WHERE user_id = $1;
 
 -- name: DeleteUserAvatar :exec
-DELETE FROM user_avatars WHERE user_id = $1;
+DELETE FROM users_avatars WHERE user_id = $1;
