@@ -163,6 +163,7 @@ func New() Service {
 	return s
 }
 
+// Test database connection
 func (s *service) Health() map[string]string {
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
@@ -409,6 +410,9 @@ func (s *service) CreateNewUserRole(userId, role string) error {
 
 	// Encrypt the role
 	roleEncrypted, err := s.encryptString(role)
+	if err != nil {
+		return err
+	}
 
 	// Insert the new role into the db
 	err = s.db_queries.CreateNewUserRole(ctx, sqlc.CreateNewUserRoleParams{

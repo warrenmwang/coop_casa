@@ -16,6 +16,7 @@ type Server struct {
 	FrontendOrigin string
 	JwtSignSecret  string
 	IsProd         bool
+	AdminUserID    string
 
 	db database.Service
 }
@@ -25,6 +26,7 @@ func NewServer() *http.Server {
 	frontendPort, _ := strconv.Atoi(os.Getenv("EXTERNAL_FRONTEND_PORT"))
 	jwtSignSecret := os.Getenv("JWT_SIGN_SECRET")
 	IsProd, _ := strconv.ParseBool(os.Getenv("IS_PROD"))
+	adminUserID := os.Getenv("ADMIN_USER_ID")
 
 	var host string
 	var frontendOrigin string
@@ -40,6 +42,7 @@ func NewServer() *http.Server {
 		FrontendOrigin: frontendOrigin,
 		JwtSignSecret:  jwtSignSecret,
 		IsProd:         IsProd,
+		AdminUserID:    adminUserID,
 
 		db: database.New(),
 	}

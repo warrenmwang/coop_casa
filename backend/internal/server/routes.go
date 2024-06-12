@@ -130,6 +130,25 @@ func (s *Server) getAuthedUserId(r *http.Request) (string, error) {
 	return userId, nil
 }
 
+func (s *Server) CreateNewUserRole(userId string) error {
+	// Check if userId is the admin user id and if so, use a role
+	// of "admin"
+	var role string
+	if userId == s.AdminUserID {
+		role = "admin"
+	} else {
+		role = "regular"
+	}
+
+	// Create role for user in the db
+	err := s.db.CreateNewUserRole(userId, role)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // ---------------------------------------------------------------
 // MIDDLEWARES
 
@@ -187,7 +206,13 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.Delete("/api/account", s.apiDeleteAccountHandler)
 
 	// Update account details
-	r.Post("/api/account/update", s.apiUpdateAccountDetailsHandler)
+	r.Post("/api/account", s.apiUpdateAccountDetailsHandler)
+
+	// Update user role
+	r.Post("/api/account/role", s.apiUpdateUserRoleHandler)
+
+	// Get user role
+	r.Get("/api/account/role", s.apiGetUserRoleHandler)
 
 	return r
 }
@@ -248,10 +273,18 @@ func (s *Server) authCallbackHandler(w http.ResponseWriter, r *http.Request) {
 			// create new user for them
 			err = s.db.CreateUser(user.UserId, user.Email)
 			if err != nil {
-				log.Fatalf("Unable to create new user in database with err: %s\n", err.Error())
+				respondWithError(w, 500, fmt.Errorf("unable to create new user in database with err: %s", err.Error()))
+				return
+			}
+			// Create a new role for the user
+			err = s.CreateNewUserRole(user.UserId)
+			if err != nil {
+				respondWithError(w, 500, fmt.Errorf("unable to create new user role in database with err: %s", err.Error()))
+				return
 			}
 		} else {
-			log.Fatalf("Error in GetUser in oauth callback function: %s\n", err.Error())
+			respondWithError(w, 500, err)
+			return
 		}
 	}
 	// If err was nil user is already in db, just return with token
@@ -259,7 +292,8 @@ func (s *Server) authCallbackHandler(w http.ResponseWriter, r *http.Request) {
 	// Generate token with user info
 	tokenSigned, err := s.GenerateToken(user, expireTime)
 	if err != nil {
-		log.Fatalf("Unable to sign token with err: %s\n", err.Error())
+		respondWithError(w, 500, err)
+		return
 	}
 
 	// Set token in cookie
@@ -398,7 +432,7 @@ func (s *Server) apiGetAccountDetailsHandler(w http.ResponseWriter, r *http.Requ
 	})
 }
 
-// Endpoint: POST HOST:PORT/api/account/update
+// Endpoint: POST HOST:PORT/api/account
 func (s *Server) apiUpdateAccountDetailsHandler(w http.ResponseWriter, r *http.Request) {
 	// Authenticate user
 	userIdFromToken, err := s.getAuthedUserId(r)
@@ -444,8 +478,15 @@ func (s *Server) apiDeleteAccountHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	// Delete account from database
+	// Delete account (details and avatar) from database
 	err = s.db.DeleteUser(userId)
+	if err != nil {
+		respondWithError(w, 401, err)
+		return
+	}
+
+	// Delete user role from database
+	err = s.db.DeleteUserRole(userId)
 	if err != nil {
 		respondWithError(w, 401, err)
 		return
@@ -456,4 +497,67 @@ func (s *Server) apiDeleteAccountHandler(w http.ResponseWriter, r *http.Request)
 
 	// Return response ok
 	w.WriteHeader(200)
+}
+
+// Endpoint: POST HOST:PORT/api/account/role
+func (s *Server) apiUpdateUserRoleHandler(w http.ResponseWriter, r *http.Request) {
+	// For now, expect that only the admin user can update roles
+
+	// Authenticate user
+	userId, err := s.getAuthedUserId(r)
+	if err != nil {
+		respondWithError(w, 401, err)
+		return
+	}
+
+	// If userid is not the admin user id, return unauthorized
+	if userId != s.AdminUserID {
+		respondWithError(w, 401, errors.New("unauthorized"))
+		return
+	}
+
+	// Get the role from the request body
+	role := struct {
+		UserID string `json:"userId"`
+		Role   string `json:"role"`
+	}{}
+	err = json.NewDecoder(r.Body).Decode(&role)
+	if err != nil {
+		respondWithError(w, 400, err)
+		return
+	}
+
+	// Update role for the user specified in the request body in the db
+	err = s.db.UpdateUserRole(role.UserID, role.Role)
+	if err != nil {
+		respondWithError(w, 500, err)
+		return
+	}
+
+	// Return response ok
+	(w).WriteHeader(200)
+}
+
+// Endpoint: GET HOST:PORT/api/account/role
+func (s *Server) apiGetUserRoleHandler(w http.ResponseWriter, r *http.Request) {
+	// Authenticate user
+	userId, err := s.getAuthedUserId(r)
+	if err != nil {
+		respondWithError(w, 401, err)
+		return
+	}
+
+	// Get the user's role from the db
+	role, err := s.db.GetUserRole(userId)
+	if err != nil {
+		respondWithError(w, 500, err)
+		return
+	}
+
+	// Return the user's role
+	respondWithJSON(w, 200, struct {
+		Role string `json:"role"`
+	}{
+		Role: role,
+	})
 }

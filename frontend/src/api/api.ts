@@ -4,7 +4,7 @@
 
 import { useEffect, useState } from "react";
 import { NullUser, User } from "../types/User";
-import { api_account_Link, api_account_update_Link, api_auth_check_link, api_auth_logout_Link } from "../urls";
+import { api_account_Link, api_account_update_Link, api_auth_check_link, api_auth_logout_Link, api_user_role_Link } from "../urls";
 import { AuthData } from "../auth/AuthWrapper";
 
 const checkFetch = (response : Response) => {
@@ -145,6 +145,39 @@ export const useAPIGetUserAccount = () : boolean => {
       if (userData !== null) {
         setUser(userData as User);
       }
+      setLoading(false);
+    })
+    .catch((err) => console.error(err));
+
+    return () => controller.abort();
+  }, []);
+
+  return loading;
+}
+
+export const useAPIGetUserRole = () : boolean => {
+  // Assuming that all components are under the global Auth Context
+  const auth = AuthData();
+  const { setUserRole } = auth;
+
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    fetch(api_user_role_Link, {
+      method: "GET",
+      headers: {
+        "Accept": "application/json",
+      },
+      credentials: "include",
+      signal: controller.signal
+    })
+    .then(checkFetch)
+    .then(response => response.json()) 
+    .then(data => {
+      const userRole = data.role as string
+      setUserRole(userRole);
       setLoading(false);
     })
     .catch((err) => console.error(err));

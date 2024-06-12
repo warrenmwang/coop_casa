@@ -5,9 +5,11 @@ import { apiLogoutUser } from "../api/api";
 interface AuthContextType {
   user: User;
   authenticated: boolean;
+  userRole: string;
   logout: () => Promise<void>;
   setUser: React.Dispatch<React.SetStateAction<User>>;
   setAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
+  setUserRole: React.Dispatch<React.SetStateAction<string>>;
 }
 
 export const EmptyUser : User = {
@@ -25,12 +27,14 @@ export const EmptyUser : User = {
 const AuthContext = createContext<AuthContextType>({
   user: EmptyUser,
   authenticated: false,
+  userRole: "",
   logout: () => Promise.resolve(),
   setUser: () => {},
-  setAuthenticated: () => {}
-})
+  setAuthenticated: () => {},
+  setUserRole: () => {}
+});
 
-export const AuthData = () => useContext(AuthContext)
+export const AuthData = () => useContext(AuthContext);
 
 // wrapper to provide the auth state context throughout all components
 const AuthWrapper: React.FC<{children: ReactNode}> = ({ children }) => {
@@ -47,6 +51,7 @@ const AuthWrapper: React.FC<{children: ReactNode}> = ({ children }) => {
     avatar: ''
   });
   const [ authenticated, setAuthenticated ] = useState(false);
+  const [ userRole, setUserRole ] = useState("");
 
   // Define the function to logout the user
   const logout = async () => {
@@ -73,9 +78,11 @@ const AuthWrapper: React.FC<{children: ReactNode}> = ({ children }) => {
       {
         user, 
         authenticated, 
+        userRole,
         logout,
         setUser,
-        setAuthenticated
+        setAuthenticated,
+        setUserRole
       }
     }>
       {children}
