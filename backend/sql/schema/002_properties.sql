@@ -2,6 +2,7 @@
 CREATE TABLE properties (
     id SERIAL PRIMARY KEY,
     property_id TEXT NOT NULL UNIQUE,
+    lister_user_id TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "description" TEXT,
     address_1 TEXT NOT NULL,

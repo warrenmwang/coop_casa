@@ -14,14 +14,19 @@ const DashboardPage: React.FC = () => {
   const auth = AuthData();
   const { user } = auth;
   const email = user.email;
-  const accountIsSetup = (user.firstName !== "");
+  const accountIsSetup = (user.firstName !== "" && user.lastName !== "");
  
   return (
     <div>
       <TopNavbar></TopNavbar>
-      <Title title="Dashboard" description={`Welcome ${email}`}></Title>
+      <Title title="Dashboard" description={`Welcome ${accountIsSetup ? `${user.firstName} ${user.lastName}`  : email}`}></Title>
       {!accountIsSetup && <AccountSetup />}
-      { accountIsSetup && <SearchCommunities/> && <SearchProperties/> }
+      { accountIsSetup && (
+        <>
+          <SearchCommunities/>
+          <SearchProperties/>
+        </>
+      ) }
       <Footer></Footer>
     </div>
   )

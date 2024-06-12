@@ -19,6 +19,7 @@ type PropertiesImage struct {
 type Property struct {
 	ID              int32
 	PropertyID      string
+	ListerUserID    string
 	Name            string
 	Description     sql.NullString
 	Address1        string
@@ -35,6 +36,12 @@ type Property struct {
 	MiscNote        sql.NullString
 	CreatedAt       time.Time
 	UpdatedAt       time.Time
+}
+
+type Role struct {
+	ID     int32
+	UserID string
+	Role   string
 }
 
 type User struct {

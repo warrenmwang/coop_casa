@@ -1,12 +1,26 @@
 -- name: CreateProperty :exec
 WITH new_property AS (
-    INSERT INTO properties (property_id, "name", "description", address_1, address_2, city, "state", zipcode, country, num_bedrooms, num_toilets, num_showers_baths, cost_dollars, cost_cents, misc_note)
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+    INSERT INTO properties 
+    (
+    property_id, lister_user_id, "name", "description", 
+    address_1, address_2, city, "state", zipcode, country, num_bedrooms, 
+    num_toilets, num_showers_baths, cost_dollars, cost_cents, misc_note
+    )
+    VALUES 
+    ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
     RETURNING property_id
 )
 INSERT INTO properties_images (property_id, images)
-SELECT property_id, $16
+SELECT property_id, $17
 FROM new_property;
+
+-- name: GetProperty :one
+SELECT * FROM properties
+WHERE property_id = $1;
+
+-- name: GetPropertyImages :one
+SELECT * FROM properties_images
+WHERE property_id = $1;
 
 -- name: UpdateProperty :exec
 UPDATE properties
@@ -25,6 +39,7 @@ SET
     cost_dollars = $13,
     cost_cents = $14,
     misc_note = $15,
+    lister_user_id = $16,
     updated_at = CURRENT_TIMESTAMP
 WHERE property_id = $1;
 

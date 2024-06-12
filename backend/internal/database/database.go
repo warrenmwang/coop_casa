@@ -33,13 +33,48 @@ type User_New struct {
 	Avatar    string `json:"avatar"`
 }
 
+type Property struct {
+	PropertyID        string `json:"propertyId"`
+	ListerUserID      string `json:"listerUserId"`
+	Name              string `json:"name"`
+	Description       string `json:"description"`
+	Address_1         string `json:"address1"`
+	Address_2         string `json:"address2"`
+	City              string `json:"city"`
+	State             string `json:"state"`
+	Zipcode           string `json:"zipcode"`
+	Country           string `json:"country"`
+	Num_bedrooms      int16  `json:"numBedrooms"`
+	Num_toilets       int16  `json:"numToilets"`
+	Num_showers_baths int16  `json:"numShowersBaths"`
+	Cost_dollars      int64  `json:"costDollars"`
+	Cost_cents        int16  `json:"costCents"`
+	Misc_note         string `json:"miscNote"`
+	Images            string `json:"images"`
+}
+
 type Service interface {
+	// General
 	Health() map[string]string
+
+	// Users
 	CreateUser(userId, email string) error
 	GetUser(userId string) (sqlc.User, error)
 	UpdateUser(updatedUserData User_New) error
 	DeleteUser(userId string) error
 	GetUserAvatar(userId string) (string, error)
+
+	// Roles
+	CreateNewUserRole(userId, role string) error
+	GetUserRole(userId string) (string, error)
+	UpdateUserRole(userId, role string) error
+	DeleteUserRole(userId string) error
+
+	// Properties
+	CreateProperty(property Property) error
+	GetProperty(propertyId string) (Property, error)
+	UpdateProperty(property Property) error
+	DeleteProperty(propertyId string) error
 }
 
 type service struct {
@@ -358,5 +393,224 @@ func (s *service) DeleteUser(userId string) error {
 
 	// Delete the user's avatar with the matching encrypted id
 	err = s.db_queries.DeleteUserAvatar(ctx, userId_encrypted)
+	return err
+}
+
+// Roles
+// Create a new role for a user, limited to one role per user
+func (s *service) CreateNewUserRole(userId, role string) error {
+	ctx := context.Background()
+
+	// Encrypt user id
+	userIdEncrypted, err := s.encryptString(userId)
+	if err != nil {
+		return err
+	}
+
+	// Encrypt the role
+	roleEncrypted, err := s.encryptString(role)
+
+	// Insert the new role into the db
+	err = s.db_queries.CreateNewUserRole(ctx, sqlc.CreateNewUserRoleParams{
+		UserID: userIdEncrypted,
+		Role:   roleEncrypted,
+	})
+	return err
+}
+
+// Get a user's role
+func (s *service) GetUserRole(userId string) (string, error) {
+	ctx := context.Background()
+
+	// Encrypt the user id
+	userIdEncrypted, err := s.encryptString(userId)
+	if err != nil {
+		return "", err
+	}
+
+	// Find the role for the user in the db
+	userRole, err := s.db_queries.GetUserRole(ctx, userIdEncrypted)
+	if err != nil {
+		return "", err
+	}
+
+	// Decrypt the role
+	roleDecrypted, err := s.decryptString(userRole.Role)
+	if err != nil {
+		return "", err
+	}
+
+	return roleDecrypted, nil
+}
+
+// Update a user's role
+func (s *service) UpdateUserRole(userId, role string) error {
+	ctx := context.Background()
+
+	// Encrypt the user id
+	userIdEncrypted, err := s.encryptString(userId)
+	if err != nil {
+		return err
+	}
+
+	// Encrypt the role
+	roleEncrypted, err := s.encryptString(role)
+	if err != nil {
+		return err
+	}
+
+	// Update the user's role
+	err = s.db_queries.UpdateUserRole(ctx, sqlc.UpdateUserRoleParams{
+		UserID: userIdEncrypted,
+		Role:   roleEncrypted,
+	})
+	return err
+}
+
+// Delete the user's role (since users must have a role as long as their account exists
+// this means the user's account has been deleted)
+func (s *service) DeleteUserRole(userId string) error {
+	ctx := context.Background()
+
+	// Encrypt the user id
+	userIdEncrypted, err := s.encryptString(userId)
+	if err != nil {
+		return err
+	}
+
+	// Delete the user's role
+	err = s.db_queries.DeleteUserRole(ctx, userIdEncrypted)
+	return err
+}
+
+// Properties
+// Just encrypt the lister user id
+// all other fields can be in plaintext
+
+// Create a row in both the properties and properties_images tables
+func (s *service) CreateProperty(property Property) error {
+	ctx := context.Background()
+
+	// Encrypt the lister user id
+	listerUserIdEncrypted, err := s.encryptString(property.ListerUserID)
+	if err != nil {
+		return err
+	}
+
+	// Insert property data into db
+	err = s.db_queries.CreateProperty(ctx, sqlc.CreatePropertyParams{
+		PropertyID:      property.PropertyID,
+		ListerUserID:    listerUserIdEncrypted,
+		Name:            property.Name,
+		Description:     utils.CreateSQLNullString(property.Description),
+		Address1:        property.Address_1,
+		Address2:        utils.CreateSQLNullString(property.Address_2),
+		City:            property.City,
+		State:           property.State,
+		Zipcode:         property.Zipcode,
+		Country:         property.Country,
+		NumBedrooms:     property.Num_bedrooms,
+		NumToilets:      property.Num_toilets,
+		NumShowersBaths: property.Num_showers_baths,
+		CostDollars:     property.Cost_dollars,
+		CostCents:       property.Cost_cents,
+		MiscNote:        utils.CreateSQLNullString(property.Misc_note),
+		Images:          utils.CreateSQLNullString(property.Images),
+	})
+	return err
+}
+
+// Find and return the property details given the property's id
+func (s *service) GetProperty(propertyId string) (Property, error) {
+	ctx := context.Background()
+
+	// Get the property details
+	property, err := s.db_queries.GetProperty(ctx, propertyId)
+	if err != nil {
+		return Property{}, err
+	}
+
+	// Decrypt the lister user id
+	listerUserIDDecrypted, err := s.decryptString(property.ListerUserID)
+	if err != nil {
+		return Property{}, err
+	}
+
+	// Get the property images
+	propertyImages, err := s.db_queries.GetPropertyImages(ctx, propertyId)
+	if err != nil {
+		return Property{}, err
+	}
+
+	fullProperty := Property{
+		PropertyID:        propertyId,
+		ListerUserID:      listerUserIDDecrypted,
+		Name:              property.Name,
+		Description:       property.Description.String,
+		Address_1:         property.Address1,
+		Address_2:         property.Address2.String,
+		City:              property.City,
+		State:             property.State,
+		Zipcode:           property.Zipcode,
+		Country:           property.Country,
+		Num_bedrooms:      property.NumBedrooms,
+		Num_toilets:       property.NumToilets,
+		Num_showers_baths: property.NumShowersBaths,
+		Cost_dollars:      property.CostDollars,
+		Cost_cents:        property.CostCents,
+		Misc_note:         property.MiscNote.String,
+		Images:            propertyImages.Images.String,
+	}
+
+	return fullProperty, nil
+}
+
+// Update property
+func (s *service) UpdateProperty(property Property) error {
+	ctx := context.Background()
+
+	// Encrypt the lister user id
+	listerUserIDEncrypted, err := s.encryptString(property.ListerUserID)
+	if err != nil {
+		return err
+	}
+
+	// Construct the new property struct to insert into db
+	err = s.db_queries.UpdateProperty(ctx, sqlc.UpdatePropertyParams{
+		PropertyID:      property.PropertyID,
+		ListerUserID:    listerUserIDEncrypted,
+		Name:            property.Name,
+		Description:     utils.CreateSQLNullString(property.Description),
+		Address1:        property.Address_1,
+		Address2:        utils.CreateSQLNullString(property.Address_2),
+		City:            property.City,
+		State:           property.State,
+		Zipcode:         property.Zipcode,
+		Country:         property.Country,
+		NumBedrooms:     property.Num_bedrooms,
+		NumToilets:      property.Num_toilets,
+		NumShowersBaths: property.Num_showers_baths,
+		CostDollars:     property.Cost_dollars,
+		CostCents:       property.Cost_cents,
+		MiscNote:        utils.CreateSQLNullString(property.Misc_note),
+	})
+	if err != nil {
+		return err
+	}
+
+	// Construct the new property images struct to insert into db
+	err = s.db_queries.UpdatePropertyImages(ctx, sqlc.UpdatePropertyImagesParams{
+		PropertyID: property.PropertyID,
+		Images:     utils.CreateSQLNullString(property.Images),
+	})
+	return err
+}
+
+// Delete property
+func (s *service) DeleteProperty(propertyId string) error {
+	ctx := context.Background()
+
+	// Delete the property and the images (a single transaction)
+	err := s.db_queries.DeleteProperty(ctx, propertyId)
 	return err
 }

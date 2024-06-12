@@ -401,7 +401,7 @@ func (s *Server) apiGetAccountDetailsHandler(w http.ResponseWriter, r *http.Requ
 // Endpoint: POST HOST:PORT/api/account/update
 func (s *Server) apiUpdateAccountDetailsHandler(w http.ResponseWriter, r *http.Request) {
 	// Authenticate user
-	_, err := s.getAuthedUserId(r)
+	userIdFromToken, err := s.getAuthedUserId(r)
 	if err != nil {
 		respondWithError(w, 405, err)
 		return
@@ -412,6 +412,13 @@ func (s *Server) apiUpdateAccountDetailsHandler(w http.ResponseWriter, r *http.R
 	err = json.NewDecoder(r.Body).Decode(&formData)
 	if err != nil {
 		respondWithError(w, 400, err)
+		return
+	}
+
+	// Ensure that the given user id is the same as the
+	// id in the token
+	if userIdFromToken != formData.UserID {
+		respondWithError(w, 400, errors.New("token user id does not match user id in form"))
 		return
 	}
 

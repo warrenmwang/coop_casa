@@ -4,6 +4,7 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/md5"
+	"database/sql"
 	"encoding/base64"
 	"time"
 )
@@ -58,4 +59,17 @@ func Decrypt(ciphertext, key string) (string, error) {
 	stream.XORKeyStream(plaintext, data)
 
 	return string(plaintext), nil
+}
+
+func CreateSQLNullString(s string) sql.NullString {
+	if s == "" {
+		return sql.NullString{
+			String: "",
+			Valid:  false,
+		}
+	}
+	return sql.NullString{
+		String: s,
+		Valid:  true,
+	}
 }

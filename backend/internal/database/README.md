@@ -11,7 +11,8 @@ Most values are self-explanatory, with detailed justification for some fields pr
 
 Note, all user data is encrypted by the backend service before being stored to disk as an extra layer of security. Therefore, all sensitive user data will be stored as strings. Only "non-sensitive" data will be stored in their raw format, such as the row's logical primary key, created_at timestamp, and updated_at timestamp.
 
-### `users`
+### Users
+Schema for table `users`:
 - id: `serial`, primary key
     unique integer for primary key logical construct
 - user_id: string
@@ -32,10 +33,31 @@ Note, all user data is encrypted by the backend service before being stored to d
 - updated_at: `timestamp with time zone`
     timestamp of when the user details were updated
 
-### `user_avatars`
+Schema for table `user_avatars`:
 - user_id: string
 - avatar_img: string
     base64 encoded string of the user's avatar
+
+### Roles
+We need to be able to know what permissions people have based on the privilege they are granted based off of what role they serve.
+
+Schema for table `roles`:
+- id SERIAL PRIMARY KEY,
+- user_id TEXT NOT NULL UNIQUE,
+    to know which user this applies to
+- "role" TEXT NOT NULL,
+    a text description of their role, in order of decreasing privilege:
+    0. `admin` - should be a single person for our purpose (me) who has god mode enabled.
+                Properties - R/W
+                Communities - R/W
+    1. `lister` - should be someone who has been "verified" as being able to list properties (write access)
+                Properties - R/W
+                Communities - R
+    2. `regular` - majority of users who will be able to just browse the properties listed
+                Properties - R
+                Communities - R/(W*)
+                    write access is given only to the users who have created their own groups and/or marked as an admin of a group
+
  
 ### Groups
 - id: int, primary key
@@ -60,7 +82,7 @@ Note, all user data is encrypted by the backend service before being stored to d
 Define the total set of properties $P$. 
 This table contains the total set of properties that exist on the Coop platform.
 
-Schema: 
+Schema for table `properties`: 
 - id: int, primary key
     unique property id
 - property_id: string unique
@@ -103,11 +125,18 @@ Schema:
 - updated_at: `timestamp with time zone`
     timestamp of when the user details were updated
 
-### `properties_images`
+Schema for table `properties_images`:
 - id `serial primary key`
 - property_id
 - images: list of strings
     list of the base64 encoded images of the property provided by the lister
+    since an image encoded as a base64 string cannot contain commas, 
+    we can use a comma (,) as the delineator character. so format will be 
+    `[image], [image], [image]`
+    if only a single image is present then:
+    `[image]`
+
+
 
 ### Interested_Users
 Define the total set of users $U$. 

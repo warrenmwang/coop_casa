@@ -12,17 +12,24 @@ import (
 
 const createProperty = `-- name: CreateProperty :exec
 WITH new_property AS (
-    INSERT INTO properties (property_id, "name", "description", address_1, address_2, city, "state", zipcode, country, num_bedrooms, num_toilets, num_showers_baths, cost_dollars, cost_cents, misc_note)
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+    INSERT INTO properties 
+    (
+    property_id, lister_user_id, "name", "description", 
+    address_1, address_2, city, "state", zipcode, country, num_bedrooms, 
+    num_toilets, num_showers_baths, cost_dollars, cost_cents, misc_note
+    )
+    VALUES 
+    ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
     RETURNING property_id
 )
 INSERT INTO properties_images (property_id, images)
-SELECT property_id, $16
+SELECT property_id, $17
 FROM new_property
 `
 
 type CreatePropertyParams struct {
 	PropertyID      string
+	ListerUserID    string
 	Name            string
 	Description     sql.NullString
 	Address1        string
@@ -43,6 +50,7 @@ type CreatePropertyParams struct {
 func (q *Queries) CreateProperty(ctx context.Context, arg CreatePropertyParams) error {
 	_, err := q.db.ExecContext(ctx, createProperty,
 		arg.PropertyID,
+		arg.ListerUserID,
 		arg.Name,
 		arg.Description,
 		arg.Address1,
@@ -79,6 +87,55 @@ func (q *Queries) DeleteProperty(ctx context.Context, propertyID string) error {
 	return err
 }
 
+const getProperty = `-- name: GetProperty :one
+SELECT id, property_id, lister_user_id, name, description, address_1, address_2, city, state, zipcode, country, num_bedrooms, num_toilets, num_showers_baths, cost_dollars, cost_cents, misc_note, created_at, updated_at FROM properties
+WHERE property_id = $1
+`
+
+func (q *Queries) GetProperty(ctx context.Context, propertyID string) (Property, error) {
+	row := q.db.QueryRowContext(ctx, getProperty, propertyID)
+	var i Property
+	err := row.Scan(
+		&i.ID,
+		&i.PropertyID,
+		&i.ListerUserID,
+		&i.Name,
+		&i.Description,
+		&i.Address1,
+		&i.Address2,
+		&i.City,
+		&i.State,
+		&i.Zipcode,
+		&i.Country,
+		&i.NumBedrooms,
+		&i.NumToilets,
+		&i.NumShowersBaths,
+		&i.CostDollars,
+		&i.CostCents,
+		&i.MiscNote,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const getPropertyImages = `-- name: GetPropertyImages :one
+SELECT id, property_id, images, updated_at FROM properties_images
+WHERE property_id = $1
+`
+
+func (q *Queries) GetPropertyImages(ctx context.Context, propertyID string) (PropertiesImage, error) {
+	row := q.db.QueryRowContext(ctx, getPropertyImages, propertyID)
+	var i PropertiesImage
+	err := row.Scan(
+		&i.ID,
+		&i.PropertyID,
+		&i.Images,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const updateProperty = `-- name: UpdateProperty :exec
 UPDATE properties
 SET 
@@ -96,6 +153,7 @@ SET
     cost_dollars = $13,
     cost_cents = $14,
     misc_note = $15,
+    lister_user_id = $16,
     updated_at = CURRENT_TIMESTAMP
 WHERE property_id = $1
 `
@@ -116,6 +174,7 @@ type UpdatePropertyParams struct {
 	CostDollars     int64
 	CostCents       int16
 	MiscNote        sql.NullString
+	ListerUserID    string
 }
 
 func (q *Queries) UpdateProperty(ctx context.Context, arg UpdatePropertyParams) error {
@@ -135,6 +194,7 @@ func (q *Queries) UpdateProperty(ctx context.Context, arg UpdatePropertyParams) 
 		arg.CostDollars,
 		arg.CostCents,
 		arg.MiscNote,
+		arg.ListerUserID,
 	)
 	return err
 }
