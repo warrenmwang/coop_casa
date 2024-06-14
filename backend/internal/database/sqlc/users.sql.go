@@ -10,6 +10,52 @@ import (
 	"database/sql"
 )
 
+const adminGetUsers = `-- name: AdminGetUsers :many
+SELECt id, user_id, email, first_name, last_name, birth_date, gender, location, interests, created_at, updated_at FROM users
+ORDER BY id 
+LIMIT $1 OFFSET $2
+`
+
+type AdminGetUsersParams struct {
+	Limit  int32
+	Offset int32
+}
+
+func (q *Queries) AdminGetUsers(ctx context.Context, arg AdminGetUsersParams) ([]User, error) {
+	rows, err := q.db.QueryContext(ctx, adminGetUsers, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []User
+	for rows.Next() {
+		var i User
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.Email,
+			&i.FirstName,
+			&i.LastName,
+			&i.BirthDate,
+			&i.Gender,
+			&i.Location,
+			&i.Interests,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const createUser = `-- name: CreateUser :exec
 WITH new_user AS (
     INSERT INTO users (user_id, email)

@@ -57,6 +57,10 @@ type Service interface {
 	// General
 	Health() map[string]string
 
+	// Admin functions
+	AdminGetUsers(limit, offset int32) ([]sqlc.User, error)
+	AdminGetUsersRoles(userIds []string) ([]string, error)
+
 	// Users
 	CreateUser(userId, email string) error
 	GetUser(userId string) (sqlc.User, error)
@@ -177,6 +181,79 @@ func (s *service) Health() map[string]string {
 		"message": "It's healthy",
 	}
 }
+
+// Admin functions
+func (s *service) AdminGetUsers(limit, offset int32) ([]sqlc.User, error) {
+	ctx := context.Background()
+
+	// Get users using the limit and offset provided
+	users, err := s.db_queries.AdminGetUsers(ctx, sqlc.AdminGetUsersParams{
+		Limit:  limit,
+		Offset: offset,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	// Decrypt user data
+	var decryptedUsers []sqlc.User
+	for _, user := range users {
+		userId, err := s.decryptString(user.UserID)
+		if err != nil {
+			return nil, err
+		}
+
+		email, err := s.decryptString(user.Email)
+		if err != nil {
+			return nil, err
+		}
+
+		firstName, err := s.decryptNullString(user.FirstName)
+		if err != nil {
+			return nil, err
+		}
+
+		lastName, err := s.decryptNullString(user.LastName)
+		if err != nil {
+			return nil, err
+		}
+
+		birthDate, err := s.decryptNullString(user.BirthDate)
+		if err != nil {
+			return nil, err
+		}
+
+		gender, err := s.decryptNullString(user.Gender)
+		if err != nil {
+			return nil, err
+		}
+
+		location, err := s.decryptNullString(user.Location)
+		if err != nil {
+			return nil, err
+		}
+
+		interests, err := s.decryptNullString(user.Interests)
+		if err != nil {
+			return nil, err
+		}
+
+		decryptedUsers = append(decryptedUsers, sqlc.User{
+			UserID:    userId,
+			Email:     email,
+			FirstName: firstName,
+			LastName:  lastName,
+			BirthDate: birthDate,
+			Gender:    gender,
+			Location:  location,
+			Interests: interests,
+		})
+	}
+
+	return decryptedUsers, nil
+}
+
+// Users
 
 func (s *service) CreateUser(userId, email string) error {
 	ctx := context.Background()
@@ -617,4 +694,42 @@ func (s *service) DeleteProperty(propertyId string) error {
 	// Delete the property and the images (a single transaction)
 	err := s.db_queries.DeleteProperty(ctx, propertyId)
 	return err
+}
+
+// Admin - get multiple user ids
+func (s *service) AdminGetUsersRoles(userIds []string) ([]string, error) {
+	ctx := context.Background()
+
+	// Encrypt the user ids
+	var userIdsEncrypted []string
+	for _, userId := range userIds {
+		userIdEncrypted, err := s.encryptString(userId)
+		if err != nil {
+			return nil, err
+		}
+		userIdsEncrypted = append(userIdsEncrypted, userIdEncrypted)
+	}
+
+	// Get the roles for the users
+	var userRolesEncrypted []sqlc.Role
+	for _, userId := range userIdsEncrypted {
+		role, err := s.db_queries.GetUserRole(ctx, userId)
+		if err != nil {
+			return nil, err
+		}
+
+		userRolesEncrypted = append(userRolesEncrypted, role)
+	}
+
+	// Decrypt the roles
+	var userRoles []string
+	for _, role := range userRolesEncrypted {
+		roleDecrypted, err := s.decryptString(role.Role)
+		if err != nil {
+			return nil, err
+		}
+		userRoles = append(userRoles, roleDecrypted)
+	}
+
+	return userRoles, nil
 }

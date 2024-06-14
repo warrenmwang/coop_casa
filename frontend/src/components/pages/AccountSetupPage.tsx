@@ -169,7 +169,11 @@ const AccountSetupPage: React.FC = () => {
 
           {/* Submit Button */}
           <div className="w-full px-3">
-            <button type="submit" className="bg-blue-500 text-white py-2 px-4 rounded" disabled={isSubmitting}>
+            <button
+              type="submit"
+              className="bg-blue-500 text-white py-2 px-4 rounded"
+              disabled={isSubmitting}
+            >
               {isSubmitting ? "Submitting..." : "Submit"}
             </button>
           </div>

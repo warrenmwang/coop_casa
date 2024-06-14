@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -208,11 +210,17 @@ func (s *Server) RegisterRoutes() http.Handler {
 	// Update account details
 	r.Post("/api/account", s.apiUpdateAccountDetailsHandler)
 
-	// Update user role
-	r.Post("/api/account/role", s.apiUpdateUserRoleHandler)
-
-	// Get user role
+	// A user can get their own role
 	r.Get("/api/account/role", s.apiGetUserRoleHandler)
+
+	// Admin - get users
+	r.Get("/api/admin/users", s.apiAdminGetUsers)
+
+	// Admin - get user(s) role(s)
+	r.Get("/api/admin/users/roles", s.apiAdminGetUsersRoles)
+
+	// Admin - update user(s) role(s)
+	r.Post("/api/admin/users/roles", s.apiUpdateUserRoleHandler)
 
 	return r
 }
@@ -499,45 +507,6 @@ func (s *Server) apiDeleteAccountHandler(w http.ResponseWriter, r *http.Request)
 	w.WriteHeader(200)
 }
 
-// Endpoint: POST HOST:PORT/api/account/role
-func (s *Server) apiUpdateUserRoleHandler(w http.ResponseWriter, r *http.Request) {
-	// For now, expect that only the admin user can update roles
-
-	// Authenticate user
-	userId, err := s.getAuthedUserId(r)
-	if err != nil {
-		respondWithError(w, 401, err)
-		return
-	}
-
-	// If userid is not the admin user id, return unauthorized
-	if userId != s.AdminUserID {
-		respondWithError(w, 401, errors.New("unauthorized"))
-		return
-	}
-
-	// Get the role from the request body
-	role := struct {
-		UserID string `json:"userId"`
-		Role   string `json:"role"`
-	}{}
-	err = json.NewDecoder(r.Body).Decode(&role)
-	if err != nil {
-		respondWithError(w, 400, err)
-		return
-	}
-
-	// Update role for the user specified in the request body in the db
-	err = s.db.UpdateUserRole(role.UserID, role.Role)
-	if err != nil {
-		respondWithError(w, 500, err)
-		return
-	}
-
-	// Return response ok
-	(w).WriteHeader(200)
-}
-
 // Endpoint: GET HOST:PORT/api/account/role
 func (s *Server) apiGetUserRoleHandler(w http.ResponseWriter, r *http.Request) {
 	// Authenticate user
@@ -560,4 +529,158 @@ func (s *Server) apiGetUserRoleHandler(w http.ResponseWriter, r *http.Request) {
 	}{
 		Role: role,
 	})
+}
+
+// Endpoint: GET HOST:PORT/api/admin/users
+func (s *Server) apiAdminGetUsers(w http.ResponseWriter, r *http.Request) {
+	// Authenticate user
+	userId, err := s.getAuthedUserId(r)
+	if err != nil {
+		respondWithError(w, 401, err)
+		return
+	}
+
+	// If userid is not the admin user id, return unauthorized
+	if userId != s.AdminUserID {
+		respondWithError(w, 401, errors.New("unauthorized"))
+		return
+	}
+
+	// Get limit and offset from query params
+	query := r.URL.Query()
+	limitStr := query.Get("limit")
+	offsetStr := query.Get("offset")
+
+	// Default query parameter values
+	limit := 10
+	offset := 0
+
+	if limitStr != "" {
+		limit, err = strconv.Atoi(limitStr)
+		if err != nil {
+			http.Error(w, "Invalid limit", http.StatusBadRequest)
+			return
+		}
+	}
+
+	if offsetStr != "" {
+		offset, err = strconv.Atoi(offsetStr)
+		if err != nil {
+			http.Error(w, "Invalid offset", http.StatusBadRequest)
+			return
+		}
+	}
+
+	// Get all users from the db
+	users, err := s.db.AdminGetUsers(int32(limit), int32(offset))
+	if err != nil {
+		respondWithError(w, 500, err)
+		return
+	}
+
+	// Need to convert all users from type
+	// sqlc.User to type User_New
+
+	// Create a new slice of User_New
+	var usersNew []database.User_New
+	for _, user := range users {
+		// Get user avatar image
+		userAvatar, err := s.db.GetUserAvatar(user.UserID)
+		if err != nil {
+			respondWithError(w, 405, err)
+			return
+		}
+
+		// Append the user to the new slice
+		usersNew = append(usersNew, database.User_New{
+			UserID:    user.UserID,
+			Email:     user.Email,
+			FirstName: user.FirstName.String,
+			LastName:  user.LastName.String,
+			BirthDate: user.BirthDate.String,
+			Gender:    user.Gender.String,
+			Location:  user.Location.String,
+			Interests: user.Interests.String,
+			Avatar:    userAvatar,
+		})
+	}
+
+	// Return the users
+	respondWithJSON(w, 200, usersNew)
+}
+
+// Endpoint: GET HOST:PORT/api/admin/users/roles
+func (s *Server) apiAdminGetUsersRoles(w http.ResponseWriter, r *http.Request) {
+	// Authenticate user
+	userId, err := s.getAuthedUserId(r)
+	if err != nil {
+		respondWithError(w, 401, err)
+		return
+	}
+
+	// If userid is not the admin user id, return unauthorized
+	if userId != s.AdminUserID {
+		respondWithError(w, 401, errors.New("unauthorized"))
+		return
+	}
+
+	// Get the userIds from the query parameter
+	query := r.URL.Query()
+	userIdsStr := query.Get("userIds")
+	userIds := strings.Split(userIdsStr, ",")
+
+	// Get the roles for the users specified in the request body
+	roles, err := s.db.AdminGetUsersRoles(userIds)
+	if err != nil {
+		respondWithError(w, 500, err)
+		return
+	}
+
+	// Return the roles
+	respondWithJSON(w, 200, roles)
+}
+
+// Endpoint: POST HOST:PORT/api/admin/users/roles
+// NOTE: despite the name, it is currently only written to allow the changing of a single
+// user's role
+func (s *Server) apiUpdateUserRoleHandler(w http.ResponseWriter, r *http.Request) {
+	// For now, expect that only the admin user can update roles
+
+	// Authenticate user
+	callerUserId, err := s.getAuthedUserId(r)
+	if err != nil {
+		respondWithError(w, 401, err)
+		return
+	}
+
+	// If userid is not the admin user id, return unauthorized
+	if callerUserId != s.AdminUserID {
+		respondWithError(w, 401, errors.New("unauthorized"))
+		return
+	}
+
+	// Get the role from the request body
+	query := r.URL.Query()
+	userID := query.Get("userID")
+	role := query.Get("role")
+
+	// Ensure query parameters are given
+	if userID == "" {
+		respondWithError(w, 422, errors.New("userID cannot be empty"))
+		return
+	}
+	if role == "" {
+		respondWithError(w, 422, errors.New("role cannot be empty"))
+		return
+	}
+
+	// Update role for the user specified in the request body in the db
+	err = s.db.UpdateUserRole(userID, role)
+	if err != nil {
+		respondWithError(w, 500, err)
+		return
+	}
+
+	// Return response ok
+	(w).WriteHeader(200)
 }

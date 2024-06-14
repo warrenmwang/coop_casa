@@ -11,7 +11,7 @@ interface GenderInputArgs {
 
 const GenderInput : React.FC<GenderInputArgs> = ({ formData, setFormData, setError, setIsChanged, required = false}) => {
 
-   // Handles changes for text fields
+  // Handles changes for text fields
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { id, value } = e.target;
 
@@ -20,10 +20,10 @@ const GenderInput : React.FC<GenderInputArgs> = ({ formData, setFormData, setErr
       [id]: value
     }));
     if (setError) {
-      setError(id, false)
+      setError(id, false);
     }
     if (setIsChanged) {
-      setIsChanged(true)
+      setIsChanged(true);
     }
   };
 
@@ -52,7 +52,7 @@ const GenderInput : React.FC<GenderInputArgs> = ({ formData, setFormData, setErr
         <option value="Prefer Not To State">Prefer Not To State</option>
       </select>
     </div>
-  )
+  );
 }
 
-export default GenderInput
+export default GenderInput;

@@ -35,6 +35,11 @@ WHERE user_id = $1;
 SELECT * FROM users
 WHERE user_id = $1;
 
+-- name: AdminGetUsers :many
+SELECt * FROM users
+ORDER BY id 
+LIMIT $1 OFFSET $2;
+
 -- name: DeleteUser :exec
 DELETE FROM users WHERE user_id = $1;
 

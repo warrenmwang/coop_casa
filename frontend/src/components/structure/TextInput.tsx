@@ -71,7 +71,7 @@ const TextInput : React.FC<TextInputArgs> = ({ setFormData, setError, setIsChang
         required={required}
       />
     </div>
-  )
+  );
 }
 
-export default TextInput
+export default TextInput;

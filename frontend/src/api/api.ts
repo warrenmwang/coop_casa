@@ -7,41 +7,41 @@ import { NullUser, User } from "../types/User";
 import { api_account_Link, api_account_update_Link, api_auth_check_link, api_auth_logout_Link, api_user_role_Link } from "../urls";
 import { AuthData } from "../auth/AuthWrapper";
 
-const checkFetch = (response : Response) => {
+export const checkFetch = (response : Response) => {
   // source: https://www.youtube.com/watch?v=b8DaQrxshu0
   if (!response.ok) {
-    throw Error(response.statusText + " - " + response.url)
+    throw Error(response.statusText + " - " + response.url);
   }
-  return response
-}
+  return response;
+};
 
 // Delete Account Function
 export const apiAccountDelete = async ( ) : Promise<boolean> => {
   // Return true for ok, else false for not ok response
   // or alert for error and return false
 
-  var returnVal : boolean = false
+  var returnVal : boolean = false;
 
   try {
     const response = await fetch(api_account_Link, {
       method: "DELETE", 
       credentials: "include",
-    })
+    });
 
     if (response.ok) {
-      returnVal = true
+      returnVal = true;
     } 
 
   } catch(error) {
-    alert(`Received error during account deletion: ${error}`)
+    alert(`Received error during account deletion: ${error}`);
   }
 
   return returnVal;
-}
+};
 
 // Update Account Details
 export const apiUpdateUserAccountDetails = async (newUserData : User) : Promise<number> => {
-  var returnVal : number = 444
+  var returnVal : number = 444;
 
   try {
     const response = await fetch(api_account_update_Link, {
@@ -51,23 +51,23 @@ export const apiUpdateUserAccountDetails = async (newUserData : User) : Promise<
       },
       credentials: "include",
       body: JSON.stringify(newUserData)
-    })
+    });
 
-    returnVal = response.status
+    returnVal = response.status;
 
   } catch(error) {
-    alert(`Received error during update user account details: ${error}`)
+    alert(`Received error during update user account details: ${error}`);
   }
 
-  return returnVal
-}
+  return returnVal;
+};
 
 // Log out user from system, end session by invalidating the client side token
 export const apiLogoutUser = async () : Promise<boolean> => {
   // Return true for successful logout, else false
   // or alert for error and return false
 
-  var returnVal : boolean = false
+  var returnVal : boolean = false;
 
   // Logout the user in the api backend as well
   try {
@@ -77,15 +77,15 @@ export const apiLogoutUser = async () : Promise<boolean> => {
     });
 
     if (response.ok || response.status === 307) {
-      returnVal = true
+      returnVal = true;
     }
     
   } catch(error) {
-    alert(`Received error during logout of user: ${error}`)
+    alert(`Received error during logout of user: ${error}`);
   }
 
-  return returnVal
-}
+  return returnVal;
+};
 
 export const useAPIAuthCheck = () : boolean => {
   // Assuming that all components are under the global Auth Context
@@ -110,7 +110,7 @@ export const useAPIAuthCheck = () : boolean => {
     .then(data => {
       const accIsAuthed = data.accountIsAuthed as boolean;
       setLoading(false);
-      setAuthenticated(accIsAuthed)
+      setAuthenticated(accIsAuthed);
     })
     .catch((err) => {console.error(err)});
 
@@ -153,7 +153,7 @@ export const useAPIGetUserAccount = () : boolean => {
   }, []);
 
   return loading;
-}
+};
 
 export const useAPIGetUserRole = () : boolean => {
   // Assuming that all components are under the global Auth Context
@@ -186,4 +186,4 @@ export const useAPIGetUserRole = () : boolean => {
   }, []);
 
   return loading;
-}
+};
