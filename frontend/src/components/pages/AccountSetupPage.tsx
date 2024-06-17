@@ -1,19 +1,23 @@
+// React
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+
+// Components
 import Title from "../structure/Title";
 import TopNavbar from "../structure/TopNavbar";
 import Footer from "../structure/Footer";
-
 import { User } from "../../types/User";
 import { apiUpdateUserAccountDetails } from "../../api/api";
 import { AuthData } from "../../auth/AuthWrapper";
-
-import '../../styles/font.css'
 import LocationInput from "../structure/LocationInput";
 import InterestsInput from "../structure/InterestsInput";
 import GenderInput from "../structure/GenderInput";
 import TextInput from "../structure/TextInput";
 import ImageInput from "../structure/ImageInput";
+
+// Styles
+import '../../styles/Form.css'
+import SubmitButton from "../structure/SubmitButton";
 
 const AccountSetupPage: React.FC = () => {
   const auth = AuthData()
@@ -80,16 +84,23 @@ const AccountSetupPage: React.FC = () => {
     }
   };
 
+  const textInputSetFormData = (id: string, value: string) => {
+    setFormData(prevState => ({
+      ...prevState,
+      [id]: value
+    }));
+  };
+
   return (
     <div>
       <TopNavbar />
       <Title title="Account Setup" description="Please provide some information about yourself to be able to use this platform and connect with others!" />
       <div className="flex justify-center items-center min-h-full">
-        <form className="w-full max-w-lg block p-1" onSubmit={handleSubmit}>
+        <form className="default-form-1" onSubmit={handleSubmit}>
           <div>
             {/* First Name */}
             <TextInput 
-              setFormData={setFormData}
+              setFormData={textInputSetFormData}
               setError={setError}
               type="text"
               label="First Name"
@@ -101,7 +112,7 @@ const AccountSetupPage: React.FC = () => {
             
             {/* Last Name */}
             <TextInput 
-              setFormData={setFormData}
+              setFormData={textInputSetFormData}
               setError={setError}
               type="text"
               label="Last Name"
@@ -113,7 +124,7 @@ const AccountSetupPage: React.FC = () => {
 
             {/* Birthdate  */}
             <TextInput 
-              setFormData={setFormData}
+              setFormData={textInputSetFormData}
               setError={setError}
               type="date"
               label="Birthdate"
@@ -168,15 +179,7 @@ const AccountSetupPage: React.FC = () => {
           </div>
 
           {/* Submit Button */}
-          <div className="w-full px-3">
-            <button
-              type="submit"
-              className="bg-blue-500 text-white py-2 px-4 rounded"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "Submitting..." : "Submit"}
-            </button>
-          </div>
+          <SubmitButton isSubmitting={isSubmitting} />
 
         </form>
       </div>

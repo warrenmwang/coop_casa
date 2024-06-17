@@ -136,6 +136,60 @@ func (q *Queries) GetPropertyImages(ctx context.Context, propertyID string) (Pro
 	return i, err
 }
 
+const getPublicProperties = `-- name: GetPublicProperties :many
+SELECT id, property_id, lister_user_id, name, description, address_1, address_2, city, state, zipcode, country, num_bedrooms, num_toilets, num_showers_baths, cost_dollars, cost_cents, misc_note, created_at, updated_at FROM properties
+ORDER BY id
+LIMIT $1 OFFSET $2
+`
+
+type GetPublicPropertiesParams struct {
+	Limit  int32
+	Offset int32
+}
+
+func (q *Queries) GetPublicProperties(ctx context.Context, arg GetPublicPropertiesParams) ([]Property, error) {
+	rows, err := q.db.QueryContext(ctx, getPublicProperties, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Property
+	for rows.Next() {
+		var i Property
+		if err := rows.Scan(
+			&i.ID,
+			&i.PropertyID,
+			&i.ListerUserID,
+			&i.Name,
+			&i.Description,
+			&i.Address1,
+			&i.Address2,
+			&i.City,
+			&i.State,
+			&i.Zipcode,
+			&i.Country,
+			&i.NumBedrooms,
+			&i.NumToilets,
+			&i.NumShowersBaths,
+			&i.CostDollars,
+			&i.CostCents,
+			&i.MiscNote,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const updateProperty = `-- name: UpdateProperty :exec
 UPDATE properties
 SET 

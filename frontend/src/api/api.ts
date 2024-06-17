@@ -4,7 +4,8 @@
 
 import { useEffect, useState } from "react";
 import { NullUser, User } from "../types/User";
-import { api_account_Link, api_account_update_Link, api_auth_check_link, api_auth_logout_Link, api_user_role_Link } from "../urls";
+import { Property } from "../components/structure/CreatePropertyForm";
+import { api_account_Link, api_account_update_Link, api_auth_check_link, api_auth_logout_Link, api_properties_Link, api_user_role_Link } from "../urls";
 import { AuthData } from "../auth/AuthWrapper";
 
 export const checkFetch = (response : Response) => {
@@ -187,3 +188,21 @@ export const useAPIGetUserRole = () : boolean => {
 
   return loading;
 };
+
+export const apiCreateNewProperty = async (property: Property): Promise<Response | null> => {
+  var returnVal : Response | null = null;
+  try {
+    const response = await fetch(api_properties_Link, {
+      method: "PUT", 
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(property),
+      credentials: "include",
+    })
+    returnVal = response;
+  } catch(err) {
+    alert(`Received error during property creation: ${err}`)
+  }
+  return returnVal;
+}

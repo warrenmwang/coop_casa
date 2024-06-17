@@ -1,4 +1,7 @@
+// React
 import React, { useState, useEffect } from "react";
+
+// Components
 import { User } from "../../types/User";
 import { apiUpdateUserAccountDetails } from "../../api/api";
 import InterestsInput from "./InterestsInput";
@@ -7,6 +10,9 @@ import GenderInput from "../structure/GenderInput";
 import TextInput from "../structure/TextInput";
 import ImageInput from "../structure/ImageInput";
 
+// Styles
+import "../../styles/Form.css"
+
 const AccountSettingsForm: React.FC<{ user: User, setUser: React.Dispatch<React.SetStateAction<User>> }> = ({ user, setUser }) => {
   const [formData, setFormData] = useState<User>(user);
   const [isChanged, setIsChanged] = useState(false);
@@ -14,6 +20,13 @@ const AccountSettingsForm: React.FC<{ user: User, setUser: React.Dispatch<React.
   useEffect(() => {
     setFormData(user);
   }, [user]);
+
+  const textInputSetFormData = (id: string, value: string) => {
+    setFormData(prevState => ({
+      ...prevState,
+      [id]: value
+    }));
+  };
 
   const handleSaveChanges = async () => {
     // Save data in auth context user
@@ -40,10 +53,10 @@ const AccountSettingsForm: React.FC<{ user: User, setUser: React.Dispatch<React.
   }
 
   return (
-    <div className="w-full max-w-lg mx-auto mt-8">
+    <div className="default-form-1">
       {/* Email */}
       <TextInput 
-        setFormData={setFormData}
+        setFormData={textInputSetFormData}
         setIsChanged={setIsChanged}
         type="email"
         label="Email"
@@ -53,7 +66,7 @@ const AccountSettingsForm: React.FC<{ user: User, setUser: React.Dispatch<React.
 
       {/* First Name */}
       <TextInput 
-        setFormData={setFormData}
+        setFormData={textInputSetFormData}
         setIsChanged={setIsChanged}
         type="text"
         label="First Name"
@@ -63,7 +76,7 @@ const AccountSettingsForm: React.FC<{ user: User, setUser: React.Dispatch<React.
 
       {/* Last Name */}
       <TextInput 
-        setFormData={setFormData}
+        setFormData={textInputSetFormData}
         setIsChanged={setIsChanged}
         type="text"
         label="Last Name"
@@ -73,7 +86,7 @@ const AccountSettingsForm: React.FC<{ user: User, setUser: React.Dispatch<React.
 
       {/* Birthdate  */}
       <TextInput 
-        setFormData={setFormData}
+        setFormData={textInputSetFormData}
         setIsChanged={setIsChanged}
         type="date"
         label="Birthdate"

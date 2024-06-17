@@ -1,9 +1,8 @@
 import React from "react";
-import { User } from "../../types/User";
 import { MAX_TEXT_INPUT_LENGTH, validateTextLength, validateDate, validateEmail } from "../../utils/inputValidation";
 
 interface TextInputArgs {
-  setFormData : React.Dispatch<React.SetStateAction<User>>
+  setFormData : (id: string, value: string) => void
   setError ?: (key: string, value: boolean) => void
   setIsChanged ?: (value: React.SetStateAction<boolean>) => void
   label : string
@@ -12,14 +11,16 @@ interface TextInputArgs {
   value : string
   type : string
   required ?: boolean
+  min ?: string
+  max ?: string
 }
 
-const TextInput : React.FC<TextInputArgs> = ({ setFormData, setError, setIsChanged, label, placeholder, id, value, type, required = false}) => {
+const TextInput : React.FC<TextInputArgs> = ({ setFormData, setError, setIsChanged, label, placeholder, id, value, type, required = false, min = "", max =""}) => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { id, value } = e.target;
 
-    // Validate user input, if not valid break
+    // Validate text input
     if (type === "text") {
       if (!validateTextLength(value)) {
         return
@@ -33,24 +34,23 @@ const TextInput : React.FC<TextInputArgs> = ({ setFormData, setError, setIsChang
       }
     }
 
+    // Validate email type
     if (type === "email") {
       if (!validateEmail(value)) {
         return
       }
     }
 
-    setFormData(prevState => ({
-      ...prevState,
-      [id]: value
-    }));
-    if (setError){
+    // Save state function
+    setFormData(id, value)
+
+    if (setError) {
       setError(id, false);
     }
     if (setIsChanged) {
-      setIsChanged(true)
+      setIsChanged(true);
     }
   };
-
 
   return(
     <div className="w-full px-3 py-1">
@@ -69,6 +69,8 @@ const TextInput : React.FC<TextInputArgs> = ({ setFormData, setError, setIsChang
         onChange={handleChange}
         maxLength={MAX_TEXT_INPUT_LENGTH}
         required={required}
+        min={min}
+        max={max}
       />
     </div>
   );

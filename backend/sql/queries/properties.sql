@@ -18,6 +18,11 @@ FROM new_property;
 SELECT * FROM properties
 WHERE property_id = $1;
 
+-- name: GetPublicProperties :many
+SELECT * FROM properties
+ORDER BY id
+LIMIT $1 OFFSET $2;
+
 -- name: GetPropertyImages :one
 SELECT * FROM properties_images
 WHERE property_id = $1;

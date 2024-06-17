@@ -1,5 +1,31 @@
 package server
 
+/*
+	Server Routes
+
+	This file defines the handlers and the route on the chi router
+	that will handle all incoming http requests.
+
+	All endpoints will have to be prefixed with either `api` or `auth`,
+	as that is what the proxy looks for to route traffic to backend or frontend
+	process.
+
+	Most handler functions prefixed with `api` should be thought of
+	as "authed" endpoints. They require that the http request being handled
+	to have a JWT that authenticates a user's action.
+
+	Some endpoints will require authentication, be it either of a regular user, or a
+	property lister, or even the admin account. Authentication of the user making the
+	request is done via checking the JWT token included in the request. If no token is
+	provided, or the token is invalid, the request will be terminated immediately without
+	completing the service. Other endpoints will not require being authed.
+	An endpoint like that is the properties endpoint where you can just query for
+	available properties on the platform as someone who is not logged in.
+
+	Currently (05/25/2024) the only way to receive a valid JWT from the server
+	is to login using the Google OAuth Provider.
+*/
+
 import (
 	"backend/internal/database"
 	"context"
@@ -151,8 +177,7 @@ func (s *Server) CreateNewUserRole(userId string) error {
 	return nil
 }
 
-// ---------------------------------------------------------------
-// MIDDLEWARES
+// --------------------- MIDDLEWARES ------------------------------
 
 func (s *Server) corsMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -221,6 +246,11 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 	// Admin - update user(s) role(s)
 	r.Post("/api/admin/users/roles", s.apiUpdateUserRoleHandler)
+
+	// Properties
+	r.Get("/api/properties", s.apiGetPropertiesHandler)
+	r.Put("/api/properties", s.apiCreatePropertiesHandler)
+	r.Post("/api/properties", s.apiUpdatePropertiesHandler)
 
 	return r
 }
@@ -318,6 +348,8 @@ func (s *Server) authCallbackHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, fmt.Sprintf("%s/oauth-callback", s.FrontendOrigin), http.StatusFound)
 }
 
+// ----------------- AUTH -------------
+
 // Endpoint: GET HOST:PORT/auth/{provider}
 func (s *Server) authLoginHandler(w http.ResponseWriter, r *http.Request) {
 	// insert the provider context
@@ -376,15 +408,7 @@ func (s *Server) authLogoutHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusTemporaryRedirect)
 }
 
-// ----------------------- API -----------------------------------
-/*
-	All handler functions prefixed with `api` should be thought of
-	as "authed" endpoints. They require that the http request being handled
-	to have a JWT that authenticates a user's action.
-
-	Currently (05/25/2024) the only way to receive a valid JWT from the server
-	is to login using the Google OAuth Provider.
-*/
+// --------------- ACCOUNT ---------------
 
 // Endpoint: GET HOST:PORT/api/account
 func (s *Server) apiGetAccountDetailsHandler(w http.ResponseWriter, r *http.Request) {
@@ -531,6 +555,8 @@ func (s *Server) apiGetUserRoleHandler(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// ---------------- ADMIN ----------------
+
 // Endpoint: GET HOST:PORT/api/admin/users
 func (s *Server) apiAdminGetUsers(w http.ResponseWriter, r *http.Request) {
 	// Authenticate user
@@ -551,24 +577,29 @@ func (s *Server) apiAdminGetUsers(w http.ResponseWriter, r *http.Request) {
 	limitStr := query.Get("limit")
 	offsetStr := query.Get("offset")
 
-	// Default query parameter values
-	limit := 10
-	offset := 0
-
-	if limitStr != "" {
-		limit, err = strconv.Atoi(limitStr)
-		if err != nil {
-			http.Error(w, "Invalid limit", http.StatusBadRequest)
-			return
-		}
+	// Limit and offset cannot be empty strings
+	if limitStr == "" {
+		respondWithError(w, 422, errors.New("query with empty limit string is not valid"))
+		return
 	}
 
-	if offsetStr != "" {
-		offset, err = strconv.Atoi(offsetStr)
-		if err != nil {
-			http.Error(w, "Invalid offset", http.StatusBadRequest)
-			return
-		}
+	if offsetStr == "" {
+		respondWithError(w, 422, errors.New("query with empty offset string is not valid"))
+		return
+	}
+
+	// Attempt Parse limit and offset
+	var limit int
+	var offset int
+	limit, err = strconv.Atoi(limitStr)
+	if err != nil {
+		respondWithError(w, 422, errors.New("invalid limit string"))
+		return
+	}
+	offset, err = strconv.Atoi(offsetStr)
+	if err != nil {
+		respondWithError(w, 422, errors.New("invalid offset string"))
+		return
 	}
 
 	// Get all users from the db
@@ -627,6 +658,13 @@ func (s *Server) apiAdminGetUsersRoles(w http.ResponseWriter, r *http.Request) {
 	// Get the userIds from the query parameter
 	query := r.URL.Query()
 	userIdsStr := query.Get("userIds")
+
+	// Ensure that we have something
+	if userIdsStr == "" {
+		respondWithError(w, 422, errors.New("query with empty string when expecting userId(s) is not valid input"))
+		return
+	}
+
 	userIds := strings.Split(userIdsStr, ",")
 
 	// Get the roles for the users specified in the request body
@@ -683,4 +721,138 @@ func (s *Server) apiUpdateUserRoleHandler(w http.ResponseWriter, r *http.Request
 
 	// Return response ok
 	(w).WriteHeader(200)
+}
+
+// ----------------- PROPERTIES ---------------------
+
+// Endpoint: GET HOST:PORT/api/properties
+func (s *Server) apiGetPropertiesHandler(w http.ResponseWriter, r *http.Request) {
+	// anyone can get properties, without needing to be authenticated.
+
+	// Get the limit and offset for the properties viewing
+	query := r.URL.Query()
+	limitStr := query.Get("limit")
+	offsetStr := query.Get("offset")
+
+	// Limit and offset cannot be empty strings
+	if limitStr == "" {
+		respondWithError(w, 422, errors.New("query with empty limit string is not valid"))
+		return
+	}
+
+	if offsetStr == "" {
+		respondWithError(w, 422, errors.New("query with empty offset string is not valid"))
+		return
+	}
+
+	// Attempt Parse limit and offset
+	var limit int
+	var offset int
+	limit, err := strconv.Atoi(limitStr)
+	if err != nil {
+		respondWithError(w, 422, errors.New("invalid limit string"))
+		return
+	}
+	offset, err = strconv.Atoi(offsetStr)
+	if err != nil {
+		respondWithError(w, 422, errors.New("invalid offset string"))
+		return
+	}
+
+	// Get the properties from DB
+	properties, err := s.db.GetPublicProperties(int32(limit), int32(offset))
+	if err != nil {
+		respondWithError(w, 500, err)
+		return
+	}
+
+	respondWithJSON(w, 200, properties)
+}
+
+// Endpoint: PUT HOST:PORT/api/properties
+func (s *Server) apiCreatePropertiesHandler(w http.ResponseWriter, r *http.Request) {
+	// Authenticate the user and make sure they have write access to properties db
+	// (i.e. Need to be either a lister or admin role, basically just not a regular user)
+	userID, err := s.getAuthedUserId(r)
+	if err != nil {
+		respondWithError(w, 401, err)
+		return
+	}
+	role, err := s.db.GetUserRole(userID)
+	if err != nil {
+		respondWithError(w, 401, err)
+		return
+	}
+	if role == "regular" {
+		respondWithError(w, 401, err)
+		return
+	}
+
+	// Get the property information from the request
+	var propertyInfo database.Property
+	err = json.NewDecoder(r.Body).Decode(&propertyInfo)
+	if err != nil {
+		respondWithError(w, 500, err)
+		return
+	}
+
+	// TODO: Need to validate that no duplicate property exists
+	// before proceeding.
+
+	// Create the property in the db
+	err = s.db.CreateProperty(propertyInfo)
+	if err != nil {
+		respondWithError(w, 500, err)
+		return
+	}
+
+	// Respond with ok created
+	w.WriteHeader(201)
+}
+
+// Endpoint: POST HOST:PORT/api/properties
+func (s *Server) apiUpdatePropertiesHandler(w http.ResponseWriter, r *http.Request) {
+	// Authenticate the user and make sure they have write access to properties db
+	// (i.e. Need to be either a lister or admin role, basically just not a regular user)
+	userID, err := s.getAuthedUserId(r)
+	if err != nil {
+		respondWithError(w, 401, err)
+		return
+	}
+	role, err := s.db.GetUserRole(userID)
+	if err != nil {
+		respondWithError(w, 401, err)
+		return
+	}
+	if role == "regular" {
+		respondWithError(w, 401, err)
+		return
+	}
+
+	// Get the new property info details
+	var propertyInfo database.Property
+	err = json.NewDecoder(r.Body).Decode(&propertyInfo)
+	if err != nil {
+		respondWithError(w, 500, err)
+		return
+	}
+
+	// Listers can only update their own properties, admins can modify any who cares if they own it or not
+	if role == "lister" && userID != propertyInfo.ListerUserID {
+		respondWithError(w, 401, errors.New("you can only modify your own property as a lister"))
+		return
+	}
+
+	// TODO: Need to validate that no duplicate property exists
+	// before proceeding.
+
+	// Update this property with the new info
+	err = s.db.UpdateProperty(propertyInfo)
+	if err != nil {
+		respondWithError(w, 500, err)
+		return
+	}
+
+	// Respond with ok
+	w.WriteHeader(200)
 }

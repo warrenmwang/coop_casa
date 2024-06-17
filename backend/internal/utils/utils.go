@@ -22,6 +22,44 @@ func ParseStringToNullTime(timeStr string) (time.Time, error) {
 	return parsedTime, nil
 }
 
+// Encrypt bytes
+func EncryptBytes(plainBytes []byte, key string) ([]byte, error) {
+	// Prepare operation with secret key
+	block, err := aes.NewCipher([]byte(key))
+	if err != nil {
+		return nil, err
+	}
+
+	// Use a fixed IV (initialization vector)
+	iv := md5.Sum([]byte(key)) // Using MD5 hash of the key as the IV
+	cipherBytes := make([]byte, len(plainBytes))
+
+	// Encrypt
+	stream := cipher.NewCFBEncrypter(block, iv[:])
+	stream.XORKeyStream(cipherBytes, plainBytes)
+
+	return cipherBytes, nil
+}
+
+// Decrypt bytes
+func DecryptBytes(cipherbytes []byte, key string) ([]byte, error) {
+	// Prepare operation with secret key
+	block, err := aes.NewCipher([]byte(key))
+	if err != nil {
+		return nil, err
+	}
+
+	// Use the same fixed IV (initialization vector)
+	iv := md5.Sum([]byte(key))
+	plainBytes := make([]byte, len(cipherbytes))
+
+	// Decrypt
+	stream := cipher.NewCFBDecrypter(block, iv[:])
+	stream.XORKeyStream(plainBytes, cipherbytes)
+
+	return plainBytes, nil
+}
+
 // Encrypt encrypts plaintext using the given key.
 func Encrypt(plaintext, key string) (string, error) {
 	block, err := aes.NewCipher([]byte(key))

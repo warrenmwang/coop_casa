@@ -61,9 +61,11 @@ const AdminManageUserRoles: React.FC = () => {
 
   return (
     <>
-      <h2 className="h2_custom">Update User Role </h2>
+      <div className="flex justify-center items-center space-x-4 mt-4 py-1">
+        <h1 className="h1_custom">Update User Role</h1>
+      </div>
       {/* Allow for querying for the user's current role */}
-      <form className="">
+      <form className="default-form-1">
         {/* user id input */}
         <label
           className="text_input_field_label_gray"
@@ -98,17 +100,18 @@ const AdminManageUserRoles: React.FC = () => {
             return <option key={role} value={role}>{role}</option>
           })}
         </select>
+
+        {/* submit for updating user role */}
+        <button
+          type="submit"
+          onClick={handleSubmit}
+          disabled={isSubmitting}
+          className="w-32 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+        >
+          {isSubmitting ? "Submitting..." : "Update Role"}
+        </button>
       </form>
 
-      {/* submit for updating user role */}
-      <button
-        type="submit"
-        onClick={handleSubmit}
-        disabled={isSubmitting}
-        className="w-32 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-      >
-        {isSubmitting ? "Submitting..." : "Update Role"}
-      </button>
     </>
   );
 };
