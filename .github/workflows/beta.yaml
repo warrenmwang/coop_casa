@@ -21,12 +21,17 @@ jobs:
             # Get Variables
             USER=${{ secrets.USERNAME }}
             
-            # Pull repo source
+            # Change into the src dir
             cd /home/${USER}/deployment_repos/coop/coop_casa
+
+            # Stop running docker services of old src
+            docker compose down
+
+            # Pull repo source
             git checkout beta-deploy
             git pull origin beta-deploy
 
-            # ENV VARS
+            # SET ENV VARS
 
             # Proxy
             export EXTERNAL_PROXY_PORT=${{ secrets.EXTERNAL_PROXY_PORT }}
@@ -61,7 +66,6 @@ jobs:
             export REACT_APP_API_PROD_HOST=${{ secrets.REACT_APP_API_PROD_HOST }}
             export REACT_APP_API_PORT=${{ secrets.REACT_APP_API_PORT }}
 
-
-            # Run all as docker orchestration (db, backend, frontend, proxy)
+            # Run all as docker containers (db, backend, frontend, proxy)
             docker compose build
             docker compose up -d --remove-orphans
