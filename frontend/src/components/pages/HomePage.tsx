@@ -12,19 +12,16 @@ const HomePage: React.FC = () => {
     <div>
       <TopNavBar></TopNavBar>
       <HeaderSection></HeaderSection>
-      {/* TODO: something about ... */}
-      <div className="p-6">
+      {/* <div className="p-6">
         <Card
           title="Title"
           imageUrl={profileImg}
           description="description"
         ></Card>
       </div>
-      {/* TODO: some information about properties */}
       
       <PropertiesHomeBanner/>
 
-      {/* TODO: something about ... */}
       <div className="p-6">
         <Card
           title="Title"
@@ -33,8 +30,7 @@ const HomePage: React.FC = () => {
           reverse={true}
         ></Card>
       </div>
-      {/* TODO: some information about communities */}
-      <CommunitiesHomeBanner/>
+      <CommunitiesHomeBanner/> */}
 
       <Footer></Footer>
     </div>

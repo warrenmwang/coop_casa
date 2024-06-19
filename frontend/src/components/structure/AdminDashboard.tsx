@@ -5,6 +5,7 @@ import { api_admin_users_Link, api_admin_users_roles_Link } from "../../urls";
 import { checkFetch } from "../../api/api";
 import AdminManageUserRoles from "./AdminManageUserRoles";
 import { Grid } from "@mui/material";
+import DisplayProperties from "./DisplayProperties";
 
 const AdminDashboard: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -99,7 +100,11 @@ const AdminDashboard: React.FC = () => {
     {/* TODO: create a grid for storing the separate components needed to manage stuff */}
     <div className="min-w-full mx-auto">
       <Grid container spacing={2}>
-        <Grid item xs={6}>
+        <Grid
+          item
+          xs={12} sm={12} md={12} lg={6}
+          style={{ gap: "0 24px" }}
+        >
           {/* table that shows all the users */}
           <div className="flex justify-center items-center space-x-4 mt-4 py-1">
             <h1 className="h1_custom">User Management</h1>
@@ -143,15 +148,27 @@ const AdminDashboard: React.FC = () => {
           </div>
 
         </Grid>
-        <Grid item xs={6}>
+        <Grid
+          item
+          xs={12} sm={12} md={12} lg={6}
+          style={{ gap: "0 24px" }}
+        >
           {/* Component to be able to update the role of a user */}
           <AdminManageUserRoles/>
         </Grid>
-        <Grid item xs={6}>
+        <Grid
+          item
+          xs={12} sm={12} md={12} lg={6}
+          style={{ gap: "0 24px" }}
+        >
           <CreatePropertyForm/>
         </Grid>
-        <Grid item xs={6}>
-          <p>TODO: show property listings</p>
+        <Grid
+          item
+          xs={6}
+          style={{ gap: "0 24px" }}
+        >
+          <DisplayProperties/>
         </Grid>
       </Grid>
     </div>

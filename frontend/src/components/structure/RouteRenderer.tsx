@@ -16,7 +16,7 @@ import AccountSetupPage from "../pages/AccountSetupPage"
 import PropertiesPage from "../pages/PropertiesPage"
 import AttributionsPage from "../pages/AttributionsPage"
 import { aboutPageLink, attributionsPageLink, communitiesPageLink, contactPageLink, homePageLink, mapPageLink, oauthCallBackPageLink, privacypolicyPageLink, propertiesPageLink, termsOfServicePageLink, dashboardPageLink, accountSettingsPageLink, accountSetupPageLink } from "../../urls"
-import { useAPIAuthCheck } from "../../api/api"
+import { useAPIAuthCheck, useAPIGetUserRole } from "../../api/api"
 
 const OAuthCallbackPage = React.lazy(() => import("../pages/OAuthCallbackPage"))
 
@@ -25,6 +25,7 @@ const RouteRenderer : React.FC = () => {
   const { authenticated } = auth
 
   const loading = useAPIAuthCheck();
+  const loading1 = useAPIGetUserRole();
 
   return(
     <Routes>

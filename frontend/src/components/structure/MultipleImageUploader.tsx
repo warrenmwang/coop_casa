@@ -1,6 +1,6 @@
-import { Card, Grid } from "@mui/material";
 import React, { useCallback, useState } from "react";
 import { useDropzone } from 'react-dropzone';
+import { MAX_IMAGE_FILE_SIZE, MAX_PROPERTY_IMGS_ALLOWED } from "../../constants";
 
 interface MultipleImageUploaderProps {
   onImagesUploaded: (files: File[]) => void;
@@ -38,7 +38,10 @@ const MultipleImageUploader : React.FC<MultipleImageUploaderProps> = ({ onImages
     accept: {
       'image/*': ['.jpeg', '.jpg', '.png', '.gif'],
     },
-    multiple: true 
+    multiple: true, 
+    maxFiles: MAX_PROPERTY_IMGS_ALLOWED,
+    minSize: 0,
+    maxSize: MAX_IMAGE_FILE_SIZE,
   });
 
   return(

@@ -8,11 +8,13 @@ import warren_img from "../../images/warren.png"
 import gloria_img from "../../images/gloria.jpeg"
 import barbara_img from "../../images/barbara.jpeg"
 
+import "../../styles/ContentBody.css"
+
 const AboutPage : React.FC = () => {
   return(
     <div>
       <TopNavbar></TopNavbar>
-      <div className="sm:w-4/5 md:w-10/12 lg:w-9/12 xl:w-8/12 mx-auto">
+      <div className="content-body">
         <Title title="About Us" description=""></Title>
         We are a small group of students that originally met at Bucknell University and we wanted to do something 
         for other people in a way that doesn't cost them much.

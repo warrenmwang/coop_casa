@@ -1,5 +1,6 @@
 import React from "react";
-import { MAX_TEXT_INPUT_LENGTH, validateTextLength, validateDate, validateEmail } from "../../utils/inputValidation";
+import { validateTextLength, validateDate, validateEmail } from "../../utils/inputValidation";
+import { MAX_TEXT_INPUT_LENGTH } from "../../constants";
 
 interface TextInputArgs {
   setFormData : (id: string, value: string) => void

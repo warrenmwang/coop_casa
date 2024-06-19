@@ -3,11 +3,13 @@ import TopNavbar from "../structure/TopNavbar";
 import Footer from "../structure/Footer";
 import "../../styles/font.css"
 
+import "../../styles/ContentBody.css"
+
 const PrivacyPolicyPage : React.FC = () => {
   return(
     <div>
       <TopNavbar></TopNavbar>
-      <div className="flex-grow container mx-auto px-4 py-8">
+      <div className="content-body px-4 py-8">
       
         <h1 className="h1_custom">Privacy Policy</h1>
         <p className="text-sm text-gray-500 mb-8">Last Updated: 05/24/2024</p>

@@ -109,6 +109,7 @@ func (s *Server) InvalidateToken(w http.ResponseWriter) {
 	})
 }
 
+// Check JWT validation.
 func (s *Server) ValidateTokenAndGetClaims(tokenString string) (jwt.MapClaims, error) {
 	// Gets the JWT and validates it. If valid, return the claims.
 	// Return an error if invalid.
@@ -132,6 +133,27 @@ func (s *Server) ValidateTokenAndGetClaims(tokenString string) (jwt.MapClaims, e
 		return nil, fmt.Errorf("invalid token")
 	}
 }
+
+// We may need a fuzzy searcher for stuff in the db
+// be it for searching for users or for properties at this point.
+// TODO: think about it and modify this commented out function to do this
+// func (s *Server) validateNoDuplicateProperty(property database.Property) error {
+// 	// Validate that the given property is not a duplicate property
+// 	// in the database. If the property is not a duplicate, then
+// 	// we will return nil. ow. return a custom error detailing the problem.
+
+// 	// Ensure that the address is unique.
+
+// 	// Search the database to see if there are any properties with the same address.
+// 	// I'm not sure how to ensure that there are "fuzzy" duplicates.
+
+// 	// For now, just query for properties using the same:
+// 	// address1, address2, city, state, zipcode, country
+
+// 	// need to write a new sql query(s) ?
+
+// 	return nil
+// }
 
 // Returns the userId from the http cookie in the request, if present (if the user is authed)
 // If something goes wrong in here, we should assume a response http code 401 for unauthorized.
@@ -796,9 +818,6 @@ func (s *Server) apiCreatePropertiesHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	// TODO: Need to validate that no duplicate property exists
-	// before proceeding.
-
 	// Create the property in the db
 	err = s.db.CreateProperty(propertyInfo)
 	if err != nil {
@@ -842,9 +861,6 @@ func (s *Server) apiUpdatePropertiesHandler(w http.ResponseWriter, r *http.Reque
 		respondWithError(w, 401, errors.New("you can only modify your own property as a lister"))
 		return
 	}
-
-	// TODO: Need to validate that no duplicate property exists
-	// before proceeding.
 
 	// Update this property with the new info
 	err = s.db.UpdateProperty(propertyInfo)

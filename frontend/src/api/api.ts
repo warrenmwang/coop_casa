@@ -7,6 +7,7 @@ import { NullUser, User } from "../types/User";
 import { Property } from "../components/structure/CreatePropertyForm";
 import { api_account_Link, api_account_update_Link, api_auth_check_link, api_auth_logout_Link, api_properties_Link, api_user_role_Link } from "../urls";
 import { AuthData } from "../auth/AuthWrapper";
+import { GlobalStore } from "../globalStore";
 
 export const checkFetch = (response : Response) => {
   // source: https://www.youtube.com/watch?v=b8DaQrxshu0
@@ -205,4 +206,36 @@ export const apiCreateNewProperty = async (property: Property): Promise<Response
     alert(`Received error during property creation: ${err}`)
   }
   return returnVal;
+}
+
+// Get user properties api hook
+export const useAPIGetProperties = (limit: number, offset: number) : boolean => {
+  // assume in global store context
+  const globalStore = GlobalStore();
+  const { setCurrProperties } = globalStore;
+
+  const [ loading, setLoading ] = useState(true);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    fetch(`${api_properties_Link}?limit=${limit}&offset=${offset}`, {
+      method: "GET",
+      headers: {
+        "Accept": "application/json",
+      },
+      credentials: "include",
+      signal: controller.signal
+    }).then(checkFetch)
+      .then(response => response.json())
+      .then(data => {
+        setCurrProperties(data as Property[]);
+        setLoading(false);
+      })
+      .catch((err) => console.error(err));
+
+      return () => controller.abort();
+  }, []);
+
+  return loading;
 }

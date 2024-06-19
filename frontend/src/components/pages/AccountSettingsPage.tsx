@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom";
 const AccountSettingsPage : React.FC = () => {
 
   const auth = AuthData()
-  const { user, setUser } = auth
+  const { user, userRole, setUser } = auth
   const [isModalOpen, setIsModalOpen] = useState(false)
   const navigate = useNavigate()
 
@@ -38,7 +38,7 @@ const AccountSettingsPage : React.FC = () => {
   return(
     <div>
       <TopNavbar></TopNavbar>
-        <Title title="Account Settings" description="All your account information in one place."></Title>
+        <Title title="Account Settings" description={`All your account information in one place. Your account role is "${userRole}"`}></Title>
 
           <div className="justify-center items-center mx-auto">
             <AccountSettingsForm user={user} setUser={setUser} />

@@ -1,33 +1,16 @@
 import React, { useState, useEffect } from "react";
+import {v4 as uuidv4} from 'uuid';
+import { fileToBase64 } from "../../utils/utils";
+import { apiCreateNewProperty } from "../../api/api";
+import { validateNumber } from "../../utils/inputValidation";
+
 import { AuthData } from "../../auth/AuthWrapper";
 import TextInput from "./TextInput";
-import {v4 as uuidv4} from 'uuid';
-import { apiCreateNewProperty } from "../../api/api";
 import SubmitButton from "./SubmitButton";
-import "../../styles/font.css"
-import { validateNumber } from "../../utils/inputValidation";
 import MultipleImageUploader from "./MultipleImageUploader";
-import { fileToBase64 } from "../../utils/utils";
-import { assert } from "console";
+import { MAX_PROPERTY_IMGS_ALLOWED } from "../../constants";
 
-
-/*
--- name: CreateProperty :exec
-WITH new_property AS (
-    INSERT INTO properties 
-    (
-    property_id, lister_user_id, "name", "description", 
-    address_1, address_2, city, "state", zipcode, country, num_bedrooms, 
-    num_toilets, num_showers_baths, cost_dollars, cost_cents, misc_note
-    )
-    VALUES 
-    ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
-    RETURNING property_id
-)
-INSERT INTO properties_images (property_id, images)
-SELECT property_id, $17
-FROM new_property;
-*/
+import "../../styles/font.css"
 
 export type Property = {
   propertyId: string;
@@ -85,11 +68,7 @@ export const EmptyProperty : Property = {
 // (for authorized users: admin or lister roles)
 const CreatePropertyForm: React.FC = () => {
   const auth = AuthData();
-
-  // TODO: if the user is admin, they get global read write capability for all properties
-  // o.w., a lister can manage their own properties
-  const { user, userRole } = auth; 
-  const isAdmin : boolean = (userRole === "admin");
+  const { user } = auth; 
 
   const [ newProperty, setNewProperty ] = useState<Property>(EmptyProperty);
   const [ isSubmitting, setIsSubmitting ] = useState<boolean>(false);
@@ -103,7 +82,7 @@ const CreatePropertyForm: React.FC = () => {
     "images"
   ];
 
-  const MAX_IMGS_ALLOWED = 10;
+  // FIXME: city state should probably be like user acc setup, where we use the autocomplete menu.
   
   const setErrors = (key: string, value: boolean) => {
     setMyMap(prevMap => {
@@ -270,10 +249,10 @@ const CreatePropertyForm: React.FC = () => {
 
   const handleImagesUploaded = (files: File[]) => {
     // update errors
-    if (files.length > MAX_IMGS_ALLOWED) {
+    if (files.length > MAX_PROPERTY_IMGS_ALLOWED) {
       setErrors("images", true);
       setImages([]);
-      alert(`Uploaded more than the maximum allowable images (${MAX_IMGS_ALLOWED}).`);
+      alert(`Uploaded more than the maximum allowable images (${MAX_PROPERTY_IMGS_ALLOWED}).`);
       return;
     } else if (files.length === 0) {
       setErrors("images", true);
@@ -292,12 +271,13 @@ const CreatePropertyForm: React.FC = () => {
     // Convert each image into base64, join them together with comma delimiters
     // for sending to backend. Save into newproperty state.
     var propertyImagesStr : string = ""
+    const delimiter : string = "#"
     for (const image of images) {
       const imageStr = await fileToBase64(image)
       if (propertyImagesStr.length === 0) {
         propertyImagesStr = imageStr;
       } else {
-        propertyImagesStr += `,${imageStr}`
+        propertyImagesStr += `${delimiter}${imageStr}`
       }
     }
     setNewProperty((prevState: any) => ({
@@ -355,8 +335,9 @@ const CreatePropertyForm: React.FC = () => {
       </div>
       {/* create a new property */}
       <form className="default-form-1" onSubmit={handleSubmit}>
-        {propertyTextFieldsConstructs.map((value) => (
+        {propertyTextFieldsConstructs.map((value, index) => (
           <TextInput
+            key={index}
             setFormData={textInputHandleChange}
             setError={setErrors}
             type={value.type}
