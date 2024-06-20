@@ -44,6 +44,7 @@ type Property struct {
 	State             string `json:"state"`
 	Zipcode           string `json:"zipcode"`
 	Country           string `json:"country"`
+	Square_feet       int32  `json:"squareFeet"`
 	Num_bedrooms      int16  `json:"numBedrooms"`
 	Num_toilets       int16  `json:"numToilets"`
 	Num_showers_baths int16  `json:"numShowersBaths"`
@@ -591,6 +592,7 @@ func (s *service) CreateProperty(property Property) error {
 		State:           property.State,
 		Zipcode:         property.Zipcode,
 		Country:         property.Country,
+		SquareFeet:      property.Square_feet,
 		NumBedrooms:     property.Num_bedrooms,
 		NumToilets:      property.Num_toilets,
 		NumShowersBaths: property.Num_showers_baths,
@@ -635,6 +637,7 @@ func (s *service) GetProperty(propertyId string) (Property, error) {
 		State:             property.State,
 		Zipcode:           property.Zipcode,
 		Country:           property.Country,
+		Square_feet:       property.SquareFeet,
 		Num_bedrooms:      property.NumBedrooms,
 		Num_toilets:       property.NumToilets,
 		Num_showers_baths: property.NumShowersBaths,
@@ -686,6 +689,7 @@ func (s *service) GetPublicProperties(limit, offset int32) ([]Property, error) {
 			State:             property.State,
 			Zipcode:           property.Zipcode,
 			Country:           property.Country,
+			Square_feet:       property.SquareFeet,
 			Num_bedrooms:      property.NumBedrooms,
 			Num_toilets:       property.NumToilets,
 			Num_showers_baths: property.NumShowersBaths,
@@ -723,6 +727,7 @@ func (s *service) UpdateProperty(property Property) error {
 		State:           property.State,
 		Zipcode:         property.Zipcode,
 		Country:         property.Country,
+		SquareFeet:      property.Square_feet,
 		NumBedrooms:     property.Num_bedrooms,
 		NumToilets:      property.Num_toilets,
 		NumShowersBaths: property.Num_showers_baths,

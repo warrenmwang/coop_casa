@@ -74,6 +74,8 @@ const PropertyCard : React.FC<PropertyCardProps> = ({ property }) => {
           <Typography id="transition-modal-description" variant="h6" sx={{ mt: 2 }}>
             Address: {`${property.address1}, ${property.address2}, ${property.city}, ${property.state} ${property.zipcode}, ${property.country}`}
             <br></br>
+            Square Feet: {property.squareFeet}
+            <br></br>
             Bedrooms: {property.numBedrooms}
             <br></br>
             Toilets: {property.numToilets}

@@ -138,7 +138,7 @@ const AccountSettingsForm: React.FC<{ user: User, setUser: React.Dispatch<React.
         <div className="flex justify-end space-x-4">
           <button
             onClick={handleSaveChanges}
-            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
           >
             Save Changes
           </button>

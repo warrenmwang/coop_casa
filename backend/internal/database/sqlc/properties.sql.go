@@ -15,15 +15,15 @@ WITH new_property AS (
     INSERT INTO properties 
     (
     property_id, lister_user_id, "name", "description", 
-    address_1, address_2, city, "state", zipcode, country, num_bedrooms, 
-    num_toilets, num_showers_baths, cost_dollars, cost_cents, misc_note
+    address_1, address_2, city, "state", zipcode, country,
+    square_feet, num_bedrooms, num_toilets, num_showers_baths, cost_dollars, cost_cents, misc_note
     )
     VALUES 
-    ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
+    ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
     RETURNING property_id
 )
 INSERT INTO properties_images (property_id, images)
-SELECT property_id, $17
+SELECT property_id, $18
 FROM new_property
 `
 
@@ -38,6 +38,7 @@ type CreatePropertyParams struct {
 	State           string
 	Zipcode         string
 	Country         string
+	SquareFeet      int32
 	NumBedrooms     int16
 	NumToilets      int16
 	NumShowersBaths int16
@@ -59,6 +60,7 @@ func (q *Queries) CreateProperty(ctx context.Context, arg CreatePropertyParams) 
 		arg.State,
 		arg.Zipcode,
 		arg.Country,
+		arg.SquareFeet,
 		arg.NumBedrooms,
 		arg.NumToilets,
 		arg.NumShowersBaths,
@@ -88,7 +90,7 @@ func (q *Queries) DeleteProperty(ctx context.Context, propertyID string) error {
 }
 
 const getProperty = `-- name: GetProperty :one
-SELECT id, property_id, lister_user_id, name, description, address_1, address_2, city, state, zipcode, country, num_bedrooms, num_toilets, num_showers_baths, cost_dollars, cost_cents, misc_note, created_at, updated_at FROM properties
+SELECT id, property_id, lister_user_id, name, description, address_1, address_2, city, state, zipcode, country, square_feet, num_bedrooms, num_toilets, num_showers_baths, cost_dollars, cost_cents, misc_note, created_at, updated_at FROM properties
 WHERE property_id = $1
 `
 
@@ -107,6 +109,7 @@ func (q *Queries) GetProperty(ctx context.Context, propertyID string) (Property,
 		&i.State,
 		&i.Zipcode,
 		&i.Country,
+		&i.SquareFeet,
 		&i.NumBedrooms,
 		&i.NumToilets,
 		&i.NumShowersBaths,
@@ -137,7 +140,7 @@ func (q *Queries) GetPropertyImages(ctx context.Context, propertyID string) (Pro
 }
 
 const getPublicProperties = `-- name: GetPublicProperties :many
-SELECT id, property_id, lister_user_id, name, description, address_1, address_2, city, state, zipcode, country, num_bedrooms, num_toilets, num_showers_baths, cost_dollars, cost_cents, misc_note, created_at, updated_at FROM properties
+SELECT id, property_id, lister_user_id, name, description, address_1, address_2, city, state, zipcode, country, square_feet, num_bedrooms, num_toilets, num_showers_baths, cost_dollars, cost_cents, misc_note, created_at, updated_at FROM properties
 ORDER BY id
 LIMIT $1 OFFSET $2
 `
@@ -168,6 +171,7 @@ func (q *Queries) GetPublicProperties(ctx context.Context, arg GetPublicProperti
 			&i.State,
 			&i.Zipcode,
 			&i.Country,
+			&i.SquareFeet,
 			&i.NumBedrooms,
 			&i.NumToilets,
 			&i.NumShowersBaths,
@@ -201,13 +205,14 @@ SET
     "state" = $7, 
     zipcode = $8, 
     country = $9, 
-    num_bedrooms = $10,
-    num_toilets = $11,
-    num_showers_baths = $12,
-    cost_dollars = $13,
-    cost_cents = $14,
-    misc_note = $15,
-    lister_user_id = $16,
+    square_feet = $10,
+    num_bedrooms = $11,
+    num_toilets = $12,
+    num_showers_baths = $13,
+    cost_dollars = $14,
+    cost_cents = $15,
+    misc_note = $16,
+    lister_user_id = $17,
     updated_at = CURRENT_TIMESTAMP
 WHERE property_id = $1
 `
@@ -222,6 +227,7 @@ type UpdatePropertyParams struct {
 	State           string
 	Zipcode         string
 	Country         string
+	SquareFeet      int32
 	NumBedrooms     int16
 	NumToilets      int16
 	NumShowersBaths int16
@@ -242,6 +248,7 @@ func (q *Queries) UpdateProperty(ctx context.Context, arg UpdatePropertyParams) 
 		arg.State,
 		arg.Zipcode,
 		arg.Country,
+		arg.SquareFeet,
 		arg.NumBedrooms,
 		arg.NumToilets,
 		arg.NumShowersBaths,

@@ -11,6 +11,7 @@ CREATE TABLE properties (
     "state" TEXT NOT NULL,
     zipcode TEXT NOT NULL,
     country TEXT NOT NULL,
+    square_feet INTEGER NOT NULL,
     num_bedrooms SMALLINT NOT NULL,
     num_toilets SMALLINT NOT NULL,
     num_showers_baths SMALLINT NOT NULL,

@@ -162,7 +162,7 @@ const PrivacyPolicyPage : React.FC = () => {
             <li><strong>Opt-Out Tools :</strong> We participate in industry-standard opt-out tools that allow you to opt-out of receiving targeted advertisements. You can visit the Network Advertising Initiative’s (NAI) opt-out page or the Digital Advertising Alliance’s (DAA) opt-out page for more information on how to opt out of targeted advertising.</li>
             <li><strong>In-App Controls :</strong> We provide you with the ability to manage your cookie preferences directly within the app. You can adjust your settings to enable or disable certain types of cookies and tracking technologies. </li>
           </ul>
-          <p className="mb-4">By using these options, you can manage how cookies and similar technologies are used on your device and control the information we collect through these technologies. For more detailed information on the use of cookies and how to manage your preferences, please contact us at warren.wang2020@gmail.com.</p>
+          <p className="mb-4">By using these options, you can manage how cookies and similar technologies are used on your device and control the information we collect through these technologies. For more detailed information on the use of cookies and how to manage your preferences, please contact us at maametaddo@gmail.com.</p>
         </section>
 
         <section className="mb-8">

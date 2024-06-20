@@ -34,27 +34,17 @@ const AboutPage : React.FC = () => {
           title="Elizabeth Addo"
           description={
             <div>
-              <p className="text-gray-600" style={{fontWeight: "bold"}}>Head of Human Resources</p>
+              <p className="text-gray-600" style={{fontWeight: "bold"}}>Human Resources and Outreach</p>
               <p className="text-gray-600">With a rich palette of interests ranging from film and creative writing to screenwriting, computer science, and community engagement, I am eager to bring my blend of creative insight and technical acumen to a team that values transformative ideas and is committed to making a difference through their work.</p>
             </div>
           }
           imageUrl={elizabeth_img}
         />
-        <Card 
-          title="Warren Wang"
-          description={
-            <div>
-              <p className="text-gray-600" style={{fontWeight: "bold"}}>Lead Web Developer</p>
-              <p className="text-gray-600">With a desire to bring value into people's lives at low to no monetary costs, I was inspired by the other founders' vision for Coop and wanted to apply my skillset to their mission. I am the sole developer for the Coop web app.</p>
-            </div>
-          }
-          imageUrl={warren_img}
-        />
         <Card
           title="Gloria Sporea"
           description={
             <div>
-              <p className="text-gray-600" style={{fontWeight: "bold"}}>Head of Marketing and Event Organization</p>
+              <p className="text-gray-600" style={{fontWeight: "bold"}}>Marketing and Event Coordinator</p>
               <p className="text-gray-600">With a passion for learning and exploring the natural world, I am pursuing a Bachelor of Science degree in Biology at Bucknell University. I am also interested in marketing and diversity, and I have developed relevant skills and knowledge through my work experience on campus.</p>
             </div>
           }
@@ -64,11 +54,21 @@ const AboutPage : React.FC = () => {
           title="Barbara Wankollie"
           description={
             <div>
-              <p className="text-gray-600" style={{fontWeight: "bold"}}>Head of Diversity, Equity, and Inclusion </p>
+              <p className="text-gray-600" style={{fontWeight: "bold"}}>Talent Acquisition</p>
               <p className="text-gray-600">Member of the class of 2025, majoring in International Relation, and Women and Gender Studies. Freeman scholar and SHE-CAN Scholar. Student Intern at Griot Institute for Black Life and culture. Student assistant for Alumina House, Bucknell University.</p>
             </div>
           }
           imageUrl={barbara_img}
+        />
+        <Card 
+          title="Warren Wang"
+          description={
+            <div>
+              <p className="text-gray-600" style={{fontWeight: "bold"}}>Contracted Web Developer</p>
+              <p className="text-gray-600">With a desire to bring value into people's lives at low to no monetary costs, I was inspired by the founders' vision for Coop and wanted to apply my skillset to their mission. I am the sole developer for the Coop web app.</p>
+            </div>
+          }
+          imageUrl={warren_img}
         />
       </div>
       <Footer></Footer>

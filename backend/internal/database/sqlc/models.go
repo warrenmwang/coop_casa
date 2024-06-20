@@ -28,6 +28,7 @@ type Property struct {
 	State           string
 	Zipcode         string
 	Country         string
+	SquareFeet      int32
 	NumBedrooms     int16
 	NumToilets      int16
 	NumShowersBaths int16

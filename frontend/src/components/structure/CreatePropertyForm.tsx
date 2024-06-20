@@ -23,6 +23,7 @@ export type Property = {
   state: string;
   zipcode: string;
   country: string;
+  squareFeet: number;
   numBedrooms: number;
   numToilets: number;
   numShowersBaths: number;
@@ -54,6 +55,7 @@ export const EmptyProperty : Property = {
   state: "",
   zipcode: "",
   country: "",
+  squareFeet: -1,
   numBedrooms: -1,
   numToilets: -1,
   numShowersBaths: -1,
@@ -77,9 +79,9 @@ const CreatePropertyForm: React.FC = () => {
 
   // for user inputs
   const propertyRequiredFields: string[] = [
-    "name", "address1", "city", "state", "zipcode",
-    "country", "numBedrooms", "numToilets", "numShowersBaths", "costDollars", "costCents",
-    "images"
+    "name", "address1", "city", "state", "zipcode", "country",
+    "squareFeet", "numBedrooms", "numToilets", "numShowersBaths",
+    "costDollars", "costCents", "images"
   ];
 
   // FIXME: city state should probably be like user acc setup, where we use the autocomplete menu.
@@ -166,6 +168,13 @@ const CreatePropertyForm: React.FC = () => {
       required: true, type: "text"
     },
     {
+      id: "squareFeet",
+      label: "Square Feet",
+      placeholder: "",
+      value: newProperty.squareFeet,
+      required: true, type: "number", min: "0", max: "999999999"
+    },
+    {
       id: "numBedrooms",
       label: "Number of Bedrooms",
       placeholder: "",
@@ -213,7 +222,7 @@ const CreatePropertyForm: React.FC = () => {
     // need to convert the text input type=number values 
     // from variable type string into number
     var numberValue : number
-    if (id === "numBedrooms" || id === "numToilets" || id === "numShowersBaths" || id === "costDollars" || id === "costCents") {
+    if (id === "squareFeet" || id === "numBedrooms" || id === "numToilets" || id === "numShowersBaths" || id === "costDollars" || id === "costCents") {
       // Validate string is a number
       if (!validateNumber(value)) {
         alert(`Value in field ${id} is not a number.`)
@@ -350,6 +359,8 @@ const CreatePropertyForm: React.FC = () => {
             max={value.max}
           />
         ))}
+
+        {/* Images */}
         <label className="text_input_field_label_gray">
           Upload some images of the property. At least 1 image is required.
           <span className="text-red-500">*</span>
@@ -357,6 +368,7 @@ const CreatePropertyForm: React.FC = () => {
         <MultipleImageUploader
           onImagesUploaded={handleImagesUploaded}
         />
+
         <SubmitButton isSubmitting={isSubmitting} />
       </form>
     </>

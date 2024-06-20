@@ -14,7 +14,7 @@ const ContactPage : React.FC = () => {
         <a href="mailto:maametaddo@gmail.com" className="text-gray-600">maametaddo@gmail.com</a>
         <br/><br/>
         <p className="text-gray-600" style={{fontWeight: "bold"}}>User Account Data</p>
-        <a href="warren.wang2020@gmail.com" className="text-gray-600">warren.wang2020@gmail.com</a>
+        <a href="maametaddo@gmail.com" className="text-gray-600">maametaddo@gmail.com</a>
         <br/><br/>
       </div>
       <Footer></Footer>
