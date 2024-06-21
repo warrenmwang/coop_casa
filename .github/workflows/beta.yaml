@@ -48,6 +48,7 @@ jobs:
             export IS_PROD=true
             export PROD_HOST=${{ secrets.PROD_HOST }}
 
+            export ADMIN_USER_ID=${{ secrets.ADMIN_USER_ID }}
             export JWT_SIGN_SECRET=${{ secrets.JWT_SIGN_SECRET }}
             export AUTH_KEY_SECRET=${{ secrets.AUTH_KEY_SECRET }}
             export DB_ENCRYPT_KEY_SECRET=${{ secrets.DB_ENCRYPT_KEY_SECRET }}
