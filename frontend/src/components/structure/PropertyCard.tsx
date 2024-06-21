@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Property } from "./CreatePropertyForm";
 import { Card, CardActionArea, CardContent, CardMedia, Typography, Modal, Fade, Box, Backdrop } from "@mui/material";
+import QuiltedImageList from "./QuiltedImageList";
 
 interface PropertyCardProps {
   property: Property;
@@ -23,6 +24,13 @@ const PropertyCard : React.FC<PropertyCardProps> = ({ property }) => {
   const [ open, setOpen ] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+
+  const imageData = images.map(image => ({
+    img: image,
+    title: "default title",
+    rows: 2, 
+    cols: 4,
+  }))
 
   return(
     <>
@@ -64,7 +72,9 @@ const PropertyCard : React.FC<PropertyCardProps> = ({ property }) => {
     >
       <Fade in={open}>
         <Box sx={style}>
-          {/* TODO: photo gallery of property images */}
+          <QuiltedImageList
+            imageData={imageData}
+          />
           <Typography id="transition-modal-title" variant="h2" component="h2">
             {property.name}
           </Typography>

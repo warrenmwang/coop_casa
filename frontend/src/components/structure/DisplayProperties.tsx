@@ -1,5 +1,5 @@
-import { Card, Grid } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import { Grid } from "@mui/material";
+import React from "react";
 import { useAPIGetProperties } from "../../api/api";
 import CardGridSkeleton from "./CardGridSkeleton";
 import { GlobalStore } from "../../globalStore";
@@ -38,10 +38,13 @@ const DisplayProperties : React.FC<DisplayPropertiesProps> = () => {
 
   return(
     <>
-      {loading
-        ? <CardGridSkeleton/>
-        : (
-          <Grid container spacing={2}>
+      {loading && <CardGridSkeleton/>}
+      {!loading && (
+        <div className="flex justify-center">
+          <Grid
+            container
+            spacing={2}
+          >
             { currProperties && 
               currProperties.map((value, index) => (
                 <Grid
@@ -49,14 +52,14 @@ const DisplayProperties : React.FC<DisplayPropertiesProps> = () => {
                   item
                   xs={12} sm={12} md={6} lg={6} xl={4}
                   style={{ gap: "0 24px" }}
-                 >
+                >
                   <PropertyCard property={value}/>
                 </Grid>
               ))
             }
           </Grid>
-        )
-      }
+        </div>
+      )}
     </>
   );
 }
