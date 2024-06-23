@@ -1,28 +1,29 @@
-import React, { Fragment } from 'react'
-import { Link } from 'react-router-dom'
-import { Disclosure, Menu, Transition } from '@headlessui/react'
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
-import defaultProfileImg from "../../images/profile.jpg"
-import coopImg from "../../images/coopAlt1.svg"
-import { AuthData } from '../../auth/AuthWrapper'
-import { api_auth_googleOAuthLink, accountSettingsPageLink } from '../../urls'
+import React, { Fragment } from "react";
+import { Link } from "react-router-dom";
+import { Disclosure, Menu, Transition } from "@headlessui/react";
+import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+import defaultProfileImg from "../../images/profile.jpg";
+import coopImg from "../../images/coopAlt1.svg";
+import { AuthData } from "../../auth/AuthWrapper";
+import { api_auth_googleOAuthLink, accountSettingsPageLink } from "../../urls";
 
 function classNames(...classes: (string | undefined | null | false)[]) {
-  return classes.filter(Boolean).join(' ')
+  return classes.filter(Boolean).join(" ");
 }
 
 const TopNavbar: React.FC = () => {
-
-  const auth = AuthData()
-  const { user, authenticated, logout } = auth
-  const profileImg = user.avatar !== "" ? user.avatar : defaultProfileImg
+  const auth = AuthData();
+  const { user, authenticated, logout } = auth;
+  const profileImg = user.avatar !== "" ? user.avatar : defaultProfileImg;
 
   const navigation = [
-    ...(authenticated ? [ { name: 'Dashboard', href: '/dashboard', current: false}] : []),
-    { name: 'Communities', href: '/communities', current: false },
-    { name: 'Properties', href: '/properties', current: false},
-    { name: 'Map', href: '/map', current: false},
-  ]
+    ...(authenticated
+      ? [{ name: "Dashboard", href: "/dashboard", current: false }]
+      : []),
+    { name: "Communities", href: "/communities", current: false },
+    { name: "Properties", href: "/properties", current: false },
+    { name: "Map", href: "/map", current: false },
+  ];
 
   return (
     <Disclosure as="nav" className="bg-gray-800">
@@ -44,9 +45,7 @@ const TopNavbar: React.FC = () => {
               </div>
               <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
                 <div className="flex flex-shrink-0 items-center">
-                  <Link
-                    to="/" 
-                  >
+                  <Link to="/">
                     <img
                       className="h-8 w-auto"
                       src={coopImg}
@@ -61,10 +60,12 @@ const TopNavbar: React.FC = () => {
                         key={item.name}
                         to={item.href}
                         className={classNames(
-                          item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                          'rounded-md px-3 py-2 text-sm font-medium'
+                          item.current
+                            ? "bg-gray-900 text-white"
+                            : "text-gray-300 hover:bg-gray-700 hover:text-white",
+                          "rounded-md px-3 py-2 text-sm font-medium",
                         )}
-                        aria-current={item.current ? 'page' : undefined}
+                        aria-current={item.current ? "page" : undefined}
                       >
                         {item.name}
                       </Link>
@@ -96,18 +97,22 @@ const TopNavbar: React.FC = () => {
                     leaveTo="transform opacity-0 scale-95"
                   >
                     <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                      { /* authed: account settings */}
-                      {authenticated &&
+                      {/* authed: account settings */}
+                      {authenticated && (
                         <Menu.Item>
                           {({ active }) => (
                             <Link
                               to={accountSettingsPageLink}
-                              className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
+                              className={classNames(
+                                active ? "bg-gray-100" : "",
+                                "block px-4 py-2 text-sm text-gray-700",
+                              )}
                             >
                               Account Settings
                             </Link>
                           )}
-                        </Menu.Item>}
+                        </Menu.Item>
+                      )}
 
                       {/* login or logout button*/}
                       {authenticated ? (
@@ -115,8 +120,11 @@ const TopNavbar: React.FC = () => {
                         <Menu.Item>
                           {({ active }) => (
                             <button
-                              onClick={logout} 
-                              className={classNames(active ? 'bg-gray-100' : '', 'block w-full text-left px-4 py-2 text-sm text-gray-700')}
+                              onClick={logout}
+                              className={classNames(
+                                active ? "bg-gray-100" : "",
+                                "block w-full text-left px-4 py-2 text-sm text-gray-700",
+                              )}
                             >
                               Logout
                             </button>
@@ -126,21 +134,21 @@ const TopNavbar: React.FC = () => {
                         // render login otherwise
                         <Menu.Item>
                           {({ active }) => (
-                            <a 
+                            <a
                               href={api_auth_googleOAuthLink}
-                              className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
+                              className={classNames(
+                                active ? "bg-gray-100" : "",
+                                "block px-4 py-2 text-sm text-gray-700",
+                              )}
                             >
                               Log in with Google
                             </a>
                           )}
                         </Menu.Item>
                       )}
-                      
-                      
                     </Menu.Items>
                   </Transition>
-                </Menu> 
-
+                </Menu>
               </div>
             </div>
           </div>
@@ -153,10 +161,12 @@ const TopNavbar: React.FC = () => {
                   key={item.name}
                   to={item.href}
                   className={classNames(
-                    item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                    'block rounded-md px-3 py-2 text-base font-medium'
+                    item.current
+                      ? "bg-gray-900 text-white"
+                      : "text-gray-300 hover:bg-gray-700 hover:text-white",
+                    "block rounded-md px-3 py-2 text-base font-medium",
                   )}
-                  aria-current={item.current ? 'page' : undefined}
+                  aria-current={item.current ? "page" : undefined}
                 >
                   {item.name}
                 </Link>
@@ -166,7 +176,7 @@ const TopNavbar: React.FC = () => {
         </>
       )}
     </Disclosure>
-  )
-}
+  );
+};
 
 export default TopNavbar;

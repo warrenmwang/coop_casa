@@ -12,16 +12,16 @@ interface AuthContextType {
   setUserRole: React.Dispatch<React.SetStateAction<string>>;
 }
 
-export const EmptyUser : User = {
-  userId: '',
-  email: '',
-  firstName: '',
-  lastName: '',
-  birthDate: '',
-  gender: '',
-  location: '',
-  interests: '',
-  avatar: ''
+export const EmptyUser: User = {
+  userId: "",
+  email: "",
+  firstName: "",
+  lastName: "",
+  birthDate: "",
+  gender: "",
+  location: "",
+  interests: "",
+  avatar: "",
 };
 
 const AuthContext = createContext<AuthContextType>({
@@ -31,63 +31,62 @@ const AuthContext = createContext<AuthContextType>({
   logout: () => Promise.resolve(),
   setUser: () => {},
   setAuthenticated: () => {},
-  setUserRole: () => {}
+  setUserRole: () => {},
 });
 
 export const AuthData = () => useContext(AuthContext);
 
 // wrapper to provide the auth state context throughout all components
-const AuthWrapper: React.FC<{children: ReactNode}> = ({ children }) => {
-
-  const [ user, setUser ] = useState({
-    userId: '',
-    email: '',
-    firstName: '',
-    lastName: '',
-    birthDate: '',
-    gender: '',
-    location: '',
-    interests: '',
-    avatar: ''
+const AuthWrapper: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [user, setUser] = useState({
+    userId: "",
+    email: "",
+    firstName: "",
+    lastName: "",
+    birthDate: "",
+    gender: "",
+    location: "",
+    interests: "",
+    avatar: "",
   });
-  const [ authenticated, setAuthenticated ] = useState(false);
-  const [ userRole, setUserRole ] = useState("");
+  const [authenticated, setAuthenticated] = useState(false);
+  const [userRole, setUserRole] = useState("");
 
   // Define the function to logout the user
   const logout = async () => {
     // console.log("logout")
     // Log out the user in api and oauth
-    const ok = await apiLogoutUser()
+    const ok = await apiLogoutUser();
     if (!ok) {
-      alert("Error during logout. Please try logging out again.")
+      alert("Error during logout. Please try logging out again.");
     }
 
     // Clear the auth context user data
-    setUser(EmptyUser)
+    setUser(EmptyUser);
     // console.log("user set to empty")
 
-    setAuthenticated(false)
+    setAuthenticated(false);
     // console.log("authenticated set to false")
-    
+
     // Redirect to home page
-    window.location.replace("/")
+    window.location.replace("/");
   };
 
-  return(
-    <AuthContext.Provider value={
-      {
-        user, 
-        authenticated, 
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        authenticated,
         userRole,
         logout,
         setUser,
         setAuthenticated,
-        setUserRole
-      }
-    }>
+        setUserRole,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
-}
+};
 
 export default AuthWrapper;

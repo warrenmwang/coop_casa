@@ -6,29 +6,50 @@ interface CardGridSkeletonProps {
   numRows?: number;
 }
 
-const CardGridSkeleton : React.FC<CardGridSkeletonProps> = ({ numPerRow = 3, numRows = 3}) => {
-  const foo = Array.from({length: numPerRow*numRows}, (_, index) => index);
+const CardGridSkeleton: React.FC<CardGridSkeletonProps> = ({
+  numPerRow = 3,
+  numRows = 3,
+}) => {
+  const foo = Array.from({ length: numPerRow * numRows }, (_, index) => index);
 
-  return(
+  return (
     <>
       <Grid container spacing={2}>
-        {
-          foo.map((index) => (
-            <Grid
-              key={index}
-              item
-              xs={12} sm={12} md={6} lg={6} xl={12/numPerRow}
-              style={{ gap: "0 24px" }}
-              >
-              <Skeleton variant="rectangular" animation="wave" width={400} height={300} sx={{ my: 1}}/>
-              <Skeleton variant="rectangular" animation="wave" width={400} sx={{ my: 1}}/>
-              <Skeleton variant="rectangular" animation="wave" width="60%" sx={{ my: 1}}/>
-            </Grid>
-          ))
-        }
+        {foo.map((index) => (
+          <Grid
+            key={index}
+            item
+            xs={12}
+            sm={12}
+            md={6}
+            lg={6}
+            xl={12 / numPerRow}
+            style={{ gap: "0 24px" }}
+          >
+            <Skeleton
+              variant="rectangular"
+              animation="wave"
+              width={400}
+              height={300}
+              sx={{ my: 1 }}
+            />
+            <Skeleton
+              variant="rectangular"
+              animation="wave"
+              width={400}
+              sx={{ my: 1 }}
+            />
+            <Skeleton
+              variant="rectangular"
+              animation="wave"
+              width="60%"
+              sx={{ my: 1 }}
+            />
+          </Grid>
+        ))}
       </Grid>
     </>
   );
-}
+};
 
 export default CardGridSkeleton;

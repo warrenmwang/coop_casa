@@ -1,4 +1,4 @@
-# Coop.casa Backend
+# Backend
 
 REST API that manages user and group information for the coop.casa app. All user data is stored in the database.
 
@@ -9,41 +9,49 @@ These instructions will get you a copy of the project up and running on your loc
 ## MakeFile
 
 run all make commands with clean tests
+
 ```bash
 make all build
 ```
 
 build the application
+
 ```bash
 make build
 ```
 
 run the application
+
 ```bash
 make run
 ```
 
 Create DB container
+
 ```bash
 make docker-run
 ```
 
 Shutdown DB container
+
 ```bash
 make docker-down
 ```
 
 live reload the application
+
 ```bash
 make watch
 ```
 
 run the test suite
+
 ```bash
 make test
 ```
 
 clean up binary from the last build
+
 ```bash
 make clean
 ```

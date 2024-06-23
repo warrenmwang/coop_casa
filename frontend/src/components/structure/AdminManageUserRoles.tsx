@@ -4,7 +4,6 @@ import { checkFetch } from "../../api/api";
 import { AuthData } from "../../auth/AuthWrapper";
 
 const AdminManageUserRoles: React.FC = () => {
-
   const auth = AuthData();
   const { user } = auth;
 
@@ -14,13 +13,13 @@ const AdminManageUserRoles: React.FC = () => {
   const [userID, setUserID] = useState<string>("");
   const [role, setRole] = useState<string>("");
 
-  const handleSubmit = (e : React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
     // prevent admin from recking their own account
     if (userID === user.userId) {
-      alert("Don't be stupid now, admin.")
+      alert("Don't be stupid now, admin.");
       setIsSubmitting(false);
       return;
     }
@@ -32,25 +31,28 @@ const AdminManageUserRoles: React.FC = () => {
     }
 
     if (role === "") {
-      alert("Cannot update with empty role")
+      alert("Cannot update with empty role");
       setIsSubmitting(false);
       return;
     }
 
     fetch(`${api_admin_users_roles_Link}?userID=${userID}&role=${role}`, {
       method: "POST",
-      credentials: "include"
-    }).then(checkFetch)
+      credentials: "include",
+    })
+      .then(checkFetch)
       .then(() => {
         setIsSubmitting(false);
       })
       .catch((err) => {
-        console.error(err)
+        console.error(err);
         setIsSubmitting(false);
       });
   };
 
-  const handleChange = (e : React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
     const { id, value } = e.target;
     if (id === "user_id") {
       setUserID(value);
@@ -67,13 +69,10 @@ const AdminManageUserRoles: React.FC = () => {
       {/* Allow for querying for the user's current role */}
       <form className="default-form-1">
         {/* user id input */}
-        <label
-          className="text_input_field_label_gray"
-          htmlFor="user_id"
-        >
+        <label className="text_input_field_label_gray" htmlFor="user_id">
           User ID
         </label>
-        <input 
+        <input
           type="text"
           id="user_id"
           placeholder="User ID"
@@ -83,21 +82,24 @@ const AdminManageUserRoles: React.FC = () => {
         />
 
         {/* drop down of role types */}
-        <label
-          className="text_input_field_label_gray"
-          htmlFor="role"
-        >
+        <label className="text_input_field_label_gray" htmlFor="role">
           Role
         </label>
-        <select 
+        <select
           id="role"
           className="text_input_field_box_gray"
           onChange={handleChange}
           defaultValue=""
         >
-          <option value="" disabled>Select Option</option>
+          <option value="" disabled>
+            Select Option
+          </option>
           {roleTypes.map((role) => {
-            return <option key={role} value={role}>{role}</option>
+            return (
+              <option key={role} value={role}>
+                {role}
+              </option>
+            );
           })}
         </select>
 
@@ -111,7 +113,6 @@ const AdminManageUserRoles: React.FC = () => {
           {isSubmitting ? "Submitting..." : "Update Role"}
         </button>
       </form>
-
     </>
   );
 };

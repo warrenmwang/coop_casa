@@ -1,4 +1,4 @@
-import React, { createContext, ReactNode, useContext, useState} from "react";
+import React, { createContext, ReactNode, useContext, useState } from "react";
 import { Property } from "./components/structure/CreatePropertyForm";
 
 interface GlobalStoreContextType {
@@ -13,19 +13,21 @@ const GlobalStoreContext = createContext<GlobalStoreContextType>({
 
 export const GlobalStore = () => useContext(GlobalStoreContext);
 
-const GlobalStoreWrapper: React.FC<{children: ReactNode}> = ({children}) => {
-  const [ currProperties, setCurrProperties ] = useState([] as Property[]);
+const GlobalStoreWrapper: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
+  const [currProperties, setCurrProperties] = useState([] as Property[]);
 
-  return(
-    <GlobalStoreContext.Provider value={
-      {
+  return (
+    <GlobalStoreContext.Provider
+      value={{
         currProperties,
-        setCurrProperties
-      }
-    }>
+        setCurrProperties,
+      }}
+    >
       {children}
     </GlobalStoreContext.Provider>
   );
-}
+};
 
 export default GlobalStoreWrapper;

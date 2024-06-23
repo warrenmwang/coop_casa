@@ -3,7 +3,7 @@ import HeaderSection from "../structure/HeaderSection";
 import Footer from "../structure/Footer";
 import Card from "../structure/Card";
 
-import profileImg from "../../images/profile.jpg"
+import profileImg from "../../images/profile.jpg";
 import PropertiesHomeBanner from "../structure/PropertiesHomeBanner";
 import CommunitiesHomeBanner from "../structure/CommunitiesHomeBanner";
 
@@ -35,6 +35,6 @@ const HomePage: React.FC = () => {
       <Footer></Footer>
     </div>
   );
-}
+};
 
-export default HomePage; 
+export default HomePage;

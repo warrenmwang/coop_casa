@@ -7,17 +7,17 @@ import CreatePropertyForm from "./CreatePropertyForm";
 const RegularDashboard: React.FC = () => {
   const auth = AuthData();
   const { userRole } = auth; // either lister or regular
-  const isLister : boolean = (userRole == "lister");
+  const isLister: boolean = userRole == "lister";
 
   const [page, setPage] = useState<number>(0);
 
   const limit = 9;
 
-  return(
+  return (
     <>
-      {isLister && <CreatePropertyForm/>}
-      <SearchCommunities/>
-      <SearchProperties/>
+      {isLister && <CreatePropertyForm />}
+      <SearchCommunities />
+      <SearchProperties />
     </>
   );
 };

@@ -1,5 +1,4 @@
-
-export type NullUser = User | null
+export type NullUser = User | null;
 
 export interface User {
   userId: string;

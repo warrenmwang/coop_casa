@@ -10,10 +10,10 @@ export const fileToBase64 = (file: AvatarType): Promise<string> => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
       reader.onload = () => resolve(reader.result as string);
-      reader.onerror = error => reject(error);
+      reader.onerror = (error) => reject(error);
     } else {
-      resolve("")
-      reject(new Error("Something went wrong."))      
+      resolve("");
+      reject(new Error("Something went wrong."));
     }
   });
 };

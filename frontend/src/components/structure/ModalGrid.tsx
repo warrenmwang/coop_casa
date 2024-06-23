@@ -1,14 +1,9 @@
 import React from "react";
 
-interface ModalGridArgs {
-  
-}
+interface ModalGridArgs {}
 
-const ModalGrid : React.FC<ModalGridArgs> = ({  }) => {
-  return (
-    <>
-    </>
-  );
-}
+const ModalGrid: React.FC<ModalGridArgs> = ({}) => {
+  return <></>;
+};
 
 export default ModalGrid;

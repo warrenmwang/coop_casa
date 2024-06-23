@@ -1,5 +1,5 @@
 services:
-  beta_proxy: 
+  beta_proxy:
     build: ./proxy
     networks:
       - frontend
@@ -28,7 +28,7 @@ services:
   beta_go_backend:
     build: ./backend
     restart: always
-    depends_on: 
+    depends_on:
       - beta_psql_db
     networks:
       - backend
@@ -54,9 +54,9 @@ services:
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
     command: >
       sh -c "./goose_migrate.sh && ./main"
-  
+
   beta_ts_frontend:
-    build: 
+    build:
       context: ./frontend
       args:
         REACT_APP_IS_PROD: ${REACT_APP_IS_PROD}

@@ -1,15 +1,18 @@
 import React from "react";
 
 type SubmitButtonArgs = {
-  isSubmitting : boolean;
-  onClick ?: () => void;
-}
+  isSubmitting: boolean;
+  onClick?: () => void;
+};
 
 // Button needs to be inside of a <form> element
 // whose onSubmit attribute should be set to some kind of
 // handleSubmit function
-const SubmitButton : React.FC<SubmitButtonArgs> = ({ isSubmitting, onClick }) => {
-  return(
+const SubmitButton: React.FC<SubmitButtonArgs> = ({
+  isSubmitting,
+  onClick,
+}) => {
+  return (
     <div className="w-full px-3">
       <button
         type="submit"
@@ -21,6 +24,6 @@ const SubmitButton : React.FC<SubmitButtonArgs> = ({ isSubmitting, onClick }) =>
       </button>
     </div>
   );
-}
+};
 
 export default SubmitButton;

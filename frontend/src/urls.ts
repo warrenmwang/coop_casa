@@ -1,4 +1,4 @@
-import { API_HOST, API_PORT } from './config'
+import { API_HOST, API_PORT } from "./config";
 
 /*
 

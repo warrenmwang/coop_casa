@@ -12,13 +12,13 @@ const OAuthCallbackPage: React.FC = () => {
   // Auth check fetch has completed
   const auth = AuthData();
   const { authenticated } = auth;
-  if(authenticated) {
+  if (authenticated) {
     navigate(dashboardPageLink);
   } else {
     navigate(homePageLink);
   }
 
-  return <TextSkeleton/>
-}
+  return <TextSkeleton />;
+};
 
 export default OAuthCallbackPage;

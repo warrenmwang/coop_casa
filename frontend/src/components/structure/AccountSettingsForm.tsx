@@ -11,9 +11,12 @@ import TextInput from "../structure/TextInput";
 import ImageInput from "../structure/ImageInput";
 
 // Styles
-import "../../styles/Form.css"
+import "../../styles/Form.css";
 
-const AccountSettingsForm: React.FC<{ user: User, setUser: React.Dispatch<React.SetStateAction<User>> }> = ({ user, setUser }) => {
+const AccountSettingsForm: React.FC<{
+  user: User;
+  setUser: React.Dispatch<React.SetStateAction<User>>;
+}> = ({ user, setUser }) => {
   const [formData, setFormData] = useState<User>(user);
   const [isChanged, setIsChanged] = useState(false);
 
@@ -22,9 +25,9 @@ const AccountSettingsForm: React.FC<{ user: User, setUser: React.Dispatch<React.
   }, [user]);
 
   const textInputSetFormData = (id: string, value: string) => {
-    setFormData(prevState => ({
+    setFormData((prevState) => ({
       ...prevState,
-      [id]: value
+      [id]: value,
     }));
   };
 
@@ -34,7 +37,9 @@ const AccountSettingsForm: React.FC<{ user: User, setUser: React.Dispatch<React.
     // Save data in the database
     const responseCode = await apiUpdateUserAccountDetails(formData);
     if (responseCode !== 200) {
-      alert(`Please try submitting again. Returned with response code ${responseCode}`)
+      alert(
+        `Please try submitting again. Returned with response code ${responseCode}`,
+      );
     }
     setIsChanged(false);
   };
@@ -45,17 +50,17 @@ const AccountSettingsForm: React.FC<{ user: User, setUser: React.Dispatch<React.
   };
 
   const handleClearAvatarImage = () => {
-    setIsChanged(true)
-    setFormData(prevState => ({
+    setIsChanged(true);
+    setFormData((prevState) => ({
       ...prevState,
-      avatar: ""
-    }))
-  }
+      avatar: "",
+    }));
+  };
 
   return (
     <div className="default-form-1">
       {/* Email */}
-      <TextInput 
+      <TextInput
         setFormData={textInputSetFormData}
         setIsChanged={setIsChanged}
         type="email"
@@ -65,7 +70,7 @@ const AccountSettingsForm: React.FC<{ user: User, setUser: React.Dispatch<React.
       />
 
       {/* First Name */}
-      <TextInput 
+      <TextInput
         setFormData={textInputSetFormData}
         setIsChanged={setIsChanged}
         type="text"
@@ -75,7 +80,7 @@ const AccountSettingsForm: React.FC<{ user: User, setUser: React.Dispatch<React.
       />
 
       {/* Last Name */}
-      <TextInput 
+      <TextInput
         setFormData={textInputSetFormData}
         setIsChanged={setIsChanged}
         type="text"
@@ -85,7 +90,7 @@ const AccountSettingsForm: React.FC<{ user: User, setUser: React.Dispatch<React.
       />
 
       {/* Birthdate  */}
-      <TextInput 
+      <TextInput
         setFormData={textInputSetFormData}
         setIsChanged={setIsChanged}
         type="date"
@@ -95,28 +100,28 @@ const AccountSettingsForm: React.FC<{ user: User, setUser: React.Dispatch<React.
       />
 
       {/* Gender */}
-      <GenderInput 
+      <GenderInput
         formData={formData}
         setFormData={setFormData}
         setIsChanged={setIsChanged}
       />
 
       {/* Location */}
-      <LocationInput 
+      <LocationInput
         formData={formData}
         setFormData={setFormData}
         setIsChanged={setIsChanged}
       />
 
       {/* Interests */}
-      <InterestsInput 
+      <InterestsInput
         formData={formData}
         setFormData={setFormData}
         setIsChanged={setIsChanged}
       />
 
       {/* Avatar */}
-      <ImageInput 
+      <ImageInput
         setFormData={setFormData}
         setIsChanged={setIsChanged}
         label="Avatar Image"
@@ -125,12 +130,12 @@ const AccountSettingsForm: React.FC<{ user: User, setUser: React.Dispatch<React.
       />
       {/* Clear Image Button */}
       {formData.avatar && (
-          <button
-            onClick={handleClearAvatarImage}
-            className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-          >
-            Clear Image
-          </button>
+        <button
+          onClick={handleClearAvatarImage}
+          className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+        >
+          Clear Image
+        </button>
       )}
 
       {/* Save / discard buttons */}
