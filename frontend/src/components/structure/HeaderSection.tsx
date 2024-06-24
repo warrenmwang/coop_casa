@@ -4,7 +4,7 @@ const stats = [
   { name: "Individual Ownership", value: "100%" },
   { name: "Dark Patterns and Hidden Fees", value: "0" },
   { name: "Office Worldwide", value: "1" },
-  { name: "Active Members", value: "4" },
+  // { name: "Active Members", value: "4" },
 ];
 
 export default function HeaderSection() {

@@ -10,24 +10,13 @@ import {
   Fade,
   Box,
   Backdrop,
+  Button,
 } from "@mui/material";
-import QuiltedImageList from "./QuiltedImageList";
+import CustomImageGallery from "./CustomImageGallery";
 
 interface PropertyCardProps {
   property: Property;
 }
-
-const style = {
-  position: "absolute" as "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: "50%",
-  bgcolor: "background.paper",
-  border: "2px solid #000",
-  boxShadow: 24,
-  p: 4,
-};
 
 const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
   const images = property.images.split("#");
@@ -75,12 +64,22 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
         slotProps={{
           backdrop: {
             timeout: 100,
+            className: "z-40",
           },
         }}
+        className="flex items-center justify-center z-50"
       >
         <Fade in={open}>
-          <Box sx={style}>
-            <QuiltedImageList imageData={imageData} />
+          <Box className="bg-white p-4 shadow-lg rounded-lg mx-auto w-11/12 md:w-3/5 lg:w-1/2 z-50">
+            <div className="flex justify-end">
+              <button
+                className="block m-3 p-3 bg-gray-500 hover:bg-gray-400 text-white md:hidden rounded"
+                onClick={handleClose}
+              >
+                Close
+              </button>
+            </div>
+            <CustomImageGallery imageData={imageData} />
             <Typography id="transition-modal-title" variant="h2" component="h2">
               {property.name}
             </Typography>
