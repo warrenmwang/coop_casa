@@ -1,112 +1,87 @@
-import React, { useState } from "react";
+import React from "react";
+import { useNavigate } from "react-router-dom";
 import { Property } from "./CreatePropertyForm";
-import {
-  Card,
-  CardActionArea,
-  CardContent,
-  CardMedia,
-  Typography,
-  Modal,
-  Fade,
-  Box,
-  Backdrop,
-  Button,
-} from "@mui/material";
-import CustomImageGallery from "./CustomImageGallery";
+import { Card, CardActionArea, CardContent, CardMedia } from "@mui/material";
+import { propertiesPageLink } from "../../urls";
 
 interface PropertyCardProps {
   property: Property;
+  openOnLoad?: boolean;
 }
 
 const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
-  const images = property.images.split("#");
-  const [open, setOpen] = useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const navigate = useNavigate();
 
-  const imageData = images.map((image) => ({
-    img: image,
-    title: "default title",
-    rows: 2,
-    cols: 4,
-  }));
+  const handleCardClick = () => {
+    navigate(`${propertiesPageLink}/${property.propertyId}`);
+  };
+
+  const images = property.images.split("#");
+
+  const costNumsToPresentableString = (
+    costDollars: number,
+    costCents: number,
+  ) => {
+    var start = `${costDollars}`;
+    var res = "";
+    var count = 0;
+    for (var i = start.length - 1; i >= 0; i--) {
+      count++;
+      if (count === 4) {
+        res = `${start[i]},${res}`;
+        count = 1;
+      } else {
+        res = `${start[i]}${res}`;
+      }
+    }
+    return "$" + res + "." + String(costCents).padStart(2, "0");
+  };
+
+  const basicInfoConstructor = (property: Property) => {
+    return (
+      <div className="flex">
+        <div className="font-bold mx-1">{property.numBedrooms}</div>
+        <div> beds | </div>
+        <div className="font-bold mx-1">{property.numShowersBaths}</div>
+        <div> ba | </div>
+        <div className="font-bold mx-1">{property.numToilets}</div>
+        <div> toil | </div>
+        <div className="font-bold mx-1">{property.squareFeet}</div>
+        <div> sqft </div>
+      </div>
+    );
+  };
+
+  const costString = costNumsToPresentableString(
+    property.costDollars,
+    property.costCents,
+  );
+  const addressString =
+    property.address2 === ""
+      ? `${property.address1}, ${property.city}, ${property.state} ${property.zipcode}, ${property.country}`
+      : `${property.address1}, ${property.address2}, ${property.city}, ${property.state} ${property.zipcode}, ${property.country}`;
+
+  const basicInfoElement = basicInfoConstructor(property);
 
   return (
     <>
       <CardActionArea
-        onClick={handleOpen}
-        sx={{ maxWidth: 400, maxHeight: 400 }}
+        onClick={handleCardClick}
+        sx={{ maxWidth: 400, maxHeight: 600 }}
       >
-        <Card sx={{ maxWidth: 400, maxHeight: 400 }}>
+        <Card sx={{ maxWidth: 400, maxHeight: 600 }}>
           <CardMedia
             sx={{ width: 400, height: 300 }}
             image={images[0]}
             title="default first image"
           />
           <CardContent>
-            <Typography gutterBottom variant="h5" component="div">
-              {property.name}
-            </Typography>
-            <Typography gutterBottom variant="h6" component="div">
-              {`${property.description}`}
-            </Typography>
+            <div className="text-3xl font-bold">{costString}</div>
+            <div className="text-2xl">{addressString}</div>
+            {basicInfoElement}
           </CardContent>
         </Card>
       </CardActionArea>
-
-      <Modal
-        aria-labelledby="transition-modal-title"
-        aria-describedby="transition-modal-description"
-        open={open}
-        onClose={handleClose}
-        closeAfterTransition
-        slots={{ backdrop: Backdrop }}
-        slotProps={{
-          backdrop: {
-            timeout: 100,
-            className: "z-40",
-          },
-        }}
-        className="flex items-center justify-center z-50"
-      >
-        <Fade in={open}>
-          <Box className="bg-white p-4 shadow-lg rounded-lg mx-auto w-11/12 md:w-3/5 lg:w-1/2 z-50">
-            <div className="flex justify-end">
-              <button
-                className="block m-3 p-3 bg-gray-500 hover:bg-gray-400 text-white md:hidden rounded"
-                onClick={handleClose}
-              >
-                Close
-              </button>
-            </div>
-            <CustomImageGallery imageData={imageData} />
-            <Typography id="transition-modal-title" variant="h2" component="h2">
-              {property.name}
-            </Typography>
-            <Typography variant="h3" component="div">
-              {`\$${property.costDollars}.${property.costCents}`}
-            </Typography>
-            <Typography
-              id="transition-modal-description"
-              variant="h6"
-              sx={{ mt: 2 }}
-            >
-              Address:{" "}
-              {`${property.address1}, ${property.address2}, ${property.city}, ${property.state} ${property.zipcode}, ${property.country}`}
-              <br></br>
-              Square Feet: {property.squareFeet}
-              <br></br>
-              Bedrooms: {property.numBedrooms}
-              <br></br>
-              Toilets: {property.numToilets}
-              <br></br>
-              Showers/Baths: {property.numShowersBaths}
-              <br></br>
-              Misc. Lister Comments: {property.miscNote}
-            </Typography>
-          </Box>
-        </Fade>
-      </Modal>
     </>
   );
 };

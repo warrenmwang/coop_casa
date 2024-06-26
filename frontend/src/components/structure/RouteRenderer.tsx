@@ -14,6 +14,7 @@ import { AuthData } from "../../auth/AuthWrapper";
 import AccountSettingsPage from "../pages/AccountSettingsPage";
 import AccountSetupPage from "../pages/AccountSetupPage";
 import PropertiesPage from "../pages/PropertiesPage";
+import PropertyDetail from "../pages/PropertyDetail";
 import AttributionsPage from "../pages/AttributionsPage";
 import {
   aboutPageLink,
@@ -48,6 +49,10 @@ const RouteRenderer: React.FC = () => {
       <Route path={homePageLink} element={<HomePage />} />
       <Route path={communitiesPageLink} element={<CommunitiesPage />} />
       <Route path={propertiesPageLink} element={<PropertiesPage />} />
+      <Route
+        path={`${propertiesPageLink}/:propertyID`}
+        element={<PropertyDetail />}
+      />
       <Route path={mapPageLink} element={<MapPage />} />
       <Route path={aboutPageLink} element={<AboutPage />} />
       <Route path={privacypolicyPageLink} element={<PrivacyPolicyPage />} />

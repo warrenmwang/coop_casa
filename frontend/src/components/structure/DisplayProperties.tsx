@@ -1,9 +1,12 @@
-import { Grid } from "@mui/material";
 import React from "react";
+import { useSearchParams } from "react-router-dom";
+import { Grid } from "@mui/material";
 import { useAPIGetProperties } from "../../api/api";
 import CardGridSkeleton from "./CardGridSkeleton";
 import { GlobalStore } from "../../globalStore";
 import PropertyCard from "./PropertyCard";
+import SearchProperties from "./SearchProperties";
+import { Property } from "./CreatePropertyForm";
 
 interface DisplayPropertiesProps {}
 
@@ -14,7 +17,11 @@ const DEV_LISTING_TOGGLE = true;
 
 const DisplayProperties: React.FC<DisplayPropertiesProps> = () => {
   const globalStore = GlobalStore();
-  const { currProperties } = globalStore;
+  const { globalMap } = globalStore;
+  let currProperties = globalMap.get("currSetProperties");
+
+  // TODO: need this for filtering search information?
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const getPropertiesMode = DEV_LISTING_TOGGLE ? "deterministic" : "random";
   const limit: number = 9;
@@ -35,12 +42,13 @@ const DisplayProperties: React.FC<DisplayPropertiesProps> = () => {
 
   return (
     <>
+      <SearchProperties />
       {loading && <CardGridSkeleton />}
       {!loading && (
         <div className="flex justify-center">
           <Grid container spacing={2}>
             {currProperties &&
-              currProperties.map((value, index) => (
+              currProperties.map((value: Property, index: number) => (
                 <Grid
                   key={index}
                   item

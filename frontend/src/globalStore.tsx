@@ -1,14 +1,12 @@
-import React, { createContext, ReactNode, useContext, useState } from "react";
+import React, { createContext, ReactNode, useContext } from "react";
 import { Property } from "./components/structure/CreatePropertyForm";
 
 interface GlobalStoreContextType {
-  currProperties: Property[];
-  setCurrProperties: React.Dispatch<React.SetStateAction<Property[]>>;
+  globalMap: Map<string, any>;
 }
 
 const GlobalStoreContext = createContext<GlobalStoreContextType>({
-  currProperties: [],
-  setCurrProperties: () => {},
+  globalMap: new Map<string, any>(),
 });
 
 export const GlobalStore = () => useContext(GlobalStoreContext);
@@ -16,13 +14,13 @@ export const GlobalStore = () => useContext(GlobalStoreContext);
 const GlobalStoreWrapper: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const [currProperties, setCurrProperties] = useState([] as Property[]);
+  const globalMap = new Map<string, any>();
+  globalMap.set("cachedProperties", new Map<string, Property>()); // propertyID -> Property
 
   return (
     <GlobalStoreContext.Provider
       value={{
-        currProperties,
-        setCurrProperties,
+        globalMap,
       }}
     >
       {children}

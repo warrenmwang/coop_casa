@@ -92,8 +92,7 @@ const LocationInput: React.FC<LocationInputArgs> = ({
     : "block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2";
   const autoSuggestInputStyle = styleWhite
     ? "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-    : // "tracking-wide appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-2 leading-tight focus:outline-none focus:bg-white"
-      "appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white";
+    : "appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white";
   const divStyle = styleWhite ? "mb-4" : "w-full px-3";
 
   return (

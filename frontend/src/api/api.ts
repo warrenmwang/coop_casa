@@ -218,11 +218,50 @@ export const apiCreateNewProperty = async (
   return returnVal;
 };
 
+// Get a single property based off of id
+export const useAPIGetProperty = (propertyID: string): boolean => {
+  const globalStore = GlobalStore();
+  const { globalMap } = globalStore;
+
+  const [loading, setLoading] = useState(true);
+
+  // property is not in cache, fetch it
+  useEffect(() => {
+    const controller = new AbortController();
+
+    fetch(`${api_properties_Link}?propertyID=${propertyID}`, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+      credentials: "include",
+      signal: controller.signal,
+    })
+      .then(checkFetch)
+      .then((response) => response.json())
+      .then((data) => {
+        if (data !== null) {
+          const propertyData = data as Property;
+          globalMap.get("cachedProperties").set(propertyID, propertyData);
+        }
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error(err);
+        setLoading(false);
+      });
+
+    return () => controller.abort();
+  }, []);
+
+  return loading;
+};
+
 // Get user properties api hook
 export const useAPIGetProperties = (limit: number, offset: number): boolean => {
   // assume in global store context
   const globalStore = GlobalStore();
-  const { setCurrProperties } = globalStore;
+  const { globalMap } = globalStore;
 
   const [loading, setLoading] = useState(true);
 
@@ -240,7 +279,12 @@ export const useAPIGetProperties = (limit: number, offset: number): boolean => {
       .then(checkFetch)
       .then((response) => response.json())
       .then((data) => {
-        setCurrProperties(data as Property[]);
+        const propertyData = data as Property[];
+        globalMap.set("currSetProperties", propertyData);
+        propertyData.map((value) => {
+          globalMap.get("cachedProperties").set(value.propertyId, value);
+        });
+
         setLoading(false);
       })
       .catch((err) => console.error(err));

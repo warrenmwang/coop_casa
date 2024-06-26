@@ -5,6 +5,10 @@ import SearchBar from "../structure/SearchBar";
 const gradientBackground = "linear-gradient(to left, #40c0ff, #1482b8)";
 
 const SearchCommunities: React.FC = () => {
+  const onSubmit = (searchText: string) => {
+    console.log("search communities: " + searchText);
+  };
+
   return (
     <div
       style={{ background: gradientBackground, padding: "20px" }}
@@ -15,7 +19,10 @@ const SearchCommunities: React.FC = () => {
           title="Search Communities"
           description="Find people with similar interests!"
         ></Title>
-        <SearchBar placeholder="Search Communities in the USA"></SearchBar>
+        <SearchBar
+          onSubmit={onSubmit}
+          placeholder="Search Communities in the USA"
+        ></SearchBar>
       </div>
     </div>
   );
