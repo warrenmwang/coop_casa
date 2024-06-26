@@ -248,31 +248,24 @@ func (s *Server) RegisterRoutes() http.Handler {
 	// Logout
 	r.Get("/auth/logout", s.authLogoutHandler)
 
-	// Get account details
+	// Account
 	r.Get("/api/account", s.apiGetAccountDetailsHandler)
-
-	// Delete account
-	r.Delete("/api/account", s.apiDeleteAccountHandler)
-
-	// Update account details
 	r.Post("/api/account", s.apiUpdateAccountDetailsHandler)
+	r.Delete("/api/account", s.apiDeleteAccountHandler)
 
 	// A user can get their own role
 	r.Get("/api/account/role", s.apiGetUserRoleHandler)
 
-	// Admin - get users
+	// Admin
 	r.Get("/api/admin/users", s.apiAdminGetUsers)
-
-	// Admin - get user(s) role(s)
 	r.Get("/api/admin/users/roles", s.apiAdminGetUsersRoles)
-
-	// Admin - update user(s) role(s)
 	r.Post("/api/admin/users/roles", s.apiUpdateUserRoleHandler)
 
 	// Properties
 	r.Get("/api/properties", s.apiGetPropertiesHandler)
 	r.Put("/api/properties", s.apiCreatePropertiesHandler)
 	r.Post("/api/properties", s.apiUpdatePropertiesHandler)
+	r.Delete("/api/properties", s.apiDeletePropertiesHandler)
 
 	return r
 }
@@ -751,8 +744,25 @@ func (s *Server) apiUpdateUserRoleHandler(w http.ResponseWriter, r *http.Request
 func (s *Server) apiGetPropertiesHandler(w http.ResponseWriter, r *http.Request) {
 	// anyone can get properties, without needing to be authenticated.
 
-	// Get the limit and offset for the properties viewing
 	query := r.URL.Query()
+
+	// Check if propertyID is a queryParam, if it is, retrieve it and 
+	// try to find the suitable property from the database
+	propertyID := query.Get("propertyID")
+	if propertyID != "" {
+		property, err := s.db.GetProperty(propertyID)
+		if err != nil {
+			respondWithError(w, 500, err)
+			return
+		}
+		respondWithJSON(w, 200, property)
+		return
+	}
+
+	// ---- For if limit and offset are present and propertyID is not 
+	// present as a query parameter
+
+	// Get the limit and offset for the properties viewing
 	limitStr := query.Get("limit")
 	offsetStr := query.Get("offset")
 
@@ -870,5 +880,43 @@ func (s *Server) apiUpdatePropertiesHandler(w http.ResponseWriter, r *http.Reque
 	}
 
 	// Respond with ok
+	w.WriteHeader(200)
+}
+
+// Endpoint: DELETE /api/properties
+func (s *Server) apiDeletePropertiesHandler(w http.ResponseWriter, r *http.Request) {
+	// Authenticate user
+	userID, err := s.getAuthedUserId(r)
+	if err != nil {
+		respondWithError(w, 401, err)
+		return
+	}
+
+	// Get the property ID they want to delete from the query param
+	query := r.URL.Query()
+	propertyID := query.Get("propertyID")
+
+	// Try to get the requested property
+	property, err := s.db.GetProperty(propertyID)
+	if err != nil {
+		respondWithError(w, 500, err)
+		return
+	}
+
+	// Ensure that the user owns the property OR 
+	// that the user is the admin
+	if (property.ListerUserID != userID && userID != s.AdminUserID) {
+		respondWithError(w, 401, err)
+		return
+	}
+
+	// Delete the property
+	err = s.db.DeleteProperty(propertyID)
+	if err != nil {
+		respondWithError(w, 500, err)
+		return
+	}
+	
+	// Respond ok
 	w.WriteHeader(200)
 }

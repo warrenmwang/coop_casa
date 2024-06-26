@@ -1,7 +1,7 @@
 events {}
 
 http {
-    client_max_body_size 10M; # 10 Mebibytes max body size
+    client_max_body_size 60M; # in Mebibytes
 
     upstream frontend {
         server beta_ts_frontend:${INTERNAL_FRONTEND_PORT}; 
