@@ -14,7 +14,6 @@ import {
   api_user_role_Link,
 } from "../urls";
 import { AuthData } from "../auth/AuthWrapper";
-import { GlobalStore } from "../globalStore";
 
 export const checkFetch = (response: Response) => {
   // source: https://www.youtube.com/watch?v=b8DaQrxshu0
@@ -219,78 +218,32 @@ export const apiCreateNewProperty = async (
 };
 
 // Get a single property based off of id
-export const useAPIGetProperty = (propertyID: string): boolean => {
-  const globalStore = GlobalStore();
-  const { globalMap } = globalStore;
-
-  const [loading, setLoading] = useState(true);
-
-  // property is not in cache, fetch it
-  useEffect(() => {
-    const controller = new AbortController();
-
-    fetch(`${api_properties_Link}?propertyID=${propertyID}`, {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-      },
-      credentials: "include",
-      signal: controller.signal,
-    })
-      .then(checkFetch)
-      .then((response) => response.json())
-      .then((data) => {
-        if (data !== null) {
-          const propertyData = data as Property;
-          globalMap.get("cachedProperties").set(propertyID, propertyData);
-        }
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error(err);
-        setLoading(false);
-      });
-
-    return () => controller.abort();
-  }, []);
-
-  return loading;
+export const apiGetProperty = async (propertyID: string): Promise<Property> => {
+  return fetch(`${api_properties_Link}?propertyID=${propertyID}`, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+    },
+    credentials: "include",
+  })
+    .then(checkFetch)
+    .then((response) => response.json())
+    .then((data) => data as Property);
 };
 
 // Get user properties api hook
-export const useAPIGetProperties = (limit: number, offset: number): boolean => {
-  // assume in global store context
-  const globalStore = GlobalStore();
-  const { globalMap } = globalStore;
-
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    fetch(`${api_properties_Link}?limit=${limit}&offset=${offset}`, {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-      },
-      credentials: "include",
-      signal: controller.signal,
-    })
-      .then(checkFetch)
-      .then((response) => response.json())
-      .then((data) => {
-        const propertyData = data as Property[];
-        globalMap.set("currSetProperties", propertyData);
-        propertyData.map((value) => {
-          globalMap.get("cachedProperties").set(value.propertyId, value);
-        });
-
-        setLoading(false);
-      })
-      .catch((err) => console.error(err));
-
-    return () => controller.abort();
-  }, []);
-
-  return loading;
+export const apiGetProperties = async (
+  limit: number,
+  offset: number,
+): Promise<Property[]> => {
+  return fetch(`${api_properties_Link}?limit=${limit}&offset=${offset}`, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+    },
+    credentials: "include",
+  })
+    .then(checkFetch)
+    .then((response) => response.json())
+    .then((data) => data as Property[]);
 };

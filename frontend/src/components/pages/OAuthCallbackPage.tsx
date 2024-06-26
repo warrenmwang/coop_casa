@@ -7,7 +7,7 @@ import { AuthData } from "../../auth/AuthWrapper";
 
 const OAuthCallbackPage: React.FC = () => {
   const navigate = useNavigate();
-  const _ = useAPIAuthCheck();
+  useAPIAuthCheck();
 
   // Auth check fetch has completed
   const auth = AuthData();

@@ -1,12 +1,12 @@
 import React from "react";
 import { useSearchParams } from "react-router-dom";
 import { Grid } from "@mui/material";
-import { useAPIGetProperties } from "../../api/api";
+import { apiGetProperties } from "../../api/api";
 import CardGridSkeleton from "./CardGridSkeleton";
-import { GlobalStore } from "../../globalStore";
 import PropertyCard from "./PropertyCard";
 import SearchProperties from "./SearchProperties";
 import { Property } from "./CreatePropertyForm";
+import { useQuery } from "@tanstack/react-query";
 
 interface DisplayPropertiesProps {}
 
@@ -16,10 +16,6 @@ interface DisplayPropertiesProps {}
 const DEV_LISTING_TOGGLE = true;
 
 const DisplayProperties: React.FC<DisplayPropertiesProps> = () => {
-  const globalStore = GlobalStore();
-  const { globalMap } = globalStore;
-  let currProperties = globalMap.get("currSetProperties");
-
   // TODO: need this for filtering search information?
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -38,13 +34,20 @@ const DisplayProperties: React.FC<DisplayPropertiesProps> = () => {
     offset = 0;
   }
 
-  const loading = useAPIGetProperties(limit, offset);
+  const {
+    status,
+    error,
+    data: currProperties,
+  } = useQuery({
+    queryKey: ["properties", limit, offset],
+    queryFn: () => apiGetProperties(limit, offset),
+  });
 
   return (
     <>
       <SearchProperties />
-      {loading && <CardGridSkeleton />}
-      {!loading && (
+      {status == "pending" && <CardGridSkeleton />}
+      {status == "success" && (
         <div className="flex justify-center">
           <Grid container spacing={2}>
             {currProperties &&
@@ -65,6 +68,7 @@ const DisplayProperties: React.FC<DisplayPropertiesProps> = () => {
           </Grid>
         </div>
       )}
+      {status == "error" && JSON.stringify(error)}
     </>
   );
 };

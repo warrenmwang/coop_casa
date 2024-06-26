@@ -31,7 +31,11 @@ import {
   accountSettingsPageLink,
   accountSetupPageLink,
 } from "../../urls";
-import { useAPIAuthCheck, useAPIGetUserRole } from "../../api/api";
+import {
+  useAPIAuthCheck,
+  useAPIGetUserRole,
+  useAPIGetUserAccount,
+} from "../../api/api";
 
 const OAuthCallbackPage = React.lazy(
   () => import("../pages/OAuthCallbackPage"),
@@ -41,8 +45,9 @@ const RouteRenderer: React.FC = () => {
   const auth = AuthData();
   const { authenticated } = auth;
 
-  const loading = useAPIAuthCheck();
-  const loading1 = useAPIGetUserRole();
+  useAPIAuthCheck();
+  useAPIGetUserAccount();
+  useAPIGetUserRole();
 
   return (
     <Routes>

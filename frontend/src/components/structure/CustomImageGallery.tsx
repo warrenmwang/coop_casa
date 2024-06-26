@@ -46,7 +46,7 @@ const CustomImageGallery: React.FC<CustomImageGalleryProps> = ({
             imageData[i].cols * 20,
             imageData[i].rows * 20,
           ),
-          loading: "lazy",
+          loading: "eager",
         });
       }
       setImagesReadyForGallery(result);
