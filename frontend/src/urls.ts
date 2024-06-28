@@ -35,3 +35,5 @@ export const api_admin_users_Link = `${API_HOST}:${API_PORT}/api/admin/users`;
 export const api_admin_users_roles_Link = `${API_HOST}:${API_PORT}/api/admin/users/roles`;
 
 export const api_properties_Link = `${API_HOST}:${API_PORT}/api/properties`;
+
+export const api_lister_Link = `${API_HOST}:${API_PORT}/api/lister`;

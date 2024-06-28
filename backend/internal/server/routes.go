@@ -267,6 +267,9 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.Post("/api/properties", s.apiUpdatePropertiesHandler)
 	r.Delete("/api/properties", s.apiDeletePropertiesHandler)
 
+	// Public Lister info
+	r.Get("/api/lister", s.apiGetListerInfoHandler)
+
 	return r
 }
 
@@ -936,4 +939,42 @@ func (s *Server) apiDeletePropertiesHandler(w http.ResponseWriter, r *http.Reque
 	
 	// Respond ok
 	w.WriteHeader(200)
+}
+
+// Endpoint: GET /api/lister
+func (s *Server) apiGetListerInfoHandler(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query()
+	listerID := query.Get("listerID")
+	if listerID == "" {
+		respondWithError(w, 422, errors.New("listerID empty"))
+		return
+	}
+
+	// Check the role of the userid
+	role, err := s.db.GetUserRole(listerID)
+	if err != nil {
+		respondWithError(w, 500, err)
+		return
+	}
+	if role != "lister" && role != "admin" {
+		respondWithError(w, 500, errors.New("user is not a lister"))
+		return
+	}
+
+	// userID is a lister, return the email and name for basic contact information
+	lister, err := s.db.GetUser(listerID)
+	if err != nil {
+		respondWithError(w, 500, err)
+		return
+	}
+
+	respondWithJSON(w, 200, struct{
+		FirstName string `json:"firstName"`
+		LastName string `json:"lastName"`
+		Email string `json:"email"`
+	}{
+		FirstName: lister.FirstName.String,
+		LastName: lister.LastName.String,
+		Email: lister.Email,
+	})
 }

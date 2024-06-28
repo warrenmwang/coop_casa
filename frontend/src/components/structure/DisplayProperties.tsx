@@ -66,7 +66,6 @@ const DisplayProperties: React.FC<DisplayPropertiesProps> = () => {
     nextPage: number | null;
   }> => {
     const propertyIDs = await apiGetProperties(pageParam);
-    console.log(propertyIDs.length);
     return new Promise((resolve) =>
       resolve({
         data: propertyIDs,

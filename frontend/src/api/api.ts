@@ -3,13 +3,14 @@
 */
 
 import { useEffect, useState } from "react";
-import { NullUser, User } from "../types/User";
+import { NullUser, User, ListerBasicInfo } from "../types/User";
 import { Property } from "../components/structure/CreatePropertyForm";
 import {
   api_account_Link,
   api_account_update_Link,
   api_auth_check_link,
   api_auth_logout_Link,
+  api_lister_Link,
   api_properties_Link,
   api_user_role_Link,
 } from "../urls";
@@ -267,6 +268,24 @@ export const apiGetTotalCountProperties = async (): Promise<number> => {
     .then(checkFetch)
     .then((response) => response.json())
     .then((data) => data as number)
+    .catch((error) => {
+      throw error;
+    });
+};
+
+// Get lister info
+export const apiGetListerInfo = async (
+  listerID: string,
+): Promise<ListerBasicInfo> => {
+  return fetch(`${api_lister_Link}?listerID=${listerID}`, {
+    method: "GET",
+    headers: {
+      Accept: "application.json",
+    },
+  })
+    .then(checkFetch)
+    .then((response) => response.json())
+    .then((data) => data as ListerBasicInfo)
     .catch((error) => {
       throw error;
     });

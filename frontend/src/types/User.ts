@@ -11,3 +11,9 @@ export interface User {
   interests: string;
   avatar: string;
 }
+
+export interface ListerBasicInfo {
+  firstName: string;
+  lastName: string;
+  email: string;
+}

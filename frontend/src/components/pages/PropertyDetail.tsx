@@ -2,13 +2,48 @@ import React from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Box } from "@mui/material";
 import CustomImageGallery from "../structure/CustomImageGallery";
-import { apiGetProperty } from "../../api/api";
+import { apiGetListerInfo, apiGetProperty } from "../../api/api";
 import { propertiesPageLink } from "../../urls";
 import { Property } from "../structure/CreatePropertyForm";
 import TopNavbar from "../structure/TopNavbar";
 import Footer from "../structure/Footer";
 import { useQuery } from "@tanstack/react-query";
 import CardSkeleton from "../structure/CardSkeleton";
+import { ListerBasicInfo } from "../../types/User";
+
+type ListerInfoProps = {
+  listerID: string;
+};
+
+const ListerInfo: React.FC<ListerInfoProps> = ({ listerID }) => {
+  const { data, status, error } = useQuery({
+    queryKey: ["lister", listerID],
+    queryFn: () => apiGetListerInfo(listerID),
+  });
+
+  const lister = data as ListerBasicInfo;
+
+  return (
+    <>
+      {status === "pending" && "Loading lister info..."}
+      {status === "success" && (
+        <>
+          <div className="text-xl font-bold pt-2">Lister Information</div>
+          <div className="flex gap-2">
+            <div className="text-lg">Name: </div>
+            <div className="text-lg">
+              {lister.firstName} {lister.lastName}
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <div className="text-lg">Email: </div>
+            <div className="text-lg">{lister.email}</div>
+          </div>
+        </>
+      )}
+    </>
+  );
+};
 
 type PropertyDetailContentProps = {
   property: Property;
@@ -92,9 +127,19 @@ const PropertyDetailContent: React.FC<PropertyDetailContentProps> = ({
         {basicInfoElement}
       </div>
       <div id="transition-modal-description">
-        <div className="text-xl underline">Misc. Lister Comments</div>
+        <div className="text-xl font-bold pt-2">Property Description</div>
+        <div className="flex gap-2">
+          <div className="text-lg">Property Name: </div>
+          <div className="text-lg">{property.name}</div>
+        </div>
+        <div className="flex gap-2">
+          <div className="text-lg">Description: </div>
+          <div className="text-lg">{property.description}</div>
+        </div>
+        <ListerInfo listerID={property.listerUserId} />
+        <div className="text-lg">Miscellaneous Lister Comments: </div>
         <div className="text-lg">{property.miscNote}</div>
-        <div className="text-md">Property ID: {property.propertyId}</div>
+        <div className="text-sm pt-5">Property ID: {property.propertyId}</div>
       </div>
     </Box>
   );
