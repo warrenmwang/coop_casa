@@ -89,6 +89,40 @@ func (q *Queries) DeleteProperty(ctx context.Context, propertyID string) error {
 	return err
 }
 
+const getNextPageProperties = `-- name: GetNextPageProperties :many
+SELECT property_id FROM properties
+ORDER BY id
+LIMIT $1 OFFSET $2
+`
+
+type GetNextPagePropertiesParams struct {
+	Limit  int32
+	Offset int32
+}
+
+func (q *Queries) GetNextPageProperties(ctx context.Context, arg GetNextPagePropertiesParams) ([]string, error) {
+	rows, err := q.db.QueryContext(ctx, getNextPageProperties, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []string
+	for rows.Next() {
+		var property_id string
+		if err := rows.Scan(&property_id); err != nil {
+			return nil, err
+		}
+		items = append(items, property_id)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getProperty = `-- name: GetProperty :one
 SELECT id, property_id, lister_user_id, name, description, address_1, address_2, city, state, zipcode, country, square_feet, num_bedrooms, num_toilets, num_showers_baths, cost_dollars, cost_cents, misc_note, created_at, updated_at FROM properties
 WHERE property_id = $1
@@ -139,59 +173,15 @@ func (q *Queries) GetPropertyImages(ctx context.Context, propertyID string) (Pro
 	return i, err
 }
 
-const getPublicProperties = `-- name: GetPublicProperties :many
-SELECT id, property_id, lister_user_id, name, description, address_1, address_2, city, state, zipcode, country, square_feet, num_bedrooms, num_toilets, num_showers_baths, cost_dollars, cost_cents, misc_note, created_at, updated_at FROM properties
-ORDER BY id
-LIMIT $1 OFFSET $2
+const getTotalCountProperties = `-- name: GetTotalCountProperties :one
+SELECT count(*) FROM properties
 `
 
-type GetPublicPropertiesParams struct {
-	Limit  int32
-	Offset int32
-}
-
-func (q *Queries) GetPublicProperties(ctx context.Context, arg GetPublicPropertiesParams) ([]Property, error) {
-	rows, err := q.db.QueryContext(ctx, getPublicProperties, arg.Limit, arg.Offset)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []Property
-	for rows.Next() {
-		var i Property
-		if err := rows.Scan(
-			&i.ID,
-			&i.PropertyID,
-			&i.ListerUserID,
-			&i.Name,
-			&i.Description,
-			&i.Address1,
-			&i.Address2,
-			&i.City,
-			&i.State,
-			&i.Zipcode,
-			&i.Country,
-			&i.SquareFeet,
-			&i.NumBedrooms,
-			&i.NumToilets,
-			&i.NumShowersBaths,
-			&i.CostDollars,
-			&i.CostCents,
-			&i.MiscNote,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
+func (q *Queries) GetTotalCountProperties(ctx context.Context) (int64, error) {
+	row := q.db.QueryRowContext(ctx, getTotalCountProperties)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
 }
 
 const updateProperty = `-- name: UpdateProperty :exec

@@ -1,74 +1,132 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Grid } from "@mui/material";
-import { apiGetProperties } from "../../api/api";
+import { apiGetProperties, apiGetProperty } from "../../api/api";
 import CardGridSkeleton from "./CardGridSkeleton";
 import PropertyCard from "./PropertyCard";
 import SearchProperties from "./SearchProperties";
 import { Property } from "./CreatePropertyForm";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQueries } from "@tanstack/react-query";
+import { useInView } from "react-intersection-observer";
+import { MAX_NUMBER_PROPERTIES_PER_PAGE } from "../../constants";
+import CardSkeleton from "./CardSkeleton";
 
 interface DisplayPropertiesProps {}
 
-// Display property information
-// We would like to be able to control whether we want to display the properties at random or
-// in a specific order (for testing).
-const DEV_LISTING_TOGGLE = true;
+type PageOfPropertiesProps = {
+  propertyIDs: string[];
+};
+const PageOfProperties: React.FC<PageOfPropertiesProps> = ({ propertyIDs }) => {
+  const propertyQueries = useQueries({
+    queries: propertyIDs.map((propertyID) => {
+      return {
+        queryKey: ["properties", propertyID],
+        queryFn: () => apiGetProperty(propertyID),
+      };
+    }),
+  });
+
+  const properties = propertyQueries
+    .map((value) => value.data)
+    .filter((value) => {
+      return value !== undefined;
+    });
+
+  return (
+    <Grid container spacing={2}>
+      {properties.map((value: Property, index: number) => (
+        <Grid
+          key={index}
+          item
+          xs={12}
+          sm={12}
+          md={6}
+          lg={6}
+          xl={4}
+          style={{ gap: "0 24px" }}
+        >
+          <PropertyCard property={value} />
+        </Grid>
+      ))}
+    </Grid>
+  );
+};
 
 const DisplayProperties: React.FC<DisplayPropertiesProps> = () => {
   // TODO: need this for filtering search information?
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const getPropertiesMode = DEV_LISTING_TOGGLE ? "deterministic" : "random";
-  const limit: number = 9;
-  var offset: number;
-  if (getPropertiesMode == "deterministic") {
-    offset = 0;
-  } else if (getPropertiesMode == "random") {
-    // TODO: we need to know how many properties are the in the db,
-    // if there are more than the default number of properties being showed, then
-    // we can do a random number gen with the offset between some range
-    // [0, N] where N = int(TOTAL / limit)
-    offset = 0;
-  } else {
-    offset = 0;
-  }
+  const fetchProperties = async ({
+    pageParam,
+  }: {
+    pageParam: number;
+  }): Promise<{
+    data: string[];
+    currentPage: number;
+    nextPage: number | null;
+  }> => {
+    const propertyIDs = await apiGetProperties(pageParam);
+    console.log(propertyIDs.length);
+    return new Promise((resolve) =>
+      resolve({
+        data: propertyIDs,
+        currentPage: pageParam,
+        nextPage:
+          propertyIDs.length === MAX_NUMBER_PROPERTIES_PER_PAGE
+            ? pageParam + 1
+            : null,
+      }),
+    );
+  };
 
   const {
-    status,
+    data,
     error,
-    data: currProperties,
-  } = useQuery({
-    queryKey: ["properties", limit, offset],
-    queryFn: () => apiGetProperties(limit, offset),
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    status,
+  } = useInfiniteQuery({
+    queryKey: ["properties"],
+    queryFn: fetchProperties,
+    initialPageParam: 0,
+    getNextPageParam: (lastPage) => lastPage.nextPage,
   });
+
+  const { ref, inView } = useInView();
+
+  useEffect(() => {
+    if (inView && hasNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, fetchNextPage, hasNextPage]);
 
   return (
     <>
       <SearchProperties />
       {status == "pending" && <CardGridSkeleton />}
-      {status == "success" && (
-        <div className="flex justify-center">
-          <Grid container spacing={2}>
-            {currProperties &&
-              currProperties.map((value: Property, index: number) => (
-                <Grid
-                  key={index}
-                  item
-                  xs={12}
-                  sm={12}
-                  md={6}
-                  lg={6}
-                  xl={4}
-                  style={{ gap: "0 24px" }}
-                >
-                  <PropertyCard property={value} />
-                </Grid>
-              ))}
-          </Grid>
+      {(status == "success" || data !== undefined) &&
+        data.pages.map((page) => {
+          const propertyIDs = page.data;
+          return (
+            <div key={page.currentPage} className="flex justify-center">
+              <PageOfProperties propertyIDs={propertyIDs} />
+            </div>
+          );
+        })}
+      {status == "error" && (
+        <h1 className="text-xl text-red-600 font-bold flex justify-center">
+          Sorry, we are unable to find any properties at the moment. Please come
+          back again later. Server returned with error: {JSON.stringify(error)}
+        </h1>
+      )}
+      <div ref={ref}></div>
+      {isFetchingNextPage && <CardSkeleton />}
+      {!hasNextPage && (
+        <div className="flex justify-center text-gray-400 text-lg">
+          No more properties to show.
         </div>
       )}
-      {status == "error" && JSON.stringify(error)}
     </>
   );
 };

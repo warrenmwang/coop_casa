@@ -224,26 +224,50 @@ export const apiGetProperty = async (propertyID: string): Promise<Property> => {
     headers: {
       Accept: "application/json",
     },
-    credentials: "include",
   })
     .then(checkFetch)
     .then((response) => response.json())
-    .then((data) => data as Property);
+    .then((data) => data as Property)
+    .catch((error) => {
+      throw error;
+    });
 };
 
-// Get user properties api hook
-export const apiGetProperties = async (
-  limit: number,
-  offset: number,
-): Promise<Property[]> => {
-  return fetch(`${api_properties_Link}?limit=${limit}&offset=${offset}`, {
+// Get a page of property ids
+export const apiGetProperties = async (page: number): Promise<string[]> => {
+  return fetch(`${api_properties_Link}?page=${page}`, {
     method: "GET",
     headers: {
       Accept: "application/json",
     },
-    credentials: "include",
   })
     .then(checkFetch)
     .then((response) => response.json())
-    .then((data) => data as Property[]);
+    .then((data) => {
+      const tmp = data as string[];
+      if (tmp == null) {
+        // no more property ids in db
+        return [];
+      }
+      return tmp;
+    })
+    .catch((error) => {
+      throw error;
+    });
+};
+
+// Get total count of properties in db
+export const apiGetTotalCountProperties = async (): Promise<number> => {
+  return fetch(`${api_properties_Link}?getTotalCount=true`, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+    },
+  })
+    .then(checkFetch)
+    .then((response) => response.json())
+    .then((data) => data as number)
+    .catch((error) => {
+      throw error;
+    });
 };

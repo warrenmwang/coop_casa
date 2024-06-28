@@ -80,8 +80,11 @@ type Service interface {
 	GetProperty(propertyId string) (Property, error)
 	UpdateProperty(property Property) error
 	DeleteProperty(propertyId string) error
-	GetPublicProperties(limit, offset int32) ([]Property, error)
+	GetNextPageProperties(limit, offset int32) ([]string, error)
+	GetTotalCountProperties() (int64, error)
 }
+
+
 
 type service struct {
 	db             *sql.DB
@@ -651,11 +654,11 @@ func (s *service) GetProperty(propertyId string) (Property, error) {
 }
 
 // Allow a public function to search for the available properties on app
-func (s *service) GetPublicProperties(limit, offset int32) ([]Property, error) {
+func (s *service) GetNextPageProperties(limit, offset int32) ([]string, error) {
 	ctx := context.Background()
 
 	// Get the encrypted properties details
-	propertiesEncrypted, err := s.db_queries.GetPublicProperties(ctx, sqlc.GetPublicPropertiesParams{
+	propertyIDs, err := s.db_queries.GetNextPageProperties(ctx, sqlc.GetNextPagePropertiesParams{
 		Limit:  limit,
 		Offset: offset,
 	})
@@ -663,46 +666,7 @@ func (s *service) GetPublicProperties(limit, offset int32) ([]Property, error) {
 		return nil, err
 	}
 
-	var properties []Property
-	for _, property := range propertiesEncrypted {
-
-		// Get the property images
-		propertyImages, err := s.db_queries.GetPropertyImages(ctx, property.PropertyID)
-		if err != nil {
-			return nil, err
-		}
-
-		// Only thing encrypted is the lister user id (which in hindsight doesn't matter if its encrypted or not)
-		listerUserID, err := s.decryptString(property.ListerUserID)
-		if err != nil {
-			return nil, err
-		}
-
-		property := Property{
-			PropertyID:        property.PropertyID,
-			ListerUserID:      listerUserID,
-			Name:              property.Name,
-			Description:       property.Description.String,
-			Address_1:         property.Address1,
-			Address_2:         property.Address2.String,
-			City:              property.City,
-			State:             property.State,
-			Zipcode:           property.Zipcode,
-			Country:           property.Country,
-			Square_feet:       property.SquareFeet,
-			Num_bedrooms:      property.NumBedrooms,
-			Num_toilets:       property.NumToilets,
-			Num_showers_baths: property.NumShowersBaths,
-			Cost_dollars:      property.CostDollars,
-			Cost_cents:        property.CostCents,
-			Misc_note:         property.MiscNote.String,
-			Images:            propertyImages.Images.String,
-		}
-
-		properties = append(properties, property)
-	}
-
-	return properties, nil
+	return propertyIDs, nil
 }
 
 // Update property
@@ -754,6 +718,16 @@ func (s *service) DeleteProperty(propertyId string) error {
 	// Delete the property and the images (a single transaction)
 	err := s.db_queries.DeleteProperty(ctx, propertyId)
 	return err
+}
+
+// Get count of properties
+func (s *service) GetTotalCountProperties() (int64, error) {
+	ctx := context.Background()
+	num, err := s.db_queries.GetTotalCountProperties(ctx)
+	if err != nil {
+		return -1, err
+	}
+	return num, nil
 }
 
 // Admin - get multiple user ids

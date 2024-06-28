@@ -1,5 +1,6 @@
 import { Grid, Skeleton } from "@mui/material";
 import React from "react";
+import CardSkeleton from "./CardSkeleton";
 
 interface CardGridSkeletonProps {
   numPerRow?: number; // Note: this should divide 12, where 12 is the default number of entities to align things in the Grid comp.
@@ -26,25 +27,7 @@ const CardGridSkeleton: React.FC<CardGridSkeletonProps> = ({
             xl={12 / numPerRow}
             style={{ gap: "0 24px" }}
           >
-            <Skeleton
-              variant="rectangular"
-              animation="wave"
-              width={400}
-              height={300}
-              sx={{ my: 1 }}
-            />
-            <Skeleton
-              variant="rectangular"
-              animation="wave"
-              width={400}
-              sx={{ my: 1 }}
-            />
-            <Skeleton
-              variant="rectangular"
-              animation="wave"
-              width="60%"
-              sx={{ my: 1 }}
-            />
+            <CardSkeleton />
           </Grid>
         ))}
       </Grid>

@@ -7,8 +7,8 @@ import { propertiesPageLink } from "../../urls";
 import { Property } from "../structure/CreatePropertyForm";
 import TopNavbar from "../structure/TopNavbar";
 import Footer from "../structure/Footer";
-import TextSkeleton from "../structure/TextSkeleton";
 import { useQuery } from "@tanstack/react-query";
+import CardSkeleton from "../structure/CardSkeleton";
 
 type PropertyDetailContentProps = {
   property: Property;
@@ -121,13 +121,23 @@ const PropertyDetail: React.FC = () => {
   return (
     <>
       <TopNavbar />
-      {status === "pending" && <TextSkeleton />}
+      {status === "pending" && (
+        <div className="flex justify-center">
+          {" "}
+          <CardSkeleton />
+        </div>
+      )}
       {status === "success" && (
         <PropertyDetailContent
           property={property as Property}
         ></PropertyDetailContent>
       )}
-      {status === "error" && JSON.stringify(error)}
+      {status === "error" && (
+        <h1 className="text-xl text-red-600 font-bold flex justify-center">
+          Sorry, we are unable to find that particular property. Server returned
+          with error: {JSON.stringify(error)}
+        </h1>
+      )}
       <Footer />
     </>
   );

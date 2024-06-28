@@ -5,6 +5,7 @@ import { api_admin_users_Link, api_admin_users_roles_Link } from "../../urls";
 import { checkFetch } from "../../api/api";
 import AdminManageUserRoles from "./AdminManageUserRoles";
 import { Grid } from "@mui/material";
+import UpdatePropertyManager from "./UpdatePropertyManager";
 
 const AdminDashboard: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -177,6 +178,7 @@ const AdminDashboard: React.FC = () => {
           </Grid>
           <Grid item xs={6} style={{ gap: "0 24px" }}>
             {/* TODO: Update Properties / Delete Properties Form */}
+            <UpdatePropertyManager />
           </Grid>
         </Grid>
       </div>

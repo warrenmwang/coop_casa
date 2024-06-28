@@ -272,7 +272,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 // --------------------------- UPTIME CHECKS --------------------------------
 
-// Endpoint: GET HOST:PORT/
+// Endpoint: GET /
 func (s *Server) HelloWorldHandler(w http.ResponseWriter, r *http.Request) {
 	resp := make(map[string]string)
 	resp["message"] = "Hello World"
@@ -285,7 +285,7 @@ func (s *Server) HelloWorldHandler(w http.ResponseWriter, r *http.Request) {
 	_, _ = w.Write(jsonResp)
 }
 
-// Endpoint: GET HOST:PORT/health
+// Endpoint: GET /health
 func (s *Server) healthHandler(w http.ResponseWriter, r *http.Request) {
 	jsonResp, _ := json.Marshal(s.db.Health())
 	_, _ = w.Write(jsonResp)
@@ -293,7 +293,7 @@ func (s *Server) healthHandler(w http.ResponseWriter, r *http.Request) {
 
 // ----------------------- AUTH -----------------------------------
 
-// Endpoint: GET HOST:PORT/auth/{provider}/callback
+// Endpoint: GET /auth/{provider}/callback
 func (s *Server) authCallbackHandler(w http.ResponseWriter, r *http.Request) {
 	// Callback function called by the OAuth provider after the user initializes oauth process.
 	// Finish auth, create JWT, and save it into a cookie.
@@ -365,7 +365,7 @@ func (s *Server) authCallbackHandler(w http.ResponseWriter, r *http.Request) {
 
 // ----------------- AUTH -------------
 
-// Endpoint: GET HOST:PORT/auth/{provider}
+// Endpoint: GET /auth/{provider}
 func (s *Server) authLoginHandler(w http.ResponseWriter, r *http.Request) {
 	// insert the provider context
 	provider := chi.URLParam(r, "provider")
@@ -385,7 +385,7 @@ func (s *Server) authLoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Endpoint: GET HOST:PORT/auth/check
+// Endpoint: GET /auth/check
 func (s *Server) authCheckHandler(w http.ResponseWriter, r *http.Request) {
 	// return a json with the account status being authed or not as a bool
 	// true for yes authed, false for no
@@ -406,7 +406,7 @@ func (s *Server) authCheckHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Endpoint: GET HOST:PORT/auth/logout
+// Endpoint: GET /auth/logout
 func (s *Server) authLogoutHandler(w http.ResponseWriter, r *http.Request) {
 	// Logout function that completes the oauth logout and invalidate the user's auth token
 
@@ -425,7 +425,7 @@ func (s *Server) authLogoutHandler(w http.ResponseWriter, r *http.Request) {
 
 // --------------- ACCOUNT ---------------
 
-// Endpoint: GET HOST:PORT/api/account
+// Endpoint: GET /api/account
 func (s *Server) apiGetAccountDetailsHandler(w http.ResponseWriter, r *http.Request) {
 	// Returns the user data based on the userId in the auth token
 
@@ -479,7 +479,7 @@ func (s *Server) apiGetAccountDetailsHandler(w http.ResponseWriter, r *http.Requ
 	})
 }
 
-// Endpoint: POST HOST:PORT/api/account
+// Endpoint: POST /api/account
 func (s *Server) apiUpdateAccountDetailsHandler(w http.ResponseWriter, r *http.Request) {
 	// Authenticate user
 	userIdFromToken, err := s.getAuthedUserId(r)
@@ -514,7 +514,7 @@ func (s *Server) apiUpdateAccountDetailsHandler(w http.ResponseWriter, r *http.R
 	w.WriteHeader(200)
 }
 
-// Endpoint: DELETE HOST:PORT/api/account
+// Endpoint: DELETE /api/account
 func (s *Server) apiDeleteAccountHandler(w http.ResponseWriter, r *http.Request) {
 	// Delete a user account given their userId from the token
 
@@ -546,7 +546,7 @@ func (s *Server) apiDeleteAccountHandler(w http.ResponseWriter, r *http.Request)
 	w.WriteHeader(200)
 }
 
-// Endpoint: GET HOST:PORT/api/account/role
+// Endpoint: GET /api/account/role
 func (s *Server) apiGetUserRoleHandler(w http.ResponseWriter, r *http.Request) {
 	// Authenticate user
 	userId, err := s.getAuthedUserId(r)
@@ -572,7 +572,7 @@ func (s *Server) apiGetUserRoleHandler(w http.ResponseWriter, r *http.Request) {
 
 // ---------------- ADMIN ----------------
 
-// Endpoint: GET HOST:PORT/api/admin/users
+// Endpoint: GET /api/admin/users
 func (s *Server) apiAdminGetUsers(w http.ResponseWriter, r *http.Request) {
 	// Authenticate user
 	userId, err := s.getAuthedUserId(r)
@@ -655,7 +655,7 @@ func (s *Server) apiAdminGetUsers(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, 200, usersNew)
 }
 
-// Endpoint: GET HOST:PORT/api/admin/users/roles
+// Endpoint: GET /api/admin/users/roles
 func (s *Server) apiAdminGetUsersRoles(w http.ResponseWriter, r *http.Request) {
 	// Authenticate user
 	userId, err := s.getAuthedUserId(r)
@@ -693,7 +693,7 @@ func (s *Server) apiAdminGetUsersRoles(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, 200, roles)
 }
 
-// Endpoint: POST HOST:PORT/api/admin/users/roles
+// Endpoint: POST /api/admin/users/roles
 // NOTE: despite the name, it is currently only written to allow the changing of a single
 // user's role
 func (s *Server) apiUpdateUserRoleHandler(w http.ResponseWriter, r *http.Request) {
@@ -740,7 +740,11 @@ func (s *Server) apiUpdateUserRoleHandler(w http.ResponseWriter, r *http.Request
 
 // ----------------- PROPERTIES ---------------------
 
-// Endpoint: GET HOST:PORT/api/properties
+// Endpoint: GET /api/properties
+// Available query params:
+// - propertyID string, return the data for a single property
+// - page int, return the property ids for the current page 
+// - getTotalCount bool, return the total number of properties present on site
 func (s *Server) apiGetPropertiesHandler(w http.ResponseWriter, r *http.Request) {
 	// anyone can get properties, without needing to be authenticated.
 
@@ -759,40 +763,53 @@ func (s *Server) apiGetPropertiesHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	// ---- For if limit and offset are present and propertyID is not 
-	// present as a query parameter
-
-	// Get the limit and offset for the properties viewing
-	limitStr := query.Get("limit")
-	offsetStr := query.Get("offset")
-
-	// Limit and offset cannot be empty strings
-	if limitStr == "" {
-		respondWithError(w, 422, errors.New("query with empty limit string is not valid"))
+	// Check if just want count of properies
+	getTotalCountStr := query.Get("getTotalCount")
+	if getTotalCountStr != "" {
+		getTotalCount, err := strconv.ParseBool(getTotalCountStr)
+		if err != nil {
+			respondWithError(w, 500, err)
+			return
+		}
+		if !getTotalCount {
+			w.WriteHeader(200) // the param was set to false, so don't give anything.
+			return
+		}
+		count, err := s.db.GetTotalCountProperties()
+		if err != nil {
+			respondWithError(w, 500, err)
+			return
+		}
+		respondWithJSON(w, 200, count)
 		return
 	}
 
+	// Otherwise, request is for paginated property IDs
+	// with or without search params for filtering.
+
+	// Get the offset for the properties viewing
+	limit := 9
+	offsetStr := query.Get("page")
+
+	// Page cannot be empty string
 	if offsetStr == "" {
 		respondWithError(w, 422, errors.New("query with empty offset string is not valid"))
 		return
 	}
 
-	// Attempt Parse limit and offset
-	var limit int
+	// Attempt Parse offset
 	var offset int
-	limit, err := strconv.Atoi(limitStr)
-	if err != nil {
-		respondWithError(w, 422, errors.New("invalid limit string"))
-		return
-	}
-	offset, err = strconv.Atoi(offsetStr)
+	offset, err := strconv.Atoi(offsetStr)
 	if err != nil {
 		respondWithError(w, 422, errors.New("invalid offset string"))
 		return
 	}
 
-	// Get the properties from DB
-	properties, err := s.db.GetPublicProperties(int32(limit), int32(offset))
+	// Calculate the correct offset
+	offset = offset * limit
+
+	// Get the property IDs from DB
+	properties, err := s.db.GetNextPageProperties(int32(limit), int32(offset))
 	if err != nil {
 		respondWithError(w, 500, err)
 		return
@@ -801,7 +818,7 @@ func (s *Server) apiGetPropertiesHandler(w http.ResponseWriter, r *http.Request)
 	respondWithJSON(w, 200, properties)
 }
 
-// Endpoint: PUT HOST:PORT/api/properties
+// Endpoint: PUT /api/properties
 func (s *Server) apiCreatePropertiesHandler(w http.ResponseWriter, r *http.Request) {
 	// Authenticate the user and make sure they have write access to properties db
 	// (i.e. Need to be either a lister or admin role, basically just not a regular user)
@@ -839,7 +856,7 @@ func (s *Server) apiCreatePropertiesHandler(w http.ResponseWriter, r *http.Reque
 	w.WriteHeader(201)
 }
 
-// Endpoint: POST HOST:PORT/api/properties
+// Endpoint: POST /api/properties
 func (s *Server) apiUpdatePropertiesHandler(w http.ResponseWriter, r *http.Request) {
 	// Authenticate the user and make sure they have write access to properties db
 	// (i.e. Need to be either a lister or admin role, basically just not a regular user)
