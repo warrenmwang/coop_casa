@@ -176,8 +176,8 @@ const AdminDashboard: React.FC = () => {
           <Grid item xs={12} sm={12} md={12} lg={6} style={{ gap: "0 24px" }}>
             <CreatePropertyForm />
           </Grid>
-          <Grid item xs={6} style={{ gap: "0 24px" }}>
-            {/* TODO: Update Properties / Delete Properties Form */}
+          <Grid item xs={12} sm={12} md={12} lg={6} style={{ gap: "0 24px" }}>
+            {/* Update Properties / Delete Properties Form */}
             <UpdatePropertyManager />
           </Grid>
         </Grid>

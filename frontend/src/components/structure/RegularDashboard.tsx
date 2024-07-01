@@ -3,6 +3,7 @@ import SearchCommunities from "./SearchCommunities";
 import SearchProperties from "./SearchProperties";
 import { AuthData } from "../../auth/AuthWrapper";
 import CreatePropertyForm from "./CreatePropertyForm";
+import UpdatePropertyManager from "./UpdatePropertyManager";
 
 const RegularDashboard: React.FC = () => {
   const auth = AuthData();
@@ -12,6 +13,7 @@ const RegularDashboard: React.FC = () => {
   return (
     <>
       {isLister && <CreatePropertyForm />}
+      {isLister && <UpdatePropertyManager />}
       <SearchCommunities />
       <SearchProperties />
     </>

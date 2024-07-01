@@ -280,7 +280,7 @@ export const apiGetListerInfo = async (
   return fetch(`${api_lister_Link}?listerID=${listerID}`, {
     method: "GET",
     headers: {
-      Accept: "application.json",
+      Accept: "application/json",
     },
   })
     .then(checkFetch)

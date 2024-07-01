@@ -7,6 +7,7 @@ import {
 
 interface MultipleImageUploaderProps {
   onImagesUploaded: (files: File[]) => void;
+  imageFiles?: File[];
 }
 
 // UI to let user either click to upload or drag and drop image files
@@ -17,8 +18,11 @@ interface MultipleImageUploaderProps {
 // then the right hand side preview box will be pushed to be below the upload box.
 const MultipleImageUploader: React.FC<MultipleImageUploaderProps> = ({
   onImagesUploaded,
+  imageFiles,
 }) => {
-  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>(
+    imageFiles === undefined ? [] : imageFiles,
+  );
 
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
