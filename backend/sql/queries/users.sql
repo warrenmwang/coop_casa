@@ -1,14 +1,12 @@
--- name: CreateUser :exec
-WITH new_user AS (
-    INSERT INTO users (user_id, email)
-    VALUES ($1, $2)
-    RETURNING user_id
-)
-INSERT INTO users_avatars (user_id, avatar)
-SELECT user_id, $3
-FROM new_user;
+-- name: CreateBareUser :exec
+INSERT INTO users (user_id, email)
+VALUES ($1, $2);
 
--- name: UpdateUser :exec
+-- name: CreateBareUserAvatar :exec
+INSERT INTO users_avatars (user_id)
+VALUES ($1);
+
+-- name: UpdateUserDetails :exec
 UPDATE users
 SET 
     first_name = $2, 
@@ -23,15 +21,18 @@ WHERE user_id = $1;
 -- name: UpdateUserAvatar :exec
 UPDATE users_avatars
 SET
-    avatar = $2,
+    file_name = $2,
+    mime_type = $3,
+    "size" = $4,
+    "data" = $5,
     updated_at = CURRENT_TIMESTAMP
 WHERE user_id = $1;
 
 -- name: GetUserAvatar :one
-SELECT avatar FROM users_avatars
+SELECT * FROM users_avatars
 WHERE user_id = $1;
 
--- name: GetUser :one
+-- name: GetUserDetails :one
 SELECT * FROM users
 WHERE user_id = $1;
 
@@ -40,7 +41,7 @@ SELECt * FROM users
 ORDER BY id 
 LIMIT $1 OFFSET $2;
 
--- name: DeleteUser :exec
+-- name: DeleteUserDetails :exec
 DELETE FROM users WHERE user_id = $1;
 
 -- name: DeleteUserAvatar :exec

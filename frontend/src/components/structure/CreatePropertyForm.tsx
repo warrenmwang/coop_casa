@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { fileToBase64 } from "../../utils/utils";
 import { apiCreateNewProperty } from "../../api/api";
 import { validateNumber } from "../../utils/inputValidation";
 

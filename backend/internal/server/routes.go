@@ -30,9 +30,11 @@ import (
 	"backend/internal/database"
 	"context"
 	"database/sql"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"strconv"
@@ -51,7 +53,7 @@ type errorBody struct {
 	Error string `json:"error"`
 }
 
-type User struct {
+type UserOAuthDetails struct {
 	UserId string
 	Email  string
 }
@@ -74,7 +76,7 @@ func respondWithError(w http.ResponseWriter, code int, err error) {
 }
 
 // Generates a JWT for a user attempting login
-func (s *Server) GenerateToken(user User, expireTime time.Time) (string, error) {
+func (s *Server) GenerateToken(user UserOAuthDetails, expireTime time.Time) (string, error) {
 	// Define token claims
 	claims := jwt.MapClaims{}
 	claims["authorized"] = true
@@ -316,13 +318,13 @@ func (s *Server) authCallbackHandler(w http.ResponseWriter, r *http.Request) {
 	expireTime := time.Now().Add(time.Hour * 24)
 
 	// Create User struct with identifying user info from OAuth
-	user := User{
+	user := UserOAuthDetails{
 		UserId: gothUser.UserID,
 		Email:  gothUser.Email,
 	}
 
 	// Create new user in DB if this is their first time in the database
-	_, err = s.db.GetUser(user.UserId)
+	_, err = s.db.GetUserDetails(user.UserId)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			// this user is not recorded in db, then it is the first time they have logged in to app.
@@ -439,23 +441,8 @@ func (s *Server) apiGetAccountDetailsHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	// Get user account details (as of 06/11/2024)
-	/*
-		type User struct {
-			ID        int32
-			UserID    string
-			Email     string
-			FirstName sql.NullString
-			LastName  sql.NullString
-			BirthDate sql.NullString
-			Gender    sql.NullString
-			Location  sql.NullString
-			Interests sql.NullString
-			CreatedAt time.Time
-			UpdatedAt time.Time
-		}
-	*/
-	userDetails, err := s.db.GetUser(userId)
+	// Get user details
+	user, err := s.db.GetUserDetails(userId)
 	if err != nil {
 		respondWithError(w, 405, err)
 		return
@@ -468,46 +455,106 @@ func (s *Server) apiGetAccountDetailsHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	// Return user details and user avatar in a json
-	respondWithJSON(w, 200, database.User_New{
-		UserID:    userDetails.UserID,
-		Email:     userDetails.Email,
-		FirstName: userDetails.FirstName.String,
-		LastName:  userDetails.LastName.String,
-		BirthDate: userDetails.BirthDate.String,
-		Gender:    userDetails.Gender.String,
-		Location:  userDetails.Location.String,
-		Interests: userDetails.Interests.String,
-		Avatar:    userAvatar,
+	userDetails := database.UserDetails{
+		UserID: user.UserID,
+		Email: user.Email,
+		FirstName: user.FirstName.String,
+		LastName: user.LastName.String,
+		BirthDate: user.BirthDate.String,
+		Gender: user.Gender.String,
+		Location: user.Location.String, 
+		Interests: user.Interests.String,
+	}
+
+	// Return as JSON data, need to convert userAvatar to base64 str
+	userAvatarDataB64 := base64.StdEncoding.EncodeToString(userAvatar.Data)
+
+	userAvatarFileExternal := database.FileExternal{
+		Filename: userAvatar.Filename,
+		Mimetype: userAvatar.Mimetype,
+		Size: userAvatar.Size,
+		Data: userAvatarDataB64,
+	}
+
+	type ReturnValue struct {
+		UserDetails database.UserDetails `json:"userDetails"`
+		UserAvatar database.FileExternal `json:"avatarImageB64"`
+	}
+
+	respondWithJSON(w, 200, ReturnValue{
+		UserDetails: userDetails,
+		UserAvatar: userAvatarFileExternal,
 	})
 }
 
 // Endpoint: POST /api/account
 func (s *Server) apiUpdateAccountDetailsHandler(w http.ResponseWriter, r *http.Request) {
+	MAX_SIZE := 32 << 20; // 32 MiB
+    // limit body size that we will parse
+    r.Body = http.MaxBytesReader(w, r.Body, int64(MAX_SIZE))
+
+    err := r.ParseMultipartForm(int64(MAX_SIZE + 512))
+    if err != nil {
+		log.Printf("parsing multipart form data: %v", err)
+        http.Error(w, "unable to parse multipart form", http.StatusInternalServerError)
+        return
+    }
+
 	// Authenticate user
 	userIdFromToken, err := s.getAuthedUserId(r)
 	if err != nil {
-		respondWithError(w, 405, err)
+		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
 	// Update the user account with the given details
-	var formData database.User_New
-	err = json.NewDecoder(r.Body).Decode(&formData)
+	userDetailsFormData := r.FormValue("user")
+
+	var userDetails database.UserDetails
+	err = json.Unmarshal([]byte(userDetailsFormData), &userDetails)
 	if err != nil {
-		respondWithError(w, 400, err)
+		log.Printf("unmarshaling json: %v", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	// Ensure that the given user id is the same as the
 	// id in the token
-	if userIdFromToken != formData.UserID {
+	if userIdFromToken != userDetails.UserID {
 		respondWithError(w, 400, errors.New("token user id does not match user id in form"))
 		return
 	}
 
-	// Update the user in the DB with the new info
-	err = s.db.UpdateUser(formData)
+	// Get avatar 
+	avatarFileData, avatarFileHeader, err := r.FormFile("avatar")
+	if err != nil && err != http.ErrMissingFile {
+		http.Error(w, "unable to get user avatar image", http.StatusBadRequest)
+		return
+	}
+
+	// log.Printf("fileName: %s\n", avatarFileHeader.Filename)
+	// log.Printf("mimetype: %v\n", avatarFileHeader.Header.Get("Content-Type"))
+	// log.Printf("size: %d\n", avatarFileHeader.Size)
+
+	var avatarFile database.FileInternal
+	if avatarFileData != nil {
+		defer avatarFileData.Close()
+
+		avatarBytes, err := io.ReadAll(avatarFileData)
+		if err != nil {
+			http.Error(w, "unable to read file", http.StatusInternalServerError)
+			return
+		}
+		avatarFile = database.FileInternal{
+			Filename: avatarFileHeader.Filename,
+			Mimetype: avatarFileHeader.Header.Get("Content-Type"),
+			Size: avatarFileHeader.Size,
+			Data: avatarBytes,
+		}
+	}		
+
+	// Update the user in the DB with the new info (with avatar)
+	err = s.db.UpdateUser(userDetails, avatarFile)
 	if err != nil {
 		respondWithError(w, 500, err)
 		return
@@ -576,6 +623,7 @@ func (s *Server) apiGetUserRoleHandler(w http.ResponseWriter, r *http.Request) {
 // ---------------- ADMIN ----------------
 
 // Endpoint: GET /api/admin/users
+// Only returns the user details (no avatar images)
 func (s *Server) apiAdminGetUsers(w http.ResponseWriter, r *http.Request) {
 	// Authenticate user
 	userId, err := s.getAuthedUserId(r)
@@ -631,17 +679,10 @@ func (s *Server) apiAdminGetUsers(w http.ResponseWriter, r *http.Request) {
 	// sqlc.User to type User_New
 
 	// Create a new slice of User_New
-	var usersNew []database.User_New
+	var usersNew []database.UserDetails
 	for _, user := range users {
-		// Get user avatar image
-		userAvatar, err := s.db.GetUserAvatar(user.UserID)
-		if err != nil {
-			respondWithError(w, 405, err)
-			return
-		}
-
 		// Append the user to the new slice
-		usersNew = append(usersNew, database.User_New{
+		usersNew = append(usersNew, database.UserDetails{
 			UserID:    user.UserID,
 			Email:     user.Email,
 			FirstName: user.FirstName.String,
@@ -650,7 +691,6 @@ func (s *Server) apiAdminGetUsers(w http.ResponseWriter, r *http.Request) {
 			Gender:    user.Gender.String,
 			Location:  user.Location.String,
 			Interests: user.Interests.String,
-			Avatar:    userAvatar,
 		})
 	}
 
@@ -904,6 +944,7 @@ func (s *Server) apiUpdatePropertiesHandler(w http.ResponseWriter, r *http.Reque
 }
 
 // Endpoint: DELETE /api/properties
+// AUTHED
 func (s *Server) apiDeletePropertiesHandler(w http.ResponseWriter, r *http.Request) {
 	// Authenticate user
 	userID, err := s.getAuthedUserId(r)
@@ -942,6 +983,7 @@ func (s *Server) apiDeletePropertiesHandler(w http.ResponseWriter, r *http.Reque
 }
 
 // Endpoint: GET /api/lister
+// NO AUTH
 func (s *Server) apiGetListerInfoHandler(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
 	listerID := query.Get("listerID")
@@ -962,7 +1004,7 @@ func (s *Server) apiGetListerInfoHandler(w http.ResponseWriter, r *http.Request)
 	}
 
 	// userID is a lister, return the email and name for basic contact information
-	lister, err := s.db.GetUser(listerID)
+	lister, err := s.db.GetUserDetails(listerID)
 	if err != nil {
 		respondWithError(w, 500, err)
 		return

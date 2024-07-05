@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import CreatePropertyForm from "./CreatePropertyForm";
-import { User } from "../../types/User";
+import { UserDetails } from "../../types/Types";
 import { api_admin_users_Link, api_admin_users_roles_Link } from "../../urls";
 import { checkFetch } from "../../api/api";
 import AdminManageUserRoles from "./AdminManageUserRoles";
@@ -8,8 +8,8 @@ import { Grid } from "@mui/material";
 import UpdatePropertyManager from "./UpdatePropertyManager";
 
 const AdminDashboard: React.FC = () => {
-  const [users, setUsers] = useState<User[]>([]);
-  const [cache, setCache] = useState<{ [key: number]: User[] }>({});
+  const [users, setUsers] = useState<UserDetails[]>([]);
+  const [cache, setCache] = useState<{ [key: number]: UserDetails[] }>({});
   const [page, setPage] = useState<number>(0);
   const [lastPage, setLastPage] = useState<number | null>(null);
   const [userRoles, setUserRoles] = useState<{ [key: string]: string }>({});
@@ -22,7 +22,7 @@ const AdminDashboard: React.FC = () => {
       if (cache[page]) {
         setUsers(cache[page]);
       } else {
-        let users: User[];
+        let users: UserDetails[];
         // fetch users
         try {
           const response = await fetch(
@@ -39,7 +39,7 @@ const AdminDashboard: React.FC = () => {
           if (!response.ok) {
             throw new Error(`got response not ok: ${response.statusText}`);
           }
-          // convert from json string to User[] type
+          // convert from json string to UserDetails[] type
           users = await response.json();
 
           if (users === null) {

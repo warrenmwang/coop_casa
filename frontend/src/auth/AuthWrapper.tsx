@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, ReactNode } from "react";
-import { User } from "../types/User";
+import { User } from "../types/Types";
 import { apiLogoutUser } from "../api/api";
 
 interface AuthContextType {
@@ -21,7 +21,7 @@ export const EmptyUser: User = {
   gender: "",
   location: "",
   interests: "",
-  avatar: "",
+  avatar: null,
 };
 
 const AuthContext = createContext<AuthContextType>({
@@ -38,7 +38,7 @@ export const AuthData = () => useContext(AuthContext);
 
 // wrapper to provide the auth state context throughout all components
 const AuthWrapper: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState({
+  const [user, setUser] = useState<User>({
     userId: "",
     email: "",
     firstName: "",
@@ -47,7 +47,7 @@ const AuthWrapper: React.FC<{ children: ReactNode }> = ({ children }) => {
     gender: "",
     location: "",
     interests: "",
-    avatar: "",
+    avatar: null,
   });
   const [authenticated, setAuthenticated] = useState(false);
   const [userRole, setUserRole] = useState("");

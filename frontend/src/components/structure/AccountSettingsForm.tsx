@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 
 // Components
-import { User } from "../../types/User";
+import { User } from "../../types/Types";
 import { apiUpdateUserAccountDetails } from "../../api/api";
 import InterestsInput from "./InterestsInput";
 import LocationInput from "./LocationInput";
@@ -53,7 +53,7 @@ const AccountSettingsForm: React.FC<{
     setIsChanged(true);
     setFormData((prevState) => ({
       ...prevState,
-      avatar: "",
+      avatar: null,
     }));
   };
 

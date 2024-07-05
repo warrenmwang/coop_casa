@@ -38,7 +38,7 @@ func TestGenerateJWT(t *testing.T) {
 		JwtSignSecret: "jwtSignSecret",
 	}
 
-	user := server.User{
+	user := server.UserOAuthDetails{
 		UserId: "1000",
 		Email:  "johnnyappleseed@yahoo.com",
 	}
@@ -59,7 +59,7 @@ func TestGenerateJWT(t *testing.T) {
 
 	// Generate a new token with a different user and email
 	// and ensure tokens are different
-	user1 := server.User{
+	user1 := server.UserOAuthDetails{
 		UserId: "1001",
 		Email:  "bobsyouruncle@hotmail.com",
 	}

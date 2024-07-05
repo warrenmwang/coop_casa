@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import Title from "../structure/Title";
 import TopNavbar from "../structure/TopNavbar";
 import Footer from "../structure/Footer";
-import { User } from "../../types/User";
+import { User } from "../../types/Types";
 import { apiUpdateUserAccountDetails } from "../../api/api";
 import { AuthData } from "../../auth/AuthWrapper";
 import LocationInput from "../structure/LocationInput";
@@ -18,6 +18,7 @@ import ImageInput from "../structure/ImageInput";
 // Styles
 import "../../styles/Form.css";
 import SubmitButton from "../structure/SubmitButton";
+import { dashboardPageLink } from "../../urls";
 
 const AccountSetupPage: React.FC = () => {
   const auth = AuthData();
@@ -51,7 +52,14 @@ const AccountSetupPage: React.FC = () => {
   const handleClearAvatarImage = () => {
     setFormData((prevState) => ({
       ...prevState,
-      avatar: "",
+      avatar: null,
+    }));
+  };
+
+  const textInputSetFormData = (id: string, value: string) => {
+    setFormData((prevState) => ({
+      ...prevState,
+      [id]: value,
     }));
   };
 
@@ -66,34 +74,34 @@ const AccountSetupPage: React.FC = () => {
     }
 
     setIsSubmitting(true);
+  };
 
-    try {
-      // Save data into the Auth context user
-      setUser(formData);
+  useEffect(() => {
+    if (isSubmitting) {
+      const foo = async () => {
+        try {
+          // Save data into the Auth context user
+          setUser(formData);
 
-      // Save user data into the backend
-      const status = await apiUpdateUserAccountDetails(formData);
-      if (status === 200) {
-        navigate("/dashboard");
-      } else {
-        alert(
-          `Unable to setup account, please try again. Returned with status code ${status}`,
-        );
-      }
-    } catch (error) {
-      console.error("Error during form submission:", error);
-      alert("An error occurred. Please try again.");
-    } finally {
-      setIsSubmitting(false);
+          // Save user data into the backend
+          const status = await apiUpdateUserAccountDetails(formData);
+          if (status === 200) {
+            navigate(dashboardPageLink);
+          } else {
+            alert(
+              `Unable to setup account, please try again. Returned with status code ${status}`,
+            );
+          }
+        } catch (error) {
+          console.error("Error during form submission:", error);
+          alert("An error occurred. Please try again.");
+        } finally {
+          setIsSubmitting(false);
+        }
+      };
+      foo();
     }
-  };
-
-  const textInputSetFormData = (id: string, value: string) => {
-    setFormData((prevState) => ({
-      ...prevState,
-      [id]: value,
-    }));
-  };
+  }, [isSubmitting]);
 
   return (
     <div>

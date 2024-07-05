@@ -21,7 +21,21 @@ import (
 	_ "github.com/joho/godotenv/autoload"
 )
 
-type User_New struct {
+type FileInternal struct {
+	Filename string 
+	Mimetype string 
+	Size int64 
+	Data []byte 
+}
+
+type FileExternal struct {
+	Filename string `json:"fileName"`
+	Mimetype string `json:"mimeType"`
+	Size int64 `json:"size"`
+	Data string `json:"data"`
+}
+
+type UserDetails struct {
 	UserID    string `json:"userId"`
 	Email     string `json:"email"`
 	FirstName string `json:"firstName"`
@@ -30,7 +44,6 @@ type User_New struct {
 	Gender    string `json:"gender"`
 	Location  string `json:"location"`
 	Interests string `json:"interests"`
-	Avatar    string `json:"avatar"`
 }
 
 type Property struct {
@@ -64,10 +77,10 @@ type Service interface {
 
 	// Users
 	CreateUser(userId, email string) error
-	GetUser(userId string) (sqlc.User, error)
-	UpdateUser(updatedUserData User_New) error
+	GetUserDetails(userId string) (sqlc.User, error)
+	UpdateUser(updatedUserData UserDetails, avatarImage FileInternal) error
 	DeleteUser(userId string) error
-	GetUserAvatar(userId string) (string, error)
+	GetUserAvatar(userId string) (FileInternal, error)
 
 	// Roles
 	CreateNewUserRole(userId, role string) error
@@ -92,9 +105,35 @@ type service struct {
 	db_encrypt_key string
 }
 
+func (s *service) encryptBytes(plainBytes []byte) ([]byte, error) {
+	if plainBytes == nil {
+		return nil, nil
+	}
+
+	encryptedBytes, err := utils.EncryptBytes(plainBytes, s.db_encrypt_key)
+	if err != nil {
+		return nil, err
+	}
+
+	return encryptedBytes, nil
+}
+
+func (s *service) decryptBytes(encryptedBytes []byte) ([]byte, error) {
+	if encryptedBytes == nil {
+		return nil, nil
+	}
+
+	plainBytes, err := utils.DecryptBytes(encryptedBytes, s.db_encrypt_key)
+	if err != nil {
+		return nil, err
+	}
+
+	return plainBytes, nil
+}
+
 func (s *service) decryptNullString(encrypted sql.NullString) (sql.NullString, error) {
 	if encrypted.Valid {
-		decrypted, err := utils.Decrypt(encrypted.String, s.db_encrypt_key)
+		decrypted, err := utils.DecryptString(encrypted.String, s.db_encrypt_key)
 		if err != nil {
 			return sql.NullString{}, err
 		}
@@ -111,7 +150,7 @@ func (s *service) decryptString(encrypted string) (string, error) {
 		return "", nil
 	}
 
-	decrypted, err := utils.Decrypt(encrypted, s.db_encrypt_key)
+	decrypted, err := utils.DecryptString(encrypted, s.db_encrypt_key)
 	if err != nil {
 		return "", err
 	}
@@ -127,7 +166,7 @@ func (s *service) encryptNullString(plainText sql.NullString) (sql.NullString, e
 		}, nil
 	}
 
-	encrypted, err := utils.Encrypt(plainText.String, s.db_encrypt_key)
+	encrypted, err := utils.EncryptString(plainText.String, s.db_encrypt_key)
 	if err != nil {
 		return sql.NullString{}, err
 	}
@@ -139,7 +178,7 @@ func (s *service) encryptNullString(plainText sql.NullString) (sql.NullString, e
 }
 
 func (s *service) encryptString(plainText string) (string, error) {
-	encrypted, err := utils.Encrypt(plainText, s.db_encrypt_key)
+	encrypted, err := utils.EncryptString(plainText, s.db_encrypt_key)
 	if err != nil {
 		return "", err
 	}
@@ -274,14 +313,16 @@ func (s *service) CreateUser(userId, email string) error {
 	}
 
 	// Create a User in the db
-	err = s.db_queries.CreateUser(ctx, sqlc.CreateUserParams{
+	err = s.db_queries.CreateBareUser(ctx, sqlc.CreateBareUserParams{
 		UserID: userId_encrypted,
-		Email:  email_encrypted,
-		Avatar: sql.NullString{
-			String: "",
-			Valid:  false,
-		},
+		Email: email_encrypted,
 	})
+	if err != nil {
+		return err
+	}
+
+	// Create the avatar
+	err = s.db_queries.CreateBareUserAvatar(ctx, userId_encrypted)
 	if err != nil {
 		return err
 	}
@@ -289,7 +330,7 @@ func (s *service) CreateUser(userId, email string) error {
 	return nil
 }
 
-func (s *service) GetUser(userId string) (sqlc.User, error) {
+func (s *service) GetUserDetails(userId string) (sqlc.User, error) {
 	ctx := context.Background()
 
 	// Need to use the encrypted userId to search
@@ -298,7 +339,7 @@ func (s *service) GetUser(userId string) (sqlc.User, error) {
 		return sqlc.User{}, err
 	}
 
-	user_encrypted, err := s.db_queries.GetUser(ctx, userId_encrypted)
+	user_encrypted, err := s.db_queries.GetUserDetails(ctx, userId_encrypted)
 	if err != nil {
 		return sqlc.User{}, err
 	}
@@ -353,32 +394,41 @@ func (s *service) GetUser(userId string) (sqlc.User, error) {
 	}, nil
 }
 
-func (s *service) GetUserAvatar(userId string) (string, error) {
+func (s *service) GetUserAvatar(userId string) (FileInternal, error) {
 	ctx := context.Background()
 
 	// Encrypt userId
-	userId_encrypted, err := s.encryptString(userId)
+	userIdEncrypted, err := s.encryptString(userId)
 	if err != nil {
-		return "", err
+		return FileInternal{}, err
 	}
 
 	// Get encrypted avatar image by searching with the encrypted user id
-	avatar_encrypted, err := s.db_queries.GetUserAvatar(ctx, userId_encrypted)
+	avatarEncrypted, err := s.db_queries.GetUserAvatar(ctx, userIdEncrypted)
 	if err != nil {
-		return "", err
+		return FileInternal{}, err
 	}
 
-	// Decrypt avatar image
-	avatar_decrypted, err := s.decryptNullString(avatar_encrypted)
+	// Decrypt filename and data
+	avatarFileNameDecrypted, err := s.decryptString(avatarEncrypted.FileName.String)
 	if err != nil {
-		return "", err
+		return FileInternal{}, err
+	}
+	avatarDataDecrypted, err := s.decryptBytes(avatarEncrypted.Data)
+	if err != nil {
+		return FileInternal{}, err
 	}
 
 	// Return decrypted user's avatar image (base64 encoded string)
-	return avatar_decrypted.String, nil
+	return FileInternal{
+		Filename: avatarFileNameDecrypted,
+		Mimetype: avatarEncrypted.MimeType.String,
+		Size: avatarEncrypted.Size.Int64,
+		Data: avatarDataDecrypted,
+	}, nil
 }
 
-func (s *service) UpdateUser(updatedUserData User_New) error {
+func (s *service) UpdateUser(updatedUserData UserDetails, avatarImage FileInternal) error {
 	ctx := context.Background()
 
 	userId := updatedUserData.UserID
@@ -388,7 +438,6 @@ func (s *service) UpdateUser(updatedUserData User_New) error {
 	gender := updatedUserData.Gender
 	location := updatedUserData.Location
 	interests := updatedUserData.Interests
-	avatar := updatedUserData.Avatar
 
 	// Encrypt all user information
 	userId_encrypted, err := s.encryptString(userId)
@@ -426,14 +475,20 @@ func (s *service) UpdateUser(updatedUserData User_New) error {
 		return err
 	}
 
-	avatar_encrypted, err := s.encryptNullString(sql.NullString{String: avatar, Valid: true})
+	// Encrypt filename and data
+	avatarFilenameEncrypted, err := s.encryptString(avatarImage.Filename)
+	if err != nil {
+		return err
+	}
+
+	avatarDataEncrypted, err := s.encryptBytes(avatarImage.Data)
 	if err != nil {
 		return err
 	}
 
 	// Store encrypted user data in db
 	// Small information
-	err = s.db_queries.UpdateUser(ctx, sqlc.UpdateUserParams{
+	err = s.db_queries.UpdateUserDetails(ctx, sqlc.UpdateUserDetailsParams{
 		UserID:    userId_encrypted, // Need the encrypted userId to search for the right row to update in db.
 		FirstName: first_name_encrypted,
 		LastName:  last_name_encrypted,
@@ -449,7 +504,19 @@ func (s *service) UpdateUser(updatedUserData User_New) error {
 	// Larger information
 	err = s.db_queries.UpdateUserAvatar(ctx, sqlc.UpdateUserAvatarParams{
 		UserID: userId_encrypted,
-		Avatar: avatar_encrypted,
+		FileName: sql.NullString{
+			String: avatarFilenameEncrypted,
+			Valid: true,
+		},
+		MimeType: sql.NullString{
+			String: avatarImage.Mimetype,
+			Valid: true,
+		},
+		Size: sql.NullInt64{
+			Int64: avatarImage.Size,
+			Valid: true,
+		},
+		Data: avatarDataEncrypted,
 	})
 	if err != nil {
 		return err
@@ -469,7 +536,7 @@ func (s *service) DeleteUser(userId string) error {
 	}
 
 	// Delete the user with the matching encrypyted id
-	err = s.db_queries.DeleteUser(ctx, userId_encrypted)
+	err = s.db_queries.DeleteUserDetails(ctx, userId_encrypted)
 	if err != nil {
 		return err
 	}

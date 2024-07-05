@@ -14,7 +14,9 @@ function classNames(...classes: (string | undefined | null | false)[]) {
 const TopNavbar: React.FC = () => {
   const auth = AuthData();
   const { user, authenticated, logout } = auth;
-  const profileImg = user.avatar !== "" ? user.avatar : defaultProfileImg;
+  const userAvatarURL =
+    user.avatar === null ? "" : URL.createObjectURL(user.avatar);
+  const profileImg = userAvatarURL === "" ? defaultProfileImg : userAvatarURL;
 
   const navigation = [
     ...(authenticated

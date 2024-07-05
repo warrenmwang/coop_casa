@@ -16,7 +16,10 @@ CREATE TABLE users (
 CREATE TABLE users_avatars (
     id SERIAL PRIMARY KEY,
     user_id TEXT NOT NULL UNIQUE,
-    avatar TEXT,
+    file_name TEXT,
+    mime_type TEXT,
+    "size" BIGINT,
+    "data" BYTEA,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 

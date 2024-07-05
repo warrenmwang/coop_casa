@@ -1,7 +1,6 @@
 import React from "react";
-import { User } from "../../types/User";
+import { User } from "../../types/Types";
 import { validateUserAvatarInput } from "../../utils/inputValidation";
-import { fileToBase64 } from "../../utils/utils";
 
 interface ImageInputArgs {
   setFormData: React.Dispatch<React.SetStateAction<User>>;
@@ -9,7 +8,7 @@ interface ImageInputArgs {
   setIsChanged?: (value: React.SetStateAction<boolean>) => void;
   label: string;
   id: string;
-  value: string;
+  value: File | null;
 }
 
 const ImageInput: React.FC<ImageInputArgs> = ({
@@ -35,12 +34,12 @@ const ImageInput: React.FC<ImageInputArgs> = ({
         return;
       }
 
-      // Save validated avatar upload
-      const avatarBase64 = await fileToBase64(file);
+      // Save validated image in formData state
       setFormData((prevState) => ({
         ...prevState,
-        avatar: avatarBase64,
+        avatar: file,
       }));
+
       if (setError) {
         setError("avatar", false);
       }
@@ -58,7 +57,7 @@ const ImageInput: React.FC<ImageInputArgs> = ({
       {value && (
         <div className="mb-3">
           <img
-            src={value}
+            src={URL.createObjectURL(value)}
             alt="Avatar"
             className="w-32 h-32 rounded-full object-cover"
           />

@@ -60,8 +60,8 @@ func DecryptBytes(cipherbytes []byte, key string) ([]byte, error) {
 	return plainBytes, nil
 }
 
-// Encrypt encrypts plaintext using the given key.
-func Encrypt(plaintext, key string) (string, error) {
+// EncryptString encrypts plaintext using the given key.
+func EncryptString(plaintext, key string) (string, error) {
 	block, err := aes.NewCipher([]byte(key))
 	if err != nil {
 		return "", err
@@ -77,8 +77,8 @@ func Encrypt(plaintext, key string) (string, error) {
 	return base64.StdEncoding.EncodeToString(ciphertext), nil
 }
 
-// Decrypt decrypts ciphertext using the given key.
-func Decrypt(ciphertext, key string) (string, error) {
+// DecryptString decrypts ciphertext using the given key.
+func DecryptString(ciphertext, key string) (string, error) {
 	data, err := base64.StdEncoding.DecodeString(ciphertext)
 	if err != nil {
 		return "", err

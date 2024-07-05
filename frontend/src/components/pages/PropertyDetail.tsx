@@ -9,7 +9,7 @@ import TopNavbar from "../structure/TopNavbar";
 import Footer from "../structure/Footer";
 import { useQuery } from "@tanstack/react-query";
 import CardSkeleton from "../structure/CardSkeleton";
-import { ListerBasicInfo } from "../../types/User";
+import { ListerBasicInfo } from "../../types/Types";
 
 type ListerInfoProps = {
   listerID: string;

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import TextSkeleton from "../structure/TextSkeleton";
 import { useAPIAuthCheck } from "../../api/api";
@@ -12,11 +12,14 @@ const OAuthCallbackPage: React.FC = () => {
   // Auth check fetch has completed
   const auth = AuthData();
   const { authenticated } = auth;
-  if (authenticated) {
-    navigate(dashboardPageLink);
-  } else {
-    navigate(homePageLink);
-  }
+
+  useEffect(() => {
+    if (authenticated) {
+      navigate(dashboardPageLink);
+    } else {
+      navigate(homePageLink);
+    }
+  }, []);
 
   return <TextSkeleton />;
 };

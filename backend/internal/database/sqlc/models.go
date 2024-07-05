@@ -62,6 +62,9 @@ type User struct {
 type UsersAvatar struct {
 	ID        int32
 	UserID    string
-	Avatar    sql.NullString
+	FileName  sql.NullString
+	MimeType  sql.NullString
+	Size      sql.NullInt64
+	Data      []byte
 	UpdatedAt time.Time
 }

@@ -1,10 +1,10 @@
 // Function to convert File to Base64 string
-
-import { AvatarType } from "../types/AccountSetup";
-
 // Returns an empty string if file is null
+
+import { APIFileReceived } from "../types/Types";
+
 // o.w. return the file as base64 encoded string
-export const fileToBase64 = (file: AvatarType): Promise<string> => {
+export const file2Base64Str = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
     if (file !== null) {
       const reader = new FileReader();
@@ -16,4 +16,43 @@ export const fileToBase64 = (file: AvatarType): Promise<string> => {
       reject(new Error("Something went wrong."));
     }
   });
+};
+
+// DOESNT WORK BECAUSE FETCH FAILS FOR SOME REASON
+// export const base64Str2File = async (
+//   b64str: string,
+//   fileName: string,
+// ): Promise<File> => {
+//   const [mimePart, _] = b64str.split(",");
+//   const mimeType = mimePart.match(/:(.*?);/)?.[1] || "";
+
+//   const response = await fetch(b64str);
+//   const blob = await response.blob();
+
+//   return new File([blob], fileName, { type: mimeType });
+// };
+
+export const apiFile2ClientFile = (fileIn: APIFileReceived): File | null => {
+  // Return null if empty file
+  if (fileIn.data === "") {
+    return null;
+  }
+
+  // Decode the base64 string
+  const binaryString = window.atob(fileIn.data);
+  const len = binaryString.length;
+  const bytes = new Uint8Array(len);
+  for (let i = 0; i < len; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+
+  // Create a Blob from the byte array
+  const blob = new Blob([bytes], { type: fileIn.mimeType });
+
+  // Convert the Blob into a File object
+  return new File([blob], fileIn.fileName, { type: fileIn.mimeType });
+};
+
+export const createFileFromBlob = (blob: Blob, fileName: string): File => {
+  return new File([blob], fileName, { type: blob.type });
 };

@@ -3,7 +3,12 @@
 */
 
 import { useEffect, useState } from "react";
-import { NullUser, User, ListerBasicInfo } from "../types/User";
+import {
+  User,
+  UserDetails,
+  ListerBasicInfo,
+  APIUserReceived,
+} from "../types/Types";
 import { Property } from "../components/structure/CreatePropertyForm";
 import {
   api_account_Link,
@@ -15,6 +20,8 @@ import {
   api_user_role_Link,
 } from "../urls";
 import { AuthData } from "../auth/AuthWrapper";
+import { apiFile2ClientFile, createFileFromBlob } from "../utils/utils";
+import { parse } from "parse-multipart-data";
 
 export const checkFetch = (response: Response) => {
   // source: https://www.youtube.com/watch?v=b8DaQrxshu0
@@ -53,14 +60,33 @@ export const apiUpdateUserAccountDetails = async (
 ): Promise<number> => {
   var returnVal: number = 444;
 
+  const formData = new FormData();
+
+  // User details (string values)
+  formData.append(
+    "user",
+    JSON.stringify({
+      userId: newUserData.userId,
+      email: newUserData.email,
+      firstName: newUserData.firstName,
+      lastName: newUserData.lastName,
+      birthDate: newUserData.birthDate,
+      gender: newUserData.gender,
+      location: newUserData.location,
+      interests: newUserData.interests,
+    }),
+  );
+
+  // Avatar image if given
+  if (newUserData.avatar) {
+    formData.append("avatar", newUserData.avatar);
+  }
+
   try {
     const response = await fetch(api_account_update_Link, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
       credentials: "include",
-      body: JSON.stringify(newUserData),
+      body: formData,
     });
 
     returnVal = response.status;
@@ -138,28 +164,30 @@ export const useAPIGetUserAccount = (): boolean => {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const controller = new AbortController();
+    const foo = async () => {
+      const controller = new AbortController();
 
-    fetch(api_account_Link, {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-      },
-      credentials: "include",
-      signal: controller.signal,
-    })
-      .then(checkFetch)
-      .then((response) => response.json())
-      .then((data) => {
-        const userData = data as NullUser;
-        if (userData !== null) {
-          setUser(userData as User);
-        }
-        setLoading(false);
+      fetch(api_account_Link, {
+        method: "GET",
+        credentials: "include",
+        signal: controller.signal,
       })
-      .catch((err) => console.error(err));
+        .then(checkFetch)
+        .then((response) => response.json())
+        .then((data) => data as APIUserReceived)
+        .then((data) => {
+          const avatar: File | null = apiFile2ClientFile(data.avatarImageB64);
 
-    return () => controller.abort();
+          setUser({
+            ...data.userDetails,
+            avatar: avatar,
+          });
+        })
+        .catch((err) => console.error(err));
+
+      return () => controller.abort();
+    };
+    foo();
   }, []);
 
   return loading;

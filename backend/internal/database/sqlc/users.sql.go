@@ -56,34 +56,28 @@ func (q *Queries) AdminGetUsers(ctx context.Context, arg AdminGetUsersParams) ([
 	return items, nil
 }
 
-const createUser = `-- name: CreateUser :exec
-WITH new_user AS (
-    INSERT INTO users (user_id, email)
-    VALUES ($1, $2)
-    RETURNING user_id
-)
-INSERT INTO users_avatars (user_id, avatar)
-SELECT user_id, $3
-FROM new_user
+const createBareUser = `-- name: CreateBareUser :exec
+INSERT INTO users (user_id, email)
+VALUES ($1, $2)
 `
 
-type CreateUserParams struct {
+type CreateBareUserParams struct {
 	UserID string
 	Email  string
-	Avatar sql.NullString
 }
 
-func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) error {
-	_, err := q.db.ExecContext(ctx, createUser, arg.UserID, arg.Email, arg.Avatar)
+func (q *Queries) CreateBareUser(ctx context.Context, arg CreateBareUserParams) error {
+	_, err := q.db.ExecContext(ctx, createBareUser, arg.UserID, arg.Email)
 	return err
 }
 
-const deleteUser = `-- name: DeleteUser :exec
-DELETE FROM users WHERE user_id = $1
+const createBareUserAvatar = `-- name: CreateBareUserAvatar :exec
+INSERT INTO users_avatars (user_id)
+VALUES ($1)
 `
 
-func (q *Queries) DeleteUser(ctx context.Context, userID string) error {
-	_, err := q.db.ExecContext(ctx, deleteUser, userID)
+func (q *Queries) CreateBareUserAvatar(ctx context.Context, userID string) error {
+	_, err := q.db.ExecContext(ctx, createBareUserAvatar, userID)
 	return err
 }
 
@@ -96,13 +90,42 @@ func (q *Queries) DeleteUserAvatar(ctx context.Context, userID string) error {
 	return err
 }
 
-const getUser = `-- name: GetUser :one
+const deleteUserDetails = `-- name: DeleteUserDetails :exec
+DELETE FROM users WHERE user_id = $1
+`
+
+func (q *Queries) DeleteUserDetails(ctx context.Context, userID string) error {
+	_, err := q.db.ExecContext(ctx, deleteUserDetails, userID)
+	return err
+}
+
+const getUserAvatar = `-- name: GetUserAvatar :one
+SELECT id, user_id, file_name, mime_type, size, data, updated_at FROM users_avatars
+WHERE user_id = $1
+`
+
+func (q *Queries) GetUserAvatar(ctx context.Context, userID string) (UsersAvatar, error) {
+	row := q.db.QueryRowContext(ctx, getUserAvatar, userID)
+	var i UsersAvatar
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.FileName,
+		&i.MimeType,
+		&i.Size,
+		&i.Data,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const getUserDetails = `-- name: GetUserDetails :one
 SELECT id, user_id, email, first_name, last_name, birth_date, gender, location, interests, created_at, updated_at FROM users
 WHERE user_id = $1
 `
 
-func (q *Queries) GetUser(ctx context.Context, userID string) (User, error) {
-	row := q.db.QueryRowContext(ctx, getUser, userID)
+func (q *Queries) GetUserDetails(ctx context.Context, userID string) (User, error) {
+	row := q.db.QueryRowContext(ctx, getUserDetails, userID)
 	var i User
 	err := row.Scan(
 		&i.ID,
@@ -120,19 +143,37 @@ func (q *Queries) GetUser(ctx context.Context, userID string) (User, error) {
 	return i, err
 }
 
-const getUserAvatar = `-- name: GetUserAvatar :one
-SELECT avatar FROM users_avatars
+const updateUserAvatar = `-- name: UpdateUserAvatar :exec
+UPDATE users_avatars
+SET
+    file_name = $2,
+    mime_type = $3,
+    "size" = $4,
+    "data" = $5,
+    updated_at = CURRENT_TIMESTAMP
 WHERE user_id = $1
 `
 
-func (q *Queries) GetUserAvatar(ctx context.Context, userID string) (sql.NullString, error) {
-	row := q.db.QueryRowContext(ctx, getUserAvatar, userID)
-	var avatar sql.NullString
-	err := row.Scan(&avatar)
-	return avatar, err
+type UpdateUserAvatarParams struct {
+	UserID   string
+	FileName sql.NullString
+	MimeType sql.NullString
+	Size     sql.NullInt64
+	Data     []byte
 }
 
-const updateUser = `-- name: UpdateUser :exec
+func (q *Queries) UpdateUserAvatar(ctx context.Context, arg UpdateUserAvatarParams) error {
+	_, err := q.db.ExecContext(ctx, updateUserAvatar,
+		arg.UserID,
+		arg.FileName,
+		arg.MimeType,
+		arg.Size,
+		arg.Data,
+	)
+	return err
+}
+
+const updateUserDetails = `-- name: UpdateUserDetails :exec
 UPDATE users
 SET 
     first_name = $2, 
@@ -145,7 +186,7 @@ SET
 WHERE user_id = $1
 `
 
-type UpdateUserParams struct {
+type UpdateUserDetailsParams struct {
 	UserID    string
 	FirstName sql.NullString
 	LastName  sql.NullString
@@ -155,8 +196,8 @@ type UpdateUserParams struct {
 	Interests sql.NullString
 }
 
-func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) error {
-	_, err := q.db.ExecContext(ctx, updateUser,
+func (q *Queries) UpdateUserDetails(ctx context.Context, arg UpdateUserDetailsParams) error {
+	_, err := q.db.ExecContext(ctx, updateUserDetails,
 		arg.UserID,
 		arg.FirstName,
 		arg.LastName,
@@ -165,23 +206,5 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) error {
 		arg.Location,
 		arg.Interests,
 	)
-	return err
-}
-
-const updateUserAvatar = `-- name: UpdateUserAvatar :exec
-UPDATE users_avatars
-SET
-    avatar = $2,
-    updated_at = CURRENT_TIMESTAMP
-WHERE user_id = $1
-`
-
-type UpdateUserAvatarParams struct {
-	UserID string
-	Avatar sql.NullString
-}
-
-func (q *Queries) UpdateUserAvatar(ctx context.Context, arg UpdateUserAvatarParams) error {
-	_, err := q.db.ExecContext(ctx, updateUserAvatar, arg.UserID, arg.Avatar)
 	return err
 }
