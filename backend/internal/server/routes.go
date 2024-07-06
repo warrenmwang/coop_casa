@@ -456,13 +456,13 @@ func (s *Server) apiGetAccountDetailsHandler(w http.ResponseWriter, r *http.Requ
 	}
 
 	userDetails := database.UserDetails{
-		UserID: user.UserID,
-		Email: user.Email,
+		UserID:    user.UserID,
+		Email:     user.Email,
 		FirstName: user.FirstName.String,
-		LastName: user.LastName.String,
+		LastName:  user.LastName.String,
 		BirthDate: user.BirthDate.String,
-		Gender: user.Gender.String,
-		Location: user.Location.String, 
+		Gender:    user.Gender.String,
+		Location:  user.Location.String,
 		Interests: user.Interests.String,
 	}
 
@@ -472,38 +472,38 @@ func (s *Server) apiGetAccountDetailsHandler(w http.ResponseWriter, r *http.Requ
 	userAvatarFileExternal := database.FileExternal{
 		Filename: userAvatar.Filename,
 		Mimetype: userAvatar.Mimetype,
-		Size: userAvatar.Size,
-		Data: userAvatarDataB64,
+		Size:     userAvatar.Size,
+		Data:     userAvatarDataB64,
 	}
 
 	type ReturnValue struct {
-		UserDetails database.UserDetails `json:"userDetails"`
-		UserAvatar database.FileExternal `json:"avatarImageB64"`
+		UserDetails database.UserDetails  `json:"userDetails"`
+		UserAvatar  database.FileExternal `json:"avatarImageB64"`
 	}
 
 	respondWithJSON(w, 200, ReturnValue{
 		UserDetails: userDetails,
-		UserAvatar: userAvatarFileExternal,
+		UserAvatar:  userAvatarFileExternal,
 	})
 }
 
 // Endpoint: POST /api/account
 func (s *Server) apiUpdateAccountDetailsHandler(w http.ResponseWriter, r *http.Request) {
-	MAX_SIZE := 32 << 20; // 32 MiB
-    // limit body size that we will parse
-    r.Body = http.MaxBytesReader(w, r.Body, int64(MAX_SIZE))
-
-    err := r.ParseMultipartForm(int64(MAX_SIZE + 512))
-    if err != nil {
-		log.Printf("parsing multipart form data: %v", err)
-        http.Error(w, "unable to parse multipart form", http.StatusInternalServerError)
-        return
-    }
-
 	// Authenticate user
 	userIdFromToken, err := s.getAuthedUserId(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+
+	// limit body size that we will parse
+	MAX_SIZE := 32 << 20 // 32 MiB
+	r.Body = http.MaxBytesReader(w, r.Body, int64(MAX_SIZE))
+
+	err = r.ParseMultipartForm(int64(MAX_SIZE + 512))
+	if err != nil {
+		log.Printf("parsing multipart form data: %v", err)
+		http.Error(w, "unable to parse multipart form", http.StatusInternalServerError)
 		return
 	}
 
@@ -525,7 +525,7 @@ func (s *Server) apiUpdateAccountDetailsHandler(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	// Get avatar 
+	// Get avatar
 	avatarFileData, avatarFileHeader, err := r.FormFile("avatar")
 	if err != nil && err != http.ErrMissingFile {
 		http.Error(w, "unable to get user avatar image", http.StatusBadRequest)
@@ -548,10 +548,10 @@ func (s *Server) apiUpdateAccountDetailsHandler(w http.ResponseWriter, r *http.R
 		avatarFile = database.FileInternal{
 			Filename: avatarFileHeader.Filename,
 			Mimetype: avatarFileHeader.Header.Get("Content-Type"),
-			Size: avatarFileHeader.Size,
-			Data: avatarBytes,
+			Size:     avatarFileHeader.Size,
+			Data:     avatarBytes,
 		}
-	}		
+	}
 
 	// Update the user in the DB with the new info (with avatar)
 	err = s.db.UpdateUser(userDetails, avatarFile)
@@ -786,22 +786,47 @@ func (s *Server) apiUpdateUserRoleHandler(w http.ResponseWriter, r *http.Request
 // Endpoint: GET /api/properties
 // Available query params:
 // - propertyID string, return the data for a single property
-// - page int, return the property ids for the current page 
+// - page int, return the property ids for the current page
 // - getTotalCount bool, return the total number of properties present on site
 func (s *Server) apiGetPropertiesHandler(w http.ResponseWriter, r *http.Request) {
 	// anyone can get properties, without needing to be authenticated.
 
 	query := r.URL.Query()
 
-	// Check if propertyID is a queryParam, if it is, retrieve it and 
+	// Check if propertyID is a queryParam, if it is, retrieve it and
 	// try to find the suitable property from the database
 	propertyID := query.Get("propertyID")
 	if propertyID != "" {
-		property, err := s.db.GetProperty(propertyID)
+		propertyDetails, err := s.db.GetPropertyDetails(propertyID)
 		if err != nil {
 			respondWithError(w, 500, err)
 			return
 		}
+
+		propertyImagesBinary, err := s.db.GetPropertyImages(propertyID)
+		if err != nil {
+			respondWithError(w, 500, err)
+			return
+		}
+
+		var propertyImagesB64 []database.OrderedFileExternal
+		for _, image := range propertyImagesBinary {
+			propertyImagesB64 = append(propertyImagesB64, database.OrderedFileExternal{
+				OrderNum: image.OrderNum,
+				File: database.FileExternal{
+					Filename: image.File.Filename,
+					Mimetype: image.File.Mimetype,
+					Size:     image.File.Size,
+					Data:     base64.StdEncoding.EncodeToString(image.File.Data),
+				},
+			})
+		}
+
+		property := database.PropertyFull{
+			PropertyDetails: propertyDetails,
+			PropertyImages:  propertyImagesB64,
+		}
+
 		respondWithJSON(w, 200, property)
 		return
 	}
@@ -880,16 +905,67 @@ func (s *Server) apiCreatePropertiesHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	// Get the property information from the request
-	var propertyInfo database.Property
-	err = json.NewDecoder(r.Body).Decode(&propertyInfo)
+	// Prepare reading body form by allocating max memory to read
+	MAX_SIZE := 55 << 20 // 55 MiB
+	r.Body = http.MaxBytesReader(w, r.Body, int64(MAX_SIZE))
+	err = r.ParseMultipartForm(int64(MAX_SIZE + 512))
+	if err != nil {
+		respondWithError(w, 401, err)
+		return
+	}
+
+	// Get details
+	detailsRaw := r.FormValue("details")
+	var propertyDetails database.PropertyDetails
+	err = json.Unmarshal([]byte(detailsRaw), &propertyDetails)
 	if err != nil {
 		respondWithError(w, 500, err)
 		return
 	}
 
+	// Get property images
+	numberImagesRaw := r.FormValue("numImages") // should be at most 10, limited on expected frontend.
+	numberImagesInt64, err := strconv.ParseInt(numberImagesRaw, 10, 16)
+	if err != nil {
+		respondWithError(w, 500, err)
+		return
+	}
+
+	var images []database.OrderedFileInternal
+	numberImages := int16(numberImagesInt64)
+	for i := range numberImages {
+		imageDataRaw, imageFileHeader, err := r.FormFile(fmt.Sprintf("image%d", i))
+		if err != nil {
+			respondWithError(w, 500, err)
+			return
+		}
+		var imageData []byte
+		if imageDataRaw == nil {
+			respondWithError(w, 500, errors.New("image data is empty"))
+			return
+		} else {
+			defer imageDataRaw.Close()
+
+			imageData, err = io.ReadAll(imageDataRaw)
+			if err != nil {
+				respondWithError(w, 500, err)
+				return
+			}
+		}
+
+		images = append(images, database.OrderedFileInternal{
+			OrderNum: i,
+			File: database.FileInternal{
+				Filename: imageFileHeader.Filename,
+				Mimetype: imageFileHeader.Header.Get("Content-Type"),
+				Size:     imageFileHeader.Size,
+				Data:     imageData,
+			},
+		})
+	}
+
 	// Create the property in the db
-	err = s.db.CreateProperty(propertyInfo)
+	err = s.db.CreateProperty(propertyDetails, images)
 	if err != nil {
 		respondWithError(w, 500, err)
 		return
@@ -918,22 +994,80 @@ func (s *Server) apiUpdatePropertiesHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	// Get the new property info details
-	var propertyInfo database.Property
-	err = json.NewDecoder(r.Body).Decode(&propertyInfo)
+	// Prepare reading body form by allocating max memory to read
+	MAX_SIZE := 55 << 20 // 55 MiB
+	r.Body = http.MaxBytesReader(w, r.Body, int64(MAX_SIZE))
+	err = r.ParseMultipartForm(int64(MAX_SIZE + 512))
+	if err != nil {
+		respondWithError(w, 401, err)
+		return
+	}
+
+	// Get details
+	detailsRaw := r.FormValue("details")
+	var propertyDetails database.PropertyDetails
+	err = json.Unmarshal([]byte(detailsRaw), &propertyDetails)
 	if err != nil {
 		respondWithError(w, 500, err)
 		return
 	}
 
+	// Get property images
+	numberImagesRaw := r.FormValue("numImages") // should be at most 10, limited on expected frontend.
+	numberImagesInt64, err := strconv.ParseInt(numberImagesRaw, 10, 16)
+	if err != nil {
+		respondWithError(w, 500, err)
+		return
+	}
+
+	var images []database.OrderedFileInternal
+	numberImages := int16(numberImagesInt64)
+	for i := range numberImages {
+		imageDataRaw, imageFileHeader, err := r.FormFile(fmt.Sprintf("image%d", i))
+		if err != nil {
+			respondWithError(w, 500, err)
+			return
+		}
+		var imageData []byte
+		if imageDataRaw == nil {
+			respondWithError(w, 500, errors.New("image data is empty"))
+			return
+		} else {
+			defer imageDataRaw.Close()
+
+			imageData, err = io.ReadAll(imageDataRaw)
+			if err != nil {
+				respondWithError(w, 500, err)
+				return
+			}
+		}
+
+		images = append(images, database.OrderedFileInternal{
+			OrderNum: i,
+			File: database.FileInternal{
+				Filename: imageFileHeader.Filename,
+				Mimetype: imageFileHeader.Header.Get("Content-Type"),
+				Size:     imageFileHeader.Size,
+				Data:     imageData,
+			},
+		})
+	}
+
 	// Listers can only update their own properties, admins can modify any who cares if they own it or not
-	if role == "lister" && userID != propertyInfo.ListerUserID {
+	if role == "lister" && userID != propertyDetails.ListerUserID {
 		respondWithError(w, 401, errors.New("you can only modify your own property as a lister"))
 		return
 	}
 
-	// Update this property with the new info
-	err = s.db.UpdateProperty(propertyInfo)
+	// Update property details
+	err = s.db.UpdatePropertyDetails(propertyDetails)
+	if err != nil {
+		respondWithError(w, 500, err)
+		return
+	}
+
+	// Update property images
+	err = s.db.UpdatePropertyImages(propertyDetails.PropertyID, images)
 	if err != nil {
 		respondWithError(w, 500, err)
 		return
@@ -958,15 +1092,15 @@ func (s *Server) apiDeletePropertiesHandler(w http.ResponseWriter, r *http.Reque
 	propertyID := query.Get("propertyID")
 
 	// Try to get the requested property
-	property, err := s.db.GetProperty(propertyID)
+	propertyDetails, err := s.db.GetPropertyDetails(propertyID)
 	if err != nil {
 		respondWithError(w, 500, err)
 		return
 	}
 
-	// Ensure that the user owns the property OR 
+	// Ensure that the user owns the property OR
 	// that the user is the admin
-	if (property.ListerUserID != userID && userID != s.AdminUserID) {
+	if propertyDetails.ListerUserID != userID && userID != s.AdminUserID {
 		respondWithError(w, 401, err)
 		return
 	}
@@ -977,7 +1111,7 @@ func (s *Server) apiDeletePropertiesHandler(w http.ResponseWriter, r *http.Reque
 		respondWithError(w, 500, err)
 		return
 	}
-	
+
 	// Respond ok
 	w.WriteHeader(200)
 }
@@ -1010,13 +1144,13 @@ func (s *Server) apiGetListerInfoHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	respondWithJSON(w, 200, struct{
+	respondWithJSON(w, 200, struct {
 		FirstName string `json:"firstName"`
-		LastName string `json:"lastName"`
-		Email string `json:"email"`
+		LastName  string `json:"lastName"`
+		Email     string `json:"email"`
 	}{
 		FirstName: lister.FirstName.String,
-		LastName: lister.LastName.String,
-		Email: lister.Email,
+		LastName:  lister.LastName.String,
+		Email:     lister.Email,
 	})
 }

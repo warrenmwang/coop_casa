@@ -8,8 +8,10 @@ import {
   UserDetails,
   ListerBasicInfo,
   APIUserReceived,
+  Property,
+  APIPropertyReceived,
+  OrderedFile,
 } from "../types/Types";
-import { Property } from "../components/structure/CreatePropertyForm";
 import {
   api_account_Link,
   api_account_update_Link,
@@ -182,6 +184,8 @@ export const useAPIGetUserAccount = (): boolean => {
             ...data.userDetails,
             avatar: avatar,
           });
+
+          setLoading(false);
         })
         .catch((err) => console.error(err));
 
@@ -231,12 +235,19 @@ export const apiCreateNewProperty = async (
 ): Promise<Response | null> => {
   var returnVal: Response | null = null;
   try {
+    const formData = new FormData();
+    formData.append("details", JSON.stringify(property.details));
+    formData.append("numImages", `${property.images.length}`);
+    if (property.images.length > 0) {
+      for (let i = 0; i < property.images.length; i++) {
+        let image = property.images[i];
+        formData.append(`image${image.orderNum}`, image.file);
+      }
+    }
+
     const response = await fetch(api_properties_Link, {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(property),
+      body: formData,
       credentials: "include",
     });
     returnVal = response;
@@ -256,7 +267,18 @@ export const apiGetProperty = async (propertyID: string): Promise<Property> => {
   })
     .then(checkFetch)
     .then((response) => response.json())
-    .then((data) => data as Property)
+    .then((data) => data as APIPropertyReceived)
+    .then((data) => {
+      return {
+        details: data.details,
+        images: data.images.map((image) => {
+          return {
+            orderNum: image.orderNum,
+            file: apiFile2ClientFile(image.file),
+          } as OrderedFile;
+        }),
+      } as Property;
+    })
     .catch((error) => {
       throw error;
     });

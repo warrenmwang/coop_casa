@@ -5,11 +5,11 @@ import { apiGetProperties, apiGetProperty } from "../../api/api";
 import CardGridSkeleton from "./CardGridSkeleton";
 import PropertyCard from "./PropertyCard";
 import SearchProperties from "./SearchProperties";
-import { Property } from "./CreatePropertyForm";
 import { useInfiniteQuery, useQueries } from "@tanstack/react-query";
 import { useInView } from "react-intersection-observer";
 import { MAX_NUMBER_PROPERTIES_PER_PAGE } from "../../constants";
 import CardSkeleton from "./CardSkeleton";
+import { Property } from "../../types/Types";
 
 interface DisplayPropertiesProps {}
 
@@ -103,8 +103,8 @@ const DisplayProperties: React.FC<DisplayPropertiesProps> = () => {
   return (
     <>
       <SearchProperties />
-      {status == "pending" && <CardGridSkeleton />}
-      {(status == "success" || data !== undefined) &&
+      {status === "pending" && <CardGridSkeleton />}
+      {(status === "success" || data !== undefined) &&
         data.pages.map((page) => {
           const propertyIDs = page.data;
           return (
@@ -113,7 +113,7 @@ const DisplayProperties: React.FC<DisplayPropertiesProps> = () => {
             </div>
           );
         })}
-      {status == "error" && (
+      {status === "error" && (
         <h1 className="text-xl text-red-600 font-bold flex justify-center">
           Sorry, we are unable to find any properties at the moment. Please come
           back again later. Server returned with error: {JSON.stringify(error)}

@@ -10,27 +10,7 @@ import MultipleImageUploader from "./MultipleImageUploader";
 import { MAX_PROPERTY_IMGS_ALLOWED } from "../../constants";
 
 import "../../styles/font.css";
-
-export type Property = {
-  propertyId: string;
-  listerUserId: string;
-  name: string;
-  description: string;
-  address1: string;
-  address2: string;
-  city: string;
-  state: string;
-  zipcode: string;
-  country: string;
-  squareFeet: number;
-  numBedrooms: number;
-  numToilets: number;
-  numShowersBaths: number;
-  costDollars: number;
-  costCents: number;
-  miscNote: string;
-  images: string;
-};
+import { OrderedFile, Property, PropertyDetails } from "../../types/Types";
 
 type TextFieldsConstruct = {
   id: string;
@@ -43,7 +23,7 @@ type TextFieldsConstruct = {
   max?: string;
 };
 
-export const EmptyProperty: Property = {
+export const EmptyPropertyDetails: PropertyDetails = {
   propertyId: "",
   listerUserId: "",
   name: "",
@@ -61,7 +41,6 @@ export const EmptyProperty: Property = {
   costDollars: -1,
   costCents: -1,
   miscNote: "",
-  images: "",
 };
 
 // This component lets the user create a property,
@@ -71,7 +50,8 @@ const CreatePropertyForm: React.FC = () => {
   const auth = AuthData();
   const { user } = auth;
 
-  const [newProperty, setNewProperty] = useState<Property>(EmptyProperty);
+  const [propertyDetails, setPropertyDetails] =
+    useState<PropertyDetails>(EmptyPropertyDetails);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [errors, setMyMap] = useState<Map<string, boolean>>(
     new Map<string, boolean>(),
@@ -113,7 +93,7 @@ const CreatePropertyForm: React.FC = () => {
       setErrors(field, true);
     });
     // Set values that we don't want the user to fill in themselves.
-    setNewProperty((prevState: any) => ({
+    setPropertyDetails((prevState: any) => ({
       ...prevState,
       propertyId: uuidv4(),
       listerUserId: user.userId,
@@ -126,7 +106,7 @@ const CreatePropertyForm: React.FC = () => {
       id: "name",
       label: "Property Name",
       placeholder: "",
-      value: newProperty.name,
+      value: propertyDetails.name,
       required: true,
       type: "text",
     },
@@ -134,7 +114,7 @@ const CreatePropertyForm: React.FC = () => {
       id: "description",
       label: "Description",
       placeholder: "",
-      value: newProperty.description,
+      value: propertyDetails.description,
       required: false,
       type: "text",
     },
@@ -142,7 +122,7 @@ const CreatePropertyForm: React.FC = () => {
       id: "address1",
       label: "Address 1",
       placeholder: "",
-      value: newProperty.address1,
+      value: propertyDetails.address1,
       required: true,
       type: "text",
     },
@@ -150,7 +130,7 @@ const CreatePropertyForm: React.FC = () => {
       id: "address2",
       label: "Address 2",
       placeholder: "",
-      value: newProperty.address2,
+      value: propertyDetails.address2,
       required: false,
       type: "text",
     },
@@ -158,7 +138,7 @@ const CreatePropertyForm: React.FC = () => {
       id: "city",
       label: "City",
       placeholder: "",
-      value: newProperty.city,
+      value: propertyDetails.city,
       required: true,
       type: "text",
     },
@@ -166,7 +146,7 @@ const CreatePropertyForm: React.FC = () => {
       id: "state",
       label: "State",
       placeholder: "",
-      value: newProperty.state,
+      value: propertyDetails.state,
       required: true,
       type: "text",
     },
@@ -174,7 +154,7 @@ const CreatePropertyForm: React.FC = () => {
       id: "zipcode",
       label: "Zipcode",
       placeholder: "",
-      value: newProperty.zipcode,
+      value: propertyDetails.zipcode,
       required: true,
       type: "text",
     },
@@ -182,7 +162,7 @@ const CreatePropertyForm: React.FC = () => {
       id: "country",
       label: "country",
       placeholder: "",
-      value: newProperty.country,
+      value: propertyDetails.country,
       required: true,
       type: "text",
     },
@@ -190,7 +170,7 @@ const CreatePropertyForm: React.FC = () => {
       id: "squareFeet",
       label: "Square Feet",
       placeholder: "",
-      value: newProperty.squareFeet,
+      value: propertyDetails.squareFeet,
       required: true,
       type: "number",
       min: "0",
@@ -200,7 +180,7 @@ const CreatePropertyForm: React.FC = () => {
       id: "numBedrooms",
       label: "Number of Bedrooms",
       placeholder: "",
-      value: newProperty.numBedrooms,
+      value: propertyDetails.numBedrooms,
       required: true,
       type: "number",
       min: "0",
@@ -210,7 +190,7 @@ const CreatePropertyForm: React.FC = () => {
       id: "numToilets",
       label: "Number of Toilets",
       placeholder: "",
-      value: newProperty.numToilets,
+      value: propertyDetails.numToilets,
       required: true,
       type: "number",
       min: "0",
@@ -220,7 +200,7 @@ const CreatePropertyForm: React.FC = () => {
       id: "numShowersBaths",
       label: "Number of Showers and/or Baths",
       placeholder: "",
-      value: newProperty.numShowersBaths,
+      value: propertyDetails.numShowersBaths,
       required: true,
       type: "number",
       min: "0",
@@ -230,7 +210,7 @@ const CreatePropertyForm: React.FC = () => {
       id: "costDollars",
       label: "Cost, Dollar Amount with no comma or dollar sign (e.g. 150000)",
       placeholder: "",
-      value: newProperty.costDollars,
+      value: propertyDetails.costDollars,
       required: true,
       type: "number",
       min: "0",
@@ -240,7 +220,7 @@ const CreatePropertyForm: React.FC = () => {
       id: "costCents",
       label: "Cost, cents portion, between 00 - 99",
       placeholder: "",
-      value: newProperty.costCents,
+      value: propertyDetails.costCents,
       required: true,
       type: "number",
       min: "0",
@@ -251,7 +231,7 @@ const CreatePropertyForm: React.FC = () => {
       label:
         "Misc. Notes (any comment that may not have been appropriate to put in the property description that the lister feels the buyer should know about should go here)",
       placeholder: "",
-      value: newProperty.miscNote,
+      value: propertyDetails.miscNote,
       required: false,
       type: "string",
     },
@@ -277,7 +257,7 @@ const CreatePropertyForm: React.FC = () => {
       // convert to number
       numberValue = Number(value);
       // save value for this field
-      setNewProperty((prevState: any) => ({
+      setPropertyDetails((prevState: any) => ({
         ...prevState,
         [id]: numberValue,
       }));
@@ -287,7 +267,7 @@ const CreatePropertyForm: React.FC = () => {
     }
 
     // o.w. set value
-    setNewProperty((prevState: any) => ({
+    setPropertyDetails((prevState: any) => ({
       ...prevState,
       [id]: value,
     }));
@@ -324,24 +304,6 @@ const CreatePropertyForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // (oh no - "base64 that shit 🤡")
-    // Convert each image into base64, join them together with comma delimiters
-    // for sending to backend. Save into newproperty state.
-    var propertyImagesStr: string = "";
-    const delimiter: string = "#";
-    for (const image of images) {
-      const imageStr = await fileToBase64(image);
-      if (propertyImagesStr.length === 0) {
-        propertyImagesStr = imageStr;
-      } else {
-        propertyImagesStr += `${delimiter}${imageStr}`;
-      }
-    }
-    setNewProperty((prevState: any) => ({
-      ...prevState,
-      images: propertyImagesStr,
-    }));
-
     // Only progress if no errors
     for (let [k, v] of errors) {
       if (v) {
@@ -361,12 +323,24 @@ const CreatePropertyForm: React.FC = () => {
   useEffect(() => {
     const foo = async () => {
       if (isSubmitting) {
+        // Format property with the details and images
+        const property: Property = {
+          details: propertyDetails,
+          images: images.map((image, index) => {
+            return {
+              orderNum: index,
+              file: image,
+            } as OrderedFile;
+          }),
+        };
+
         // Send data to backend
-        const response = await apiCreateNewProperty(newProperty);
+        const response = await apiCreateNewProperty(property);
         if (response) {
           if (response.ok) {
             // Clear the data
-            setNewProperty(EmptyProperty);
+            setPropertyDetails(EmptyPropertyDetails);
+            setImages([]);
             // Tell user submission was good
             alert("Property Created.");
           } else {
@@ -382,7 +356,7 @@ const CreatePropertyForm: React.FC = () => {
       }
     };
     foo();
-  }, [isSubmitting, newProperty]);
+  }, [isSubmitting, propertyDetails]);
 
   return (
     <>

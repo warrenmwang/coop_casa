@@ -12,7 +12,11 @@ import (
 type PropertiesImage struct {
 	ID         int32
 	PropertyID string
-	Images     sql.NullString
+	OrderNum   int16
+	FileName   string
+	MimeType   string
+	Size       int64
+	Data       []byte
 	UpdatedAt  time.Time
 }
 

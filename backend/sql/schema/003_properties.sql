@@ -24,8 +24,12 @@ CREATE TABLE properties (
 
 CREATE TABLE properties_images (
     id SERIAL PRIMARY KEY,
-    property_id TEXT NOT NULL UNIQUE,
-    images TEXT,
+    property_id TEXT NOT NULL,
+    order_num SMALLINT NOT NULL,
+    file_name TEXT NOT NULL,
+    mime_type TEXT NOT NULL,
+    "size" BIGINT NOT NULL,
+    "data" BYTEA NOT NULL,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 

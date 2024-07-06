@@ -22,17 +22,27 @@ import (
 )
 
 type FileInternal struct {
-	Filename string 
-	Mimetype string 
-	Size int64 
-	Data []byte 
+	Filename string
+	Mimetype string
+	Size     int64
+	Data     []byte
 }
 
 type FileExternal struct {
 	Filename string `json:"fileName"`
 	Mimetype string `json:"mimeType"`
-	Size int64 `json:"size"`
-	Data string `json:"data"`
+	Size     int64  `json:"size"`
+	Data     string `json:"data"`
+}
+
+type OrderedFileInternal struct {
+	OrderNum int16        `json:"orderNum"`
+	File     FileInternal `json:"file"`
+}
+
+type OrderedFileExternal struct {
+	OrderNum int16        `json:"orderNum"`
+	File     FileExternal `json:"file"`
 }
 
 type UserDetails struct {
@@ -46,7 +56,7 @@ type UserDetails struct {
 	Interests string `json:"interests"`
 }
 
-type Property struct {
+type PropertyDetails struct {
 	PropertyID        string `json:"propertyId"`
 	ListerUserID      string `json:"listerUserId"`
 	Name              string `json:"name"`
@@ -64,7 +74,11 @@ type Property struct {
 	Cost_dollars      int64  `json:"costDollars"`
 	Cost_cents        int16  `json:"costCents"`
 	Misc_note         string `json:"miscNote"`
-	Images            string `json:"images"`
+}
+
+type PropertyFull struct {
+	PropertyDetails PropertyDetails       `json:"details"`
+	PropertyImages  []OrderedFileExternal `json:"images"`
 }
 
 type Service interface {
@@ -89,15 +103,16 @@ type Service interface {
 	DeleteUserRole(userId string) error
 
 	// Properties
-	CreateProperty(property Property) error
-	GetProperty(propertyId string) (Property, error)
-	UpdateProperty(property Property) error
+	CreateProperty(propertyDetails PropertyDetails, images []OrderedFileInternal) error
+	GetPropertyDetails(propertyId string) (PropertyDetails, error)
+	GetPropertyImages(propertyId string) ([]OrderedFileInternal, error)
+	UpdatePropertyDetails(details PropertyDetails) error
+	UpdatePropertyImages(propertyID string, images []OrderedFileInternal) error
 	DeleteProperty(propertyId string) error
+	DeletePropertyImage(propertyId string, imageOrderNum int16) error
 	GetNextPageProperties(limit, offset int32) ([]string, error)
 	GetTotalCountProperties() (int64, error)
 }
-
-
 
 type service struct {
 	db             *sql.DB
@@ -315,7 +330,7 @@ func (s *service) CreateUser(userId, email string) error {
 	// Create a User in the db
 	err = s.db_queries.CreateBareUser(ctx, sqlc.CreateBareUserParams{
 		UserID: userId_encrypted,
-		Email: email_encrypted,
+		Email:  email_encrypted,
 	})
 	if err != nil {
 		return err
@@ -423,8 +438,8 @@ func (s *service) GetUserAvatar(userId string) (FileInternal, error) {
 	return FileInternal{
 		Filename: avatarFileNameDecrypted,
 		Mimetype: avatarEncrypted.MimeType.String,
-		Size: avatarEncrypted.Size.Int64,
-		Data: avatarDataDecrypted,
+		Size:     avatarEncrypted.Size.Int64,
+		Data:     avatarDataDecrypted,
 	}, nil
 }
 
@@ -506,11 +521,11 @@ func (s *service) UpdateUser(updatedUserData UserDetails, avatarImage FileIntern
 		UserID: userId_encrypted,
 		FileName: sql.NullString{
 			String: avatarFilenameEncrypted,
-			Valid: true,
+			Valid:  true,
 		},
 		MimeType: sql.NullString{
 			String: avatarImage.Mimetype,
-			Valid: true,
+			Valid:  true,
 		},
 		Size: sql.NullInt64{
 			Int64: avatarImage.Size,
@@ -641,64 +656,64 @@ func (s *service) DeleteUserRole(userId string) error {
 // all other fields can be in plaintext
 
 // Create a row in both the properties and properties_images tables
-func (s *service) CreateProperty(property Property) error {
+func (s *service) CreateProperty(propertyDetails PropertyDetails, images []OrderedFileInternal) error {
 	ctx := context.Background()
 
-	// Encrypt the lister user id
-	listerUserIdEncrypted, err := s.encryptString(property.ListerUserID)
+	// Insert property data into db
+	err := s.db_queries.CreatePropertyDetails(ctx, sqlc.CreatePropertyDetailsParams{
+		PropertyID:      propertyDetails.PropertyID,
+		ListerUserID:    propertyDetails.ListerUserID,
+		Name:            propertyDetails.Name,
+		Description:     utils.CreateSQLNullString(propertyDetails.Description),
+		Address1:        propertyDetails.Address_1,
+		Address2:        utils.CreateSQLNullString(propertyDetails.Address_2),
+		City:            propertyDetails.City,
+		State:           propertyDetails.State,
+		Zipcode:         propertyDetails.Zipcode,
+		Country:         propertyDetails.Country,
+		SquareFeet:      propertyDetails.Square_feet,
+		NumBedrooms:     propertyDetails.Num_bedrooms,
+		NumToilets:      propertyDetails.Num_toilets,
+		NumShowersBaths: propertyDetails.Num_showers_baths,
+		CostDollars:     propertyDetails.Cost_dollars,
+		CostCents:       propertyDetails.Cost_cents,
+		MiscNote:        utils.CreateSQLNullString(propertyDetails.Misc_note),
+	})
 	if err != nil {
 		return err
 	}
 
-	// Insert property data into db
-	err = s.db_queries.CreateProperty(ctx, sqlc.CreatePropertyParams{
-		PropertyID:      property.PropertyID,
-		ListerUserID:    listerUserIdEncrypted,
-		Name:            property.Name,
-		Description:     utils.CreateSQLNullString(property.Description),
-		Address1:        property.Address_1,
-		Address2:        utils.CreateSQLNullString(property.Address_2),
-		City:            property.City,
-		State:           property.State,
-		Zipcode:         property.Zipcode,
-		Country:         property.Country,
-		SquareFeet:      property.Square_feet,
-		NumBedrooms:     property.Num_bedrooms,
-		NumToilets:      property.Num_toilets,
-		NumShowersBaths: property.Num_showers_baths,
-		CostDollars:     property.Cost_dollars,
-		CostCents:       property.Cost_cents,
-		MiscNote:        utils.CreateSQLNullString(property.Misc_note),
-		Images:          utils.CreateSQLNullString(property.Images),
-	})
-	return err
+	// Create the property images
+	for _, image := range images {
+		err = s.db_queries.CreatePropertyImage(ctx, sqlc.CreatePropertyImageParams{
+			PropertyID: propertyDetails.PropertyID,
+			OrderNum:   image.OrderNum,
+			FileName:   image.File.Filename,
+			MimeType:   image.File.Mimetype,
+			Size:       image.File.Size,
+			Data:       image.File.Data,
+		})
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 // Find and return the property details given the property's id
-func (s *service) GetProperty(propertyId string) (Property, error) {
+func (s *service) GetPropertyDetails(propertyId string) (PropertyDetails, error) {
 	ctx := context.Background()
 
 	// Get the property details
 	property, err := s.db_queries.GetProperty(ctx, propertyId)
 	if err != nil {
-		return Property{}, err
+		return PropertyDetails{}, err
 	}
 
-	// Decrypt the lister user id
-	listerUserIDDecrypted, err := s.decryptString(property.ListerUserID)
-	if err != nil {
-		return Property{}, err
-	}
-
-	// Get the property images
-	propertyImages, err := s.db_queries.GetPropertyImages(ctx, propertyId)
-	if err != nil {
-		return Property{}, err
-	}
-
-	fullProperty := Property{
+	propertyDetails := PropertyDetails{
 		PropertyID:        propertyId,
-		ListerUserID:      listerUserIDDecrypted,
+		ListerUserID:      property.ListerUserID,
 		Name:              property.Name,
 		Description:       property.Description.String,
 		Address_1:         property.Address1,
@@ -714,10 +729,33 @@ func (s *service) GetProperty(propertyId string) (Property, error) {
 		Cost_dollars:      property.CostDollars,
 		Cost_cents:        property.CostCents,
 		Misc_note:         property.MiscNote.String,
-		Images:            propertyImages.Images.String,
 	}
 
-	return fullProperty, nil
+	return propertyDetails, nil
+}
+
+func (s *service) GetPropertyImages(propertyId string) ([]OrderedFileInternal, error) {
+	ctx := context.Background()
+
+	var propertyImages []OrderedFileInternal
+	propertyImagesDB, err := s.db_queries.GetPropertyImages(ctx, propertyId)
+	if err != nil {
+		return []OrderedFileInternal{}, err
+	}
+
+	for _, image := range propertyImagesDB {
+		propertyImages = append(propertyImages, OrderedFileInternal{
+			OrderNum: image.OrderNum,
+			File: FileInternal{
+				Filename: image.FileName,
+				Mimetype: image.MimeType,
+				Size:     image.Size,
+				Data:     image.Data,
+			},
+		})
+	}
+
+	return propertyImages, nil
 }
 
 // Allow a public function to search for the available properties on app
@@ -736,49 +774,57 @@ func (s *service) GetNextPageProperties(limit, offset int32) ([]string, error) {
 	return propertyIDs, nil
 }
 
-// Update property
-func (s *service) UpdateProperty(property Property) error {
+// Update property details
+func (s *service) UpdatePropertyDetails(details PropertyDetails) error {
 	ctx := context.Background()
 
-	// Encrypt the lister user id
-	listerUserIDEncrypted, err := s.encryptString(property.ListerUserID)
-	if err != nil {
-		return err
-	}
-
-	// Construct the new property struct to insert into db
-	err = s.db_queries.UpdateProperty(ctx, sqlc.UpdatePropertyParams{
-		PropertyID:      property.PropertyID,
-		ListerUserID:    listerUserIDEncrypted,
-		Name:            property.Name,
-		Description:     utils.CreateSQLNullString(property.Description),
-		Address1:        property.Address_1,
-		Address2:        utils.CreateSQLNullString(property.Address_2),
-		City:            property.City,
-		State:           property.State,
-		Zipcode:         property.Zipcode,
-		Country:         property.Country,
-		SquareFeet:      property.Square_feet,
-		NumBedrooms:     property.Num_bedrooms,
-		NumToilets:      property.Num_toilets,
-		NumShowersBaths: property.Num_showers_baths,
-		CostDollars:     property.Cost_dollars,
-		CostCents:       property.Cost_cents,
-		MiscNote:        utils.CreateSQLNullString(property.Misc_note),
+	// Construct the new details struct to insert into db
+	err := s.db_queries.UpdatePropertyDetails(ctx, sqlc.UpdatePropertyDetailsParams{
+		PropertyID:      details.PropertyID,
+		ListerUserID:    details.ListerUserID,
+		Name:            details.Name,
+		Description:     utils.CreateSQLNullString(details.Description),
+		Address1:        details.Address_1,
+		Address2:        utils.CreateSQLNullString(details.Address_2),
+		City:            details.City,
+		State:           details.State,
+		Zipcode:         details.Zipcode,
+		Country:         details.Country,
+		SquareFeet:      details.Square_feet,
+		NumBedrooms:     details.Num_bedrooms,
+		NumToilets:      details.Num_toilets,
+		NumShowersBaths: details.Num_showers_baths,
+		CostDollars:     details.Cost_dollars,
+		CostCents:       details.Cost_cents,
+		MiscNote:        utils.CreateSQLNullString(details.Misc_note),
 	})
 	if err != nil {
 		return err
 	}
-
-	// Construct the new property images struct to insert into db
-	err = s.db_queries.UpdatePropertyImages(ctx, sqlc.UpdatePropertyImagesParams{
-		PropertyID: property.PropertyID,
-		Images:     utils.CreateSQLNullString(property.Images),
-	})
-	return err
+	return nil
 }
 
-// Delete property
+func (s *service) UpdatePropertyImages(propertyID string, images []OrderedFileInternal) error {
+	ctx := context.Background()
+
+	for _, image := range images {
+		err := s.db_queries.UpdatePropertyImages(ctx, sqlc.UpdatePropertyImagesParams{
+			PropertyID: propertyID,
+			OrderNum:   image.OrderNum,
+			FileName:   image.File.Filename,
+			MimeType:   image.File.Mimetype,
+			Size:       image.File.Size,
+			Data:       image.File.Data,
+		})
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// Delete both property details and all images for a given property id
 func (s *service) DeleteProperty(propertyId string) error {
 	ctx := context.Background()
 
@@ -797,6 +843,19 @@ func (s *service) GetTotalCountProperties() (int64, error) {
 	return num, nil
 }
 
+// Delete a single property's image identified by its order number
+func (s *service) DeletePropertyImage(propertyId string, imageOrderNum int16) error {
+	ctx := context.Background()
+
+	err := s.db_queries.DeletePropertyImage(ctx, sqlc.DeletePropertyImageParams{
+		PropertyID: propertyId,
+		OrderNum:   imageOrderNum,
+	})
+
+	return err
+}
+
+// ------------------- ADMIN -------------------
 // Admin - get multiple user ids
 func (s *service) AdminGetUsersRoles(userIds []string) ([]string, error) {
 	ctx := context.Background()

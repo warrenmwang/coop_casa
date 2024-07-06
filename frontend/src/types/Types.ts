@@ -50,3 +50,45 @@ export type AccountSetupPageFormData = {
   location: string;
   interests: string[];
 };
+
+// --------
+
+export type PropertyDetails = {
+  propertyId: string;
+  listerUserId: string;
+  name: string;
+  description: string;
+  address1: string;
+  address2: string;
+  city: string;
+  state: string;
+  zipcode: string;
+  country: string;
+  squareFeet: number;
+  numBedrooms: number;
+  numToilets: number;
+  numShowersBaths: number;
+  costDollars: number;
+  costCents: number;
+  miscNote: string;
+};
+
+export type APIOrderedFile = {
+  orderNum: number;
+  file: APIFileReceived;
+};
+
+export type APIPropertyReceived = {
+  details: PropertyDetails;
+  images: APIOrderedFile[];
+};
+
+export type OrderedFile = {
+  orderNum: number;
+  file: File;
+};
+
+export type Property = {
+  details: PropertyDetails;
+  images: OrderedFile[];
+};

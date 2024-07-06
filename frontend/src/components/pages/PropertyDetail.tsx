@@ -4,7 +4,7 @@ import { Box } from "@mui/material";
 import CustomImageGallery from "../structure/CustomImageGallery";
 import { apiGetListerInfo, apiGetProperty } from "../../api/api";
 import { propertiesPageLink } from "../../urls";
-import { Property } from "../structure/CreatePropertyForm";
+import { Property } from "../../types/Types";
 import TopNavbar from "../structure/TopNavbar";
 import Footer from "../structure/Footer";
 import { useQuery } from "@tanstack/react-query";
@@ -53,7 +53,9 @@ const PropertyDetailContent: React.FC<PropertyDetailContentProps> = ({
   property,
 }) => {
   const navigate = useNavigate();
-  const images = property.images.split("#");
+  const images = property.images.map((image) =>
+    URL.createObjectURL(image.file),
+  );
   const imageData = images.map((image) => ({
     img: image,
     title: "default title",
@@ -83,26 +85,26 @@ const PropertyDetailContent: React.FC<PropertyDetailContentProps> = ({
   const basicInfoConstructor = (property: Property) => {
     return (
       <div className="flex">
-        <div className="font-bold mx-1">{property.numBedrooms}</div>
+        <div className="font-bold mx-1">{property.details.numBedrooms}</div>
         <div> beds | </div>
-        <div className="font-bold mx-1">{property.numShowersBaths}</div>
+        <div className="font-bold mx-1">{property.details.numShowersBaths}</div>
         <div> ba | </div>
-        <div className="font-bold mx-1">{property.numToilets}</div>
+        <div className="font-bold mx-1">{property.details.numToilets}</div>
         <div> toil | </div>
-        <div className="font-bold mx-1">{property.squareFeet}</div>
+        <div className="font-bold mx-1">{property.details.squareFeet}</div>
         <div> sqft </div>
       </div>
     );
   };
 
   const costString = costNumsToPresentableString(
-    property.costDollars,
-    property.costCents,
+    property.details.costDollars,
+    property.details.costCents,
   );
   const addressString =
-    property.address2 === ""
-      ? `${property.address1}, ${property.city}, ${property.state} ${property.zipcode}, ${property.country}`
-      : `${property.address1}, ${property.address2}, ${property.city}, ${property.state} ${property.zipcode}, ${property.country}`;
+    property.details.address2 === ""
+      ? `${property.details.address1}, ${property.details.city}, ${property.details.state} ${property.details.zipcode}, ${property.details.country}`
+      : `${property.details.address1}, ${property.details.address2}, ${property.details.city}, ${property.details.state} ${property.details.zipcode}, ${property.details.country}`;
 
   const basicInfoElement = basicInfoConstructor(property);
 
@@ -130,16 +132,18 @@ const PropertyDetailContent: React.FC<PropertyDetailContentProps> = ({
         <div className="text-xl font-bold pt-2">Property Description</div>
         <div className="flex gap-2">
           <div className="text-lg">Property Name: </div>
-          <div className="text-lg">{property.name}</div>
+          <div className="text-lg">{property.details.name}</div>
         </div>
         <div className="flex gap-2">
           <div className="text-lg">Description: </div>
-          <div className="text-lg">{property.description}</div>
+          <div className="text-lg">{property.details.description}</div>
         </div>
-        <ListerInfo listerID={property.listerUserId} />
+        <ListerInfo listerID={property.details.listerUserId} />
         <div className="text-lg">Miscellaneous Lister Comments: </div>
-        <div className="text-lg">{property.miscNote}</div>
-        <div className="text-sm pt-5">Property ID: {property.propertyId}</div>
+        <div className="text-lg">{property.details.miscNote}</div>
+        <div className="text-sm pt-5">
+          Property ID: {property.details.propertyId}
+        </div>
       </div>
     </Box>
   );

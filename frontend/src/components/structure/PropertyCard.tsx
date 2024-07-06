@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Property } from "./CreatePropertyForm";
+import { Property } from "../../types/Types";
 import { Card, CardActionArea, CardContent, CardMedia } from "@mui/material";
 import { propertiesPageLink } from "../../urls";
 
@@ -13,10 +13,15 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
   const navigate = useNavigate();
 
   const handleCardClick = () => {
-    navigate(`${propertiesPageLink}/${property.propertyId}`);
+    navigate(`${propertiesPageLink}/${property.details.propertyId}`);
   };
 
-  const images = property.images.split("#");
+  // FIXME: image has a property called `orderNum` which denotes the order
+  // that the images should be displayed in. Use that to construct the
+  // correct order here.
+  let images: string[] = property.images.map((image) =>
+    URL.createObjectURL(image.file),
+  );
 
   const costNumsToPresentableString = (
     costDollars: number,
@@ -40,26 +45,26 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
   const basicInfoConstructor = (property: Property) => {
     return (
       <div className="flex">
-        <div className="font-bold mx-1">{property.numBedrooms}</div>
+        <div className="font-bold mx-1">{property.details.numBedrooms}</div>
         <div> beds | </div>
-        <div className="font-bold mx-1">{property.numShowersBaths}</div>
+        <div className="font-bold mx-1">{property.details.numShowersBaths}</div>
         <div> ba | </div>
-        <div className="font-bold mx-1">{property.numToilets}</div>
+        <div className="font-bold mx-1">{property.details.numToilets}</div>
         <div> toil | </div>
-        <div className="font-bold mx-1">{property.squareFeet}</div>
+        <div className="font-bold mx-1">{property.details.squareFeet}</div>
         <div> sqft </div>
       </div>
     );
   };
 
   const costString = costNumsToPresentableString(
-    property.costDollars,
-    property.costCents,
+    property.details.costDollars,
+    property.details.costCents,
   );
   const addressString =
-    property.address2 === ""
-      ? `${property.address1}, ${property.city}, ${property.state} ${property.zipcode}, ${property.country}`
-      : `${property.address1}, ${property.address2}, ${property.city}, ${property.state} ${property.zipcode}, ${property.country}`;
+    property.details.address2 === ""
+      ? `${property.details.address1}, ${property.details.city}, ${property.details.state} ${property.details.zipcode}, ${property.details.country}`
+      : `${property.details.address1}, ${property.details.address2}, ${property.details.city}, ${property.details.state} ${property.details.zipcode}, ${property.details.country}`;
 
   const basicInfoElement = basicInfoConstructor(property);
 

@@ -1,18 +1,16 @@
--- name: CreateProperty :exec
-WITH new_property AS (
-    INSERT INTO properties 
-    (
-    property_id, lister_user_id, "name", "description", 
-    address_1, address_2, city, "state", zipcode, country,
-    square_feet, num_bedrooms, num_toilets, num_showers_baths, cost_dollars, cost_cents, misc_note
-    )
-    VALUES 
-    ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
-    RETURNING property_id
+-- name: CreatePropertyDetails :exec
+INSERT INTO properties 
+(
+property_id, lister_user_id, "name", "description", 
+address_1, address_2, city, "state", zipcode, country,
+square_feet, num_bedrooms, num_toilets, num_showers_baths, cost_dollars, cost_cents, misc_note
 )
-INSERT INTO properties_images (property_id, images)
-SELECT property_id, $18
-FROM new_property;
+VALUES 
+($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17);
+
+-- name: CreatePropertyImage :exec
+INSERT INTO properties_images (property_id, order_num, file_name, mime_type, "size", "data")
+VALUES ($1, $2, $3, $4, $5, $6);
 
 -- name: GetProperty :one
 SELECT * FROM properties
@@ -26,11 +24,11 @@ LIMIT $1 OFFSET $2;
 -- name: GetTotalCountProperties :one
 SELECT count(*) FROM properties;
 
--- name: GetPropertyImages :one
+-- name: GetPropertyImages :many
 SELECT * FROM properties_images
 WHERE property_id = $1;
 
--- name: UpdateProperty :exec
+-- name: UpdatePropertyDetails :exec
 UPDATE properties
 SET 
     "name" = $2,
@@ -55,7 +53,11 @@ WHERE property_id = $1;
 -- name: UpdatePropertyImages :exec
 UPDATE properties_images
 SET
-    images = $2,
+    order_num = $2,
+    file_name = $3,
+    mime_type = $4,
+    "size" = $5,
+    "data" = $6,
     updated_at = CURRENT_TIMESTAMP
 WHERE property_id = $1;
 
@@ -69,3 +71,7 @@ DELETE FROM properties_images
 WHERE properties_images.property_id
 IN
 (SELECT deleted_property.property_id FROM deleted_property);
+
+-- name: DeletePropertyImage :exec
+DELETE FROM properties_images
+WHERE property_id = $1 AND order_num = $2;
