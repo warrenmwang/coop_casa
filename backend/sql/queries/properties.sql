@@ -50,28 +50,14 @@ SET
     updated_at = CURRENT_TIMESTAMP
 WHERE property_id = $1;
 
--- name: UpdatePropertyImages :exec
-UPDATE properties_images
-SET
-    order_num = $2,
-    file_name = $3,
-    mime_type = $4,
-    "size" = $5,
-    "data" = $6,
-    updated_at = CURRENT_TIMESTAMP
+-- name: DeletePropertyDetails :exec
+DELETE FROM properties
 WHERE property_id = $1;
-
--- name: DeleteProperty :exec
-WITH deleted_property AS (
-    DELETE FROM properties
-    WHERE properties.property_id = $1
-    RETURNING property_id
-)
-DELETE FROM properties_images
-WHERE properties_images.property_id
-IN
-(SELECT deleted_property.property_id FROM deleted_property);
 
 -- name: DeletePropertyImage :exec
 DELETE FROM properties_images
 WHERE property_id = $1 AND order_num = $2;
+
+-- name: DeletePropertyImages :exec
+DELETE FROM properties_images
+WHERE property_id = $1;

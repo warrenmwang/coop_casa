@@ -7,6 +7,7 @@ interface GenderInputArgs {
   setIsChanged?: (value: React.SetStateAction<boolean>) => void;
   setError?: (key: string, value: boolean) => void;
   required?: boolean;
+  classNameCustom?: string;
 }
 
 const GenderInput: React.FC<GenderInputArgs> = ({
@@ -15,6 +16,7 @@ const GenderInput: React.FC<GenderInputArgs> = ({
   setError,
   setIsChanged,
   required = false,
+  classNameCustom = "",
 }) => {
   // Handles changes for text fields
   const handleChange = (
@@ -41,7 +43,7 @@ const GenderInput: React.FC<GenderInputArgs> = ({
       </label>
       <select
         id="gender"
-        className="text_input_field_box_gray"
+        className={`text_input_field_box_gray ${classNameCustom}`}
         onChange={handleChange}
         defaultValue={formData.gender}
         required={required}

@@ -1,14 +1,37 @@
-import React, { useCallback, useState } from "react";
+import React, { useEffect, useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import {
   MAX_IMAGE_FILE_SIZE,
   MAX_PROPERTY_IMGS_ALLOWED,
 } from "../../constants";
+import { OrderedFile } from "../../types/Types";
 
-interface MultipleImageUploaderProps {
-  onImagesUploaded: (files: File[]) => void;
-  imageFiles?: File[];
-}
+const orderedFileArray2FileArray = (arr: OrderedFile[]): File[] => {
+  const newArr: File[] = Array(arr.length);
+  let file: OrderedFile;
+  for (let i = 0; i < arr.length; i++) {
+    file = arr[i];
+    newArr[file.orderNum] = file.file;
+  }
+  return newArr;
+};
+
+const fileArray2OrderedFileArray = (arr: File[]): OrderedFile[] => {
+  const newArr: OrderedFile[] = Array(arr.length);
+  for (let i = 0; i < arr.length; i++) {
+    newArr[i] = {
+      orderNum: i,
+      file: arr[i],
+    } as OrderedFile;
+  }
+  return newArr;
+};
+
+type MultipleImageUploaderProps = {
+  onImagesUploaded: (files: OrderedFile[]) => void;
+  images: OrderedFile[];
+  setIsChanged?: (value: React.SetStateAction<boolean>) => void;
+};
 
 // UI to let user either click to upload or drag and drop image files
 // into the component to upload images. Also has an image preview box.
@@ -18,17 +41,27 @@ interface MultipleImageUploaderProps {
 // then the right hand side preview box will be pushed to be below the upload box.
 const MultipleImageUploader: React.FC<MultipleImageUploaderProps> = ({
   onImagesUploaded,
-  imageFiles,
+  images,
+  setIsChanged,
 }) => {
   const [uploadedFiles, setUploadedFiles] = useState<File[]>(
-    imageFiles === undefined ? [] : imageFiles,
+    images === undefined ? [] : orderedFileArray2FileArray(images),
   );
+
+  useEffect(() => {
+    if (images) {
+      setUploadedFiles(orderedFileArray2FileArray(images));
+    }
+  }, [images]);
 
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
       const newFiles = [...uploadedFiles, ...acceptedFiles];
       setUploadedFiles(newFiles);
-      onImagesUploaded(newFiles);
+      onImagesUploaded(fileArray2OrderedFileArray(newFiles));
+      if (setIsChanged) {
+        setIsChanged(true);
+      }
     },
     [uploadedFiles, onImagesUploaded],
   );
@@ -36,12 +69,18 @@ const MultipleImageUploader: React.FC<MultipleImageUploaderProps> = ({
   const removeFile = (index: number) => {
     const newFiles = uploadedFiles.filter((_, i) => i !== index);
     setUploadedFiles(newFiles);
-    onImagesUploaded(newFiles);
+    onImagesUploaded(fileArray2OrderedFileArray(newFiles));
+    if (setIsChanged) {
+      setIsChanged(true);
+    }
   };
 
   const removeAllFiles = () => {
     setUploadedFiles([]);
     onImagesUploaded([]);
+    if (setIsChanged) {
+      setIsChanged(true);
+    }
   };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({

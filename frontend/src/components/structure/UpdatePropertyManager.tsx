@@ -1,24 +1,42 @@
 import React, { useState, useEffect } from "react";
 import SubmitButton from "./SubmitButton";
 import { validate as uuidValidate } from "uuid";
-import { apiGetProperty } from "../../api/api";
-import { Property } from "./CreatePropertyForm";
+import {
+  apiDeleteProperty,
+  apiGetProperty,
+  apiUpdateProperty,
+} from "../../api/api";
+import { OrderedFile, Property, PropertyDetails } from "../../types/Types";
 import TextInput from "./TextInput";
 import MultipleImageUploader from "./MultipleImageUploader";
 import { MAX_PROPERTY_IMGS_ALLOWED } from "../../constants";
+import { useMutation } from "@tanstack/react-query";
+import { validateNumber } from "../../utils/inputValidation";
 
 const UpdatePropertyForm: React.FC<{
   property: Property;
   setProperty: React.Dispatch<React.SetStateAction<Property | null>>;
 }> = ({ property, setProperty }) => {
   // ------------- For Updating the property details
-  const [formData, setFormData] = useState<Property>(property);
+  const [formDetails, setFormDetails] = useState<PropertyDetails>(
+    property.details,
+  );
+  const [formImages, setFormImages] = useState<OrderedFile[]>(property.images);
   const [isChanged, setIsChanged] = useState(false);
-  const [images, setImages] = useState<File[]>([]);
   const [errors, setMyMap] = useState<Map<string, boolean>>(
     new Map<string, boolean>(),
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const {
+    mutate: updateMutate,
+    isPending,
+    isSuccess,
+  } = useMutation({
+    mutationFn: (property: Property) => apiUpdateProperty(property),
+  });
+
+  const handleDelete = async () => {};
 
   const setErrors = (key: string, value: boolean) => {
     setMyMap((prevMap) => {
@@ -29,28 +47,69 @@ const UpdatePropertyForm: React.FC<{
   };
 
   const handleSaveChanges = async () => {
-    // manipulate the (images: File[]) into a (images: string)
+    // ensure no errors
+    for (let key of errors.keys()) {
+      if (errors.get(key)) {
+        alert(`Resolve error in field "${key}" first before submitting.`);
+        return;
+      }
+    }
 
-    setProperty(property);
+    // save property details and images and start submission request.
+    setProperty((prevState) => ({
+      ...prevState,
+      details: formDetails,
+      images: formImages,
+    }));
     setIsSubmitting(true);
   };
 
   const handleDiscardChanges = () => {
-    setFormData(property);
+    setFormDetails(property.details);
+    setFormImages(property.images);
     setIsChanged(false);
   };
 
   const textInputSetFormData = (id: string, value: string) => {
-    setFormData((prevState) => ({
+    // need to convert the text input type=number values
+    // from variable type string into number
+    var numberValue: number;
+    if (
+      id === "squareFeet" ||
+      id === "numBedrooms" ||
+      id === "numToilets" ||
+      id === "numShowersBaths" ||
+      id === "costDollars" ||
+      id === "costCents"
+    ) {
+      // Validate string is a number
+      if (!validateNumber(value)) {
+        alert(`Value in field ${id} is not a number.`);
+        return;
+      }
+      setErrors(id, false);
+
+      // convert to number and save value
+      numberValue = Number(value);
+      setFormDetails((prevState) => ({
+        ...prevState,
+        [id]: numberValue,
+      }));
+      return;
+    }
+
+    // text value
+    setErrors(id, false);
+    setFormDetails((prevState) => ({
       ...prevState,
       [id]: value,
     }));
   };
 
-  const handleImagesUpload = (files: File[]) => {
+  const handleImagesUpload = (files: OrderedFile[]) => {
     // update errors
     if (files.length > MAX_PROPERTY_IMGS_ALLOWED) {
-      setImages([]);
+      setFormImages([]);
       alert(
         `Uploaded more than the maximum allowable images (${MAX_PROPERTY_IMGS_ALLOWED}).`,
       );
@@ -62,21 +121,20 @@ const UpdatePropertyForm: React.FC<{
     }
 
     // save images state
-    setImages(files);
+    setFormImages(files);
   };
 
   useEffect(() => {
     if (isSubmitting) {
-      // submit the data to the backend
-      // TODO: update the property by hitting POST /api/properties endpoint
-      // with the property data in the body
-
+      updateMutate(property);
       setIsSubmitting(false);
     }
   }, [isSubmitting]);
 
   return (
     <>
+      {isPending && <p>Updating property...</p>}
+      {isSuccess && <p>Property updated.</p>}
       {/* update form */}
       <form className="default-form-1">
         <TextInput
@@ -85,7 +143,7 @@ const UpdatePropertyForm: React.FC<{
           type="text"
           label="Property Name"
           id="name"
-          value={formData.name}
+          value={formDetails.name}
           required={true}
         />
         <TextInput
@@ -94,7 +152,7 @@ const UpdatePropertyForm: React.FC<{
           type="text"
           label="Description"
           id="description"
-          value={formData.description}
+          value={formDetails.description}
         />
         <TextInput
           setFormData={textInputSetFormData}
@@ -102,7 +160,7 @@ const UpdatePropertyForm: React.FC<{
           type="text"
           label="Address 1"
           id="address1"
-          value={formData.address1}
+          value={formDetails.address1}
           required={true}
         />
         <TextInput
@@ -111,7 +169,7 @@ const UpdatePropertyForm: React.FC<{
           type="text"
           label="Address 2"
           id="address2"
-          value={formData.address2}
+          value={formDetails.address2}
         />
         <TextInput
           setFormData={textInputSetFormData}
@@ -119,7 +177,7 @@ const UpdatePropertyForm: React.FC<{
           type="text"
           label="City"
           id="city"
-          value={formData.city}
+          value={formDetails.city}
           required={true}
         />
         <TextInput
@@ -128,7 +186,7 @@ const UpdatePropertyForm: React.FC<{
           type="text"
           label="State"
           id="state"
-          value={formData.state}
+          value={formDetails.state}
           required={true}
         />
         <TextInput
@@ -137,7 +195,7 @@ const UpdatePropertyForm: React.FC<{
           type="text"
           label="Zipcode"
           id="zipcode"
-          value={formData.zipcode}
+          value={formDetails.zipcode}
           required={true}
         />
         <TextInput
@@ -146,7 +204,7 @@ const UpdatePropertyForm: React.FC<{
           type="text"
           label="Country"
           id="country"
-          value={formData.country}
+          value={formDetails.country}
           required={true}
         />
         <TextInput
@@ -155,7 +213,7 @@ const UpdatePropertyForm: React.FC<{
           type="number"
           label="Square Feet"
           id="squareFeet"
-          value={`${formData.squareFeet}`}
+          value={`${formDetails.squareFeet}`}
           required={true}
         />
         <TextInput
@@ -164,7 +222,7 @@ const UpdatePropertyForm: React.FC<{
           type="number"
           label="Number of Bedrooms"
           id="numBedrooms"
-          value={`${formData.numBedrooms}`}
+          value={`${formDetails.numBedrooms}`}
           required={true}
         />
         <TextInput
@@ -173,7 +231,7 @@ const UpdatePropertyForm: React.FC<{
           type="number"
           label="Number of Toilets"
           id="numToilets"
-          value={`${formData.numToilets}`}
+          value={`${formDetails.numToilets}`}
           required={true}
         />
         <TextInput
@@ -182,7 +240,7 @@ const UpdatePropertyForm: React.FC<{
           type="number"
           label="Number of Showers and/or Baths"
           id="numShowersBaths"
-          value={`${formData.numShowersBaths}`}
+          value={`${formDetails.numShowersBaths}`}
           required={true}
         />
         <TextInput
@@ -191,7 +249,7 @@ const UpdatePropertyForm: React.FC<{
           type="number"
           label="Cost, Dollar Amount"
           id="costDollars"
-          value={`${formData.costDollars}`}
+          value={`${formDetails.costDollars}`}
           required={true}
         />
         <TextInput
@@ -200,7 +258,7 @@ const UpdatePropertyForm: React.FC<{
           type="number"
           label="Cost, Cents Amount"
           id="costCents"
-          value={`${formData.costCents}`}
+          value={`${formDetails.costCents}`}
           required={true}
         />
         <TextInput
@@ -209,12 +267,17 @@ const UpdatePropertyForm: React.FC<{
           type="text"
           label="Misc. Notes"
           id="miscNote"
-          value={`${formData.miscNote}`}
+          value={`${formDetails.miscNote}`}
         />
       </form>
+      <label className="text_input_field_label_gray">
+        Upload some images of the property. At least 1 image is required.
+        <span className="text-red-500">*</span>
+      </label>
       <MultipleImageUploader
         onImagesUploaded={handleImagesUpload}
-        imageFiles={images}
+        images={formImages}
+        setIsChanged={setIsChanged}
       />
 
       {/* Save / discard buttons */}
@@ -244,6 +307,7 @@ const UpdatePropertyManager: React.FC = () => {
     useState(false);
   const [propertyID, setPropertyID] = useState<string>("");
   const [property, setProperty] = useState<Property | null>(null);
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
   const getPropertyDetails = (e: React.FormEvent) => {
     e.preventDefault();
@@ -255,46 +319,109 @@ const UpdatePropertyManager: React.FC = () => {
 
     setGetPropertyDetailsIsSubmitting(true);
   };
+
+  const {
+    mutate: deleteMutate,
+    isPending: isPendingDeletion,
+    isSuccess: isDeletionSuccess,
+  } = useMutation({
+    mutationFn: (propertyID: string) => apiDeleteProperty(propertyID),
+  });
+
+  const handleDelete = (e: React.FormEvent) => {
+    e.preventDefault();
+    // ensure is a valid uuid
+    if (!uuidValidate(propertyID)) {
+      alert("Not a valid property ID.");
+      return;
+    }
+    setIsDeleting(true);
+  };
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     setPropertyID(e.target.value);
   };
 
+  const clearForm = (e: React.FormEvent) => {
+    e.preventDefault();
+    setPropertyID("");
+    setProperty(null);
+  };
+
   useEffect(() => {
     const foo = async () => {
-      if (getPropertyDetailsIsSubmitting) {
-        // get the property data using the propertID
-        try {
-          const property = await apiGetProperty(propertyID);
-          setProperty(property);
-        } catch (err) {
-          alert(`Error in getting requested property: ${err}`);
-        }
-        setGetPropertyDetailsIsSubmitting(false);
+      // get the property data using the propertID
+      try {
+        const property = await apiGetProperty(propertyID);
+        setProperty(property);
+      } catch (err) {
+        alert(`Error in getting requested property: ${err}`);
       }
+      setGetPropertyDetailsIsSubmitting(false);
     };
-    foo();
+    if (getPropertyDetailsIsSubmitting) {
+      foo();
+    }
   }, [getPropertyDetailsIsSubmitting]);
+
+  useEffect(() => {
+    if (isDeleting) {
+      deleteMutate(propertyID);
+      setPropertyID("");
+      setProperty(null);
+      setIsDeleting(false);
+    }
+  }, [isDeleting]);
 
   return (
     <div className="mx-auto">
       <h1 className="h1_custom">Update Property</h1>
       {/* query property data form */}
-      <form onSubmit={getPropertyDetails}>
-        <label>Get property details via ID.</label>
-        <div className="flex col-span-2">
+      <form className="" onSubmit={getPropertyDetails}>
+        <div className="flex flex-col">
+          <label className="text_input_field_label_gray">
+            Get property details via ID.
+          </label>
           <input
             type="text"
             id="getPropertyDetails"
             placeholder="Property ID"
             value={propertyID}
             onChange={handleChange}
-            className="text_input_field_box_gray"
+            className="text_input_field_box_gray w-3/5"
           />
+        </div>
+        <div className="flex gap-2">
           <SubmitButton isSubmitting={getPropertyDetailsIsSubmitting} />
+          <button
+            id="clear"
+            className="bg-gray-500 hover:bg-gray-600 text-white rounded p-3"
+            onClick={clearForm}
+          >
+            Clear
+          </button>
+          <button
+            id="delete"
+            className="bg-red-500 hover:bg-red-600 rounded p-3"
+            onClick={handleDelete}
+          >
+            Delete
+          </button>
         </div>
       </form>
+      {isDeleting ? (
+        isPendingDeletion ? (
+          <p>Deleting property...</p>
+        ) : isDeletionSuccess ? (
+          <p>Deleted.</p>
+        ) : (
+          <p>Couldn't delete property. Try again.</p>
+        )
+      ) : (
+        <></>
+      )}
       {property !== null && (
         <UpdatePropertyForm property={property} setProperty={setProperty} />
       )}

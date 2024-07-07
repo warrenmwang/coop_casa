@@ -90,20 +90,13 @@ func (q *Queries) CreatePropertyImage(ctx context.Context, arg CreatePropertyIma
 	return err
 }
 
-const deleteProperty = `-- name: DeleteProperty :exec
-WITH deleted_property AS (
-    DELETE FROM properties
-    WHERE properties.property_id = $1
-    RETURNING property_id
-)
-DELETE FROM properties_images
-WHERE properties_images.property_id
-IN
-(SELECT deleted_property.property_id FROM deleted_property)
+const deletePropertyDetails = `-- name: DeletePropertyDetails :exec
+DELETE FROM properties
+WHERE property_id = $1
 `
 
-func (q *Queries) DeleteProperty(ctx context.Context, propertyID string) error {
-	_, err := q.db.ExecContext(ctx, deleteProperty, propertyID)
+func (q *Queries) DeletePropertyDetails(ctx context.Context, propertyID string) error {
+	_, err := q.db.ExecContext(ctx, deletePropertyDetails, propertyID)
 	return err
 }
 
@@ -119,6 +112,16 @@ type DeletePropertyImageParams struct {
 
 func (q *Queries) DeletePropertyImage(ctx context.Context, arg DeletePropertyImageParams) error {
 	_, err := q.db.ExecContext(ctx, deletePropertyImage, arg.PropertyID, arg.OrderNum)
+	return err
+}
+
+const deletePropertyImages = `-- name: DeletePropertyImages :exec
+DELETE FROM properties_images
+WHERE property_id = $1
+`
+
+func (q *Queries) DeletePropertyImages(ctx context.Context, propertyID string) error {
+	_, err := q.db.ExecContext(ctx, deletePropertyImages, propertyID)
 	return err
 }
 
@@ -299,39 +302,6 @@ func (q *Queries) UpdatePropertyDetails(ctx context.Context, arg UpdatePropertyD
 		arg.CostCents,
 		arg.MiscNote,
 		arg.ListerUserID,
-	)
-	return err
-}
-
-const updatePropertyImages = `-- name: UpdatePropertyImages :exec
-UPDATE properties_images
-SET
-    order_num = $2,
-    file_name = $3,
-    mime_type = $4,
-    "size" = $5,
-    "data" = $6,
-    updated_at = CURRENT_TIMESTAMP
-WHERE property_id = $1
-`
-
-type UpdatePropertyImagesParams struct {
-	PropertyID string
-	OrderNum   int16
-	FileName   string
-	MimeType   string
-	Size       int64
-	Data       []byte
-}
-
-func (q *Queries) UpdatePropertyImages(ctx context.Context, arg UpdatePropertyImagesParams) error {
-	_, err := q.db.ExecContext(ctx, updatePropertyImages,
-		arg.PropertyID,
-		arg.OrderNum,
-		arg.FileName,
-		arg.MimeType,
-		arg.Size,
-		arg.Data,
 	)
 	return err
 }

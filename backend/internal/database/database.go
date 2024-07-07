@@ -807,8 +807,15 @@ func (s *service) UpdatePropertyDetails(details PropertyDetails) error {
 func (s *service) UpdatePropertyImages(propertyID string, images []OrderedFileInternal) error {
 	ctx := context.Background()
 
+	// Delete all old property images
+	err := s.db_queries.DeletePropertyImages(ctx, propertyID)
+	if err != nil {
+		return err
+	}
+
+	// Upload new ones
 	for _, image := range images {
-		err := s.db_queries.UpdatePropertyImages(ctx, sqlc.UpdatePropertyImagesParams{
+		err = s.db_queries.CreatePropertyImage(ctx, sqlc.CreatePropertyImageParams{
 			PropertyID: propertyID,
 			OrderNum:   image.OrderNum,
 			FileName:   image.File.Filename,
@@ -829,7 +836,12 @@ func (s *service) DeleteProperty(propertyId string) error {
 	ctx := context.Background()
 
 	// Delete the property and the images (a single transaction)
-	err := s.db_queries.DeleteProperty(ctx, propertyId)
+	err := s.db_queries.DeletePropertyDetails(ctx, propertyId)
+	if err != nil {
+		return err
+	}
+	err = s.db_queries.DeletePropertyImages(ctx, propertyId)
+
 	return err
 }
 

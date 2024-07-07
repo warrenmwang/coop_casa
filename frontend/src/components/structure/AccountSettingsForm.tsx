@@ -67,6 +67,7 @@ const AccountSettingsForm: React.FC<{
         label="Email"
         id="email"
         value={formData.email}
+        classNameCustom="w-full"
       />
 
       {/* First Name */}
@@ -77,6 +78,7 @@ const AccountSettingsForm: React.FC<{
         label="First Name"
         id="firstName"
         value={formData.firstName}
+        classNameCustom="w-full"
       />
 
       {/* Last Name */}
@@ -87,6 +89,7 @@ const AccountSettingsForm: React.FC<{
         label="Last Name"
         id="lastName"
         value={formData.lastName}
+        classNameCustom="w-full"
       />
 
       {/* Birthdate  */}
@@ -97,6 +100,7 @@ const AccountSettingsForm: React.FC<{
         label="Birthdate"
         id="birthDate"
         value={formData.birthDate}
+        classNameCustom="w-full"
       />
 
       {/* Gender */}
@@ -104,6 +108,7 @@ const AccountSettingsForm: React.FC<{
         formData={formData}
         setFormData={setFormData}
         setIsChanged={setIsChanged}
+        classNameCustom="w-full"
       />
 
       {/* Location */}

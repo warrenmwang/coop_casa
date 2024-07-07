@@ -5,7 +5,6 @@
 import { useEffect, useState } from "react";
 import {
   User,
-  UserDetails,
   ListerBasicInfo,
   APIUserReceived,
   Property,
@@ -22,8 +21,7 @@ import {
   api_user_role_Link,
 } from "../urls";
 import { AuthData } from "../auth/AuthWrapper";
-import { apiFile2ClientFile, createFileFromBlob } from "../utils/utils";
-import { parse } from "parse-multipart-data";
+import { apiFile2ClientFile } from "../utils/utils";
 
 export const checkFetch = (response: Response) => {
   // source: https://www.youtube.com/watch?v=b8DaQrxshu0
@@ -257,6 +255,26 @@ export const apiCreateNewProperty = async (
   return returnVal;
 };
 
+export const apiUpdateProperty = async (
+  property: Property,
+): Promise<Response | null> => {
+  const formData = new FormData();
+  formData.append("details", JSON.stringify(property.details));
+  formData.append("numImages", `${property.images.length}`);
+  if (property.images.length > 0) {
+    for (let i = 0; i < property.images.length; i++) {
+      let image = property.images[i];
+      formData.append(`image${image.orderNum}`, image.file);
+    }
+  }
+
+  return fetch(api_properties_Link, {
+    method: "POST",
+    body: formData,
+    credentials: "include",
+  });
+};
+
 // Get a single property based off of id
 export const apiGetProperty = async (propertyID: string): Promise<Property> => {
   return fetch(`${api_properties_Link}?propertyID=${propertyID}`, {
@@ -275,8 +293,8 @@ export const apiGetProperty = async (propertyID: string): Promise<Property> => {
           return {
             orderNum: image.orderNum,
             file: apiFile2ClientFile(image.file),
-          } as OrderedFile;
-        }),
+          };
+        }) as OrderedFile[],
       } as Property;
     })
     .catch((error) => {
@@ -305,6 +323,15 @@ export const apiGetProperties = async (page: number): Promise<string[]> => {
     .catch((error) => {
       throw error;
     });
+};
+
+export const apiDeleteProperty = async (
+  propertyID: string,
+): Promise<Response | null> => {
+  return fetch(`${api_properties_Link}?propertyID=${propertyID}`, {
+    method: "DELETE",
+    credentials: "include",
+  });
 };
 
 // Get total count of properties in db

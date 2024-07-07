@@ -56,7 +56,7 @@ const CreatePropertyForm: React.FC = () => {
   const [errors, setMyMap] = useState<Map<string, boolean>>(
     new Map<string, boolean>(),
   ); // if any key value in errors is true, then there is a problem.
-  const [images, setImages] = useState<File[]>([]);
+  const [images, setImages] = useState<OrderedFile[]>([]);
 
   // for user inputs
   const propertyRequiredFields: string[] = [
@@ -282,7 +282,7 @@ const CreatePropertyForm: React.FC = () => {
     setErrors(id, false);
   };
 
-  const handleImagesUploaded = (files: File[]) => {
+  const handleImagesUploaded = (files: OrderedFile[]) => {
     // update errors
     if (files.length > MAX_PROPERTY_IMGS_ALLOWED) {
       setErrors("images", true);
@@ -326,12 +326,7 @@ const CreatePropertyForm: React.FC = () => {
         // Format property with the details and images
         const property: Property = {
           details: propertyDetails,
-          images: images.map((image, index) => {
-            return {
-              orderNum: index,
-              file: image,
-            } as OrderedFile;
-          }),
+          images: images,
         };
 
         // Send data to backend
@@ -359,15 +354,11 @@ const CreatePropertyForm: React.FC = () => {
   }, [isSubmitting, propertyDetails]);
 
   return (
-    <>
-      <div className="flex justify-center items-center space-x-4 mt-4">
-        <h1 className="h1_custom">Add Property Listing</h1>
-      </div>
-      <div className="flex justify-center items-center space-x-4 mt-4">
-        <h4 className="h4_custom">
-          This form allows you to upload a new property listing to the platform.
-        </h4>
-      </div>
+    <div className="flex flex-col justify-center items-center space-x-4 mt-4">
+      <h1 className="h1_custom">Add Property Listing</h1>
+      <h4 className="h4_custom">
+        This form allows you to upload a new property listing to the platform.
+      </h4>
       {/* create a new property */}
       <form className="default-form-1" onSubmit={handleSubmit}>
         {propertyTextFieldsConstructs.map((value, index) => (
@@ -383,6 +374,7 @@ const CreatePropertyForm: React.FC = () => {
             required={value.required}
             min={value.min}
             max={value.max}
+            classNameCustom="w-full"
           />
         ))}
 
@@ -391,11 +383,14 @@ const CreatePropertyForm: React.FC = () => {
           Upload some images of the property. At least 1 image is required.
           <span className="text-red-500">*</span>
         </label>
-        <MultipleImageUploader onImagesUploaded={handleImagesUploaded} />
+        <MultipleImageUploader
+          images={images}
+          onImagesUploaded={handleImagesUploaded}
+        />
 
         <SubmitButton isSubmitting={isSubmitting} />
       </form>
-    </>
+    </div>
   );
 };
 

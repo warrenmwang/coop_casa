@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { api_admin_users_roles_Link } from "../../urls";
 import { checkFetch } from "../../api/api";
 import { AuthData } from "../../auth/AuthWrapper";
+import SubmitButton from "./SubmitButton";
 
 const AdminManageUserRoles: React.FC = () => {
   const auth = AuthData();
@@ -15,7 +16,6 @@ const AdminManageUserRoles: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
 
     // prevent admin from recking their own account
     if (userID === user.userId) {
@@ -36,18 +36,7 @@ const AdminManageUserRoles: React.FC = () => {
       return;
     }
 
-    fetch(`${api_admin_users_roles_Link}?userID=${userID}&role=${role}`, {
-      method: "POST",
-      credentials: "include",
-    })
-      .then(checkFetch)
-      .then(() => {
-        setIsSubmitting(false);
-      })
-      .catch((err) => {
-        console.error(err);
-        setIsSubmitting(false);
-      });
+    setIsSubmitting(true);
   };
 
   const handleChange = (
@@ -60,6 +49,24 @@ const AdminManageUserRoles: React.FC = () => {
       setRole(value);
     }
   };
+
+  useEffect(() => {
+    if (isSubmitting) {
+      fetch(`${api_admin_users_roles_Link}?userID=${userID}&role=${role}`, {
+        method: "POST",
+        credentials: "include",
+      })
+        .then(checkFetch)
+        .then(() => {
+          setIsSubmitting(false);
+          setUserID("");
+        })
+        .catch((err) => {
+          console.error(err);
+          setIsSubmitting(false);
+        });
+    }
+  }, [isSubmitting]);
 
   return (
     <>
@@ -78,7 +85,7 @@ const AdminManageUserRoles: React.FC = () => {
           placeholder="User ID"
           value={userID}
           onChange={handleChange}
-          className="text_input_field_box_gray"
+          className="text_input_field_box_gray w-full"
         />
 
         {/* drop down of role types */}
@@ -87,7 +94,7 @@ const AdminManageUserRoles: React.FC = () => {
         </label>
         <select
           id="role"
-          className="text_input_field_box_gray"
+          className="text_input_field_box_gray w-full"
           onChange={handleChange}
           defaultValue=""
         >
@@ -104,14 +111,7 @@ const AdminManageUserRoles: React.FC = () => {
         </select>
 
         {/* submit for updating user role */}
-        <button
-          type="submit"
-          onClick={handleSubmit}
-          disabled={isSubmitting}
-          className="w-32 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-        >
-          {isSubmitting ? "Submitting..." : "Update Role"}
-        </button>
+        <SubmitButton isSubmitting={isSubmitting} onClick={handleSubmit} />
       </form>
     </>
   );

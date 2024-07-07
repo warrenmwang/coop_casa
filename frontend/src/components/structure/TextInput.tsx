@@ -18,6 +18,7 @@ interface TextInputArgs {
   required?: boolean;
   min?: string;
   max?: string;
+  classNameCustom?: string;
 }
 
 const TextInput: React.FC<TextInputArgs> = ({
@@ -32,6 +33,7 @@ const TextInput: React.FC<TextInputArgs> = ({
   required = false,
   min = "",
   max = "",
+  classNameCustom = "",
 }) => {
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -76,7 +78,7 @@ const TextInput: React.FC<TextInputArgs> = ({
         {label} {required && <span className="text-red-500">*</span>}
       </label>
       <input
-        className="text_input_field_box_gray"
+        className={`text_input_field_box_gray ${classNameCustom}`}
         id={id}
         type={type}
         placeholder={placeholder}
