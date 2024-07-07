@@ -90,6 +90,16 @@ func (q *Queries) CreatePropertyImage(ctx context.Context, arg CreatePropertyIma
 	return err
 }
 
+const deleteListerProperties = `-- name: DeleteListerProperties :exec
+DELETE FROM properties
+WHERE lister_user_id = $1
+`
+
+func (q *Queries) DeleteListerProperties(ctx context.Context, listerUserID string) error {
+	_, err := q.db.ExecContext(ctx, deleteListerProperties, listerUserID)
+	return err
+}
+
 const deletePropertyDetails = `-- name: DeletePropertyDetails :exec
 DELETE FROM properties
 WHERE property_id = $1

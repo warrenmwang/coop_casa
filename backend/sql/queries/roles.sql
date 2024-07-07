@@ -9,7 +9,8 @@ WHERE user_id = $1;
 -- name: UpdateUserRole :exec
 UPDATE roles
 SET
-    "role" = $2
+    "role" = $2,
+    updated_at = CURRENT_TIMESTAMP
 WHERE user_id = $1;
 
 -- name: DeleteUserRole :exec

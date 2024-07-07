@@ -9,6 +9,7 @@ interface ImageInputArgs {
   label: string;
   id: string;
   value: File | null;
+  classNameCustom?: string;
 }
 
 const ImageInput: React.FC<ImageInputArgs> = ({
@@ -18,6 +19,7 @@ const ImageInput: React.FC<ImageInputArgs> = ({
   label,
   id,
   value,
+  classNameCustom = "",
 }) => {
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = e.target;
@@ -64,7 +66,7 @@ const ImageInput: React.FC<ImageInputArgs> = ({
         </div>
       )}
       <input
-        className="text_input_field_box_gray"
+        className={`text_input_field_box_gray ${classNameCustom}`}
         id={id}
         type="file"
         accept="image/*"

@@ -61,3 +61,7 @@ WHERE property_id = $1 AND order_num = $2;
 -- name: DeletePropertyImages :exec
 DELETE FROM properties_images
 WHERE property_id = $1;
+
+-- name: DeleteListerProperties :exec
+DELETE FROM properties
+WHERE lister_user_id = $1;

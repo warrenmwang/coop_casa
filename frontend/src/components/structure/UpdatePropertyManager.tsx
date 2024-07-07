@@ -376,7 +376,7 @@ const UpdatePropertyManager: React.FC = () => {
   }, [isDeleting]);
 
   return (
-    <div className="mx-auto">
+    <div className="w-1/2 mx-auto">
       <h1 className="h1_custom">Update Property</h1>
       {/* query property data form */}
       <form className="" onSubmit={getPropertyDetails}>

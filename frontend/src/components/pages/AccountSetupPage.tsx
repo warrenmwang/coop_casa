@@ -123,6 +123,7 @@ const AccountSetupPage: React.FC = () => {
               id="firstName"
               value={formData.firstName}
               required={true}
+              classNameCustom="w-full"
             />
 
             {/* Last Name */}
@@ -135,6 +136,7 @@ const AccountSetupPage: React.FC = () => {
               id="lastName"
               value={formData.lastName}
               required={true}
+              classNameCustom="w-full"
             />
 
             {/* Birthdate  */}
@@ -147,6 +149,7 @@ const AccountSetupPage: React.FC = () => {
               id="birthDate"
               value={formData.birthDate}
               required={true}
+              classNameCustom="w-full"
             />
 
             {/* Gender */}
@@ -155,6 +158,7 @@ const AccountSetupPage: React.FC = () => {
               setFormData={setFormData}
               setError={setError}
               required={true}
+              classNameCustom="w-full"
             />
 
             {/* Location */}
@@ -172,6 +176,7 @@ const AccountSetupPage: React.FC = () => {
               label="Avatar Image (Max size 5 MiB)"
               id="avatar"
               value={formData.avatar}
+              classNameCustom="w-full"
             />
             {/* Clear Image Button */}
             {formData.avatar && (

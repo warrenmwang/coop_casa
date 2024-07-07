@@ -112,6 +112,7 @@ type Service interface {
 	DeletePropertyImage(propertyId string, imageOrderNum int16) error
 	GetNextPageProperties(limit, offset int32) ([]string, error)
 	GetTotalCountProperties() (int64, error)
+	DeleteProperties(userID string) error
 }
 
 type service struct {
@@ -552,12 +553,6 @@ func (s *service) DeleteUser(userId string) error {
 
 	// Delete the user with the matching encrypyted id
 	err = s.db_queries.DeleteUserDetails(ctx, userId_encrypted)
-	if err != nil {
-		return err
-	}
-
-	// Delete the user's avatar with the matching encrypted id
-	err = s.db_queries.DeleteUserAvatar(ctx, userId_encrypted)
 	return err
 }
 
@@ -835,12 +830,11 @@ func (s *service) UpdatePropertyImages(propertyID string, images []OrderedFileIn
 func (s *service) DeleteProperty(propertyId string) error {
 	ctx := context.Background()
 
-	// Delete the property and the images (a single transaction)
+	// Delete the property (image rows get deleted via cascade)
 	err := s.db_queries.DeletePropertyDetails(ctx, propertyId)
 	if err != nil {
 		return err
 	}
-	err = s.db_queries.DeletePropertyImages(ctx, propertyId)
 
 	return err
 }
@@ -864,6 +858,13 @@ func (s *service) DeletePropertyImage(propertyId string, imageOrderNum int16) er
 		OrderNum:   imageOrderNum,
 	})
 
+	return err
+}
+
+// Delete all properties that whose lister id is the user id given
+func (s *service) DeleteProperties(userID string) error {
+	ctx := context.Background()
+	err := s.db_queries.DeleteListerProperties(ctx, userID)
 	return err
 }
 

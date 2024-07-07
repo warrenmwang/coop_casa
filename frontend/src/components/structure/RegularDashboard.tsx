@@ -13,7 +13,7 @@ const RegularDashboard: React.FC = () => {
   return (
     <>
       {isLister && (
-        <div className="flex justify-center">
+        <div className="flex">
           <CreatePropertyForm />
           <UpdatePropertyManager />
         </div>

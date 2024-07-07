@@ -532,10 +532,6 @@ func (s *Server) apiUpdateAccountDetailsHandler(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	// log.Printf("fileName: %s\n", avatarFileHeader.Filename)
-	// log.Printf("mimetype: %v\n", avatarFileHeader.Header.Get("Content-Type"))
-	// log.Printf("size: %d\n", avatarFileHeader.Size)
-
 	var avatarFile database.FileInternal
 	if avatarFileData != nil {
 		defer avatarFileData.Close()
@@ -575,17 +571,17 @@ func (s *Server) apiDeleteAccountHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	// Delete account (details and avatar) from database
+	// Delete user account (details, role, avatar)
 	err = s.db.DeleteUser(userId)
 	if err != nil {
 		respondWithError(w, 401, err)
 		return
 	}
 
-	// Delete user role from database
-	err = s.db.DeleteUserRole(userId)
+	// Delete all the properties that are listed by this user
+	err = s.db.DeleteProperties(userId)
 	if err != nil {
-		respondWithError(w, 401, err)
+		respondWithError(w, 500, err)
 		return
 	}
 

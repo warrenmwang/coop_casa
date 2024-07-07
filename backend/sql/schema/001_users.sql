@@ -20,7 +20,11 @@ CREATE TABLE users_avatars (
     mime_type TEXT,
     "size" BIGINT,
     "data" BYTEA,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_property
+        FOREIGN KEY(user_id)
+        REFERENCES users(user_id)
+        ON DELETE CASCADE
 );
 
 -- +goose Down

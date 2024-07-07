@@ -30,7 +30,11 @@ CREATE TABLE properties_images (
     mime_type TEXT NOT NULL,
     "size" BIGINT NOT NULL,
     "data" BYTEA NOT NULL,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_property
+        FOREIGN KEY(property_id)
+        REFERENCES properties(property_id)
+        ON DELETE CASCADE
 );
 
 -- +goose Down
