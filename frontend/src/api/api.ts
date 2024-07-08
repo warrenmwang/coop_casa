@@ -92,6 +92,7 @@ export const apiUpdateUserAccountDetails = async (
     returnVal = response.status;
   } catch (error) {
     alert(`Received error during update user account details: ${error}`);
+    console.error(error);
   }
 
   return returnVal;

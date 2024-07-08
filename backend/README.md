@@ -2,6 +2,12 @@
 
 REST API that manages user and group information for the coop.casa app. All user data is stored in the database.
 
+## Misc. Notes From Me For Me
+
+It took using `sqlc` a couple times, going through their docs, and finally going into their discord server that I now understand
+that all the inputs are properly "parameterized" and therefore the input values are properly "escaped", thus solving the problem
+of preventing SQL injection for me, as long as I use their functions with their parameters in my own code.
+
 ## Getting Started
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.

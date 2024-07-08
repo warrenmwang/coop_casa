@@ -157,6 +157,22 @@ func (s *Server) ValidateTokenAndGetClaims(tokenString string) (jwt.MapClaims, e
 // 	return nil
 // }
 
+func (s *Server) authCheckAndGetClaims(r *http.Request) (jwt.MapClaims, error) {
+	// Read JWT from HttpOnly Cookie
+	cookie, err := r.Cookie("token")
+	if err != nil {
+		return nil, fmt.Errorf("no token in cookie in request: %v", err.Error())
+	}
+	tokenString := cookie.Value
+
+	// Check if JWT is valid and get claims
+	claims, err := s.ValidateTokenAndGetClaims(tokenString)
+	if err != nil {
+		return nil, err
+	}
+	return claims, nil
+}
+
 // Returns the userId from the http cookie in the request, if present (if the user is authed)
 // If something goes wrong in here, we should assume a response http code 401 for unauthorized.
 func (s *Server) getAuthedUserId(r *http.Request) (string, error) {
@@ -490,11 +506,12 @@ func (s *Server) apiGetAccountDetailsHandler(w http.ResponseWriter, r *http.Requ
 // Endpoint: POST /api/account
 func (s *Server) apiUpdateAccountDetailsHandler(w http.ResponseWriter, r *http.Request) {
 	// Authenticate user
-	userIdFromToken, err := s.getAuthedUserId(r)
+	claims, err := s.authCheckAndGetClaims(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
+	userIdFromToken := claims["user_id"]
 
 	// limit body size that we will parse
 	MAX_SIZE := 32 << 20 // 32 MiB
@@ -522,6 +539,20 @@ func (s *Server) apiUpdateAccountDetailsHandler(w http.ResponseWriter, r *http.R
 	// id in the token
 	if userIdFromToken != userDetails.UserID {
 		respondWithError(w, 400, errors.New("token user id does not match user id in form"))
+		return
+	}
+
+	// Prevent user from changing their email
+	// Ensure that the userDetails email is the same as the email in the token
+	if claims["email"] != userDetails.Email {
+		respondWithError(w, http.StatusUnauthorized, errors.New("can't change email tied to google account"))
+		return
+	}
+
+	// Validate the details
+	err = ValidateUserDetails(userDetails)
+	if err != nil {
+		respondWithError(w, http.StatusNotAcceptable, err)
 		return
 	}
 

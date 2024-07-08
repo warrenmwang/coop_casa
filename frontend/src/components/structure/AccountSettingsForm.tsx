@@ -59,17 +59,6 @@ const AccountSettingsForm: React.FC<{
 
   return (
     <div className="default-form-1">
-      {/* Email */}
-      <TextInput
-        setFormData={textInputSetFormData}
-        setIsChanged={setIsChanged}
-        type="email"
-        label="Email"
-        id="email"
-        value={formData.email}
-        classNameCustom="w-full"
-      />
-
       {/* First Name */}
       <TextInput
         setFormData={textInputSetFormData}
@@ -79,6 +68,7 @@ const AccountSettingsForm: React.FC<{
         id="firstName"
         value={formData.firstName}
         classNameCustom="w-full"
+        required={true}
       />
 
       {/* Last Name */}
@@ -90,6 +80,7 @@ const AccountSettingsForm: React.FC<{
         id="lastName"
         value={formData.lastName}
         classNameCustom="w-full"
+        required={true}
       />
 
       {/* Birthdate  */}
@@ -101,6 +92,7 @@ const AccountSettingsForm: React.FC<{
         id="birthDate"
         value={formData.birthDate}
         classNameCustom="w-full"
+        required={true}
       />
 
       {/* Gender */}
@@ -109,6 +101,7 @@ const AccountSettingsForm: React.FC<{
         setFormData={setFormData}
         setIsChanged={setIsChanged}
         classNameCustom="w-full"
+        required={true}
       />
 
       {/* Location */}
@@ -116,6 +109,7 @@ const AccountSettingsForm: React.FC<{
         formData={formData}
         setFormData={setFormData}
         setIsChanged={setIsChanged}
+        required={true}
       />
 
       {/* Interests */}
@@ -123,6 +117,7 @@ const AccountSettingsForm: React.FC<{
         formData={formData}
         setFormData={setFormData}
         setIsChanged={setIsChanged}
+        required={true}
       />
 
       {/* Avatar */}
