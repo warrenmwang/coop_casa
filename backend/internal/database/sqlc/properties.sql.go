@@ -10,6 +10,47 @@ import (
 	"database/sql"
 )
 
+const checkIsPropertyDuplicate = `-- name: CheckIsPropertyDuplicate :one
+SELECT count(*) FROM properties
+WHERE
+(
+    lower(trim(address_1)) = lower(trim($1)) 
+    AND 
+    lower(trim(coalesce(address_2, ''))) = lower(trim($2)) 
+    AND
+    lower(trim(city)) = lower(trim($3)) 
+    AND
+    lower(trim("state")) = lower(trim($4)) 
+    AND
+    lower(trim(zipcode)) = lower(trim($5)) 
+    AND
+    lower(trim(country)) = lower(trim($6))
+)
+`
+
+type CheckIsPropertyDuplicateParams struct {
+	Btrim   string
+	Btrim_2 string
+	Btrim_3 string
+	Btrim_4 string
+	Btrim_5 string
+	Btrim_6 string
+}
+
+func (q *Queries) CheckIsPropertyDuplicate(ctx context.Context, arg CheckIsPropertyDuplicateParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, checkIsPropertyDuplicate,
+		arg.Btrim,
+		arg.Btrim_2,
+		arg.Btrim_3,
+		arg.Btrim_4,
+		arg.Btrim_5,
+		arg.Btrim_6,
+	)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const createPropertyDetails = `-- name: CreatePropertyDetails :exec
 INSERT INTO properties 
 (

@@ -65,3 +65,20 @@ WHERE property_id = $1;
 -- name: DeleteListerProperties :exec
 DELETE FROM properties
 WHERE lister_user_id = $1;
+
+-- name: CheckIsPropertyDuplicate :one
+SELECT count(*) FROM properties
+WHERE
+(
+    lower(trim(address_1)) = lower(trim($1)) 
+    AND 
+    lower(trim(coalesce(address_2, ''))) = lower(trim($2)) 
+    AND
+    lower(trim(city)) = lower(trim($3)) 
+    AND
+    lower(trim("state")) = lower(trim($4)) 
+    AND
+    lower(trim(zipcode)) = lower(trim($5)) 
+    AND
+    lower(trim(country)) = lower(trim($6))
+);

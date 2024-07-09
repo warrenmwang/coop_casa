@@ -34,21 +34,27 @@ func (q *Queries) DeleteUserRole(ctx context.Context, userID string) error {
 }
 
 const getUserRole = `-- name: GetUserRole :one
-SELECT id, user_id, role FROM roles
+SELECT id, user_id, role, updated_at FROM roles
 WHERE user_id = $1
 `
 
 func (q *Queries) GetUserRole(ctx context.Context, userID string) (Role, error) {
 	row := q.db.QueryRowContext(ctx, getUserRole, userID)
 	var i Role
-	err := row.Scan(&i.ID, &i.UserID, &i.Role)
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.Role,
+		&i.UpdatedAt,
+	)
 	return i, err
 }
 
 const updateUserRole = `-- name: UpdateUserRole :exec
 UPDATE roles
 SET
-    "role" = $2
+    "role" = $2,
+    updated_at = CURRENT_TIMESTAMP
 WHERE user_id = $1
 `
 

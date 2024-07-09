@@ -12,6 +12,7 @@ import (
 	"backend/internal/utils"
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -113,6 +114,7 @@ type Service interface {
 	GetNextPageProperties(limit, offset int32) ([]string, error)
 	GetTotalCountProperties() (int64, error)
 	DeleteProperties(userID string) error
+	CheckDuplicateProperty(propertyDetails PropertyDetails) error
 }
 
 type service struct {
@@ -866,6 +868,36 @@ func (s *service) DeleteProperties(userID string) error {
 	ctx := context.Background()
 	err := s.db_queries.DeleteListerProperties(ctx, userID)
 	return err
+}
+
+func (s *service) CheckDuplicateProperty(propertyDetails PropertyDetails) error {
+	ctx := context.Background()
+
+	// No duplicate property addresses (basic search and check)
+	address1 := propertyDetails.Address_1
+	address2 := propertyDetails.Address_2
+	city := propertyDetails.City
+	state := propertyDetails.State
+	zipcode := propertyDetails.Zipcode
+	country := propertyDetails.Country
+
+	count, err := s.db_queries.CheckIsPropertyDuplicate(ctx, sqlc.CheckIsPropertyDuplicateParams{
+		Btrim:   address1,
+		Btrim_2: address2,
+		Btrim_3: city,
+		Btrim_4: state,
+		Btrim_5: zipcode,
+		Btrim_6: country,
+	})
+	if err != nil {
+		return err
+	}
+
+	if count > 0 {
+		return errors.New("property uses an address that is already in use")
+	}
+
+	return nil
 }
 
 // ------------------- ADMIN -------------------

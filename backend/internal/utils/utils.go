@@ -7,7 +7,14 @@ import (
 	"database/sql"
 	"encoding/base64"
 	"time"
+
+	"github.com/google/uuid"
 )
+
+func IsValidUUID(str string) bool {
+	_, err := uuid.Parse(str)
+	return err == nil
+}
 
 func ParseStringToNullTime(timeStr string) (time.Time, error) {
 	// Define the layout according to the format of your time string

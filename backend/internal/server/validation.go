@@ -2,9 +2,71 @@ package server
 
 import (
 	"backend/internal/database"
+	"backend/internal/utils"
 	"errors"
 	"time"
 )
+
+func IsPropertyUsingDuplicateAddress(propertyDetails database.PropertyDetails, s *Server) error {
+	// Check property is not duplicate address
+	return s.db.CheckDuplicateProperty(propertyDetails)
+}
+
+// Validate property details
+func ValidatePropertyDetails(propertyDetails database.PropertyDetails) error {
+	// Ensure property id is a valid uuidv4
+	if !utils.IsValidUUID(propertyDetails.PropertyID) {
+		return errors.New("invalid form state: property id is not a valid uuid")
+	}
+
+	// Ensure lister id is present
+	if len(propertyDetails.ListerUserID) == 0 {
+		return errors.New("invalid form state: property's lister id is empty")
+	}
+
+	// Ensure important fields are not empty or out of expected range
+	if len(propertyDetails.City) == 0 {
+		return errors.New("invalid form state: city is invalid")
+	}
+
+	if len(propertyDetails.State) == 0 {
+		return errors.New("invalid form state: State is invalid")
+	}
+
+	if len(propertyDetails.Zipcode) == 0 {
+		return errors.New("invalid form state: Zipcode is invalid")
+	}
+
+	if len(propertyDetails.Country) == 0 {
+		return errors.New("invalid form state: Country is invalid")
+	}
+
+	if v := propertyDetails.Square_feet; v <= 0 || v > 999999999 {
+		return errors.New("invalid form state: square feet invalid")
+	}
+
+	if v := propertyDetails.Num_bedrooms; v < 0 || v > 32767 {
+		return errors.New("invalid form state: number of bedrooms invalid")
+	}
+
+	if v := propertyDetails.Num_toilets; v < 0 || v > 32767 {
+		return errors.New("invalid form state: number of toilets invalid")
+	}
+
+	if v := propertyDetails.Num_showers_baths; v < 0 || v > 32767 {
+		return errors.New("invalid form state: number of showers/baths invalid")
+	}
+
+	if v := propertyDetails.Cost_dollars; v <= 0 || v > 999999999999 {
+		return errors.New("invalid form state: cost in dollars invalid")
+	}
+
+	if v := propertyDetails.Cost_cents; v < 0 || v > 99 {
+		return errors.New("invalid form state: cost in cents invalid")
+	}
+
+	return nil
+}
 
 // Validate the user details field values
 // Should ensure no SQL injection or whatnot

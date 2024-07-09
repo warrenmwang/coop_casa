@@ -10,7 +10,12 @@ import MultipleImageUploader from "./MultipleImageUploader";
 import { MAX_PROPERTY_IMGS_ALLOWED } from "../../constants";
 
 import "../../styles/font.css";
-import { OrderedFile, Property, PropertyDetails } from "../../types/Types";
+import {
+  ErrorBody,
+  OrderedFile,
+  Property,
+  PropertyDetails,
+} from "../../types/Types";
 
 type TextFieldsConstruct = {
   id: string;
@@ -92,12 +97,6 @@ const CreatePropertyForm: React.FC = () => {
     propertyRequiredFields.map((field) => {
       setErrors(field, true);
     });
-    // Set values that we don't want the user to fill in themselves.
-    setPropertyDetails((prevState: any) => ({
-      ...prevState,
-      propertyId: uuidv4(),
-      listerUserId: user.userId,
-    }));
   }, []);
 
   // for constructing the textinputs
@@ -184,7 +183,7 @@ const CreatePropertyForm: React.FC = () => {
       required: true,
       type: "number",
       min: "0",
-      max: "999999999999",
+      max: "32767",
     },
     {
       id: "numToilets",
@@ -194,7 +193,7 @@ const CreatePropertyForm: React.FC = () => {
       required: true,
       type: "number",
       min: "0",
-      max: "999999999999",
+      max: "32767",
     },
     {
       id: "numShowersBaths",
@@ -204,7 +203,7 @@ const CreatePropertyForm: React.FC = () => {
       required: true,
       type: "number",
       min: "0",
-      max: "999999999999",
+      max: "32767",
     },
     {
       id: "costDollars",
@@ -238,9 +237,7 @@ const CreatePropertyForm: React.FC = () => {
   ];
 
   const textInputHandleChange = (id: string, value: string) => {
-    // need to convert the text input type=number values
-    // from variable type string into number
-    var numberValue: number;
+    // need to convert the text input type=number values from variable type string into number
     if (
       id === "squareFeet" ||
       id === "numBedrooms" ||
@@ -254,32 +251,19 @@ const CreatePropertyForm: React.FC = () => {
         alert(`Value in field ${id} is not a number.`);
         return;
       }
-      // convert to number
-      numberValue = Number(value);
       // save value for this field
       setPropertyDetails((prevState: any) => ({
         ...prevState,
-        [id]: numberValue,
+        [id]: Number(value),
       }));
-      // set error to false for this field
-      setErrors(id, false);
       return;
     }
 
-    // o.w. set value
+    // o.w. set string value
     setPropertyDetails((prevState: any) => ({
       ...prevState,
       [id]: value,
     }));
-
-    // If required field is empty, then set error to true and quit
-    if (propertyRequiredFields.includes(id) && value === "") {
-      setErrors(id, true);
-      return;
-    }
-
-    // valid save -- update error to false
-    setErrors(id, false);
   };
 
   const handleImagesUploaded = (files: OrderedFile[]) => {
@@ -304,16 +288,36 @@ const CreatePropertyForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Only progress if no errors
-    for (let [k, v] of errors) {
-      if (v) {
-        setIsSubmitting(false);
-        alert(
-          `Please ensure field ${k} is set correctly and then try submitting again.`,
-        );
-        return;
+    // Basic input check
+    type propertyDetailsKey = keyof typeof propertyDetails;
+    for (let field of propertyRequiredFields) {
+      const id = field as propertyDetailsKey;
+      const value = propertyDetails[id];
+
+      // Empty field of required
+      if (typeof value === "string") {
+        if (value === "") {
+          setErrors(field, true);
+          continue;
+        }
+      } else if (typeof value === "number") {
+        if (value < 0 || value > 999999999999) {
+          setErrors(field, true);
+          continue;
+        }
       }
+
+      // All good for this field
+      setErrors(field, false);
     }
+
+    // Set values that we don't want the user to fill in themselves.
+    // property id as a UUIDV4, lister id (openauth id)
+    setPropertyDetails((prevState: any) => ({
+      ...prevState,
+      propertyId: uuidv4(),
+      listerUserId: user.userId,
+    }));
 
     // Set is submitting true, prevent spamming submit and start submission process.
     setIsSubmitting(true);
@@ -323,6 +327,15 @@ const CreatePropertyForm: React.FC = () => {
   useEffect(() => {
     const foo = async () => {
       if (isSubmitting) {
+        // Only progress if no errors
+        for (let [k, v] of errors) {
+          if (v) {
+            setIsSubmitting(false);
+            alert(`Fix field: ${k}`);
+            return;
+          }
+        }
+
         // Format property with the details and images
         const property: Property = {
           details: propertyDetails,
@@ -340,7 +353,8 @@ const CreatePropertyForm: React.FC = () => {
             alert("Property Created.");
           } else {
             // response was not ok
-            alert("Got not ok response: " + response.statusText);
+            const body = (await response.json()) as ErrorBody;
+            alert("Got not ok response: " + body.error);
           }
         } else {
           alert("Try submitting again.");
@@ -383,12 +397,13 @@ const CreatePropertyForm: React.FC = () => {
           Upload some images of the property. At least 1 image is required.
           <span className="text-red-500">*</span>
         </label>
-        <MultipleImageUploader
-          images={images}
-          onImagesUploaded={handleImagesUploaded}
-        />
-
-        <SubmitButton isSubmitting={isSubmitting} />
+        <div className="flex flex-col gap-2">
+          <MultipleImageUploader
+            images={images}
+            onImagesUploaded={handleImagesUploaded}
+          />
+          <SubmitButton isSubmitting={isSubmitting} className="w-3/5" />
+        </div>
       </form>
     </div>
   );

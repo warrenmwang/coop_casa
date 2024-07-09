@@ -44,9 +44,10 @@ type Property struct {
 }
 
 type Role struct {
-	ID     int32
-	UserID string
-	Role   string
+	ID        int32
+	UserID    string
+	Role      string
+	UpdatedAt time.Time
 }
 
 type User struct {

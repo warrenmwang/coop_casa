@@ -950,6 +950,20 @@ func (s *Server) apiCreatePropertiesHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
+	// Validate property details
+	err = ValidatePropertyDetails(propertyDetails)
+	if err != nil {
+		respondWithError(w, 400, err)
+		return
+	}
+
+	// Check that property address is not a duplicate of an existing one before creation
+	err = IsPropertyUsingDuplicateAddress(propertyDetails, s)
+	if err != nil {
+		respondWithError(w, 400, err)
+		return
+	}
+
 	// Get property images
 	numberImagesRaw := r.FormValue("numImages") // should be at most 10, limited on expected frontend.
 	numberImagesInt64, err := strconv.ParseInt(numberImagesRaw, 10, 16)
@@ -1036,6 +1050,13 @@ func (s *Server) apiUpdatePropertiesHandler(w http.ResponseWriter, r *http.Reque
 	err = json.Unmarshal([]byte(detailsRaw), &propertyDetails)
 	if err != nil {
 		respondWithError(w, 500, err)
+		return
+	}
+
+	// Validate property details
+	err = ValidatePropertyDetails(propertyDetails)
+	if err != nil {
+		respondWithError(w, 400, err)
 		return
 	}
 

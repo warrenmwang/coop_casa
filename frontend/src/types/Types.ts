@@ -92,3 +92,7 @@ export type Property = {
   details: PropertyDetails;
   images: OrderedFile[];
 };
+
+export type ErrorBody = {
+  error: string;
+};

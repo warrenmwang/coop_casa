@@ -13,6 +13,22 @@ import { MAX_PROPERTY_IMGS_ALLOWED } from "../../constants";
 import { useMutation } from "@tanstack/react-query";
 import { validateNumber } from "../../utils/inputValidation";
 
+const propertyRequiredFields: string[] = [
+  "name",
+  "address1",
+  "city",
+  "state",
+  "zipcode",
+  "country",
+  "squareFeet",
+  "numBedrooms",
+  "numToilets",
+  "numShowersBaths",
+  "costDollars",
+  "costCents",
+  "images",
+];
+
 const UpdatePropertyForm: React.FC<{
   property: Property;
   setProperty: React.Dispatch<React.SetStateAction<Property | null>>;
@@ -28,15 +44,19 @@ const UpdatePropertyForm: React.FC<{
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // FIXME: in actual testing, it looks like the helpful messages provided by
+  // the result of these variables that useMutation live for "too long"
+  // that is, I need a way to manually set them to all false or something
+  // or remove their value.
   const {
-    mutate: updateMutate,
-    isPending,
-    isSuccess,
+    mutate: mutateUpdate,
+    isPending: isPendingUpdate,
+    isSuccess: isSuccessUpdate,
+    isError: isErrorUpdate,
+    error: errorUpdate,
   } = useMutation({
     mutationFn: (property: Property) => apiUpdateProperty(property),
   });
-
-  const handleDelete = async () => {};
 
   const setErrors = (key: string, value: boolean) => {
     setMyMap((prevMap) => {
@@ -44,24 +64,6 @@ const UpdatePropertyForm: React.FC<{
       newMap.set(key, value);
       return newMap;
     });
-  };
-
-  const handleSaveChanges = async () => {
-    // ensure no errors
-    for (let key of errors.keys()) {
-      if (errors.get(key)) {
-        alert(`Resolve error in field "${key}" first before submitting.`);
-        return;
-      }
-    }
-
-    // save property details and images and start submission request.
-    setProperty((prevState) => ({
-      ...prevState,
-      details: formDetails,
-      images: formImages,
-    }));
-    setIsSubmitting(true);
   };
 
   const handleDiscardChanges = () => {
@@ -73,7 +75,6 @@ const UpdatePropertyForm: React.FC<{
   const textInputSetFormData = (id: string, value: string) => {
     // need to convert the text input type=number values
     // from variable type string into number
-    var numberValue: number;
     if (
       id === "squareFeet" ||
       id === "numBedrooms" ||
@@ -87,19 +88,16 @@ const UpdatePropertyForm: React.FC<{
         alert(`Value in field ${id} is not a number.`);
         return;
       }
-      setErrors(id, false);
 
       // convert to number and save value
-      numberValue = Number(value);
       setFormDetails((prevState) => ({
         ...prevState,
-        [id]: numberValue,
+        [id]: Number(value),
       }));
       return;
     }
 
     // text value
-    setErrors(id, false);
     setFormDetails((prevState) => ({
       ...prevState,
       [id]: value,
@@ -124,17 +122,58 @@ const UpdatePropertyForm: React.FC<{
     setFormImages(files);
   };
 
+  const handleSaveChanges = async () => {
+    // Basic input check
+    type propertyDetailsKey = keyof typeof formDetails;
+    for (let field of propertyRequiredFields) {
+      const id = field as propertyDetailsKey;
+      const value = formDetails[id];
+
+      // Empty field of required
+      if (typeof value === "string") {
+        if (value === "") {
+          console.log(`setting field ${id} to true`);
+          setErrors(field, true);
+          continue;
+        }
+      } else if (typeof value === "number") {
+        if (value < 0 || value > 999999999999) {
+          setErrors(field, true);
+          continue;
+        }
+      }
+
+      // All good for this field
+      setErrors(field, false);
+    }
+
+    // save property details and images and start submission request.
+    setProperty((prevState) => ({
+      ...prevState,
+      details: formDetails,
+      images: formImages,
+    }));
+    setIsSubmitting(true);
+  };
+
   useEffect(() => {
     if (isSubmitting) {
-      updateMutate(property);
+      // ensure no errors
+      for (let key of errors.keys()) {
+        if (errors.get(key)) {
+          setIsSubmitting(false);
+          alert(`Resolve error in field "${key}" first before submitting.`);
+          return;
+        }
+      }
+
+      mutateUpdate(property);
       setIsSubmitting(false);
     }
   }, [isSubmitting]);
 
   return (
     <>
-      {isPending && <p>Updating property...</p>}
-      {isSuccess && <p>Property updated.</p>}
       {/* update form */}
       <form className="default-form-1">
         <TextInput
@@ -280,23 +319,31 @@ const UpdatePropertyForm: React.FC<{
         setIsChanged={setIsChanged}
       />
 
-      {/* Save / discard buttons */}
-      {isChanged && (
-        <div className="flex justify-end space-x-4">
-          <button
-            onClick={handleSaveChanges}
-            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-          >
-            {isSubmitting ? "Saving..." : "Save Changes"}
-          </button>
-          <button
-            onClick={handleDiscardChanges}
-            className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-          >
-            Discard Changes
-          </button>
-        </div>
-      )}
+      <div className="pt-3">
+        {isPendingUpdate && <p>Updating property...</p>}
+        {isSuccessUpdate && <p>Property updated.</p>}
+        {isErrorUpdate && (
+          <p>Failed to update property. Error: {errorUpdate.message}</p>
+        )}
+
+        {/* Save / discard buttons */}
+        {isChanged && (
+          <div className="flex justify-end space-x-4">
+            <button
+              onClick={handleSaveChanges}
+              className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+            >
+              {isSubmitting ? "Saving..." : "Save Changes"}
+            </button>
+            <button
+              onClick={handleDiscardChanges}
+              className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+            >
+              Discard Changes
+            </button>
+          </div>
+        )}
+      </div>
     </>
   );
 };
@@ -308,6 +355,7 @@ const UpdatePropertyManager: React.FC = () => {
   const [propertyID, setPropertyID] = useState<string>("");
   const [property, setProperty] = useState<Property | null>(null);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
+  const [inputChanged, setInputChanged] = useState<boolean>(false);
 
   const getPropertyDetails = (e: React.FormEvent) => {
     e.preventDefault();
@@ -321,9 +369,11 @@ const UpdatePropertyManager: React.FC = () => {
   };
 
   const {
-    mutate: deleteMutate,
-    isPending: isPendingDeletion,
-    isSuccess: isDeletionSuccess,
+    mutate: mutateDelete,
+    isPending: isPendingDelete,
+    isSuccess: isSuccessDelete,
+    isError: isErrorDelete,
+    error: errorDelete,
   } = useMutation({
     mutationFn: (propertyID: string) => apiDeleteProperty(propertyID),
   });
@@ -341,6 +391,7 @@ const UpdatePropertyManager: React.FC = () => {
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
+    setInputChanged(true);
     setPropertyID(e.target.value);
   };
 
@@ -368,7 +419,8 @@ const UpdatePropertyManager: React.FC = () => {
 
   useEffect(() => {
     if (isDeleting) {
-      deleteMutate(propertyID);
+      setInputChanged(false);
+      mutateDelete(propertyID);
       setPropertyID("");
       setProperty(null);
       setIsDeleting(false);
@@ -394,34 +446,32 @@ const UpdatePropertyManager: React.FC = () => {
           />
         </div>
         <div className="flex gap-2">
-          <SubmitButton isSubmitting={getPropertyDetailsIsSubmitting} />
+          {property === null && (
+            <SubmitButton isSubmitting={getPropertyDetailsIsSubmitting} />
+          )}
           <button
             id="clear"
             className="bg-gray-500 hover:bg-gray-600 text-white rounded p-3"
             onClick={clearForm}
           >
-            Clear
+            Clear Form
           </button>
           <button
             id="delete"
             className="bg-red-500 hover:bg-red-600 rounded p-3"
             onClick={handleDelete}
           >
-            Delete
+            Delete Property
           </button>
         </div>
       </form>
-      {isDeleting ? (
-        isPendingDeletion ? (
-          <p>Deleting property...</p>
-        ) : isDeletionSuccess ? (
-          <p>Deleted.</p>
-        ) : (
-          <p>Couldn't delete property. Try again.</p>
-        )
-      ) : (
-        <></>
+
+      {!inputChanged && isPendingDelete && <p>Deleting property...</p>}
+      {!inputChanged && isSuccessDelete && <p>Property deleted.</p>}
+      {!inputChanged && isErrorDelete && (
+        <p>Couldn't delete property. Try again. {errorDelete.message}</p>
       )}
+
       {property !== null && (
         <UpdatePropertyForm property={property} setProperty={setProperty} />
       )}

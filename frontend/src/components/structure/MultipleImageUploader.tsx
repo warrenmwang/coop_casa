@@ -131,7 +131,7 @@ const MultipleImageUploader: React.FC<MultipleImageUploaderProps> = ({
         <button
           type="button"
           onClick={removeAllFiles}
-          className="mt-4 bg-red-500 text-white p-2 rounded-lg"
+          className="mt-4 bg-red-500 text-white p-2 rounded-lg w-3/5"
         >
           Remove All
         </button>

@@ -16,9 +16,6 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
     navigate(`${propertiesPageLink}/${property.details.propertyId}`);
   };
 
-  // FIXME: image has a property called `orderNum` which denotes the order
-  // that the images should be displayed in. Use that to construct the
-  // correct order here.
   let images: string[] = property.images.map((image) =>
     URL.createObjectURL(image.file),
   );
