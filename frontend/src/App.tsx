@@ -1,8 +1,8 @@
 import { Suspense } from "react";
 import AuthWrapper from "./auth/AuthWrapper";
-import RouteRenderer from "./components/structure/RouteRenderer";
+import RouteRenderer from "./components/RouteRenderer";
 import { BrowserRouter as Router } from "react-router-dom";
-import TextSkeleton from "./components/structure/TextSkeleton";
+import TextSkeleton from "./skeleton/TextSkeleton";
 import GlobalStoreWrapper from "./globalStore";
 
 function App() {

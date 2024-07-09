@@ -1,5 +1,5 @@
 import React, { createContext, ReactNode, useContext } from "react";
-import { Property } from "./components/structure/CreatePropertyForm";
+import { Property } from "./form/CreatePropertyForm";
 
 interface GlobalStoreContextType {
   globalMap: Map<string, any>;
