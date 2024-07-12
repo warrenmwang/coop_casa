@@ -16,9 +16,9 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
     navigate(`${propertiesPageLink}/${property.details.propertyId}`);
   };
 
-  let images: string[] = property.images.map((image) =>
-    URL.createObjectURL(image.file),
-  );
+  // let images: string[] = property.images.map((image) =>
+  //   URL.createObjectURL(image.file),
+  // );
 
   const costNumsToPresentableString = (
     costDollars: number,
@@ -65,6 +65,8 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
 
   const basicInfoElement = basicInfoConstructor(property);
 
+  // console.log("hi");
+
   return (
     <>
       <CardActionArea
@@ -74,7 +76,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
         <Card sx={{ maxWidth: 400, maxHeight: 600 }}>
           <CardMedia
             sx={{ width: 400, height: 300 }}
-            image={images[0]}
+            image={URL.createObjectURL(property.images[0].file)}
             title="default first image"
           />
           <CardContent>

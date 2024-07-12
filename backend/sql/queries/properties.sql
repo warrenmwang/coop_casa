@@ -82,3 +82,10 @@ WHERE
     AND
     lower(trim(country)) = lower(trim($6))
 );
+
+-- name: PropertiesFuzzySearchAddress :one
+-- SELECT 
+--     tbl_name_column, 
+--     levenshtein(tbl_name_column, 'search string') AS score 
+-- FROM tbl 
+-- ORDER BY score ASC; --levenshtein distance decreases with similarity

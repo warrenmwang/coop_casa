@@ -84,13 +84,12 @@ const AccountSetupPage: React.FC = () => {
           setUser(formData);
 
           // Save user data into the backend
-          const status = await apiUpdateUserAccountDetails(formData);
-          if (status === 200) {
+          const response = await apiUpdateUserAccountDetails(formData);
+          if (response.ok) {
             navigate(dashboardPageLink);
           } else {
-            alert(
-              `Unable to setup account, please try again. Returned with status code ${status}`,
-            );
+            const errorText = await response.text();
+            alert(`Unable to setup account due to reason: ${errorText}`);
           }
         } catch (error) {
           console.error("Error during form submission:", error);

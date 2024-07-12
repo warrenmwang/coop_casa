@@ -49,10 +49,6 @@ import (
 
 // ---------------------------------------------------------------
 
-type errorBody struct {
-	Error string `json:"error"`
-}
-
 type UserOAuthDetails struct {
 	UserId string
 	Email  string
@@ -69,9 +65,9 @@ func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 	w.Write(response)
 }
 
-// Wrapper for respondWithJSON for sending errors as the interface used to be converted to json
+// Responds with an error
 func respondWithError(w http.ResponseWriter, code int, err error) {
-	respondWithJSON(w, code, errorBody{Error: err.Error()})
+	http.Error(w, err.Error(), code)
 	log.Println("responded with err:", err.Error())
 }
 
@@ -111,7 +107,9 @@ func (s *Server) InvalidateToken(w http.ResponseWriter) {
 	})
 }
 
-// Check JWT validation.
+// Given the raw JWT as string, validate that the server signed it and return
+// the claims object (key value pairs of information put inside the token)
+// if it is good, otherwise return an error.
 func (s *Server) ValidateTokenAndGetClaims(tokenString string) (jwt.MapClaims, error) {
 	// Gets the JWT and validates it. If valid, return the claims.
 	// Return an error if invalid.
@@ -136,27 +134,8 @@ func (s *Server) ValidateTokenAndGetClaims(tokenString string) (jwt.MapClaims, e
 	}
 }
 
-// We may need a fuzzy searcher for stuff in the db
-// be it for searching for users or for properties at this point.
-// TODO: think about it and modify this commented out function to do this
-// func (s *Server) validateNoDuplicateProperty(property database.Property) error {
-// 	// Validate that the given property is not a duplicate property
-// 	// in the database. If the property is not a duplicate, then
-// 	// we will return nil. ow. return a custom error detailing the problem.
-
-// 	// Ensure that the address is unique.
-
-// 	// Search the database to see if there are any properties with the same address.
-// 	// I'm not sure how to ensure that there are "fuzzy" duplicates.
-
-// 	// For now, just query for properties using the same:
-// 	// address1, address2, city, state, zipcode, country
-
-// 	// need to write a new sql query(s) ?
-
-// 	return nil
-// }
-
+// Checks the JWT attached to the request, verify that it was properly signed
+// by the server, and if so return the claims object. Otherwise, return an error.
 func (s *Server) authCheckAndGetClaims(r *http.Request) (jwt.MapClaims, error) {
 	// Read JWT from HttpOnly Cookie
 	cookie, err := r.Cookie("token")
@@ -198,6 +177,9 @@ func (s *Server) getAuthedUserId(r *http.Request) (string, error) {
 	return userId, nil
 }
 
+// Given the User ID (oauth openid) check if it is the secret, server known
+// admin user id and if it is, create the role as a admin
+// otherwise default to a regular role.
 func (s *Server) CreateNewUserRole(userId string) error {
 	// Check if userId is the admin user id and if so, use a role
 	// of "admin"

@@ -32,15 +32,20 @@ const AccountSettingsForm: React.FC<{
   };
 
   const handleSaveChanges = async () => {
+    // Save data in the database
+    try {
+      const response = await apiUpdateUserAccountDetails(formData);
+      if (!response.ok) {
+        const errorText = await response.text();
+        alert(`Failed to update because: ${errorText}`);
+        return;
+      }
+    } catch (err) {
+      alert(`Failed to update because: ${err}`);
+      return;
+    }
     // Save data in auth context user
     setUser(formData);
-    // Save data in the database
-    const responseCode = await apiUpdateUserAccountDetails(formData);
-    if (responseCode !== 200) {
-      alert(
-        `Please try submitting again. Returned with response code ${responseCode}`,
-      );
-    }
     setIsChanged(false);
   };
 

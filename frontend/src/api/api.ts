@@ -57,9 +57,7 @@ export const apiAccountDelete = async (): Promise<boolean> => {
 // Update Account Details
 export const apiUpdateUserAccountDetails = async (
   newUserData: User,
-): Promise<number> => {
-  var returnVal: number = 444;
-
+): Promise<Response> => {
   const formData = new FormData();
 
   // User details (string values)
@@ -82,20 +80,11 @@ export const apiUpdateUserAccountDetails = async (
     formData.append("avatar", newUserData.avatar);
   }
 
-  try {
-    const response = await fetch(api_account_update_Link, {
-      method: "POST",
-      credentials: "include",
-      body: formData,
-    });
-
-    returnVal = response.status;
-  } catch (error) {
-    alert(`Received error during update user account details: ${error}`);
-    console.error(error);
-  }
-
-  return returnVal;
+  return fetch(api_account_update_Link, {
+    method: "POST",
+    credentials: "include",
+    body: formData,
+  });
 };
 
 // Log out user from system, end session by invalidating the client side token
