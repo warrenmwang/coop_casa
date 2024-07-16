@@ -940,7 +940,7 @@ func (s *Server) apiCreatePropertiesHandler(w http.ResponseWriter, r *http.Reque
 	}
 
 	// Check that property address is not a duplicate of an existing one before creation
-	err = IsPropertyUsingDuplicateAddress(propertyDetails, s)
+	err = s.db.CheckDuplicateProperty(propertyDetails)
 	if err != nil {
 		respondWithError(w, 400, err)
 		return

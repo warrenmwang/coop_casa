@@ -1,9 +1,8 @@
-// Function to convert File to Base64 string
-// Returns an empty string if file is null
-
 import { APIFileReceived } from "../types/Types";
 
-// o.w. return the file as base64 encoded string
+// Function to convert a File to Base64 string, useful for arbitrary binary format
+// user input into a string format for passing it around (i.e. serializing and sending over network)
+// Returns an empty string if file is null o.w. return the file as base64 encoded string
 export const file2Base64Str = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
     if (file !== null) {
@@ -18,20 +17,9 @@ export const file2Base64Str = (file: File): Promise<string> => {
   });
 };
 
-// DOESNT WORK BECAUSE FETCH FAILS FOR SOME REASON
-// export const base64Str2File = async (
-//   b64str: string,
-//   fileName: string,
-// ): Promise<File> => {
-//   const [mimePart, _] = b64str.split(",");
-//   const mimeType = mimePart.match(/:(.*?);/)?.[1] || "";
-
-//   const response = await fetch(b64str);
-//   const blob = await response.blob();
-
-//   return new File([blob], fileName, { type: mimeType });
-// };
-
+// Takes an object that is our custom, backend representation of the actual
+// contents and some metadata of an arbitrary binary file and converts it into
+// a standard JS File type.
 export const apiFile2ClientFile = (fileIn: APIFileReceived): File | null => {
   // Return null if empty file
   if (fileIn.data === "") {

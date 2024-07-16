@@ -7,11 +7,6 @@ import (
 	"time"
 )
 
-func IsPropertyUsingDuplicateAddress(propertyDetails database.PropertyDetails, s *Server) error {
-	// Check property is not duplicate address
-	return s.db.CheckDuplicateProperty(propertyDetails)
-}
-
 // Validate property details
 func ValidatePropertyDetails(propertyDetails database.PropertyDetails) error {
 	// Ensure property id is a valid uuidv4

@@ -22,6 +22,7 @@ import {
 } from "../urls";
 import { AuthData } from "../auth/AuthWrapper";
 import { apiFile2ClientFile } from "../utils/utils";
+import axios from "axios";
 
 export const checkFetch = (response: Response) => {
   // source: https://www.youtube.com/watch?v=b8DaQrxshu0
@@ -221,28 +222,24 @@ export const useAPIGetUserRole = (): boolean => {
 export const apiCreateNewProperty = async (
   property: Property,
 ): Promise<Response | null> => {
-  var returnVal: Response | null = null;
-  try {
-    const formData = new FormData();
-    formData.append("details", JSON.stringify(property.details));
-    formData.append("numImages", `${property.images.length}`);
-    if (property.images.length > 0) {
-      for (let i = 0; i < property.images.length; i++) {
-        let image = property.images[i];
-        formData.append(`image${image.orderNum}`, image.file);
-      }
+  const formData = new FormData();
+  formData.append("details", JSON.stringify(property.details));
+  formData.append("numImages", `${property.images.length}`);
+  if (property.images.length > 0) {
+    for (let i = 0; i < property.images.length; i++) {
+      let image = property.images[i];
+      formData.append(`image${image.orderNum}`, image.file);
     }
-
-    const response = await fetch(api_properties_Link, {
-      method: "PUT",
-      body: formData,
-      credentials: "include",
-    });
-    returnVal = response;
-  } catch (err) {
-    alert(`Received error during property creation: ${err}`);
   }
-  return returnVal;
+
+  // return fetch(api_properties_Link, {
+  //   method: "PUT",
+  //   body: formData,
+  //   credentials: "include",
+  // });
+  return axios.put(api_properties_Link, formData, {
+    withCredentials: true,
+  });
 };
 
 export const apiUpdateProperty = async (

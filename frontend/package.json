@@ -11,7 +11,6 @@
     "@mui/icons-material": "^5.15.20",
     "@mui/material": "^5.15.20",
     "@tanstack/react-query": "^5.48.0",
-    "@tanstack/react-query-devtools": "^5.51.1",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -61,10 +60,12 @@
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@tanstack/eslint-plugin-query": "^5.47.0",
+    "@tanstack/react-query-devtools": "^5.51.1",
     "@types/lodash.debounce": "^4.0.9",
     "@types/react-autosuggest": "^10.1.11",
     "@types/react-image-gallery": "^1.2.4",
     "@types/uuid": "^9.0.8",
+    "eslint": "^8.57.0",
     "prettier": "3.3.2"
   }
 }

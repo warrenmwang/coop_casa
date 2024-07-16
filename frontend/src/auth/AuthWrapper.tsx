@@ -52,9 +52,7 @@ const AuthWrapper: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [authenticated, setAuthenticated] = useState(false);
   const [userRole, setUserRole] = useState("");
 
-  // Define the function to logout the user
   const logout = async () => {
-    // console.log("logout")
     // Log out the user in api and oauth
     const ok = await apiLogoutUser();
     if (!ok) {
@@ -63,13 +61,7 @@ const AuthWrapper: React.FC<{ children: ReactNode }> = ({ children }) => {
 
     // Clear the auth context user data
     setUser(EmptyUser);
-    // console.log("user set to empty")
-
     setAuthenticated(false);
-    // console.log("authenticated set to false")
-
-    // Redirect to home page
-    window.location.replace("/");
   };
 
   return (

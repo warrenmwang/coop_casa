@@ -51,7 +51,7 @@ const TopNavbar: React.FC = () => {
                     <img
                       className="h-8 w-auto"
                       src={coopImg}
-                      alt="Your Company"
+                      alt="Coop"
                     />
                   </Link>
                 </div>
@@ -85,7 +85,7 @@ const TopNavbar: React.FC = () => {
                       <img
                         className="h-8 w-8 rounded-full"
                         src={profileImg}
-                        alt=""
+                        alt="profileImg"
                       />
                     </Menu.Button>
                   </div>

@@ -16,6 +16,7 @@ import {
   Property,
   PropertyDetails,
 } from "../types/Types";
+import { useMutation } from "@tanstack/react-query";
 
 type TextFieldsConstruct = {
   id: string;
@@ -62,6 +63,10 @@ const CreatePropertyForm: React.FC = () => {
     new Map<string, boolean>(),
   ); // if any key value in errors is true, then there is a problem.
   const [images, setImages] = useState<OrderedFile[]>([]);
+
+  const { mutate: mutateCreate } = useMutation({
+    mutationFn: (property: Property) => apiCreateNewProperty(property),
+  });
 
   // for user inputs
   const propertyRequiredFields: string[] = [
@@ -172,7 +177,7 @@ const CreatePropertyForm: React.FC = () => {
       value: propertyDetails.squareFeet,
       required: true,
       type: "number",
-      min: "0",
+      min: "1",
       max: "999999999",
     },
     {
@@ -325,46 +330,36 @@ const CreatePropertyForm: React.FC = () => {
 
   // Submit data if can submit
   useEffect(() => {
-    const foo = async () => {
-      if (isSubmitting) {
-        // Only progress if no errors
-        for (let [k, v] of errors) {
-          if (v) {
-            setIsSubmitting(false);
-            alert(`Fix field: ${k}`);
-            return;
-          }
+    if (isSubmitting) {
+      // Only progress if no errors
+      for (let [k, v] of errors) {
+        if (v) {
+          setIsSubmitting(false);
+          alert(`Fix field: ${k}`);
+          return;
         }
-
-        // Format property with the details and images
-        const property: Property = {
-          details: propertyDetails,
-          images: images,
-        };
-
-        // Send data to backend
-        const response = await apiCreateNewProperty(property);
-        if (response) {
-          if (response.ok) {
-            // Clear the data
-            setPropertyDetails(EmptyPropertyDetails);
-            setImages([]);
-            // Tell user submission was good
-            alert("Property Created.");
-          } else {
-            // response was not ok
-            const body = (await response.json()) as ErrorBody;
-            alert("Got not ok response: " + body.error);
-          }
-        } else {
-          alert("Try submitting again.");
-        }
-
-        // set is submitting to false
-        setIsSubmitting(false);
       }
-    };
-    foo();
+
+      // Format property with the details and images
+      const property: Property = {
+        details: propertyDetails,
+        images: images,
+      };
+
+      // Send data to backend
+      mutateCreate(property, {
+        onSuccess: () => {
+          setPropertyDetails(EmptyPropertyDetails);
+          setImages([]);
+          setIsSubmitting(false);
+          alert("Property created.");
+        },
+        onError: (error: any) => {
+          const errorMessage = error.response?.data || error.message;
+          alert("Got not ok response: " + errorMessage);
+        },
+      });
+    }
   }, [isSubmitting, propertyDetails]);
 
   return (

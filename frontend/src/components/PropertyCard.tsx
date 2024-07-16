@@ -65,7 +65,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
 
   const basicInfoElement = basicInfoConstructor(property);
 
-  // console.log("hi");
+  console.log(property.details.propertyId);
 
   return (
     <>

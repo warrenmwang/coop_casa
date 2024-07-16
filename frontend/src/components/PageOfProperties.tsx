@@ -25,6 +25,8 @@ const PageOfProperties: React.FC<PageOfPropertiesProps> = ({ propertyIDs }) => {
       return value !== undefined;
     });
 
+  console.log("page of properties");
+
   return (
     <Grid container spacing={2}>
       {properties.map((value: Property) => (

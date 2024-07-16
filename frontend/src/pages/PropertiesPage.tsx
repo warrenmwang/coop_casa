@@ -51,6 +51,7 @@ const PropertiesPage: React.FC = () => {
 
   useEffect(() => {
     if (inView && propertiesQuery.hasNextPage) {
+      console.log("fetching next page....");
       propertiesQuery.fetchNextPage();
     }
   }, [inView, propertiesQuery]);
