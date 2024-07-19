@@ -356,7 +356,7 @@ const CreatePropertyForm: React.FC = () => {
         },
         onError: (error: any) => {
           const errorMessage = error.response?.data || error.message;
-          alert("Got not ok response: " + errorMessage);
+          alert("Could not create property because: " + errorMessage);
         },
       });
     }

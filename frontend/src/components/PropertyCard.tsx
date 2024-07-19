@@ -1,7 +1,7 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Property } from "../types/Types";
-import { Card, CardActionArea, CardContent, CardMedia } from "@mui/material";
+import { Card, CardContent, CardMedia } from "@mui/material";
 import { propertiesPageLink } from "../urls";
 
 interface PropertyCardProps {
@@ -10,15 +10,8 @@ interface PropertyCardProps {
 }
 
 const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
-  const navigate = useNavigate();
-
-  const handleCardClick = () => {
-    navigate(`${propertiesPageLink}/${property.details.propertyId}`);
-  };
-
-  // let images: string[] = property.images.map((image) =>
-  //   URL.createObjectURL(image.file),
-  // );
+  const propertyDetailPage = `${propertiesPageLink}/${property.details.propertyId}`;
+  let cardImage = URL.createObjectURL(property.images[0].file);
 
   const costNumsToPresentableString = (
     costDollars: number,
@@ -65,18 +58,16 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
 
   const basicInfoElement = basicInfoConstructor(property);
 
-  console.log(property.details.propertyId);
+  // console.log(property.details.propertyId);
+  // console.log("PropertyCard");
 
   return (
     <>
-      <CardActionArea
-        onClick={handleCardClick}
-        sx={{ maxWidth: 400, maxHeight: 600 }}
-      >
+      <Link to={propertyDetailPage}>
         <Card sx={{ maxWidth: 400, maxHeight: 600 }}>
           <CardMedia
             sx={{ width: 400, height: 300 }}
-            image={URL.createObjectURL(property.images[0].file)}
+            image={cardImage}
             title="default first image"
           />
           <CardContent>
@@ -85,9 +76,12 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
             {basicInfoElement}
           </CardContent>
         </Card>
-      </CardActionArea>
+      </Link>
     </>
   );
 };
 
-export default PropertyCard;
+// only use memo if certain PropertyCard is pure!
+// (only re-render this comp if the props change.)
+export default React.memo(PropertyCard);
+// export default PropertyCard;

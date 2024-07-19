@@ -1,6 +1,5 @@
 import React from "react";
 import { useQueries } from "@tanstack/react-query";
-import { Grid } from "@mui/material";
 import { apiGetProperty } from "../api/api";
 import PropertyCard from "./PropertyCard";
 
@@ -25,26 +24,17 @@ const PageOfProperties: React.FC<PageOfPropertiesProps> = ({ propertyIDs }) => {
       return value !== undefined;
     });
 
-  console.log("page of properties");
+  // console.log("PageOfProperties");
 
   return (
-    <Grid container spacing={2}>
-      {properties.map((value: Property) => (
-        <Grid
-          key={value.details.propertyId}
-          item
-          xs={12}
-          sm={12}
-          md={6}
-          lg={6}
-          xl={4}
-          style={{ gap: "0 24px" }}
-        >
+    <div className="flex justify-center">
+      <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4">
+        {properties.map((value: Property) => (
           <PropertyCard key={value.details.propertyId} property={value} />
-        </Grid>
-      ))}
-    </Grid>
+        ))}
+      </div>
+    </div>
   );
 };
 
-export default PageOfProperties;
+export default React.memo(PageOfProperties);

@@ -73,6 +73,19 @@ export type PropertyDetails = {
   miscNote: string;
 };
 
+/*
+
+We may want to use a type generic for OrderedFile like:
+
+export type OrderedFile<T> = {
+  orderNm: number;
+  file: T
+}
+
+export type APIOrderedFile = OrderedFile<APIFileReceived>;
+export type FEOrderedFile = OrderedFile<File>; // FE = FrontEnd
+*/
+
 export type APIOrderedFile = {
   orderNum: number;
   file: APIFileReceived;
