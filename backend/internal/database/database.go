@@ -111,7 +111,7 @@ type Service interface {
 	UpdatePropertyImages(propertyID string, images []OrderedFileInternal) error
 	DeleteProperty(propertyId string) error
 	DeletePropertyImage(propertyId string, imageOrderNum int16) error
-	GetNextPageProperties(limit, offset int32) ([]string, error)
+	GetNextPageProperties(limit, offset int32, filter string) ([]string, error)
 	GetTotalCountProperties() (int64, error)
 	DeleteProperties(userID string) error
 	CheckDuplicateProperty(propertyDetails PropertyDetails) error
@@ -756,13 +756,26 @@ func (s *service) GetPropertyImages(propertyId string) ([]OrderedFileInternal, e
 }
 
 // Allow a public function to search for the available properties on app
-func (s *service) GetNextPageProperties(limit, offset int32) ([]string, error) {
+func (s *service) GetNextPageProperties(limit, offset int32, filter string) ([]string, error) {
 	ctx := context.Background()
 
-	// Get the encrypted properties details
-	propertyIDs, err := s.db_queries.GetNextPageProperties(ctx, sqlc.GetNextPagePropertiesParams{
-		Limit:  limit,
-		Offset: offset,
+	if filter == "" {
+		// Get the encrypted properties details
+		propertyIDs, err := s.db_queries.GetNextPageProperties(ctx, sqlc.GetNextPagePropertiesParams{
+			Limit:  limit,
+			Offset: offset,
+		})
+		if err != nil {
+			return nil, err
+		}
+		return propertyIDs, nil
+	}
+
+	// there is a filter
+	propertyIDs, err := s.db_queries.GetNextPagePropertiesFiltered(ctx, sqlc.GetNextPagePropertiesFilteredParams{
+		Limit:       limit,
+		Offset:      offset,
+		Levenshtein: filter,
 	})
 	if err != nil {
 		return nil, err

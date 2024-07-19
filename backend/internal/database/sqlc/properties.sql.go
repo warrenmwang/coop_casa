@@ -210,6 +210,45 @@ func (q *Queries) GetNextPageProperties(ctx context.Context, arg GetNextPageProp
 	return items, nil
 }
 
+const getNextPagePropertiesFiltered = `-- name: GetNextPagePropertiesFiltered :many
+SELECT 
+    property_id
+FROM properties
+ORDER BY
+    levenshtein(address_1, $3) + levenshtein(address_2, $3) + levenshtein(city, $3)
+    + levenshtein("state", $3) + levenshtein(zipcode, $3) + levenshtein(country, $3)
+LIMIT $1 OFFSET $2
+`
+
+type GetNextPagePropertiesFilteredParams struct {
+	Limit       int32
+	Offset      int32
+	Levenshtein string
+}
+
+func (q *Queries) GetNextPagePropertiesFiltered(ctx context.Context, arg GetNextPagePropertiesFilteredParams) ([]string, error) {
+	rows, err := q.db.QueryContext(ctx, getNextPagePropertiesFiltered, arg.Limit, arg.Offset, arg.Levenshtein)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []string
+	for rows.Next() {
+		var property_id string
+		if err := rows.Scan(&property_id); err != nil {
+			return nil, err
+		}
+		items = append(items, property_id)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getProperty = `-- name: GetProperty :one
 SELECT id, property_id, lister_user_id, name, description, address_1, address_2, city, state, zipcode, country, square_feet, num_bedrooms, num_toilets, num_showers_baths, cost_dollars, cost_cents, misc_note, created_at, updated_at FROM properties
 WHERE property_id = $1

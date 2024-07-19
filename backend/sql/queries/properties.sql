@@ -83,7 +83,15 @@ WHERE
     lower(trim(country)) = lower(trim($6))
 );
 
--- name: PropertiesFuzzySearchAddress :one
+-- name: GetNextPagePropertiesFiltered :many
+SELECT 
+    property_id
+FROM properties
+ORDER BY
+    levenshtein(address_1, $3) + levenshtein(address_2, $3) + levenshtein(city, $3)
+    + levenshtein("state", $3) + levenshtein(zipcode, $3) + levenshtein(country, $3)
+LIMIT $1 OFFSET $2;
+
 -- SELECT 
 --     tbl_name_column, 
 --     levenshtein(tbl_name_column, 'search string') AS score 
