@@ -1,5 +1,19 @@
 # Coop.casa
 
+### Comment
+
+Just a project to learn about building full stack web applications around a theme that I own no creative rights to. I feel legally obligated to mention
+that this project is currently not a legal entity nor a real company. This does not indicate anything about
+whether Coop will exist in the future.
+
+### Tech Stack
+
+**Frontend:** Typescript, ReactJS, TailwindCSS, TanStack/React Query, React Router <br>
+**Backend:** Go, PostgreSQL, Goose, SQLC, Goth <br>
+**Other:** Docker, Nginx
+
+There's a lot more Javascript libraries than Go libraries that I use that are not mentioned. As for PostgreSQL extensions that I use, just look in the migrations folder.
+
 ## Connecting Communities, Empowering Ownership.
 
 Coop wants to provide a platform for people to meet specifically with the idea in mind to
