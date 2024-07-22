@@ -1,78 +1,66 @@
 import React, { useState, useEffect } from "react";
 import { apiGetProperties } from "../api/api";
-import { useInfiniteQuery } from "@tanstack/react-query";
-import { useInView } from "react-intersection-observer";
+import { useQuery } from "@tanstack/react-query";
 import { MAX_NUMBER_PROPERTIES_PER_PAGE } from "../constants";
 import Title from "../components/Title";
 import CardGridSkeleton from "../skeleton/CardGridSkeleton";
-import CardSkeleton from "../skeleton/CardSkeleton";
 import SearchBar from "../input/SearchBar";
 import PageOfProperties from "../components/PageOfProperties";
 import { useSearchParams } from "react-router-dom";
 import "../styles/ContentBody.css";
-import debounce from "lodash/debounce";
 import SubmitButton from "./SubmitButton";
 
 const DisplayProperties: React.FC = () => {
-  // console.log("DisplayProperties");
-
   const [searchIsSubmitting, setSearchIsSubmitting] = useState(false);
   const [searchParams, _] = useSearchParams();
   const searchQueryParamKey = "searchProperties";
-  const { ref, inView } = useInView();
+  const [pages, setPages] = useState<Map<number, string[]>>(new Map()); // <page num, property ids>
+
+  const [currentPage, setCurrentPage] = useState<number>(0);
+  const [filter, setFilter] = useState<string>("");
 
   const searchPropertiesWithFilter = (e: React.FormEvent) => {
     e.preventDefault();
     setSearchIsSubmitting(true);
   };
 
-  const fetchProperties = async ({
-    pageParam,
-  }: {
-    pageParam: number;
-  }): Promise<{
-    data: string[];
-    currentPage: number;
-    nextPage: number | null;
-  }> => {
-    const propertyIDs = await apiGetProperties(pageParam);
-    return new Promise((resolve) =>
-      resolve({
-        data: propertyIDs,
-        currentPage: pageParam,
-        nextPage:
-          propertyIDs.length === MAX_NUMBER_PROPERTIES_PER_PAGE
-            ? pageParam + 1
-            : null,
-      }),
-    );
-  };
-
-  const propertiesQuery = useInfiniteQuery({
-    queryKey: ["properties"],
-    queryFn: fetchProperties,
-    initialPageParam: 0,
-    getNextPageParam: (lastPage) => lastPage.nextPage,
+  const query = useQuery({
+    queryKey: ["propertiesPage", currentPage, filter],
+    queryFn: () => apiGetProperties(currentPage, filter),
   });
 
-  const debouncedFetchNextPage = debounce((inView, propertiesQuery) => {
-    if (inView && propertiesQuery.hasNextPage) {
-      propertiesQuery.fetchNextPage();
-    }
-  }, 500);
+  const handleNavPage = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    const element = e.target as HTMLElement;
+    const pageToGoTo = Number(element.innerHTML) - 1;
+    setCurrentPage(pageToGoTo);
+  };
 
+  const handleNextPage = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    // const element = e.target as HTMLElement;
+    const pageToGoTo = currentPage + 1;
+    setCurrentPage(pageToGoTo);
+  };
+
+  // update cache of pages
   useEffect(() => {
-    debouncedFetchNextPage(inView, propertiesQuery);
-  }, [debouncedFetchNextPage, inView, propertiesQuery]);
+    if (query.status === "success") {
+      const newPage = query.data as string[];
+      setPages((prevPages) => new Map(prevPages).set(currentPage, newPage));
+    }
+  }, [query.status]);
 
+  // fetching a new page
   useEffect(() => {
     if (searchIsSubmitting) {
-      // TODO:
       const filter = searchParams.get(searchQueryParamKey);
-      console.log(`firing off new search with filter ${filter}`);
+      setFilter(filter as string);
       setSearchIsSubmitting(false);
     }
   }, [searchIsSubmitting]);
+
+  // change current page displayed
 
   return (
     <div className="content-body">
@@ -92,30 +80,36 @@ const DisplayProperties: React.FC = () => {
         <SubmitButton isSubmitting={searchIsSubmitting} />
       </form>
 
-      {propertiesQuery.status === "pending" && <CardGridSkeleton />}
+      {query.status === "pending" && <CardGridSkeleton />}
 
-      {(propertiesQuery.status === "success" ||
-        propertiesQuery.data !== undefined) &&
-        propertiesQuery.data.pages.map((page) => (
-          <PageOfProperties key={page.currentPage} propertyIDs={page.data} />
+      {pages.has(currentPage) && (
+        <PageOfProperties propertyIDs={pages.get(currentPage) as string[]} />
+      )}
+
+      <div
+        id="DisplayProperties__navigationBtnsContainer"
+        className="flex gap-1"
+      >
+        {Array.from(pages.entries()).map((_, key) => (
+          <button
+            className="bg-gray-500 hover:bg-gray-600 text-white p-3 rounded"
+            disabled={currentPage === key}
+            onClick={handleNavPage}
+          >
+            {key + 1}
+          </button>
         ))}
-
-      {propertiesQuery.status === "error" && (
-        <h1 className="text-xl text-red-600 font-bold flex justify-center">
-          Sorry, we are unable to find any properties at the moment. Please come
-          back again later. Server returned with error:{" "}
-          {JSON.stringify(propertiesQuery.error)}
-        </h1>
-      )}
-
-      {propertiesQuery.isFetchingNextPage && <CardSkeleton />}
-
-      {!propertiesQuery.hasNextPage && (
-        <div className="flex justify-center text-gray-400 text-lg">
-          No more properties to show.
-        </div>
-      )}
-      <div ref={ref}></div>
+        {pages.has(currentPage) &&
+          (pages.get(currentPage) as string[]).length ===
+            MAX_NUMBER_PROPERTIES_PER_PAGE && (
+            <button
+              className="bg-gray-500 hover:bg-gray-600 text-white p-3 rounded"
+              onClick={handleNextPage}
+            >
+              Next
+            </button>
+          )}
+      </div>
     </div>
   );
 };

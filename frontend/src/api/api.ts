@@ -290,8 +290,12 @@ export const apiGetProperty = async (propertyID: string): Promise<Property> => {
 };
 
 // Get a page of property ids
-export const apiGetProperties = async (page: number): Promise<string[]> => {
-  return fetch(`${api_properties_Link}?page=${page}`, {
+export const apiGetProperties = async (
+  page: number,
+  filter: string,
+): Promise<string[]> => {
+  if (filter === undefined) filter = "";
+  return fetch(`${api_properties_Link}?page=${page}&filter=${filter}`, {
     method: "GET",
     headers: {
       Accept: "application/json",
