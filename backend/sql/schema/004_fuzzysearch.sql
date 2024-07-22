@@ -1,5 +1,5 @@
---- +goose Up
+-- +goose Up
 CREATE EXTENSION fuzzystrmatch;
 
---- +goose Down
+-- +goose Down
 DROP EXTENSION fuzzystrmatch;
