@@ -954,9 +954,15 @@ func (s *Server) apiCreatePropertiesHandler(w http.ResponseWriter, r *http.Reque
 		respondWithError(w, 500, err)
 		return
 	}
+	numberImages := int16(numberImagesInt64)
+
+	// Ensure that at least a single image is given for the property
+	if numberImages == 0 {
+		respondWithError(w, 400, errors.New("property must have at least one property"))
+		return
+	}
 
 	var images []database.OrderedFileInternal
-	numberImages := int16(numberImagesInt64)
 	for i := range numberImages {
 		imageDataRaw, imageFileHeader, err := r.FormFile(fmt.Sprintf("image%d", i))
 		if err != nil {
@@ -1050,9 +1056,15 @@ func (s *Server) apiUpdatePropertiesHandler(w http.ResponseWriter, r *http.Reque
 		respondWithError(w, 500, err)
 		return
 	}
+	numberImages := int16(numberImagesInt64)
+
+	// Ensure that at least a single image is given for the property
+	if numberImages == 0 {
+		respondWithError(w, 400, errors.New("property must have at least one property"))
+		return
+	}
 
 	var images []database.OrderedFileInternal
-	numberImages := int16(numberImagesInt64)
 	for i := range numberImages {
 		imageDataRaw, imageFileHeader, err := r.FormFile(fmt.Sprintf("image%d", i))
 		if err != nil {

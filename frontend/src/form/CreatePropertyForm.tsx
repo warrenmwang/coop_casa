@@ -99,7 +99,7 @@ const CreatePropertyForm: React.FC = () => {
   // the required fields are entered.
   useEffect(() => {
     // Set Errors for required fields that the user needs to fill in
-    propertyRequiredFields.map((field) => {
+    propertyRequiredFields.forEach((field) => {
       setErrors(field, true);
     });
   }, []);
@@ -275,46 +275,23 @@ const CreatePropertyForm: React.FC = () => {
     // update errors
     if (files.length > MAX_PROPERTY_IMGS_ALLOWED) {
       setErrors("images", true);
-      setImages([]);
       alert(
         `Uploaded more than the maximum allowable images (${MAX_PROPERTY_IMGS_ALLOWED}).`,
       );
       return;
     } else if (files.length === 0) {
       setErrors("images", true);
-    } else {
-      setErrors("images", false);
+      return;
     }
 
+    // no errors (at least 1 image)
+    setErrors("images", false);
     // save images state
     setImages(files);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    // Basic input check
-    type propertyDetailsKey = keyof typeof propertyDetails;
-    for (let field of propertyRequiredFields) {
-      const id = field as propertyDetailsKey;
-      const value = propertyDetails[id];
-
-      // Empty field of required
-      if (typeof value === "string") {
-        if (value === "") {
-          setErrors(field, true);
-          continue;
-        }
-      } else if (typeof value === "number") {
-        if (value < 0 || value > 999999999999) {
-          setErrors(field, true);
-          continue;
-        }
-      }
-
-      // All good for this field
-      setErrors(field, false);
-    }
 
     // Set values that we don't want the user to fill in themselves.
     // property id as a UUIDV4, lister id (openauth id)

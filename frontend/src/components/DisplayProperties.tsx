@@ -83,7 +83,10 @@ const DisplayProperties: React.FC = () => {
       {query.status === "pending" && <CardGridSkeleton />}
 
       {pages.has(currentPage) && (
-        <PageOfProperties propertyIDs={pages.get(currentPage) as string[]} />
+        <PageOfProperties
+          key={currentPage}
+          propertyIDs={pages.get(currentPage) as string[]}
+        />
       )}
 
       <div
@@ -92,6 +95,7 @@ const DisplayProperties: React.FC = () => {
       >
         {Array.from(pages.entries()).map((_, key) => (
           <button
+            key={key}
             className="bg-gray-500 hover:bg-gray-600 text-white p-3 rounded"
             disabled={currentPage === key}
             onClick={handleNavPage}
@@ -103,6 +107,7 @@ const DisplayProperties: React.FC = () => {
           (pages.get(currentPage) as string[]).length ===
             MAX_NUMBER_PROPERTIES_PER_PAGE && (
             <button
+              key="next"
               className="bg-gray-500 hover:bg-gray-600 text-white p-3 rounded"
               onClick={handleNextPage}
             >

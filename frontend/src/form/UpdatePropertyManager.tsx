@@ -44,10 +44,6 @@ const UpdatePropertyForm: React.FC<{
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // FIXME: in actual testing, it looks like the helpful messages provided by
-  // the result of these variables that useMutation live for "too long"
-  // that is, I need a way to manually set them to all false or something
-  // or remove their value.
   const {
     mutate: mutateUpdate,
     isPending: isPendingUpdate,
@@ -123,30 +119,6 @@ const UpdatePropertyForm: React.FC<{
   };
 
   const handleSaveChanges = async () => {
-    // Basic input check
-    type propertyDetailsKey = keyof typeof formDetails;
-    for (let field of propertyRequiredFields) {
-      const id = field as propertyDetailsKey;
-      const value = formDetails[id];
-
-      // Empty field of required
-      if (typeof value === "string") {
-        if (value === "") {
-          console.log(`setting field ${id} to true`);
-          setErrors(field, true);
-          continue;
-        }
-      } else if (typeof value === "number") {
-        if (value < 0 || value > 999999999999) {
-          setErrors(field, true);
-          continue;
-        }
-      }
-
-      // All good for this field
-      setErrors(field, false);
-    }
-
     // save property details and images and start submission request.
     setProperty((prevState) => ({
       ...prevState,

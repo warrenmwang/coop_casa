@@ -11,7 +11,7 @@ interface PropertyCardProps {
 
 const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
   const propertyDetailPage = `${propertiesPageLink}/${property.details.propertyId}`;
-  let cardImage = URL.createObjectURL(property.images[0].file);
+  let cardImage: string = URL.createObjectURL(property.images[0].file);
 
   const costNumsToPresentableString = (
     costDollars: number,
