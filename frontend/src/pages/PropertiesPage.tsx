@@ -4,7 +4,7 @@ import Footer from "../components/Footer";
 import DisplayProperties from "../components/DisplayProperties";
 
 const PropertiesPage: React.FC = () => {
-  // console.log("properties page");
+  console.log("PropertiesPage");
 
   return (
     <>

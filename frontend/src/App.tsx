@@ -1,10 +1,11 @@
-import { Suspense, createContext } from "react";
+import { Suspense } from "react";
 import AuthWrapper from "./auth/AuthWrapper";
 import RouteRenderer from "./components/RouteRenderer";
 import { BrowserRouter as Router } from "react-router-dom";
 import TextSkeleton from "./skeleton/TextSkeleton";
 
 function App() {
+  // console.log("App");
   return (
     <AuthWrapper>
       <Router>

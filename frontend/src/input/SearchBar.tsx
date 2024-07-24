@@ -15,15 +15,13 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const handleInputOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     const searchText = e.target.value;
-    setSearchParams((prevState) => ({
-      ...prevState,
-      [searchQueryParamKey]: searchText,
-    }));
+    searchParams.set(searchQueryParamKey, searchText);
+    setSearchParams(searchParams);
   };
 
   return (
     <>
-      <div className="relative">
+      <div className="relative w-1/2">
         <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
           <svg
             className="w-4 h-4 text-gray-500 dark:text-gray-400"
@@ -52,7 +50,6 @@ const SearchBar: React.FC<SearchBarProps> = ({
               : ""
           }
           onChange={handleInputOnChange}
-          required
         />
       </div>
     </>

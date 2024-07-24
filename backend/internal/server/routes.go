@@ -867,7 +867,7 @@ func (s *Server) apiGetPropertiesHandler(w http.ResponseWriter, r *http.Request)
 	// Get the offset for the properties viewing
 	limit := 9
 	offsetStr := query.Get("page")
-	filter := query.Get("filter")
+	addressFilter := query.Get("addressFilter")
 
 	// Page cannot be empty string
 	if offsetStr == "" {
@@ -887,7 +887,7 @@ func (s *Server) apiGetPropertiesHandler(w http.ResponseWriter, r *http.Request)
 	offset = offset * limit
 
 	// Get the property IDs from DB
-	properties, err := s.db.GetNextPageProperties(int32(limit), int32(offset), filter)
+	properties, err := s.db.GetNextPageProperties(int32(limit), int32(offset), addressFilter)
 	if err != nil {
 		respondWithError(w, 500, err)
 		return

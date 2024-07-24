@@ -42,13 +42,6 @@ const AccountSetupPage: React.FC = () => {
     });
   };
 
-  // Set interests error to true at first render
-  useEffect(() => {
-    if (formData.interests === "") {
-      setError("interests", true);
-    }
-  }, [formData.interests]);
-
   const handleClearAvatarImage = () => {
     setFormData((prevState) => ({
       ...prevState,
@@ -76,6 +69,14 @@ const AccountSetupPage: React.FC = () => {
     setIsSubmitting(true);
   };
 
+  // Set interests error to true at first render
+  useEffect(() => {
+    if (formData.interests === "") {
+      setError("interests", true);
+    }
+  }, [formData.interests]);
+
+  // account setup form submission
   useEffect(() => {
     if (isSubmitting) {
       const foo = async () => {

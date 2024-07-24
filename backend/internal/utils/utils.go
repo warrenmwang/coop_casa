@@ -6,18 +6,19 @@ import (
 	"crypto/md5"
 	"database/sql"
 	"encoding/base64"
+	"regexp"
 	"time"
-
-	"github.com/google/uuid"
 )
 
-func IsValidUUID(str string) bool {
-	_, err := uuid.Parse(str)
-	return err == nil
+func IsValidEmail(email string) bool {
+	const emailRegexPattern = `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
+	re := regexp.MustCompile(emailRegexPattern)
+	return re.MatchString(email)
 }
 
+// Parse a string representing a date in format `layout`
+// as a time.Time object and return that.
 func ParseStringToNullTime(timeStr string) (time.Time, error) {
-	// Define the layout according to the format of your time string
 	layout := "2006-01-02"
 
 	// Parse the string into a time.Time object

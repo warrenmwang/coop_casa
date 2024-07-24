@@ -10,14 +10,48 @@ import { useSearchParams } from "react-router-dom";
 import "../styles/ContentBody.css";
 import SubmitButton from "./SubmitButton";
 
+export const addressFilterQPKey = "addressFilter";
+export const pageQPKey = "page";
+
 const DisplayProperties: React.FC = () => {
   const [searchIsSubmitting, setSearchIsSubmitting] = useState(false);
-  const [searchParams, _] = useSearchParams();
-  const searchQueryParamKey = "searchProperties";
+  const [searchParams, setSearchParams] = useSearchParams();
+
   const [pages, setPages] = useState<Map<number, string[]>>(new Map()); // <page num, property ids>
 
-  const [currentPage, setCurrentPage] = useState<number>(0);
-  const [filter, setFilter] = useState<string>("");
+  // Sync query params with state
+  // page num
+  let startPage: string | null = searchParams.get(pageQPKey);
+  let startPageNum: number;
+  if (startPage !== null && startPage.length > 0) {
+    // use the given page num, or use 0 if not a valid number
+    startPage = startPage as string;
+    startPageNum = Number(startPage);
+    if (Number.isNaN(startPageNum)) {
+      startPageNum = 0;
+    }
+  } else {
+    // not given, start with first page (0)
+    startPageNum = 0;
+    searchParams.set(pageQPKey, `${startPageNum}`);
+    setSearchParams(searchParams);
+  }
+
+  let addressFilterQP: string | null = searchParams.get(addressFilterQPKey);
+  let addressFilterStr: string;
+  if (addressFilterQP !== null) {
+    addressFilterStr = addressFilterQP as string;
+  } else {
+    addressFilterStr = "";
+  }
+
+  const [currentPage, _setCurrentPage] = useState<number>(startPageNum);
+  const setCurrentPage = (page: number) => {
+    _setCurrentPage(page);
+    searchParams.set(pageQPKey, `${page}`);
+    setSearchParams(searchParams);
+  };
+  const [addressFilter, setAddressFilter] = useState<string>(addressFilterStr);
 
   const searchPropertiesWithFilter = (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,8 +59,8 @@ const DisplayProperties: React.FC = () => {
   };
 
   const query = useQuery({
-    queryKey: ["propertiesPage", currentPage, filter],
-    queryFn: () => apiGetProperties(currentPage, filter),
+    queryKey: ["propertiesPage", currentPage, addressFilter],
+    queryFn: () => apiGetProperties(currentPage, addressFilter),
   });
 
   const handleNavPage = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -38,7 +72,6 @@ const DisplayProperties: React.FC = () => {
 
   const handleNextPage = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    // const element = e.target as HTMLElement;
     const pageToGoTo = currentPage + 1;
     setCurrentPage(pageToGoTo);
   };
@@ -48,19 +81,22 @@ const DisplayProperties: React.FC = () => {
     if (query.status === "success") {
       const newPage = query.data as string[];
       setPages((prevPages) => new Map(prevPages).set(currentPage, newPage));
-    }
-  }, [query.status]);
-
-  // fetching a new page
-  useEffect(() => {
-    if (searchIsSubmitting) {
-      const filter = searchParams.get(searchQueryParamKey);
-      setFilter(filter as string);
       setSearchIsSubmitting(false);
     }
-  }, [searchIsSubmitting]);
+  }, [query.status, query.isRefetching]); // add isRefetching to dependency to allow us to use pages that were cached from previous queries
 
-  // change current page displayed
+  // when new search is fired off, get the latest address
+  useEffect(() => {
+    if (searchIsSubmitting) {
+      let addressFilter: string | null = searchParams.get(addressFilterQPKey);
+      if (addressFilter === null) {
+        addressFilter = "";
+      }
+
+      setCurrentPage(0);
+      setAddressFilter(addressFilter);
+    }
+  }, [searchIsSubmitting]);
 
   return (
     <div className="content-body">
@@ -74,7 +110,7 @@ const DisplayProperties: React.FC = () => {
         onSubmit={searchPropertiesWithFilter}
       >
         <SearchBar
-          searchQueryParamKey={searchQueryParamKey}
+          searchQueryParamKey={addressFilterQPKey}
           placeholder="Search by address."
         ></SearchBar>
         <SubmitButton isSubmitting={searchIsSubmitting} />

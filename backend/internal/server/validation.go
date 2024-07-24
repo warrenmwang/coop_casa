@@ -5,12 +5,14 @@ import (
 	"backend/internal/utils"
 	"errors"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 // Validate property details
 func ValidatePropertyDetails(propertyDetails database.PropertyDetails) error {
 	// Ensure property id is a valid uuidv4
-	if !utils.IsValidUUID(propertyDetails.PropertyID) {
+	if _, err := uuid.Parse(propertyDetails.PropertyID); err != nil {
 		return errors.New("invalid form state: property id is not a valid uuid")
 	}
 
@@ -64,16 +66,24 @@ func ValidatePropertyDetails(propertyDetails database.PropertyDetails) error {
 }
 
 // Validate the user details field values
-// Should ensure no SQL injection or whatnot
 // Returns an error
 func ValidateUserDetails(userDetails database.UserDetails) error {
+	// Ensure id field is present
+	if len(userDetails.UserID) == 0 {
+		return errors.New("user id is empty")
+	}
+
+	// Ensure email is a proper email
+	if !utils.IsValidEmail(userDetails.Email) {
+		return errors.New("email is not valid")
+	}
 
 	// Ensure name fields are not empty
 	if len(userDetails.FirstName) == 0 {
-		return errors.New("invalid form state: first name is empty")
+		return errors.New("first name is empty")
 	}
 	if len(userDetails.LastName) == 0 {
-		return errors.New("invalid form state: last name is empty")
+		return errors.New("last name is empty")
 	}
 
 	// Ensure user is more than 18 years of age
@@ -95,15 +105,15 @@ func ValidateUserDetails(userDetails database.UserDetails) error {
 
 	// Ensure rest of fields are not empty
 	if len(userDetails.Gender) == 0 {
-		return errors.New("invalid form state: gender is empty")
+		return errors.New("gender is empty")
 	}
 
 	if len(userDetails.Location) == 0 {
-		return errors.New("invalid form state: location is empty")
+		return errors.New("location is empty")
 	}
 
 	if len(userDetails.Interests) == 0 {
-		return errors.New("invalid form state: interests is empty")
+		return errors.New("interests is empty")
 	}
 
 	return nil

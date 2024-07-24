@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Property } from "../types/Types";
 import { Card, CardContent, CardMedia } from "@mui/material";
@@ -10,8 +10,13 @@ interface PropertyCardProps {
 }
 
 const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
+  console.log("PropertyCard");
+
   const propertyDetailPage = `${propertiesPageLink}/${property.details.propertyId}`;
-  let cardImage: string = URL.createObjectURL(property.images[0].file);
+  let cardImage: string = useMemo(
+    () => URL.createObjectURL(property.images[0].file),
+    [property.images],
+  );
 
   const costNumsToPresentableString = (
     costDollars: number,

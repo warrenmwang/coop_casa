@@ -88,12 +88,8 @@ SELECT
     property_id
 FROM properties
 ORDER BY
-    levenshtein(address_1, $3) + levenshtein(address_2, $3) + levenshtein(city, $3)
-    + levenshtein("state", $3) + levenshtein(zipcode, $3) + levenshtein(country, $3)
+    levenshtein(
+        CONCAT (address_1, ', ', address_2, ', ', city, ', ', zipcode, ', ', country),
+        $3
+    ) ASC
 LIMIT $1 OFFSET $2;
-
--- SELECT 
---     tbl_name_column, 
---     levenshtein(tbl_name_column, 'search string') AS score 
--- FROM tbl 
--- ORDER BY score ASC; --levenshtein distance decreases with similarity

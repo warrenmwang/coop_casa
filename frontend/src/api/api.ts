@@ -23,6 +23,7 @@ import {
 import { AuthData } from "../auth/AuthWrapper";
 import { apiFile2ClientFile } from "../utils/utils";
 import axios from "axios";
+import { addressFilterQPKey, pageQPKey } from "../components/DisplayProperties";
 
 export const checkFetch = (response: Response) => {
   // source: https://www.youtube.com/watch?v=b8DaQrxshu0
@@ -232,11 +233,6 @@ export const apiCreateNewProperty = async (
     }
   }
 
-  // return fetch(api_properties_Link, {
-  //   method: "PUT",
-  //   body: formData,
-  //   credentials: "include",
-  // });
   return axios.put(api_properties_Link, formData, {
     withCredentials: true,
   });
@@ -255,10 +251,8 @@ export const apiUpdateProperty = async (
     }
   }
 
-  return fetch(api_properties_Link, {
-    method: "POST",
-    body: formData,
-    credentials: "include",
+  return axios.post(api_properties_Link, formData, {
+    withCredentials: true,
   });
 };
 
@@ -292,15 +286,19 @@ export const apiGetProperty = async (propertyID: string): Promise<Property> => {
 // Get a page of property ids
 export const apiGetProperties = async (
   page: number,
-  filter: string,
+  addressFilter: string,
 ): Promise<string[]> => {
-  if (filter === undefined) filter = "";
-  return fetch(`${api_properties_Link}?page=${page}&filter=${filter}`, {
-    method: "GET",
-    headers: {
-      Accept: "application/json",
+  if (addressFilter === undefined) addressFilter = "";
+  // return axios.get(`${api_properties_Link}?${pageQPKey}=${page}&${addressFilterQPKey}=${addressFilter}`, )
+  return fetch(
+    `${api_properties_Link}?${pageQPKey}=${page}&${addressFilterQPKey}=${addressFilter}`,
+    {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
     },
-  })
+  )
     .then(checkFetch)
     .then((response) => response.json())
     .then((data) => {

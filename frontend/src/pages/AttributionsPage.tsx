@@ -25,12 +25,6 @@ const AttributionsPage: React.FC = () => {
           </b>{" "}
           from simplemaps.
         </Typography>
-        <Typography variant="body1">
-          The fallback house property image is from brgfx taken from Freepik:{" "}
-          <a href="https://www.freepik.com/free-vector/sticker-template-with-mini-house-isolated_16508000.htm#query=house%20clipart&position=0&from_view=keyword&track=ais_user&uuid=92db24b8-fc69-40a5-a766-a21911bc32c8">
-            link
-          </a>{" "}
-        </Typography>
       </div>
       <Footer></Footer>
     </>

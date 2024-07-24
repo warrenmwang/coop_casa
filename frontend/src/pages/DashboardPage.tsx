@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import TopNavbar from "../components/TopNavbar";
 import Footer from "../components/Footer";
 import Title from "../components/Title";
@@ -9,16 +9,24 @@ import { useAPIGetUserRole } from "../api/api";
 import TextSkeleton from "../skeleton/TextSkeleton";
 import RegularDashboard from "../components/RegularDashboard";
 import AdminDashboard from "../components/AdminDashboard";
-import { accountSetupPageLink } from "../urls";
+import { accountSetupPageLink, homePageLink } from "../urls";
 
 // Dashboard is only showed when user is authed.
 const DashboardPage: React.FC = () => {
+  console.log("DashboardPage");
+  const loading = useAPIGetUserRole();
+
+  const navigate = useNavigate();
+
   const auth = AuthData();
-  const { user, userRole } = auth;
+  const { user, authenticated, userRole } = auth;
+
+  if (!authenticated) {
+    navigate(homePageLink);
+  }
+
   const email = user.email;
   const accountIsSetup = user.firstName !== "" && user.lastName !== "";
-
-  const loading = useAPIGetUserRole();
 
   return (
     <>

@@ -10,7 +10,6 @@ import MapPage from "../pages/MapPage";
 import PrivacyPolicyPage from "../pages/PrivacyPolicyPage";
 import TermsOfServicePage from "../pages/TermsOfServicePage";
 
-import { AuthData } from "../auth/AuthWrapper";
 import AccountSettingsPage from "../pages/AccountSettingsPage";
 import AccountSetupPage from "../pages/AccountSetupPage";
 import PropertiesPage from "../pages/PropertiesPage";
@@ -42,8 +41,7 @@ const OAuthCallbackPage = React.lazy(
 );
 
 const RouteRenderer: React.FC = () => {
-  const auth = AuthData();
-  const { authenticated } = auth;
+  // console.log("RouteRenderer");
 
   useAPIAuthCheck();
   useAPIGetUserAccount();
@@ -65,31 +63,9 @@ const RouteRenderer: React.FC = () => {
       <Route path={attributionsPageLink} element={<AttributionsPage />} />
       <Route path={contactPageLink} element={<ContactPage />} />
       <Route path={oauthCallBackPageLink} element={<OAuthCallbackPage />} />
-      {authenticated ? (
-        <>
-          <Route path={dashboardPageLink} element={<DashboardPage />} />
-          <Route
-            path={accountSettingsPageLink}
-            element={<AccountSettingsPage />}
-          />
-          <Route path={accountSetupPageLink} element={<AccountSetupPage />} />
-        </>
-      ) : (
-        <>
-          <Route
-            path={dashboardPageLink}
-            element={<Navigate to={homePageLink} replace />}
-          />
-          <Route
-            path={accountSettingsPageLink}
-            element={<Navigate to={homePageLink} replace />}
-          />
-          <Route
-            path={accountSetupPageLink}
-            element={<Navigate to={homePageLink} replace />}
-          />
-        </>
-      )}
+      <Route path={dashboardPageLink} element={<DashboardPage />} />
+      <Route path={accountSettingsPageLink} element={<AccountSettingsPage />} />
+      <Route path={accountSetupPageLink} element={<AccountSetupPage />} />
       {/* Catch all route for non-existent routes */}
       <Route path="*" element={<Navigate to={homePageLink} replace />} />
     </Routes>
