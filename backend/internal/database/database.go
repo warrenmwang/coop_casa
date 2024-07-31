@@ -82,6 +82,12 @@ type PropertyFull struct {
 	PropertyImages  []OrderedFileExternal `json:"images"`
 }
 
+type service struct {
+	db             *sql.DB
+	db_queries     *sqlc.Queries
+	db_encrypt_key string
+}
+
 type Service interface {
 	// General
 	Health() map[string]string
@@ -117,10 +123,19 @@ type Service interface {
 	CheckDuplicateProperty(propertyDetails PropertyDetails) error
 }
 
-type service struct {
-	db             *sql.DB
-	db_queries     *sqlc.Queries
-	db_encrypt_key string
+// Test database connection
+func (s *service) Health() map[string]string {
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	defer cancel()
+
+	err := s.db.PingContext(ctx)
+	if err != nil {
+		log.Fatalf(fmt.Sprintf("db down: %v", err))
+	}
+
+	return map[string]string{
+		"message": "It's healthy",
+	}
 }
 
 func (s *service) encryptBytes(plainBytes []byte) ([]byte, error) {
@@ -201,47 +216,6 @@ func (s *service) encryptString(plainText string) (string, error) {
 		return "", err
 	}
 	return encrypted, nil
-}
-
-func New() Service {
-	database := os.Getenv("DB_DATABASE")
-	password := os.Getenv("DB_PASSWORD")
-	username := os.Getenv("DB_USERNAME")
-	port := os.Getenv("DB_PORT")
-	host := os.Getenv("DB_HOST")
-	dbEncryptKey := os.Getenv("DB_ENCRYPT_KEY_SECRET")
-
-	// Raw sql connection
-	connStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", username, password, host, port, database)
-	db, err := sql.Open("pgx", connStr)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// Instantiate the sqlc queries object for querying
-	db_queries := sqlc.New(db)
-
-	s := &service{
-		db:             db,
-		db_queries:     db_queries,
-		db_encrypt_key: dbEncryptKey,
-	}
-	return s
-}
-
-// Test database connection
-func (s *service) Health() map[string]string {
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
-	defer cancel()
-
-	err := s.db.PingContext(ctx)
-	if err != nil {
-		log.Fatalf(fmt.Sprintf("db down: %v", err))
-	}
-
-	return map[string]string{
-		"message": "It's healthy",
-	}
 }
 
 // Admin functions
@@ -950,4 +924,49 @@ func (s *service) AdminGetUsersRoles(userIds []string) ([]string, error) {
 	}
 
 	return userRoles, nil
+}
+
+// DB entrance func to init
+func New() Service {
+	database := os.Getenv("DB_DATABASE")
+	if database == "" {
+		log.Fatal("unexpected empty environment variable: DB_DATABASE")
+	}
+	password := os.Getenv("DB_PASSWORD")
+	if password == "" {
+		log.Fatal("unexpected empty environment variable: DB_PASSWORD")
+	}
+	username := os.Getenv("DB_USERNAME")
+	if username == "" {
+		log.Fatal("unexpected empty environment variable: DB_USERNAME")
+	}
+	port := os.Getenv("DB_PORT")
+	if port == "" {
+		log.Fatal("unexpected empty environment variable: DB_PORT")
+	}
+	host := os.Getenv("DB_HOST")
+	if host == "" {
+		log.Fatal("unexpected empty environment variable: DB_HOST")
+	}
+	dbEncryptKey := os.Getenv("DB_ENCRYPT_KEY_SECRET")
+	if dbEncryptKey == "" {
+		log.Fatal("unexpected empty environment variable: DB_ENCRYPT_KEY_SECRET")
+	}
+
+	// Raw sql connection
+	connStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", username, password, host, port, database)
+	db, err := sql.Open("pgx", connStr)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Instantiate the sqlc queries object for querying
+	db_queries := sqlc.New(db)
+
+	s := &service{
+		db:             db,
+		db_queries:     db_queries,
+		db_encrypt_key: dbEncryptKey,
+	}
+	return s
 }

@@ -1,16 +1,15 @@
-import { createContext, useContext, useState, ReactNode } from "react";
-import { User } from "../types/Types";
-import { apiLogoutUser } from "../api/api";
-
-interface AuthContextType {
-  user: User;
-  authenticated: boolean;
-  userRole: string;
-  logout: () => Promise<void>;
-  setUser: React.Dispatch<React.SetStateAction<User>>;
-  setAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
-  setUserRole: React.Dispatch<React.SetStateAction<string>>;
-}
+import {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useEffect,
+} from "react";
+import { User, APIUserReceived, UserDetails } from "../types/Types";
+import { apiGetUserAuth, apiGetUser, apiGetUserRole } from "../api/api";
+import { useQuery, UseQueryResult } from "@tanstack/react-query";
+import TextSkeleton from "../skeleton/TextSkeleton";
+import { apiFile2ClientFile } from "../utils/utils";
 
 export const EmptyUser: User = {
   userId: "",
@@ -24,11 +23,19 @@ export const EmptyUser: User = {
   avatar: null,
 };
 
+interface AuthContextType {
+  user: User;
+  authenticated: boolean;
+  userRole: string;
+  setUser: React.Dispatch<React.SetStateAction<User>>;
+  setAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
+  setUserRole: React.Dispatch<React.SetStateAction<string>>;
+}
+
 const AuthContext = createContext<AuthContextType>({
   user: EmptyUser,
   authenticated: false,
   userRole: "",
-  logout: () => Promise.resolve(),
   setUser: () => {},
   setAuthenticated: () => {},
   setUserRole: () => {},
@@ -52,17 +59,50 @@ const AuthWrapper: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [authenticated, setAuthenticated] = useState(false);
   const [userRole, setUserRole] = useState("");
 
-  const logout = async () => {
-    // Log out the user in api and oauth
-    const ok = await apiLogoutUser();
-    if (!ok) {
-      alert("Error during logout. Please try logging out again.");
-    }
+  // const queryUser = useQuery({
+  //   queryKey: ["user", "details"],
+  //   queryFn: apiGetUser,
+  // });
 
-    // Clear the auth context user data
-    setUser(EmptyUser);
-    setAuthenticated(false);
-  };
+  // const queryAuth = useQuery({
+  //   queryKey: ["user", "auth"],
+  //   queryFn: apiGetUserAuth,
+  // });
+
+  // const queryRole = useQuery({
+  //   queryKey: ["user", "role"],
+  //   queryFn: apiGetUserRole,
+  // });
+
+  // if (
+  //   queryUser.status === "pending" ||
+  //   queryAuth.status === "pending" ||
+  //   queryRole.status === "pending"
+  // ) {
+  //   return <TextSkeleton />;
+  // }
+
+  // useEffect(() => {
+  //   if (queryUser.status === "success") {
+  //     const userReceived = queryUser.data as APIUserReceived;
+  //     const details: UserDetails = userReceived.userDetails;
+  //     const avatar: File | null = apiFile2ClientFile(
+  //       userReceived.avatarImageB64,
+  //     );
+  //     setUser({
+  //       ...details,
+  //       avatar: avatar,
+  //     });
+  //   }
+
+  //   if (queryAuth.status === "success") {
+  //     setAuthenticated(queryAuth.data);
+  //   }
+
+  //   if (queryRole.status === "success") {
+  //     setUserRole(queryRole.data);
+  //   }
+  // }, [queryUser, queryAuth, queryRole]);
 
   return (
     <AuthContext.Provider
@@ -70,7 +110,6 @@ const AuthWrapper: React.FC<{ children: ReactNode }> = ({ children }) => {
         user,
         authenticated,
         userRole,
-        logout,
         setUser,
         setAuthenticated,
         setUserRole,

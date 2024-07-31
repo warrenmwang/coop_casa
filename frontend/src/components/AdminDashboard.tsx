@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import CreatePropertyForm from "../form/CreatePropertyForm";
 import { UserDetails } from "../types/Types";
-import { api_admin_users_Link, api_admin_users_roles_Link } from "../urls";
-import { checkFetch } from "../api/api";
+import { apiAdminUsersLink, apiAdminUsersRolesLink } from "../urls";
 import AdminManageUserRoles from "../form/AdminManageUserRoles";
 import { Grid } from "@mui/material";
 import UpdatePropertyManager from "../form/UpdatePropertyManager";
@@ -26,7 +25,7 @@ const AdminDashboard: React.FC = () => {
         // fetch users
         try {
           const response = await fetch(
-            `${api_admin_users_Link}?limit=${limit}&offset=${page * limit}`,
+            `${apiAdminUsersLink}?limit=${limit}&offset=${page * limit}`,
             {
               method: "GET",
               headers: {
@@ -55,7 +54,7 @@ const AdminDashboard: React.FC = () => {
           const userIds_for_roles = users.map((user) => user.userId);
 
           // fetch user roles
-          const tmp = `${api_admin_users_roles_Link}?userIds=${userIds_for_roles}`;
+          const tmp = `${apiAdminUsersRolesLink}?userIds=${userIds_for_roles}`;
           fetch(tmp, {
             method: "GET",
             headers: {
@@ -63,7 +62,6 @@ const AdminDashboard: React.FC = () => {
             },
             credentials: "include",
           })
-            .then(checkFetch)
             .then((response) => response.json())
             .then((data) => {
               const roles = data as string[];

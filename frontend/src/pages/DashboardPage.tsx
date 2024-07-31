@@ -1,55 +1,98 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import TopNavbar from "../components/TopNavbar";
 import Footer from "../components/Footer";
 import Title from "../components/Title";
 
-import { AuthData } from "../auth/AuthWrapper";
-import { useAPIGetUserRole } from "../api/api";
+import { AuthData, EmptyUser } from "../auth/AuthWrapper";
 import TextSkeleton from "../skeleton/TextSkeleton";
 import RegularDashboard from "../components/RegularDashboard";
 import AdminDashboard from "../components/AdminDashboard";
 import { accountSetupPageLink, homePageLink } from "../urls";
+import { APIUserReceived, UserDetails } from "../types/Types";
 
-// Dashboard is only showed when user is authed.
+import { useQuery } from "@tanstack/react-query";
+import { apiGetUser, apiGetUserAuth, apiGetUserRole } from "../api/api";
+import ListerDashboard from "../components/ListerDashboard";
+
+// Authenticated Endpoint
 const DashboardPage: React.FC = () => {
   console.log("DashboardPage");
-  const loading = useAPIGetUserRole();
-
   const navigate = useNavigate();
 
-  const auth = AuthData();
-  const { user, authenticated, userRole } = auth;
+  const userQuery = useQuery({
+    queryKey: ["user", "details"],
+    queryFn: apiGetUser,
+  });
 
-  if (!authenticated) {
-    navigate(homePageLink);
+  const authQuery = useQuery({
+    queryKey: ["user", "auth"],
+    queryFn: apiGetUserAuth,
+  });
+
+  const roleQuery = useQuery({
+    queryKey: ["user", "role"],
+    queryFn: apiGetUserRole,
+  });
+
+  let userDetails: UserDetails = EmptyUser;
+  if (userQuery.status === "success") {
+    let user: APIUserReceived | undefined = userQuery.data;
+    if (user !== undefined) {
+      user = user as APIUserReceived;
+      userDetails = user.userDetails;
+    }
   }
 
-  const email = user.email;
-  const accountIsSetup = user.firstName !== "" && user.lastName !== "";
+  let authenticated: boolean = false;
+  if (authQuery.status === "success") {
+    authenticated = authQuery.data as boolean;
+  }
+
+  let userRole: string = "";
+  if (roleQuery.status === "success") {
+    userRole = roleQuery.data as string;
+  }
+
+  const ready: boolean =
+    userQuery.isFetched && authQuery.isFetched && roleQuery.isFetched;
+
+  React.useEffect(() => {
+    if (authQuery.isFetched) {
+      if (!authenticated) {
+        navigate(homePageLink);
+      }
+    }
+  }, [authQuery]);
 
   return (
     <>
       <TopNavbar></TopNavbar>
-      <Title
-        title="Dashboard"
-        description={`Welcome ${accountIsSetup ? `${user.firstName} ${user.lastName}` : email}!`}
-      ></Title>
-      {!accountIsSetup ? (
-        <div className="my-4" style={{ textAlign: "center" }}>
-          <Link
-            to={accountSetupPageLink}
-            className="mx-auto block bg-white border-2 p-4 shadow-lg rounded-lg w-full sm:w-2/3 lg:w-1/3 sm:p-6 lg:p-8"
-          >
-            Set up your account!
-          </Link>
-        </div>
-      ) : loading ? (
-        <TextSkeleton />
-      ) : userRole === "admin" ? (
-        <AdminDashboard />
+      {ready ? (
+        <>
+          <Title
+            title="Dashboard"
+            description={`Welcome ${userDetails.firstName !== "" && userDetails.lastName !== "" ? `${userDetails.firstName} ${userDetails.lastName}` : userDetails.email}!`}
+          ></Title>
+          {userDetails.firstName === "" && userDetails.lastName === "" ? (
+            <div className="my-4" style={{ textAlign: "center" }}>
+              <Link
+                to={accountSetupPageLink}
+                className="mx-auto block bg-white border-2 p-4 shadow-lg rounded-lg w-full sm:w-2/3 lg:w-1/3 sm:p-6 lg:p-8"
+              >
+                Set up your account!
+              </Link>
+            </div>
+          ) : userRole === "admin" ? (
+            <AdminDashboard />
+          ) : userRole === "lister" ? (
+            <ListerDashboard />
+          ) : (
+            <RegularDashboard />
+          )}
+        </>
       ) : (
-        <RegularDashboard />
+        <TextSkeleton />
       )}
       <Footer></Footer>
     </>

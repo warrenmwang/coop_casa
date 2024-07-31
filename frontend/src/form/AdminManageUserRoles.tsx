@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { api_admin_users_roles_Link } from "../urls";
-import { checkFetch } from "../api/api";
+import { apiAdminUsersRolesLink } from "../urls";
 import { AuthData } from "../auth/AuthWrapper";
 import SubmitButton from "../components/SubmitButton";
 
@@ -52,11 +51,10 @@ const AdminManageUserRoles: React.FC = () => {
 
   useEffect(() => {
     if (isSubmitting) {
-      fetch(`${api_admin_users_roles_Link}?userID=${userID}&role=${role}`, {
+      fetch(`${apiAdminUsersRolesLink}?userID=${userID}&role=${role}`, {
         method: "POST",
         credentials: "include",
       })
-        .then(checkFetch)
         .then(() => {
           setIsSubmitting(false);
           setUserID("");

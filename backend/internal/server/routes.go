@@ -199,80 +199,6 @@ func (s *Server) CreateNewUserRole(userId string) error {
 	return nil
 }
 
-// --------------------- MIDDLEWARES ------------------------------
-
-func (s *Server) corsMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Set CORS headers
-		w.Header().Set("Access-Control-Allow-Origin", s.FrontendOrigin)
-
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
-		w.Header().Set("Access-Control-Allow-Credentials", "true")
-
-		// Handle cors preflight if method is OPTIONS
-		if r.Method == http.MethodOptions {
-			w.WriteHeader(http.StatusNoContent)
-			return
-		}
-		// Otherwise pass to the handler
-		next.ServeHTTP(w, r)
-	})
-}
-
-// ------------------------ ALL ROUTES -------------------------------
-
-func (s *Server) RegisterRoutes() http.Handler {
-	r := chi.NewRouter()
-
-	// Middlewares
-	r.Use(middleware.Logger)  // stdout logger
-	r.Use(middleware.NoCache) // dont cache responses (especially important to get up to date api/auth responses)
-	r.Use(s.corsMiddleware)   // set headers for CORS
-
-	// API uptime check
-	r.Get("/", s.HelloWorldHandler)
-
-	// DB uptime check
-	r.Get("/health", s.healthHandler)
-
-	// Oauth callback
-	r.Get("/auth/{provider}/callback", s.authCallbackHandler)
-
-	// Being Oauth login
-	r.Get("/auth/{provider}", s.authLoginHandler)
-
-	// Simple auth check
-	r.Get("/auth/check", s.authCheckHandler)
-
-	// Logout
-	r.Get("/auth/logout", s.authLogoutHandler)
-
-	// Account
-	r.Get("/api/account", s.apiGetAccountDetailsHandler)
-	r.Post("/api/account", s.apiUpdateAccountDetailsHandler)
-	r.Delete("/api/account", s.apiDeleteAccountHandler)
-
-	// A user can get their own role
-	r.Get("/api/account/role", s.apiGetUserRoleHandler)
-
-	// Admin
-	r.Get("/api/admin/users", s.apiAdminGetUsers)
-	r.Get("/api/admin/users/roles", s.apiAdminGetUsersRoles)
-	r.Post("/api/admin/users/roles", s.apiUpdateUserRoleHandler)
-
-	// Properties
-	r.Get("/api/properties", s.apiGetPropertiesHandler)
-	r.Put("/api/properties", s.apiCreatePropertiesHandler)
-	r.Post("/api/properties", s.apiUpdatePropertiesHandler)
-	r.Delete("/api/properties", s.apiDeletePropertiesHandler)
-
-	// Public Lister info
-	r.Get("/api/lister", s.apiGetListerInfoHandler)
-
-	return r
-}
-
 // --------------------------- UPTIME CHECKS --------------------------------
 
 // Endpoint: GET /
@@ -362,8 +288,8 @@ func (s *Server) authCallbackHandler(w http.ResponseWriter, r *http.Request) {
 		Secure:   s.IsProd,
 	})
 
-	// Redirect to oauth callback page
-	http.Redirect(w, r, fmt.Sprintf("%s/oauth-callback", s.FrontendOrigin), http.StatusFound)
+	// Redirect to dashboard page
+	http.Redirect(w, r, fmt.Sprintf("%s/dashboard", s.FrontendOrigin), http.StatusFound)
 }
 
 // ----------------- AUTH -------------
@@ -409,7 +335,7 @@ func (s *Server) authCheckHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Endpoint: GET /auth/logout
+// Endpoint: POST /auth/logout
 func (s *Server) authLogoutHandler(w http.ResponseWriter, r *http.Request) {
 	// Logout function that completes the oauth logout and invalidate the user's auth token
 
@@ -423,7 +349,7 @@ func (s *Server) authLogoutHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Logout oauth
 	gothic.Logout(w, r)
-	w.WriteHeader(http.StatusTemporaryRedirect)
+	w.WriteHeader(http.StatusOK)
 }
 
 // --------------- ACCOUNT ---------------
@@ -1196,4 +1122,78 @@ func (s *Server) apiGetListerInfoHandler(w http.ResponseWriter, r *http.Request)
 		LastName:  lister.LastName.String,
 		Email:     lister.Email,
 	})
+}
+
+// --------------------- MIDDLEWARES ------------------------------
+
+func (s *Server) corsMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Set CORS headers
+		w.Header().Set("Access-Control-Allow-Origin", s.FrontendOrigin)
+
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+		w.Header().Set("Access-Control-Allow-Credentials", "true")
+
+		// Handle cors preflight if method is OPTIONS
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+		// Otherwise pass to the handler
+		next.ServeHTTP(w, r)
+	})
+}
+
+// ------------------------ ALL ROUTES -------------------------------
+
+func (s *Server) RegisterRoutes() http.Handler {
+	r := chi.NewRouter()
+
+	// Middlewares
+	r.Use(middleware.Logger)  // stdout logger
+	r.Use(middleware.NoCache) // dont cache responses (especially important to get up to date api/auth responses)
+	r.Use(s.corsMiddleware)   // set headers for CORS
+
+	// API uptime check
+	r.Get("/", s.HelloWorldHandler)
+
+	// DB uptime check
+	r.Get("/health", s.healthHandler)
+
+	// Oauth callback
+	r.Get("/auth/{provider}/callback", s.authCallbackHandler)
+
+	// Being Oauth login
+	r.Get("/auth/{provider}", s.authLoginHandler)
+
+	// Simple auth check
+	r.Get("/auth/check", s.authCheckHandler)
+
+	// Logout
+	r.Post("/auth/logout", s.authLogoutHandler)
+
+	// Account
+	r.Get("/api/account", s.apiGetAccountDetailsHandler)
+	r.Post("/api/account", s.apiUpdateAccountDetailsHandler)
+	r.Delete("/api/account", s.apiDeleteAccountHandler)
+
+	// A user can get their own role
+	r.Get("/api/account/role", s.apiGetUserRoleHandler)
+
+	// Admin
+	r.Get("/api/admin/users", s.apiAdminGetUsers)
+	r.Get("/api/admin/users/roles", s.apiAdminGetUsersRoles)
+	r.Post("/api/admin/users/roles", s.apiUpdateUserRoleHandler)
+
+	// Properties
+	r.Get("/api/properties", s.apiGetPropertiesHandler)
+	r.Put("/api/properties", s.apiCreatePropertiesHandler)
+	r.Post("/api/properties", s.apiUpdatePropertiesHandler)
+	r.Delete("/api/properties", s.apiDeletePropertiesHandler)
+
+	// Public Lister info
+	r.Get("/api/lister", s.apiGetListerInfoHandler)
+
+	return r
 }

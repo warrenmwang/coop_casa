@@ -1,22 +1,72 @@
-import React, { Fragment } from "react";
-import { Link } from "react-router-dom";
+import React, { Fragment, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import defaultProfileImg from "../assets/profile.jpg";
 import coopImg from "../assets/coopAlt1.svg";
-import { AuthData } from "../auth/AuthWrapper";
-import { api_auth_googleOAuthLink, accountSettingsPageLink } from "../urls";
+import { AuthData, EmptyUser } from "../auth/AuthWrapper";
+import {
+  apiAuthGoogleOAuthLink,
+  accountSettingsPageLink,
+  homePageLink,
+} from "../urls";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { apiGetUser, apiGetUserAuth, apiLogoutUser } from "../api/api";
+import { APIFileReceived, APIUserReceived, UserDetails } from "../types/Types";
+import { apiFile2ClientFile } from "../utils/utils";
 
 function classNames(...classes: (string | undefined | null | false)[]) {
   return classes.filter(Boolean).join(" ");
 }
 
 const TopNavbar: React.FC = () => {
-  const auth = AuthData();
-  const { user, authenticated, logout } = auth;
-  const userAvatarURL =
-    user.avatar === null ? "" : URL.createObjectURL(user.avatar);
-  const profileImg = userAvatarURL === "" ? defaultProfileImg : userAvatarURL;
+  const navigate = useNavigate();
+
+  const userQuery = useQuery({
+    queryKey: ["user", "details"],
+    queryFn: apiGetUser,
+  });
+
+  const authQuery = useQuery({
+    queryKey: ["user", "auth"],
+    queryFn: apiGetUserAuth,
+  });
+
+  const mutation = useMutation({
+    mutationFn: apiLogoutUser,
+    onSuccess: () => {
+      // invalidate the query for user data.
+      queryClient.invalidateQueries({
+        queryKey: ["user"], // invalidate all queries that start with user
+      });
+      profileImg = defaultProfileImg;
+      navigate(homePageLink);
+    },
+    onError: () => {
+      alert(`Failed to logout: ${mutation.error}`);
+    },
+  });
+  const queryClient = useQueryClient();
+
+  let profileImg: string = defaultProfileImg;
+  if (userQuery.status === "success") {
+    const receivedUser: APIUserReceived = userQuery.data;
+    const avatarFile: File | null = apiFile2ClientFile(
+      receivedUser.avatarImageB64,
+    );
+    if (avatarFile !== null) {
+      profileImg = URL.createObjectURL(avatarFile);
+    }
+  }
+
+  let authenticated: boolean = false;
+  if (authQuery.status === "success") {
+    const receivedAuth: boolean = authQuery.data;
+    authenticated = receivedAuth;
+  }
+  if (!authenticated) {
+    profileImg = defaultProfileImg;
+  }
 
   const navigation = [
     ...(authenticated
@@ -118,7 +168,7 @@ const TopNavbar: React.FC = () => {
                         <Menu.Item>
                           {({ active }) => (
                             <button
-                              onClick={logout}
+                              onClick={() => mutation.mutate()}
                               className={classNames(
                                 active ? "bg-gray-100" : "",
                                 "block w-full text-left px-4 py-2 text-sm text-gray-700",
@@ -133,7 +183,7 @@ const TopNavbar: React.FC = () => {
                         <Menu.Item>
                           {({ active }) => (
                             <a
-                              href={api_auth_googleOAuthLink}
+                              href={apiAuthGoogleOAuthLink}
                               className={classNames(
                                 active ? "bg-gray-100" : "",
                                 "block px-4 py-2 text-sm text-gray-700",

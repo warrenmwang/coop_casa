@@ -22,7 +22,6 @@ import {
   contactPageLink,
   homePageLink,
   mapPageLink,
-  oauthCallBackPageLink,
   privacypolicyPageLink,
   propertiesPageLink,
   termsOfServicePageLink,
@@ -30,22 +29,9 @@ import {
   accountSettingsPageLink,
   accountSetupPageLink,
 } from "../urls";
-import {
-  useAPIAuthCheck,
-  useAPIGetUserRole,
-  useAPIGetUserAccount,
-} from "../api/api";
-
-const OAuthCallbackPage = React.lazy(
-  () => import("../pages/OAuthCallbackPage"),
-);
 
 const RouteRenderer: React.FC = () => {
   // console.log("RouteRenderer");
-
-  useAPIAuthCheck();
-  useAPIGetUserAccount();
-  useAPIGetUserRole();
 
   return (
     <Routes>
@@ -62,7 +48,7 @@ const RouteRenderer: React.FC = () => {
       <Route path={termsOfServicePageLink} element={<TermsOfServicePage />} />
       <Route path={attributionsPageLink} element={<AttributionsPage />} />
       <Route path={contactPageLink} element={<ContactPage />} />
-      <Route path={oauthCallBackPageLink} element={<OAuthCallbackPage />} />
+      {/* authed routes */}
       <Route path={dashboardPageLink} element={<DashboardPage />} />
       <Route path={accountSettingsPageLink} element={<AccountSettingsPage />} />
       <Route path={accountSetupPageLink} element={<AccountSetupPage />} />

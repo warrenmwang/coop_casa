@@ -12,6 +12,17 @@ of preventing SQL injection for me, as long as I use their functions with their 
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
+## Tests
+
+To run the backend tests run:
+
+```
+cd tests
+go test
+```
+
+--
+
 ## MakeFile
 
 run all make commands with clean tests

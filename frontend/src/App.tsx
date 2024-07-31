@@ -5,7 +5,6 @@ import { BrowserRouter as Router } from "react-router-dom";
 import TextSkeleton from "./skeleton/TextSkeleton";
 
 function App() {
-  // console.log("App");
   return (
     <AuthWrapper>
       <Router>

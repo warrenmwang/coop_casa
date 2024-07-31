@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -22,19 +23,40 @@ type Server struct {
 }
 
 func NewServer() *http.Server {
-	backendPort, _ := strconv.Atoi(os.Getenv("INTERNAL_BACKEND_PORT"))
-	frontendPort, _ := strconv.Atoi(os.Getenv("EXTERNAL_FRONTEND_PORT"))
+	backendPort, err := strconv.Atoi(os.Getenv("INTERNAL_BACKEND_PORT"))
+	if err != nil {
+		log.Fatal("failed to parse INTERNAL_BACKEND_PORT")
+	}
+	frontendPort, err := strconv.Atoi(os.Getenv("EXTERNAL_FRONTEND_PORT"))
+	if err != nil {
+		log.Fatal("failed to parse EXTERNAL_FRONTEND_PORT")
+	}
 	jwtSignSecret := os.Getenv("JWT_SIGN_SECRET")
-	IsProd, _ := strconv.ParseBool(os.Getenv("IS_PROD"))
+	if jwtSignSecret == "" {
+		log.Fatal("unexpected empty environment variable: jwtSignSecret")
+	}
+	IsProd, err := strconv.ParseBool(os.Getenv("IS_PROD"))
+	if err != nil {
+		log.Fatal("failed to parse IS_PROD")
+	}
 	adminUserID := os.Getenv("ADMIN_USER_ID")
+	if adminUserID == "" {
+		log.Fatal("unexpected empty environment variable: adminUserID")
+	}
 
 	var host string
 	var frontendOrigin string
 	if IsProd {
 		host = os.Getenv("PROD_HOST")
+		if host == "" {
+			log.Fatal("unexpected empty environment variable: host")
+		}
 		frontendOrigin = fmt.Sprintf("%s:%d", host, frontendPort)
 	} else {
 		host = os.Getenv("DEV_HOST")
+		if host == "" {
+			log.Fatal("unexpected empty environment variable: host")
+		}
 		frontendOrigin = fmt.Sprintf("%s:%d", host, frontendPort)
 	}
 
