@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Box } from "@mui/material";
 import CustomImageGallery from "../components/CustomImageGallery";
@@ -11,6 +11,7 @@ import { useQuery } from "@tanstack/react-query";
 import CardSkeleton from "../skeleton/CardSkeleton";
 import { ListerBasicInfo } from "../types/Types";
 import ShareLinkButton from "../components/ShareLinkButton";
+import { toast } from "react-toastify";
 
 type ListerInfoProps = {
   listerID: string;
@@ -154,19 +155,11 @@ const PropertyDetailContent: React.FC<PropertyDetailContentProps> = ({
 };
 
 const PropertyDetail: React.FC = () => {
-  const navigate = useNavigate();
   const { propertyID } = useParams<{ propertyID: string }>();
 
-  if (propertyID === undefined) {
-    navigate(propertiesPageLink);
-  }
-  const propertyIDStr = propertyID as string;
+  const propertyIDStr: string = propertyID as string;
 
-  const {
-    status,
-    error,
-    data: property,
-  } = useQuery({
+  const propertyQuery = useQuery({
     queryKey: ["properties", propertyIDStr],
     queryFn: () => apiGetProperty(propertyIDStr),
   });
@@ -174,21 +167,20 @@ const PropertyDetail: React.FC = () => {
   return (
     <>
       <TopNavbar />
-      {status === "pending" && (
+      {propertyQuery.status === "pending" && (
         <div className="flex justify-center">
           {" "}
           <CardSkeleton />
         </div>
       )}
-      {status === "success" && (
+      {propertyQuery.status === "success" && (
         <PropertyDetailContent
-          property={property as Property}
+          property={propertyQuery.data as Property}
         ></PropertyDetailContent>
       )}
-      {status === "error" && (
+      {propertyQuery.status === "error" && (
         <h1 className="text-xl text-red-600 font-bold flex justify-center">
-          Sorry, we are unable to find that particular property. Server returned
-          with error: {JSON.stringify(error)}
+          Sorry, we are unable to find that particular property.
         </h1>
       )}
       <Footer />

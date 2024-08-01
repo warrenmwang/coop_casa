@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { apiGetProperties } from "../api/api";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { MAX_NUMBER_PROPERTIES_PER_PAGE } from "../constants";
 import Title from "../components/Title";
 import CardGridSkeleton from "../skeleton/CardGridSkeleton";
@@ -62,6 +62,7 @@ const DisplayProperties: React.FC = () => {
     queryKey: ["propertiesPage", currentPage, addressFilter],
     queryFn: () => apiGetProperties(currentPage, addressFilter),
   });
+  const queryClient = useQueryClient();
 
   const handleNavPage = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -76,7 +77,7 @@ const DisplayProperties: React.FC = () => {
     setCurrentPage(pageToGoTo);
   };
 
-  // update cache of pages
+  // fetches a new page if not in cache
   useEffect(() => {
     if (query.status === "success") {
       const newPage = query.data as string[];
@@ -85,12 +86,24 @@ const DisplayProperties: React.FC = () => {
     }
   }, [query.status, query.isRefetching]); // add isRefetching to dependency to allow us to use pages that were cached from previous queries
 
-  // when new search is fired off, get the latest address
+  // when new search is fired off, get the latest address filter
   useEffect(() => {
     if (searchIsSubmitting) {
       let addressFilter: string | null = searchParams.get(addressFilterQPKey);
       if (addressFilter === null) {
         addressFilter = "";
+      }
+
+      // see if first page of the search is already cached.
+      const pageCached: string[] | undefined = queryClient.getQueryData([
+        "propertiesPage",
+        0,
+        addressFilter,
+      ]);
+      if (pageCached !== undefined) {
+        setPages(() => new Map().set(0, pageCached));
+        setSearchIsSubmitting(false);
+        return;
       }
 
       setCurrentPage(0);
@@ -129,16 +142,19 @@ const DisplayProperties: React.FC = () => {
         id="DisplayProperties__navigationBtnsContainer"
         className="flex gap-1"
       >
-        {Array.from(pages.entries()).map((_, key) => (
-          <button
-            key={key}
-            className="bg-gray-500 hover:bg-gray-600 text-white p-3 rounded"
-            disabled={currentPage === key}
-            onClick={handleNavPage}
-          >
-            {key + 1}
-          </button>
-        ))}
+        {Array(currentPage + 1)
+          .fill(0)
+          .map((_, i) => i * 1)
+          .map((pageNum) => (
+            <button
+              key={pageNum}
+              className="bg-gray-500 hover:bg-gray-600 text-white p-3 rounded"
+              disabled={currentPage === pageNum}
+              onClick={handleNavPage}
+            >
+              {pageNum + 1}
+            </button>
+          ))}
         {pages.has(currentPage) &&
           (pages.get(currentPage) as string[]).length ===
             MAX_NUMBER_PROPERTIES_PER_PAGE && (
