@@ -1,22 +1,26 @@
 import React, { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { apiCreateNewProperty } from "../api/api";
+import { apiCreateNewProperty, apiGetUser } from "../api/api";
 import { validateNumber } from "../utils/inputValidation";
 
-import { AuthData } from "../auth/AuthWrapper";
 import TextInput from "../input/TextInput";
 import SubmitButton from "../components/SubmitButton";
 import MultipleImageUploader from "../input/MultipleImageUploader";
 import { MAX_PROPERTY_IMGS_ALLOWED } from "../constants";
 
-import "../styles/font.css";
 import {
-  ErrorBody,
+  APIUserReceived,
   OrderedFile,
   Property,
   PropertyDetails,
+  UserDetails,
 } from "../types/Types";
-import { useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import TextSkeleton from "../skeleton/TextSkeleton";
+
+import "../styles/font.css";
+import "../styles/input.css";
+import "../styles/form.css";
 
 type TextFieldsConstruct = {
   id: string;
@@ -53,9 +57,6 @@ export const EmptyPropertyDetails: PropertyDetails = {
 // and be able to view and modify their created properties.
 // (for authorized users: admin or lister roles)
 const CreatePropertyForm: React.FC = () => {
-  const auth = AuthData();
-  const { user } = auth;
-
   const [propertyDetails, setPropertyDetails] =
     useState<PropertyDetails>(EmptyPropertyDetails);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -64,6 +65,10 @@ const CreatePropertyForm: React.FC = () => {
   ); // if any key value in errors is true, then there is a problem.
   const [images, setImages] = useState<OrderedFile[]>([]);
 
+  const userQuery = useQuery({
+    queryKey: ["user", "details"],
+    queryFn: apiGetUser,
+  });
   const { mutate: mutateCreate } = useMutation({
     mutationFn: (property: Property) => apiCreateNewProperty(property),
   });
@@ -94,15 +99,6 @@ const CreatePropertyForm: React.FC = () => {
       return newMap;
     });
   };
-
-  // Initialize with errots for all required fields, thus needing to make sure that
-  // the required fields are entered.
-  useEffect(() => {
-    // Set Errors for required fields that the user needs to fill in
-    propertyRequiredFields.forEach((field) => {
-      setErrors(field, true);
-    });
-  }, []);
 
   // for constructing the textinputs
   const propertyTextFieldsConstructs: TextFieldsConstruct[] = [
@@ -293,17 +289,33 @@ const CreatePropertyForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Set values that we don't want the user to fill in themselves.
-    // property id as a UUIDV4, lister id (openauth id)
-    setPropertyDetails((prevState: any) => ({
-      ...prevState,
-      propertyId: uuidv4(),
-      listerUserId: user.userId,
-    }));
-
     // Set is submitting true, prevent spamming submit and start submission process.
     setIsSubmitting(true);
   };
+
+  useEffect(() => {
+    if (userQuery.status === "success") {
+      const received: APIUserReceived = userQuery.data;
+      const userDetails: UserDetails = received.userDetails;
+
+      // Set values that we don't want the user to fill in themselves.
+      // > property id as a UUIDV4, lister id (openauth id)
+      setPropertyDetails((prevState: any) => ({
+        ...prevState,
+        propertyId: uuidv4(),
+        listerUserId: userDetails.userId,
+      }));
+    }
+  }, [userQuery.status]);
+
+  // Initialize with errots for all required fields, thus needing to make sure that
+  // the required fields are entered.
+  useEffect(() => {
+    // Set Errors for required fields that the user needs to fill in
+    propertyRequiredFields.forEach((field) => {
+      setErrors(field, true);
+    });
+  }, []);
 
   // Submit data if can submit
   useEffect(() => {
@@ -339,8 +351,10 @@ const CreatePropertyForm: React.FC = () => {
     }
   }, [isSubmitting, propertyDetails]);
 
-  return (
-    <div className="flex flex-col justify-center items-center space-x-4 mt-4">
+  const ready: boolean = userQuery.isFetched;
+
+  return ready ? (
+    <div className="flex flex-col items-center">
       <h1 className="h1_custom">Add Property Listing</h1>
       <h4 className="h4_custom">
         This form allows you to upload a new property listing to the platform.
@@ -365,19 +379,23 @@ const CreatePropertyForm: React.FC = () => {
         ))}
 
         {/* Images */}
-        <label className="text_input_field_label_gray">
-          Upload some images of the property. At least 1 image is required.
-          <span className="text-red-500">*</span>
-        </label>
-        <div className="flex flex-col gap-2">
-          <MultipleImageUploader
-            images={images}
-            onImagesUploaded={handleImagesUploaded}
-          />
-          <SubmitButton isSubmitting={isSubmitting} className="w-3/5" />
+        <div className="px-3">
+          <label className="text_input_field_label_gray">
+            Upload some images of the property. At least 1 image is required.
+            <span className="text-red-500">*</span>
+          </label>
+          <div className="flex flex-col gap-2">
+            <MultipleImageUploader
+              images={images}
+              onImagesUploaded={handleImagesUploaded}
+            />
+            <SubmitButton isSubmitting={isSubmitting} className="w-3/5" />
+          </div>
         </div>
       </form>
     </div>
+  ) : (
+    <TextSkeleton />
   );
 };
 

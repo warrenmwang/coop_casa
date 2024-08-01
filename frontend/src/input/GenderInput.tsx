@@ -1,5 +1,6 @@
 import React from "react";
 import { User } from "../types/Types";
+import "../styles/input.css";
 
 interface GenderInputArgs {
   formData: User;

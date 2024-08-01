@@ -12,6 +12,7 @@ import MultipleImageUploader from "../input/MultipleImageUploader";
 import { MAX_PROPERTY_IMGS_ALLOWED } from "../constants";
 import { useMutation } from "@tanstack/react-query";
 import { validateNumber } from "../utils/inputValidation";
+import "../styles/input.css";
 
 const propertyRequiredFields: string[] = [
   "name",
@@ -147,7 +148,7 @@ const UpdatePropertyForm: React.FC<{
   return (
     <>
       {/* update form */}
-      <form className="default-form-1">
+      <form className="form__update_property">
         <TextInput
           setFormData={textInputSetFormData}
           setIsChanged={setIsChanged}
@@ -156,6 +157,7 @@ const UpdatePropertyForm: React.FC<{
           id="name"
           value={formDetails.name}
           required={true}
+          classNameCustom="w-full"
         />
         <TextInput
           setFormData={textInputSetFormData}
@@ -164,6 +166,7 @@ const UpdatePropertyForm: React.FC<{
           label="Description"
           id="description"
           value={formDetails.description}
+          classNameCustom="w-full"
         />
         <TextInput
           setFormData={textInputSetFormData}
@@ -173,6 +176,7 @@ const UpdatePropertyForm: React.FC<{
           id="address1"
           value={formDetails.address1}
           required={true}
+          classNameCustom="w-full"
         />
         <TextInput
           setFormData={textInputSetFormData}
@@ -181,6 +185,7 @@ const UpdatePropertyForm: React.FC<{
           label="Address 2"
           id="address2"
           value={formDetails.address2}
+          classNameCustom="w-full"
         />
         <TextInput
           setFormData={textInputSetFormData}
@@ -190,6 +195,7 @@ const UpdatePropertyForm: React.FC<{
           id="city"
           value={formDetails.city}
           required={true}
+          classNameCustom="w-full"
         />
         <TextInput
           setFormData={textInputSetFormData}
@@ -199,6 +205,7 @@ const UpdatePropertyForm: React.FC<{
           id="state"
           value={formDetails.state}
           required={true}
+          classNameCustom="w-full"
         />
         <TextInput
           setFormData={textInputSetFormData}
@@ -208,6 +215,7 @@ const UpdatePropertyForm: React.FC<{
           id="zipcode"
           value={formDetails.zipcode}
           required={true}
+          classNameCustom="w-full"
         />
         <TextInput
           setFormData={textInputSetFormData}
@@ -217,6 +225,7 @@ const UpdatePropertyForm: React.FC<{
           id="country"
           value={formDetails.country}
           required={true}
+          classNameCustom="w-full"
         />
         <TextInput
           setFormData={textInputSetFormData}
@@ -226,6 +235,7 @@ const UpdatePropertyForm: React.FC<{
           id="squareFeet"
           value={`${formDetails.squareFeet}`}
           required={true}
+          classNameCustom="w-full"
         />
         <TextInput
           setFormData={textInputSetFormData}
@@ -235,6 +245,7 @@ const UpdatePropertyForm: React.FC<{
           id="numBedrooms"
           value={`${formDetails.numBedrooms}`}
           required={true}
+          classNameCustom="w-full"
         />
         <TextInput
           setFormData={textInputSetFormData}
@@ -244,6 +255,7 @@ const UpdatePropertyForm: React.FC<{
           id="numToilets"
           value={`${formDetails.numToilets}`}
           required={true}
+          classNameCustom="w-full"
         />
         <TextInput
           setFormData={textInputSetFormData}
@@ -253,6 +265,7 @@ const UpdatePropertyForm: React.FC<{
           id="numShowersBaths"
           value={`${formDetails.numShowersBaths}`}
           required={true}
+          classNameCustom="w-full"
         />
         <TextInput
           setFormData={textInputSetFormData}
@@ -262,6 +275,7 @@ const UpdatePropertyForm: React.FC<{
           id="costDollars"
           value={`${formDetails.costDollars}`}
           required={true}
+          classNameCustom="w-full"
         />
         <TextInput
           setFormData={textInputSetFormData}
@@ -271,6 +285,7 @@ const UpdatePropertyForm: React.FC<{
           id="costCents"
           value={`${formDetails.costCents}`}
           required={true}
+          classNameCustom="w-full"
         />
         <TextInput
           setFormData={textInputSetFormData}
@@ -279,17 +294,20 @@ const UpdatePropertyForm: React.FC<{
           label="Misc. Notes"
           id="miscNote"
           value={`${formDetails.miscNote}`}
+          classNameCustom="w-full"
         />
       </form>
-      <label className="text_input_field_label_gray">
-        Upload some images of the property. At least 1 image is required.
-        <span className="text-red-500">*</span>
-      </label>
-      <MultipleImageUploader
-        onImagesUploaded={handleImagesUpload}
-        images={formImages}
-        setIsChanged={setIsChanged}
-      />
+      <div className="px-3">
+        <label className="text_input_field_label_gray">
+          Upload some images of the property. At least 1 image is required.
+          <span className="text-red-500">*</span>
+        </label>
+        <MultipleImageUploader
+          onImagesUploaded={handleImagesUpload}
+          images={formImages}
+          setIsChanged={setIsChanged}
+        />
+      </div>
 
       <div className="pt-3">
         {isPendingUpdate && <p>Updating property...</p>}
@@ -400,43 +418,49 @@ const UpdatePropertyManager: React.FC = () => {
   }, [isDeleting]);
 
   return (
-    <div className="w-1/2 mx-auto">
-      <h1 className="h1_custom">Update Property</h1>
-      {/* query property data form */}
-      <form className="" onSubmit={getPropertyDetails}>
-        <div className="flex flex-col">
-          <label className="text_input_field_label_gray">
-            Get property details via ID.
-          </label>
-          <input
-            type="text"
-            id="getPropertyDetails"
-            placeholder="Property ID"
-            value={propertyID}
-            onChange={handleChange}
-            className="text_input_field_box_gray w-3/5"
-          />
-        </div>
-        <div className="flex gap-2">
-          {property === null && (
-            <SubmitButton isSubmitting={getPropertyDetailsIsSubmitting} />
-          )}
-          <button
-            id="clear"
-            className="bg-gray-500 hover:bg-gray-600 text-white rounded p-3"
-            onClick={clearForm}
-          >
-            Clear Form
-          </button>
-          <button
-            id="delete"
-            className="bg-red-500 hover:bg-red-600 rounded p-3"
-            onClick={handleDelete}
-          >
-            Delete Property
-          </button>
-        </div>
-      </form>
+    <div className="">
+      <div className="px-3">
+        <h1 className="h1_custom">Update Property</h1>
+        <h4 className="h4_custom">
+          This form allows you to update an existing property listing owned by
+          you. You will need the specific property's ID.
+        </h4>
+        {/* query property data form */}
+        <form className="" onSubmit={getPropertyDetails}>
+          <div className="flex flex-col">
+            <label className="text_input_field_label_gray">
+              Get property details via ID.
+            </label>
+            <input
+              type="text"
+              id="getPropertyDetails"
+              placeholder="Property ID"
+              value={propertyID}
+              onChange={handleChange}
+              className="text_input_field_box_gray w-full"
+            />
+          </div>
+          <div className="flex gap-2">
+            {property === null && (
+              <SubmitButton isSubmitting={getPropertyDetailsIsSubmitting} />
+            )}
+            <button
+              id="clear"
+              className="bg-gray-500 hover:bg-gray-600 text-white rounded p-3"
+              onClick={clearForm}
+            >
+              Clear Form
+            </button>
+            <button
+              id="delete"
+              className="bg-red-500 hover:bg-red-600 rounded p-3"
+              onClick={handleDelete}
+            >
+              Delete Property
+            </button>
+          </div>
+        </form>
+      </div>
 
       {!inputChanged && isPendingDelete && <p>Deleting property...</p>}
       {!inputChanged && isSuccessDelete && <p>Property deleted.</p>}

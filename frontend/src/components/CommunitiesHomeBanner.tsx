@@ -9,7 +9,7 @@ const CommunitiesHomeBanner: React.FC = () => {
         description="Together we are stronger than we could ever be alone."
       />
       <p className="mx-auto block" style={{ textAlign: "center" }}>
-        TODO: fill in with some content of communities. graphics and text
+        {/* TODO: fill in with some content of communities. graphics and text */}
       </p>
     </div>
   );

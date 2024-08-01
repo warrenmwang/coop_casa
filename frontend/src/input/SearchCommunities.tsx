@@ -19,10 +19,10 @@ const SearchCommunities: React.FC = () => {
           title="Search Communities"
           description="Find people with similar interests!"
         ></Title>
-        <SearchBar
+        {/* <SearchBar
           onSubmit={onSubmit}
           placeholder="Search Communities in the USA"
-        ></SearchBar>
+        ></SearchBar> */}
       </div>
     </div>
   );

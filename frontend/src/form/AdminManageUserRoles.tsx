@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { apiAdminUsersRolesLink } from "../urls";
 import { AuthData } from "../auth/AuthWrapper";
 import SubmitButton from "../components/SubmitButton";
+import "../styles/input.css";
 
 const AdminManageUserRoles: React.FC = () => {
   const auth = AuthData();

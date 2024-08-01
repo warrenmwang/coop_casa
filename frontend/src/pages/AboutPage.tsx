@@ -8,7 +8,7 @@ import warren_img from "../assets/warren.png";
 import gloria_img from "../assets/gloria.jpeg";
 import barbara_img from "../assets/barbara.jpeg";
 
-import "../styles/ContentBody.css";
+import "../styles/contentBody.css";
 
 const AboutPage: React.FC = () => {
   return (

@@ -7,7 +7,7 @@ import TextInput from "../input/TextInput";
 import ImageInput from "../input/ImageInput";
 import { apiFile2ClientFile } from "../utils/utils";
 import { APIUserReceived, User, UserDetails } from "../types/Types";
-import "../styles/Form.css";
+import "../styles/form.css";
 import { EmptyUser } from "../auth/AuthWrapper";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import TextSkeleton from "../skeleton/TextSkeleton";

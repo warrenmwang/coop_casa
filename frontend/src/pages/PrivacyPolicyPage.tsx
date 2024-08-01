@@ -3,7 +3,7 @@ import TopNavbar from "../components/TopNavbar";
 import Footer from "../components/Footer";
 import "../styles/font.css";
 
-import "../styles/ContentBody.css";
+import "../styles/contentBody.css";
 
 const PrivacyPolicyPage: React.FC = () => {
   return (

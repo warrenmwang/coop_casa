@@ -1,10 +1,10 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import TopNavbar from "../components/TopNavbar";
 import Footer from "../components/Footer";
 import Title from "../components/Title";
 
-import { AuthData, EmptyUser } from "../auth/AuthWrapper";
+import { EmptyUser } from "../auth/AuthWrapper";
 import TextSkeleton from "../skeleton/TextSkeleton";
 import RegularDashboard from "../components/RegularDashboard";
 import AdminDashboard from "../components/AdminDashboard";

@@ -5,6 +5,7 @@ import {
   validateEmail,
 } from "../utils/inputValidation";
 import { MAX_TEXT_INPUT_LENGTH } from "../constants";
+import "../styles/input.css";
 
 interface TextInputArgs {
   setFormData: (id: string, value: string) => void;

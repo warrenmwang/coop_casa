@@ -6,7 +6,7 @@ import AboutPage from "../pages/AboutPage";
 import DashboardPage from "../pages/DashboardPage";
 import ContactPage from "../pages/ContactPage";
 import CommunitiesPage from "../pages/CommunitiesPage";
-import MapPage from "../pages/MapPage";
+// import MapPage from "../pages/MapPage";
 import PrivacyPolicyPage from "../pages/PrivacyPolicyPage";
 import TermsOfServicePage from "../pages/TermsOfServicePage";
 
@@ -42,7 +42,7 @@ const RouteRenderer: React.FC = () => {
         path={`${propertiesPageLink}/:propertyID`}
         element={<PropertyDetail />}
       />
-      <Route path={mapPageLink} element={<MapPage />} />
+      {/* <Route path={mapPageLink} element={<MapPage />} /> */}
       <Route path={aboutPageLink} element={<AboutPage />} />
       <Route path={privacypolicyPageLink} element={<PrivacyPolicyPage />} />
       <Route path={termsOfServicePageLink} element={<TermsOfServicePage />} />

@@ -3,7 +3,7 @@ import TopNavbar from "../components/TopNavbar";
 import Footer from "../components/Footer";
 import Title from "../components/Title";
 
-import "../styles/ContentBody.css";
+import "../styles/contentBody.css";
 import { Typography } from "@mui/material";
 
 const AttributionsPage: React.FC = () => {

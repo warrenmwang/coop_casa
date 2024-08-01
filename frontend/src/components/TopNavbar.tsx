@@ -74,7 +74,7 @@ const TopNavbar: React.FC = () => {
       : []),
     { name: "Communities", href: "/communities", current: false },
     { name: "Properties", href: "/properties", current: false },
-    { name: "Map", href: "/map", current: false },
+    // { name: "Map", href: "/map", current: false },
   ];
 
   return (

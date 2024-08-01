@@ -1,3 +1,7 @@
 .default-form-1 {
   @apply w-full max-w-lg mx-auto mt-8;
 }
+
+.form__update_property {
+  @apply w-full max-w-lg mt-3;
+}

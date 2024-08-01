@@ -1,0 +1,3 @@
+.bullet_pt_list_default {
+  @apply list-disc list-inside mb-4;
+}

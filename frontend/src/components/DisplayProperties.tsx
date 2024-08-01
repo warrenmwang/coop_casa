@@ -7,7 +7,7 @@ import CardGridSkeleton from "../skeleton/CardGridSkeleton";
 import SearchBar from "../input/SearchBar";
 import PageOfProperties from "../components/PageOfProperties";
 import { useSearchParams } from "react-router-dom";
-import "../styles/ContentBody.css";
+import "../styles/contentBody.css";
 import SubmitButton from "./SubmitButton";
 
 export const addressFilterQPKey = "addressFilter";

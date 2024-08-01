@@ -16,7 +16,7 @@ import TextInput from "../input/TextInput";
 import ImageInput from "../input/ImageInput";
 
 // Styles
-import "../styles/Form.css";
+import "../styles/form.css";
 import SubmitButton from "../components/SubmitButton";
 import { dashboardPageLink } from "../urls";
 import { useMutation, useQuery } from "@tanstack/react-query";

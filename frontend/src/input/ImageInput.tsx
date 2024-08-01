@@ -1,6 +1,7 @@
 import React from "react";
 import { User } from "../types/Types";
 import { validateUserAvatarInput } from "../utils/inputValidation";
+import "../styles/input.css";
 
 interface ImageInputArgs {
   setFormData: React.Dispatch<React.SetStateAction<User>>;
