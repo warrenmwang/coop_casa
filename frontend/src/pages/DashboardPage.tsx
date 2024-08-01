@@ -1,10 +1,9 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import TopNavbar from "../components/TopNavbar";
 import Footer from "../components/Footer";
 import Title from "../components/Title";
 
-import { EmptyUser } from "../auth/AuthWrapper";
 import TextSkeleton from "../skeleton/TextSkeleton";
 import RegularDashboard from "../components/RegularDashboard";
 import AdminDashboard from "../components/AdminDashboard";
@@ -14,6 +13,7 @@ import { APIUserReceived, UserDetails } from "../types/Types";
 import { useQuery } from "@tanstack/react-query";
 import { apiGetUser, apiGetUserAuth, apiGetUserRole } from "../api/api";
 import ListerDashboard from "../components/ListerDashboard";
+import { EmptyUser } from "../types/Objects";
 
 // Authenticated Endpoint
 const DashboardPage: React.FC = () => {
@@ -57,7 +57,7 @@ const DashboardPage: React.FC = () => {
   const ready: boolean =
     userQuery.isFetched && authQuery.isFetched && roleQuery.isFetched;
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (authQuery.isFetched) {
       if (!authenticated) {
         navigate(homePageLink);

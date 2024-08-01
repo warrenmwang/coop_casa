@@ -1,3 +1,4 @@
+import { toast } from "react-toastify";
 import { MAX_TEXT_INPUT_LENGTH, MAX_IMAGE_FILE_SIZE } from "../constants";
 
 export const validateTextLength = (value: string): boolean => {
@@ -22,7 +23,7 @@ export const validateUserAvatarInput = (file: File): boolean => {
 
   // Check file size
   if (file.size > MAX_IMAGE_FILE_SIZE) {
-    alert("File size should not exceed 5 MiB.");
+    toast.error("File size should not exceed 5 MiB.");
     return false;
   }
 

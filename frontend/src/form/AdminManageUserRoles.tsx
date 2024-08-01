@@ -1,15 +1,24 @@
 import React, { useEffect, useState } from "react";
 import { apiAdminUsersRolesLink } from "../urls";
-import { AuthData } from "../auth/AuthWrapper";
 import SubmitButton from "../components/SubmitButton";
 import "../styles/input.css";
+import { useQuery } from "@tanstack/react-query";
+import { apiGetUser } from "../api/api";
+import { APIUserReceived, User, UserDetails } from "../types/Types";
+import { EmptyUser } from "../types/Objects";
+import { toast } from "react-toastify";
+import { apiFile2ClientFile } from "../utils/utils";
+import TextSkeleton from "../skeleton/TextSkeleton";
 
 const AdminManageUserRoles: React.FC = () => {
-  const auth = AuthData();
-  const { user } = auth;
+  const userQuery = useQuery({
+    queryKey: ["user", "details"],
+    queryFn: apiGetUser,
+  });
 
   const roleTypes = ["lister", "regular"];
 
+  const [user, setUser] = useState<User>(EmptyUser);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [userID, setUserID] = useState<string>("");
   const [role, setRole] = useState<string>("");
@@ -19,19 +28,19 @@ const AdminManageUserRoles: React.FC = () => {
 
     // prevent admin from recking their own account
     if (userID === user.userId) {
-      alert("Don't be stupid now, admin.");
+      toast.warn("Don't be stupid now, admin.");
       setIsSubmitting(false);
       return;
     }
 
     if (userID === "") {
-      alert("Cannot update an empty user ID");
+      toast.warn("Cannot update an empty user ID");
       setIsSubmitting(false);
       return;
     }
 
     if (role === "") {
-      alert("Cannot update with empty role");
+      toast.warn("Cannot update with empty role");
       setIsSubmitting(false);
       return;
     }
@@ -51,6 +60,22 @@ const AdminManageUserRoles: React.FC = () => {
   };
 
   useEffect(() => {
+    if (userQuery.status === "success") {
+      const received: APIUserReceived = userQuery.data;
+      const details: UserDetails = received.userDetails;
+      const avatarImg: File | null = apiFile2ClientFile(
+        received.avatarImageB64,
+      );
+      setUser({
+        ...details,
+        avatar: avatarImg,
+      });
+    } else if (userQuery.status === "error") {
+      toast.error("Unable to fetch user data.");
+    }
+  }, [userQuery.status]);
+
+  useEffect(() => {
     if (isSubmitting) {
       fetch(`${apiAdminUsersRolesLink}?userID=${userID}&role=${role}`, {
         method: "POST",
@@ -67,7 +92,9 @@ const AdminManageUserRoles: React.FC = () => {
     }
   }, [isSubmitting]);
 
-  return (
+  const ready: boolean = userQuery.isFetched;
+
+  return ready ? (
     <>
       <div className="flex justify-center items-center space-x-4 mt-4 py-1">
         <h1 className="h1_custom">Update User Role</h1>
@@ -113,6 +140,8 @@ const AdminManageUserRoles: React.FC = () => {
         <SubmitButton isSubmitting={isSubmitting} onClick={handleSubmit} />
       </form>
     </>
+  ) : (
+    <TextSkeleton />
   );
 };
 

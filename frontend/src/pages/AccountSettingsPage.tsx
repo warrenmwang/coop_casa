@@ -4,19 +4,14 @@ import Footer from "../components/Footer";
 import Title from "../components/Title";
 import Modal from "../components/Modal";
 import AccountSettingsForm from "../form/AccountSettingsForm";
-import { AuthData, EmptyUser } from "../auth/AuthWrapper";
-import {
-  apiAccountDelete,
-  apiGetUser,
-  apiGetUserAuth,
-  apiGetUserRole,
-} from "../api/api";
+import { apiAccountDelete, apiGetUserAuth, apiGetUserRole } from "../api/api";
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { homePageLink } from "../urls";
 
 import TextSkeleton from "../skeleton/TextSkeleton";
-import axios, { Axios, AxiosError } from "axios";
+import axios, { AxiosError } from "axios";
+import { toast } from "react-toastify";
 
 // Authenticated Endpoint
 const AccountSettingsPage: React.FC = () => {
@@ -47,7 +42,7 @@ const AccountSettingsPage: React.FC = () => {
       if (axios.isAxiosError(error)) {
         errMsg = `${(error as AxiosError).response?.data}`;
       }
-      alert(
+      toast.error(
         `Something went wrong in deleting the account: ${errMsg}. Try again.`,
       );
     },
@@ -65,7 +60,7 @@ const AccountSettingsPage: React.FC = () => {
 
   const ready: boolean = authQuery.isFetched && roleQuery.isFetched;
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (authQuery.isFetched) {
       if (!authenticated) {
         navigate(homePageLink);

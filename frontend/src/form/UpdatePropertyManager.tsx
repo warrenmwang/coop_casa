@@ -13,6 +13,7 @@ import { MAX_PROPERTY_IMGS_ALLOWED } from "../constants";
 import { useMutation } from "@tanstack/react-query";
 import { validateNumber } from "../utils/inputValidation";
 import "../styles/input.css";
+import { toast } from "react-toastify";
 
 const propertyRequiredFields: string[] = [
   "name",
@@ -82,7 +83,7 @@ const UpdatePropertyForm: React.FC<{
     ) {
       // Validate string is a number
       if (!validateNumber(value)) {
-        alert(`Value in field ${id} is not a number.`);
+        toast.error(`Value in field ${id} is not a number.`);
         return;
       }
 
@@ -105,7 +106,7 @@ const UpdatePropertyForm: React.FC<{
     // update errors
     if (files.length > MAX_PROPERTY_IMGS_ALLOWED) {
       setFormImages([]);
-      alert(
+      toast.error(
         `Uploaded more than the maximum allowable images (${MAX_PROPERTY_IMGS_ALLOWED}).`,
       );
       return;
@@ -135,7 +136,9 @@ const UpdatePropertyForm: React.FC<{
       for (let key of errors.keys()) {
         if (errors.get(key)) {
           setIsSubmitting(false);
-          alert(`Resolve error in field "${key}" first before submitting.`);
+          toast.error(
+            `Resolve error in field "${key}" first before submitting.`,
+          );
           return;
         }
       }
@@ -351,7 +354,7 @@ const UpdatePropertyManager: React.FC = () => {
     e.preventDefault();
     // ensure is a valid uuid
     if (!uuidValidate(propertyID)) {
-      alert("Not a valid property ID.");
+      toast.error("Not a valid property ID.");
       return;
     }
 
@@ -372,7 +375,7 @@ const UpdatePropertyManager: React.FC = () => {
     e.preventDefault();
     // ensure is a valid uuid
     if (!uuidValidate(propertyID)) {
-      alert("Not a valid property ID.");
+      toast.error("Not a valid property ID.");
       return;
     }
     setIsDeleting(true);
@@ -398,7 +401,7 @@ const UpdatePropertyManager: React.FC = () => {
         const property = await apiGetProperty(propertyID);
         setProperty(property);
       } catch (err) {
-        alert(`Error in getting requested property: ${err}`);
+        toast.error(`Error in getting requested property: ${err}`);
       }
       setGetPropertyDetailsIsSubmitting(false);
     };

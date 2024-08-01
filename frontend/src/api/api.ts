@@ -1,8 +1,6 @@
 /*
   Functions used to interact with the backend API.
 */
-
-import { useEffect, useState } from "react";
 import {
   User,
   ListerBasicInfo,
@@ -20,7 +18,6 @@ import {
   apiPropertiesLink,
   apiUserRoleLink,
 } from "../urls";
-import { AuthData } from "../auth/AuthWrapper";
 import { apiFile2ClientFile } from "../utils/utils";
 import axios from "axios";
 import { addressFilterQPKey, pageQPKey } from "../components/DisplayProperties";

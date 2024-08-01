@@ -1,10 +1,9 @@
-import React, { Fragment, useEffect } from "react";
+import React, { Fragment } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import defaultProfileImg from "../assets/profile.jpg";
 import coopImg from "../assets/coopAlt1.svg";
-import { AuthData, EmptyUser } from "../auth/AuthWrapper";
 import {
   apiAuthGoogleOAuthLink,
   accountSettingsPageLink,
@@ -12,8 +11,9 @@ import {
 } from "../urls";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiGetUser, apiGetUserAuth, apiLogoutUser } from "../api/api";
-import { APIFileReceived, APIUserReceived, UserDetails } from "../types/Types";
+import { APIUserReceived } from "../types/Types";
 import { apiFile2ClientFile } from "../utils/utils";
+import { toast } from "react-toastify";
 
 function classNames(...classes: (string | undefined | null | false)[]) {
   return classes.filter(Boolean).join(" ");
@@ -43,7 +43,7 @@ const TopNavbar: React.FC = () => {
       navigate(homePageLink);
     },
     onError: () => {
-      alert(`Failed to logout: ${mutation.error}`);
+      toast.error(`Failed to logout: ${mutation.error}`);
     },
   });
   const queryClient = useQueryClient();

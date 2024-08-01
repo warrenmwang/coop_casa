@@ -8,9 +8,10 @@ import ImageInput from "../input/ImageInput";
 import { apiFile2ClientFile } from "../utils/utils";
 import { APIUserReceived, User, UserDetails } from "../types/Types";
 import "../styles/form.css";
-import { EmptyUser } from "../auth/AuthWrapper";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import TextSkeleton from "../skeleton/TextSkeleton";
+import { toast } from "react-toastify";
+import { EmptyUser } from "../types/Objects";
 
 const AccountSettingsForm: React.FC = () => {
   const [user, setUser] = useState<User>(EmptyUser);
@@ -34,7 +35,7 @@ const AccountSettingsForm: React.FC = () => {
       setIsChanged(false);
     },
     onError: () => {
-      alert(`Failed to update because: ${mutation.error}`);
+      toast.error(`Failed to update because: ${mutation.error}`);
     },
   });
 

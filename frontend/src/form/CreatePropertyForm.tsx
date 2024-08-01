@@ -21,6 +21,7 @@ import TextSkeleton from "../skeleton/TextSkeleton";
 import "../styles/font.css";
 import "../styles/input.css";
 import "../styles/form.css";
+import { toast } from "react-toastify";
 
 type TextFieldsConstruct = {
   id: string;
@@ -249,7 +250,7 @@ const CreatePropertyForm: React.FC = () => {
     ) {
       // Validate string is a number
       if (!validateNumber(value)) {
-        alert(`Value in field ${id} is not a number.`);
+        toast.error(`Value in field ${id} is not a number.`);
         return;
       }
       // save value for this field
@@ -271,7 +272,7 @@ const CreatePropertyForm: React.FC = () => {
     // update errors
     if (files.length > MAX_PROPERTY_IMGS_ALLOWED) {
       setErrors("images", true);
-      alert(
+      toast.error(
         `Uploaded more than the maximum allowable images (${MAX_PROPERTY_IMGS_ALLOWED}).`,
       );
       return;
@@ -324,7 +325,7 @@ const CreatePropertyForm: React.FC = () => {
       for (let [k, v] of errors) {
         if (v) {
           setIsSubmitting(false);
-          alert(`Fix field: ${k}`);
+          toast.error(`Fix field: ${k}`);
           return;
         }
       }
@@ -341,11 +342,11 @@ const CreatePropertyForm: React.FC = () => {
           setPropertyDetails(EmptyPropertyDetails);
           setImages([]);
           setIsSubmitting(false);
-          alert("Property created.");
+          toast.success("Property created.");
         },
         onError: (error: any) => {
           const errorMessage = error.response?.data || error.message;
-          alert("Could not create property because: " + errorMessage);
+          toast.error("Could not create property because: " + errorMessage);
         },
       });
     }

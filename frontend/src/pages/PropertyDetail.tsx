@@ -10,6 +10,7 @@ import Footer from "../components/Footer";
 import { useQuery } from "@tanstack/react-query";
 import CardSkeleton from "../skeleton/CardSkeleton";
 import { ListerBasicInfo } from "../types/Types";
+import ShareLinkButton from "../components/ShareLinkButton";
 
 type ListerInfoProps = {
   listerID: string;
@@ -108,19 +109,22 @@ const PropertyDetailContent: React.FC<PropertyDetailContentProps> = ({
 
   const basicInfoElement = basicInfoConstructor(property);
 
-  const handleReturn = () => {
-    navigate(propertiesPageLink);
-  };
-
   return (
     <Box className="bg-white p-4 shadow-lg rounded-lg mx-auto w-11/12 md:w-3/5 lg:w-1/2 z-50">
       <div className="flex">
         <button
           className="block m-3 p-3 bg-gray-500 hover:bg-gray-400 text-white rounded"
-          onClick={handleReturn}
+          onClick={() => navigate(-1)}
+        >
+          Back
+        </button>
+        <button
+          className="block m-3 p-3 bg-gray-500 hover:bg-gray-400 text-white rounded"
+          onClick={() => navigate(propertiesPageLink)}
         >
           Browse Properties
         </button>
+        <ShareLinkButton />
       </div>
       <CustomImageGallery imageData={imageData} />
       <div id="transition-modal-title">

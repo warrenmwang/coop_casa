@@ -8,12 +8,12 @@ import TopNavbar from "../components/TopNavbar";
 import Footer from "../components/Footer";
 import { APIUserReceived, User, UserDetails } from "../types/Types";
 import { apiGetUser, apiUpdateUserAccountDetails } from "../api/api";
-import { AuthData, EmptyUser } from "../auth/AuthWrapper";
 import LocationInput from "../input/LocationInput";
 import InterestsInput from "../input/InterestsInput";
 import GenderInput from "../input/GenderInput";
 import TextInput from "../input/TextInput";
 import ImageInput from "../input/ImageInput";
+import { EmptyUser } from "../types/Objects";
 
 // Styles
 import "../styles/form.css";
@@ -24,6 +24,7 @@ import TextSkeleton from "../skeleton/TextSkeleton";
 import { apiFile2ClientFile } from "../utils/utils";
 
 import axios, { AxiosError } from "axios";
+import { toast } from "react-toastify";
 
 // Authenticated Endpoint
 const AccountSetupPage: React.FC = () => {
@@ -53,7 +54,7 @@ const AccountSetupPage: React.FC = () => {
       if (axios.isAxiosError(error)) {
         errMsg = `${(error as AxiosError).response?.data}`;
       }
-      alert(`Unable to setup account due to reason: ${errMsg}.`);
+      toast.error(`Unable to setup account due to reason: ${errMsg}.`);
       setIsSubmitting(false);
     },
   });
@@ -85,7 +86,7 @@ const AccountSetupPage: React.FC = () => {
     // Check for errors
     const hasErrors = Array.from(errors.values()).some((value) => value);
     if (hasErrors) {
-      alert("Fill out required fields.");
+      toast.error("Fill out required fields.");
       return;
     }
     // Send update

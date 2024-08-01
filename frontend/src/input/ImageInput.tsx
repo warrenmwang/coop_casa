@@ -2,6 +2,7 @@ import React from "react";
 import { User } from "../types/Types";
 import { validateUserAvatarInput } from "../utils/inputValidation";
 import "../styles/input.css";
+import { toast } from "react-toastify";
 
 interface ImageInputArgs {
   setFormData: React.Dispatch<React.SetStateAction<User>>;
@@ -32,7 +33,7 @@ const ImageInput: React.FC<ImageInputArgs> = ({
         if (setError) {
           setError("avatar", true);
         }
-        alert("Please upload a valid image file (JPEG, PNG, or GIF).");
+        toast.error("Please upload a valid image file (JPEG, PNG, or GIF).");
         e.target.value = ""; // Clear the input value to allow re-upload
         return;
       }

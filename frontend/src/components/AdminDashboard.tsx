@@ -5,6 +5,7 @@ import { apiAdminUsersLink, apiAdminUsersRolesLink } from "../urls";
 import AdminManageUserRoles from "../form/AdminManageUserRoles";
 import { Grid } from "@mui/material";
 import UpdatePropertyManager from "../form/UpdatePropertyManager";
+import { toast } from "react-toastify";
 
 const AdminDashboard: React.FC = () => {
   const [users, setUsers] = useState<UserDetails[]>([]);
@@ -44,7 +45,7 @@ const AdminDashboard: React.FC = () => {
           if (users === null) {
             // list is empty, meaning we've reached the end
             setLastPage(page);
-            alert("No more users to show");
+            toast.info("No more users to show");
             return;
           }
           setUsers(users);
@@ -84,7 +85,7 @@ const AdminDashboard: React.FC = () => {
   // user role - next button
   const handleNext = () => {
     if (page === lastPage) {
-      alert("No more users to show");
+      toast.info("No more users to show");
       return;
     }
     setPage((prevPage) => prevPage + 1);
@@ -97,7 +98,6 @@ const AdminDashboard: React.FC = () => {
 
   return (
     <>
-      {/* TODO: create a grid for storing the separate components needed to manage stuff */}
       <div className="min-w-full mx-auto">
         <Grid container spacing={2}>
           <Grid item xs={12} sm={12} md={12} lg={6} style={{ gap: "0 24px" }}>
