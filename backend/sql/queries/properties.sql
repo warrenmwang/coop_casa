@@ -1,9 +1,9 @@
 -- name: CreatePropertyDetails :exec
 INSERT INTO properties 
 (
-property_id, lister_user_id, "name", "description", 
-address_1, address_2, city, "state", zipcode, country,
-square_feet, num_bedrooms, num_toilets, num_showers_baths, cost_dollars, cost_cents, misc_note
+    property_id, lister_user_id, "name", "description", 
+    address_1, address_2, city, "state", zipcode, country,
+    square_feet, num_bedrooms, num_toilets, num_showers_baths, cost_dollars, cost_cents, misc_note
 )
 VALUES 
 ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17);
@@ -83,10 +83,8 @@ WHERE
     lower(trim(country)) = lower(trim($6))
 );
 
--- name: GetNextPagePropertiesFiltered :many
-SELECT 
-    property_id
-FROM properties
+-- name: GetNextPagePropertiesFilterByAddress :many
+SELECT property_id FROM properties
 ORDER BY
     levenshtein(
         CONCAT (address_1, ', ', address_2, ', ', city, ', ', zipcode, ', ', country),

@@ -1,5 +1,5 @@
 -- +goose Up
-CREATE EXTENSION fuzzystrmatch;
+CREATE EXTENSION IF NOT EXISTS fuzzystrmatch;
 
 -- +goose Down
-DROP EXTENSION fuzzystrmatch;
+DROP EXTENSION IF EXISTS fuzzystrmatch;

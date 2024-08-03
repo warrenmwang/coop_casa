@@ -82,6 +82,20 @@ type PropertyFull struct {
 	PropertyImages  []OrderedFileExternal `json:"images"`
 }
 
+type CommunityDetails struct {
+	CommunityID string `json:"communityId"`
+	AdminUserID string `json:"adminUserId"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+}
+
+type CommunityFull struct {
+	CommunityDetails    CommunityDetails `json:"details"`
+	CommunityImages     []FileExternal   `json:"images"`
+	CommunityUsers      []string         `json:"users"`      // user ids
+	CommunityProperties []string         `json:"properties"` // property ids
+}
+
 type service struct {
 	db             *sql.DB
 	db_queries     *sqlc.Queries
@@ -121,6 +135,19 @@ type Service interface {
 	GetTotalCountProperties() (int64, error)
 	DeleteProperties(userID string) error
 	CheckDuplicateProperty(propertyDetails PropertyDetails) error
+
+	// Communities
+	CreateCommunity(details CommunityDetails, images []FileInternal) error
+	CreateCommunityUser(communityId, userId string) error
+	CreateCommunityProperty(communityId, propertyId string) error
+	GetCommunityDetails(communityId string) (CommunityDetails, error)
+	GetCommunityImages(communityId string) ([]FileInternal, error)
+	GetCommunityUsers(communityId string) ([]string, error)
+	GetCommunityProperties(communityId string) ([]string, error)
+	UpdateCommunityDetails(details CommunityDetails) error
+	UpdateCommunityImages(communityId string, images []FileInternal) error
+	DeleteCommunity(communityId string) error
+	GetUserOwnedCommunities(userId string) ([]string, error)
 }
 
 // Test database connection
@@ -746,7 +773,7 @@ func (s *service) GetNextPageProperties(limit, offset int32, addressFilter strin
 	}
 
 	// there is a addressFilter
-	propertyIDs, err := s.db_queries.GetNextPagePropertiesFiltered(ctx, sqlc.GetNextPagePropertiesFilteredParams{
+	propertyIDs, err := s.db_queries.GetNextPagePropertiesFilterByAddress(ctx, sqlc.GetNextPagePropertiesFilterByAddressParams{
 		Limit:       limit,
 		Offset:      offset,
 		Levenshtein: addressFilter,
@@ -924,6 +951,168 @@ func (s *service) AdminGetUsersRoles(userIds []string) ([]string, error) {
 	}
 
 	return userRoles, nil
+}
+
+// ---------------- Communities --------------------
+func (s *service) CreateCommunity(details CommunityDetails, images []FileInternal) error {
+	ctx := context.Background()
+
+	err := s.db_queries.CreateCommunityDetails(ctx, sqlc.CreateCommunityDetailsParams{
+		CommunityID: details.CommunityID,
+		AdminUserID: details.AdminUserID,
+		Name:        details.Name,
+		Description: utils.CreateSQLNullString(details.Description),
+	})
+	if err != nil {
+		return err
+	}
+
+	// Add the community admin as the first user
+	err = s.db_queries.CreateCommunityUser(ctx, sqlc.CreateCommunityUserParams{
+		CommunityID: details.CommunityID,
+		UserID:      details.AdminUserID,
+	})
+	if err != nil {
+		return err
+	}
+
+	for _, image := range images {
+		err = s.db_queries.CreateCommunityImage(ctx, sqlc.CreateCommunityImageParams{
+			CommunityID: details.CommunityID,
+			FileName:    image.Filename,
+			MimeType:    image.Mimetype,
+			Size:        image.Size,
+			Data:        image.Data,
+		})
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (s *service) CreateCommunityUser(communityId, userId string) error {
+	ctx := context.Background()
+	err := s.db_queries.CreateCommunityUser(ctx, sqlc.CreateCommunityUserParams{
+		CommunityID: communityId,
+		UserID:      userId,
+	})
+	return err
+}
+
+func (s *service) CreateCommunityProperty(communityId, propertyId string) error {
+	ctx := context.Background()
+	err := s.db_queries.CreateCommunityProperty(ctx, sqlc.CreateCommunityPropertyParams{
+		CommunityID: communityId,
+		PropertyID:  propertyId,
+	})
+	return err
+}
+
+func (s *service) GetCommunityDetails(communityId string) (CommunityDetails, error) {
+	ctx := context.Background()
+	details, err := s.db_queries.GetCommunityDetails(ctx, communityId)
+	if err != nil {
+		return CommunityDetails{}, err
+	}
+	return CommunityDetails{
+		CommunityID: details.CommunityID,
+		AdminUserID: details.AdminUserID,
+		Name:        details.Name,
+		Description: details.Description.String,
+	}, nil
+}
+
+func (s *service) GetCommunityImages(communityId string) ([]FileInternal, error) {
+	ctx := context.Background()
+	images, err := s.db_queries.GetCommunityImages(ctx, communityId)
+	if err != nil {
+		return nil, err
+	}
+	var returnImages []FileInternal
+	for _, image := range images {
+		returnImages = append(returnImages, FileInternal{
+			Filename: image.FileName,
+			Mimetype: image.MimeType,
+			Size:     image.Size,
+			Data:     image.Data,
+		})
+	}
+	return returnImages, nil
+}
+
+func (s *service) GetCommunityUsers(communityId string) ([]string, error) {
+	ctx := context.Background()
+	userIds, err := s.db_queries.GetCommunityUsers(ctx, communityId)
+	if err != nil {
+		return nil, err
+	}
+	var returnUserIds []string
+	for _, id := range userIds {
+		returnUserIds = append(returnUserIds, id.UserID)
+	}
+	return returnUserIds, nil
+}
+
+func (s *service) GetCommunityProperties(communityId string) ([]string, error) {
+	ctx := context.Background()
+	propertyIds, err := s.db_queries.GetCommunityProperties(ctx, communityId)
+	if err != nil {
+		return nil, err
+	}
+	var returnPropertyIds []string
+	for _, id := range propertyIds {
+		returnPropertyIds = append(returnPropertyIds, id.PropertyID)
+	}
+	return returnPropertyIds, nil
+}
+
+func (s *service) UpdateCommunityDetails(details CommunityDetails) error {
+	ctx := context.Background()
+	err := s.db_queries.UpdateCommunityDetails(ctx, sqlc.UpdateCommunityDetailsParams{
+		CommunityID: details.CommunityID,
+		AdminUserID: details.AdminUserID,
+		Name:        details.Name,
+		Description: utils.CreateSQLNullString(details.Description),
+	})
+	return err
+}
+
+func (s *service) UpdateCommunityImages(communityId string, images []FileInternal) error {
+	ctx := context.Background()
+	err := s.db_queries.DeleteCommunityImages(ctx, communityId)
+	if err != nil {
+		return err
+	}
+	for _, image := range images {
+		err = s.db_queries.CreateCommunityImage(ctx, sqlc.CreateCommunityImageParams{
+			CommunityID: communityId,
+			FileName:    image.Filename,
+			MimeType:    image.Mimetype,
+			Size:        image.Size,
+			Data:        image.Data,
+		})
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (s *service) DeleteCommunity(communityId string) error {
+	ctx := context.Background()
+	err := s.db_queries.DeleteCommunity(ctx, communityId)
+	return err
+}
+
+func (s *service) GetUserOwnedCommunities(userId string) ([]string, error) {
+	ctx := context.Background()
+	communities, err := s.db_queries.GetUserOwnedCommunities(ctx, userId)
+	if err != nil {
+		return nil, err
+	}
+	return communities, nil
 }
 
 // DB entrance func to init

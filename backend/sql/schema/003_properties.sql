@@ -31,12 +31,12 @@ CREATE TABLE properties_images (
     "size" BIGINT NOT NULL,
     "data" BYTEA NOT NULL,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_property
+    CONSTRAINT fk_property_id_properties_images
         FOREIGN KEY(property_id)
         REFERENCES properties(property_id)
         ON DELETE CASCADE
 );
 
 -- +goose Down
-DROP TABLE properties;
-DROP TABLE properties_images;
+DROP TABLE IF EXISTS properties_images;
+DROP TABLE IF EXISTS properties;

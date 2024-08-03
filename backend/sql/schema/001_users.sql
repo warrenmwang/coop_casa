@@ -21,12 +21,12 @@ CREATE TABLE users_avatars (
     "size" BIGINT,
     "data" BYTEA,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_property
+    CONSTRAINT fk_user_id_users_avatars
         FOREIGN KEY(user_id)
         REFERENCES users(user_id)
         ON DELETE CASCADE
 );
 
 -- +goose Down
-DROP TABLE users;
-DROP TABLE users_avatars;
+DROP TABLE IF EXISTS users_avatars;
+DROP TABLE IF EXISTS users;

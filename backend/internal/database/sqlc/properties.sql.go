@@ -54,9 +54,9 @@ func (q *Queries) CheckIsPropertyDuplicate(ctx context.Context, arg CheckIsPrope
 const createPropertyDetails = `-- name: CreatePropertyDetails :exec
 INSERT INTO properties 
 (
-property_id, lister_user_id, "name", "description", 
-address_1, address_2, city, "state", zipcode, country,
-square_feet, num_bedrooms, num_toilets, num_showers_baths, cost_dollars, cost_cents, misc_note
+    property_id, lister_user_id, "name", "description", 
+    address_1, address_2, city, "state", zipcode, country,
+    square_feet, num_bedrooms, num_toilets, num_showers_baths, cost_dollars, cost_cents, misc_note
 )
 VALUES 
 ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
@@ -210,16 +210,9 @@ func (q *Queries) GetNextPageProperties(ctx context.Context, arg GetNextPageProp
 	return items, nil
 }
 
-const getNextPagePropertiesFiltered = `-- name: GetNextPagePropertiesFiltered :many
-SELECT 
-    property_id
-FROM properties
-
-
-
+const getNextPagePropertiesFilterByAddress = `-- name: GetNextPagePropertiesFilterByAddress :many
+SELECT property_id FROM properties
 ORDER BY
-    -- levenshtein(address_1, $3) + levenshtein(address_2, $3) + levenshtein(city, $3)
-    -- + levenshtein("state", $3) + levenshtein(zipcode, $3) + levenshtein(country, $3) ASC
     levenshtein(
         CONCAT (address_1, ', ', address_2, ', ', city, ', ', zipcode, ', ', country),
         $3
@@ -227,14 +220,14 @@ ORDER BY
 LIMIT $1 OFFSET $2
 `
 
-type GetNextPagePropertiesFilteredParams struct {
+type GetNextPagePropertiesFilterByAddressParams struct {
 	Limit       int32
 	Offset      int32
 	Levenshtein string
 }
 
-func (q *Queries) GetNextPagePropertiesFiltered(ctx context.Context, arg GetNextPagePropertiesFilteredParams) ([]string, error) {
-	rows, err := q.db.QueryContext(ctx, getNextPagePropertiesFiltered, arg.Limit, arg.Offset, arg.Levenshtein)
+func (q *Queries) GetNextPagePropertiesFilterByAddress(ctx context.Context, arg GetNextPagePropertiesFilterByAddressParams) ([]string, error) {
+	rows, err := q.db.QueryContext(ctx, getNextPagePropertiesFilterByAddress, arg.Limit, arg.Offset, arg.Levenshtein)
 	if err != nil {
 		return nil, err
 	}

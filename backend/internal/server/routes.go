@@ -238,8 +238,8 @@ func (s *Server) authCallbackHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Define token lifetime to be a day
-	expireTime := time.Now().Add(time.Hour * 24)
+	// Define token lifetime to be one month
+	expireTime := time.Now().Add(time.Hour * 24 * 30)
 
 	// Create User struct with identifying user info from OAuth
 	user := UserOAuthDetails{
@@ -713,7 +713,7 @@ func (s *Server) apiUpdateUserRoleHandler(w http.ResponseWriter, r *http.Request
 	}
 
 	// Return response ok
-	(w).WriteHeader(200)
+	w.WriteHeader(200)
 }
 
 // ----------------- PROPERTIES ---------------------

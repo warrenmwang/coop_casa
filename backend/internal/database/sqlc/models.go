@@ -9,6 +9,38 @@ import (
 	"time"
 )
 
+type CommunitiesImage struct {
+	ID          int32
+	CommunityID string
+	FileName    string
+	MimeType    string
+	Size        int64
+	Data        []byte
+	UpdatedAt   time.Time
+}
+
+type CommunitiesProperty struct {
+	ID          int32
+	CommunityID string
+	PropertyID  string
+}
+
+type CommunitiesUser struct {
+	ID          int32
+	CommunityID string
+	UserID      string
+}
+
+type Community struct {
+	ID          int32
+	CommunityID string
+	AdminUserID string
+	Name        string
+	Description sql.NullString
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+}
+
 type PropertiesImage struct {
 	ID         int32
 	PropertyID string
