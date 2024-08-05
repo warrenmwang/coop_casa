@@ -20,7 +20,7 @@ import {
 } from "../urls";
 import { apiFile2ClientFile } from "../utils/utils";
 import axios from "axios";
-import { addressFilterQPKey, pageQPKey } from "../components/DisplayProperties";
+import { filterAddressQPKey, pageQPKey } from "../components/DisplayProperties";
 
 // Delete Account Function
 export const apiAccountDelete = async (): Promise<any> => {
@@ -117,7 +117,7 @@ export const apiCreateNewProperty = async (
     }
   }
 
-  return axios.put(apiPropertiesLink, formData, {
+  return axios.post(apiPropertiesLink, formData, {
     withCredentials: true,
   });
 };
@@ -135,7 +135,7 @@ export const apiUpdateProperty = async (
     }
   }
 
-  return axios.post(apiPropertiesLink, formData, {
+  return axios.put(apiPropertiesLink, formData, {
     withCredentials: true,
   });
 };
@@ -143,7 +143,7 @@ export const apiUpdateProperty = async (
 // Get a single property based off of id
 export const apiGetProperty = async (propertyID: string): Promise<Property> => {
   return axios
-    .get(`${apiPropertiesLink}?propertyID=${propertyID}`, {
+    .get(`${apiPropertiesLink}/${propertyID}`, {
       headers: {
         Accept: "application/json",
       },
@@ -166,12 +166,12 @@ export const apiGetProperty = async (propertyID: string): Promise<Property> => {
 // Get a page of property ids
 export const apiGetProperties = async (
   page: number,
-  addressFilter: string,
+  filterAddress: string,
 ): Promise<string[]> => {
-  if (addressFilter === undefined) addressFilter = "";
+  if (filterAddress === undefined) filterAddress = "";
   return axios
     .get(
-      `${apiPropertiesLink}?${pageQPKey}=${page}&${addressFilterQPKey}=${addressFilter}`,
+      `${apiPropertiesLink}?${pageQPKey}=${page}&${filterAddressQPKey}=${filterAddress}&limit=9`, // TODO: move limit definition to somewhere else
       {
         headers: {
           Accept: "application/json",
@@ -192,7 +192,7 @@ export const apiGetProperties = async (
 export const apiDeleteProperty = async (
   propertyID: string,
 ): Promise<Response | null> => {
-  return axios.delete(`${apiPropertiesLink}?propertyID=${propertyID}`, {
+  return axios.delete(`${apiPropertiesLink}/${propertyID}`, {
     withCredentials: true,
   });
 };
@@ -200,14 +200,11 @@ export const apiDeleteProperty = async (
 // Unused
 // Get total count of properties in db
 // export const apiGetTotalCountProperties = async (): Promise<number> => {
-//   return fetch(`${api_properties_Link}?getTotalCount=true`, {
-//     method: "GET",
-//     headers: {
-//       Accept: "application/json",
-//     },
-//   })
-//     .then(checkFetch)
-//     .then((response) => response.json())
+//   return axios
+//     .get(`${apiPropertiesLink}/total`, {
+//       withCredentials: true,
+//     })
+//     .then((response) => response.data)
 //     .then((data) => data as number)
 //     .catch((error) => {
 //       throw error;

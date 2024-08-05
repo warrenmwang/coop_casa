@@ -49,7 +49,7 @@ type PropertiesImage struct {
 	MimeType   string
 	Size       int64
 	Data       []byte
-	UpdatedAt  time.Time
+	CreatedAt  time.Time
 }
 
 type Property struct {
@@ -94,6 +94,13 @@ type User struct {
 	Interests sql.NullString
 	CreatedAt time.Time
 	UpdatedAt time.Time
+}
+
+type UserSavedProperty struct {
+	ID         int32
+	UserID     string
+	PropertyID string
+	CreatedAt  time.Time
 }
 
 type UsersAvatar struct {

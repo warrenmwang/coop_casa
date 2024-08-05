@@ -155,15 +155,7 @@ func (s *Server) authCheckAndGetClaims(r *http.Request) (jwt.MapClaims, error) {
 // Returns the userId from the http cookie in the request, if present (if the user is authed)
 // If something goes wrong in here, we should assume a response http code 401 for unauthorized.
 func (s *Server) getAuthedUserId(r *http.Request) (string, error) {
-	// Read JWT from HttpOnly Cookie
-	cookie, err := r.Cookie("token")
-	if err != nil {
-		return "", fmt.Errorf("no token in cookie in request: %v", err.Error())
-	}
-	tokenString := cookie.Value
-
-	// Check if JWT is valid and get claims
-	claims, err := s.ValidateTokenAndGetClaims(tokenString)
+	claims, err := s.authCheckAndGetClaims(r)
 	if err != nil {
 		return "", err
 	}
@@ -355,6 +347,7 @@ func (s *Server) authLogoutHandler(w http.ResponseWriter, r *http.Request) {
 // --------------- ACCOUNT ---------------
 
 // Endpoint: GET /api/account
+// AUTHED
 func (s *Server) apiGetAccountDetailsHandler(w http.ResponseWriter, r *http.Request) {
 	// Returns the user data based on the userId in the auth token
 
@@ -412,6 +405,7 @@ func (s *Server) apiGetAccountDetailsHandler(w http.ResponseWriter, r *http.Requ
 }
 
 // Endpoint: POST /api/account
+// AUTHED
 func (s *Server) apiUpdateAccountDetailsHandler(w http.ResponseWriter, r *http.Request) {
 	// Authenticate user
 	claims, err := s.authCheckAndGetClaims(r)
@@ -500,6 +494,7 @@ func (s *Server) apiUpdateAccountDetailsHandler(w http.ResponseWriter, r *http.R
 }
 
 // Endpoint: DELETE /api/account
+// AUTHED
 func (s *Server) apiDeleteAccountHandler(w http.ResponseWriter, r *http.Request) {
 	// Delete a user account given their userId from the token
 
@@ -524,6 +519,8 @@ func (s *Server) apiDeleteAccountHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
+	// TODO: delete all communities owned by this user ?
+
 	// Invalidate their token
 	s.InvalidateToken(w)
 
@@ -532,6 +529,7 @@ func (s *Server) apiDeleteAccountHandler(w http.ResponseWriter, r *http.Request)
 }
 
 // Endpoint: GET /api/account/role
+// AUTHED
 func (s *Server) apiGetUserRoleHandler(w http.ResponseWriter, r *http.Request) {
 	// Authenticate user
 	userId, err := s.getAuthedUserId(r)
@@ -558,6 +556,7 @@ func (s *Server) apiGetUserRoleHandler(w http.ResponseWriter, r *http.Request) {
 // ---------------- ADMIN ----------------
 
 // Endpoint: GET /api/admin/users
+// AUTHED
 // Only returns the user details (no avatar images)
 func (s *Server) apiAdminGetUsers(w http.ResponseWriter, r *http.Request) {
 	// Authenticate user
@@ -634,6 +633,7 @@ func (s *Server) apiAdminGetUsers(w http.ResponseWriter, r *http.Request) {
 }
 
 // Endpoint: GET /api/admin/users/roles
+// AUTHED
 func (s *Server) apiAdminGetUsersRoles(w http.ResponseWriter, r *http.Request) {
 	// Authenticate user
 	userId, err := s.getAuthedUserId(r)
@@ -672,6 +672,7 @@ func (s *Server) apiAdminGetUsersRoles(w http.ResponseWriter, r *http.Request) {
 }
 
 // Endpoint: POST /api/admin/users/roles
+// AUTHED
 // NOTE: despite the name, it is currently only written to allow the changing of a single
 // user's role
 func (s *Server) apiUpdateUserRoleHandler(w http.ResponseWriter, r *http.Request) {
@@ -718,94 +719,85 @@ func (s *Server) apiUpdateUserRoleHandler(w http.ResponseWriter, r *http.Request
 
 // ----------------- PROPERTIES ---------------------
 
-// Endpoint: GET /api/properties
-// Available query params:
-// - propertyID string, return the data for a single property
-// - page int, return the property ids for the current page
-// - getTotalCount bool, return the total number of properties present on site
-func (s *Server) apiGetPropertiesHandler(w http.ResponseWriter, r *http.Request) {
-	// anyone can get properties, without needing to be authenticated.
+// GET /api/properties/{id}
+// NO AUTH
+func (s *Server) apiGetPropertyHandler(w http.ResponseWriter, r *http.Request) {
+	propertyID := chi.URLParam(r, "id")
 
+	// Try to get property from db
+	propertyDetails, err := s.db.GetPropertyDetails(propertyID)
+	if err != nil {
+		respondWithError(w, 500, err)
+		return
+	}
+
+	propertyImagesBinary, err := s.db.GetPropertyImages(propertyID)
+	if err != nil {
+		respondWithError(w, 500, err)
+		return
+	}
+
+	var propertyImagesB64 []database.OrderedFileExternal
+	for _, image := range propertyImagesBinary {
+		propertyImagesB64 = append(propertyImagesB64, database.OrderedFileExternal{
+			OrderNum: image.OrderNum,
+			File: database.FileExternal{
+				Filename: image.File.Filename,
+				Mimetype: image.File.Mimetype,
+				Size:     image.File.Size,
+				Data:     base64.StdEncoding.EncodeToString(image.File.Data),
+			},
+		})
+	}
+
+	property := database.PropertyFull{
+		PropertyDetails: propertyDetails,
+		PropertyImages:  propertyImagesB64,
+	}
+
+	respondWithJSON(w, 200, property)
+}
+
+// GET /api/properties/total
+// AUTHED
+func (s *Server) apiGetPropertiesTotalCountHandler(w http.ResponseWriter, r *http.Request) {
+	// Authenticate user
+	_, err := s.authCheckAndGetClaims(r)
+	if err != nil {
+		respondWithError(w, 401, err)
+		return
+	}
+
+	// Validate properties
+	count, err := s.db.GetTotalCountProperties()
+	if err != nil {
+		respondWithError(w, 500, err)
+		return
+	}
+	respondWithJSON(w, 200, count)
+}
+
+// Endpoint: GET /api/properties
+// NO AUTH
+func (s *Server) apiGetPropertiesHandler(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
 
-	// Check if propertyID is a queryParam, if it is, retrieve it and
-	// try to find the suitable property from the database
-	propertyID := query.Get("propertyID")
-	if propertyID != "" {
-		propertyDetails, err := s.db.GetPropertyDetails(propertyID)
-		if err != nil {
-			respondWithError(w, 500, err)
-			return
-		}
+	pageStr := query.Get("page")
+	limitStr := query.Get("limit")
+	filterAddress := query.Get("filterAddress")
 
-		propertyImagesBinary, err := s.db.GetPropertyImages(propertyID)
-		if err != nil {
-			respondWithError(w, 500, err)
-			return
-		}
-
-		var propertyImagesB64 []database.OrderedFileExternal
-		for _, image := range propertyImagesBinary {
-			propertyImagesB64 = append(propertyImagesB64, database.OrderedFileExternal{
-				OrderNum: image.OrderNum,
-				File: database.FileExternal{
-					Filename: image.File.Filename,
-					Mimetype: image.File.Mimetype,
-					Size:     image.File.Size,
-					Data:     base64.StdEncoding.EncodeToString(image.File.Data),
-				},
-			})
-		}
-
-		property := database.PropertyFull{
-			PropertyDetails: propertyDetails,
-			PropertyImages:  propertyImagesB64,
-		}
-
-		respondWithJSON(w, 200, property)
-		return
-	}
-
-	// Check if just want count of properies
-	getTotalCountStr := query.Get("getTotalCount")
-	if getTotalCountStr != "" {
-		getTotalCount, err := strconv.ParseBool(getTotalCountStr)
-		if err != nil {
-			respondWithError(w, 500, err)
-			return
-		}
-		if !getTotalCount {
-			w.WriteHeader(200) // the param was set to false, so don't give anything.
-			return
-		}
-		count, err := s.db.GetTotalCountProperties()
-		if err != nil {
-			respondWithError(w, 500, err)
-			return
-		}
-		respondWithJSON(w, 200, count)
-		return
-	}
-
-	// Otherwise, request is for paginated property IDs
-	// with or without search params for filtering.
-
-	// Get the offset for the properties viewing
-	limit := 9
-	offsetStr := query.Get("page")
-	addressFilter := query.Get("addressFilter")
-
-	// Page cannot be empty string
-	if offsetStr == "" {
-		respondWithError(w, 422, errors.New("query with empty offset string is not valid"))
-		return
-	}
-
-	// Attempt Parse offset
+	// Parse offset and limit
 	var offset int
-	offset, err := strconv.Atoi(offsetStr)
+	offset, err := strconv.Atoi(pageStr)
 	if err != nil {
-		respondWithError(w, 422, errors.New("invalid offset string"))
+		respondWithError(w, 422, fmt.Errorf("unable to parse page: %s", pageStr))
+		return
+	}
+
+	var limit int
+	limit, err = strconv.Atoi(limitStr)
+	if err != nil {
+		respondWithError(w, 422, fmt.Errorf("unable to parse limit: %s", limitStr))
 		return
 	}
 
@@ -813,7 +805,7 @@ func (s *Server) apiGetPropertiesHandler(w http.ResponseWriter, r *http.Request)
 	offset = offset * limit
 
 	// Get the property IDs from DB
-	properties, err := s.db.GetNextPageProperties(int32(limit), int32(offset), addressFilter)
+	properties, err := s.db.GetNextPageProperties(int32(limit), int32(offset), filterAddress)
 	if err != nil {
 		respondWithError(w, 500, err)
 		return
@@ -822,7 +814,8 @@ func (s *Server) apiGetPropertiesHandler(w http.ResponseWriter, r *http.Request)
 	respondWithJSON(w, 200, properties)
 }
 
-// Endpoint: PUT /api/properties
+// Endpoint: POST /api/properties
+// AUTHED
 func (s *Server) apiCreatePropertiesHandler(w http.ResponseWriter, r *http.Request) {
 	// Authenticate the user and make sure they have write access to properties db
 	// (i.e. Need to be either a lister or admin role, basically just not a regular user)
@@ -846,7 +839,7 @@ func (s *Server) apiCreatePropertiesHandler(w http.ResponseWriter, r *http.Reque
 	r.Body = http.MaxBytesReader(w, r.Body, int64(MAX_SIZE))
 	err = r.ParseMultipartForm(int64(MAX_SIZE + 512))
 	if err != nil {
-		respondWithError(w, 401, err)
+		respondWithError(w, 500, err)
 		return
 	}
 
@@ -931,7 +924,8 @@ func (s *Server) apiCreatePropertiesHandler(w http.ResponseWriter, r *http.Reque
 	w.WriteHeader(201)
 }
 
-// Endpoint: POST /api/properties
+// Endpoint: PUT /api/properties
+// AUTHED
 func (s *Server) apiUpdatePropertiesHandler(w http.ResponseWriter, r *http.Request) {
 	// Authenticate the user and make sure they have write access to properties db
 	// (i.e. Need to be either a lister or admin role, basically just not a regular user)
@@ -955,7 +949,7 @@ func (s *Server) apiUpdatePropertiesHandler(w http.ResponseWriter, r *http.Reque
 	r.Body = http.MaxBytesReader(w, r.Body, int64(MAX_SIZE))
 	err = r.ParseMultipartForm(int64(MAX_SIZE + 512))
 	if err != nil {
-		respondWithError(w, 401, err)
+		respondWithError(w, 500, err)
 		return
 	}
 
@@ -1046,7 +1040,7 @@ func (s *Server) apiUpdatePropertiesHandler(w http.ResponseWriter, r *http.Reque
 	w.WriteHeader(200)
 }
 
-// Endpoint: DELETE /api/properties
+// Endpoint: DELETE /api/properties/{id}
 // AUTHED
 func (s *Server) apiDeletePropertiesHandler(w http.ResponseWriter, r *http.Request) {
 	// Authenticate user
@@ -1056,9 +1050,12 @@ func (s *Server) apiDeletePropertiesHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	// Get the property ID they want to delete from the query param
-	query := r.URL.Query()
-	propertyID := query.Get("propertyID")
+	// Get the property ID they want to delete from the URL param
+	propertyID := chi.URLParam(r, "propertyID")
+	if len(propertyID) == 0 {
+		respondWithError(w, 400, errors.New("no communityId given"))
+		return
+	}
 
 	// Try to get the requested property
 	propertyDetails, err := s.db.GetPropertyDetails(propertyID)
@@ -1070,7 +1067,7 @@ func (s *Server) apiDeletePropertiesHandler(w http.ResponseWriter, r *http.Reque
 	// Ensure that the user owns the property OR
 	// that the user is the admin
 	if propertyDetails.ListerUserID != userID && userID != s.AdminUserID {
-		respondWithError(w, 401, err)
+		respondWithError(w, 401, errors.New("account not authorized for this action"))
 		return
 	}
 
@@ -1124,6 +1121,448 @@ func (s *Server) apiGetListerInfoHandler(w http.ResponseWriter, r *http.Request)
 	})
 }
 
+// GET /api/communities/{id}
+// NO AUTH
+func (s *Server) apiGetCommunityHandler(w http.ResponseWriter, r *http.Request) {
+	communityId := chi.URLParam(r, "id")
+	communityDetails, err := s.db.GetCommunityDetails(communityId)
+	if err != nil {
+		respondWithError(w, 500, err)
+		return
+	}
+	communityImagesInternal, err := s.db.GetCommunityImages(communityId)
+	if err != nil {
+		respondWithError(w, 500, err)
+		return
+	}
+	var communityImagesExternal []database.FileExternal
+	for _, image := range communityImagesInternal {
+		communityImagesExternal = append(communityImagesExternal, database.FileExternal{
+			Filename: image.Filename,
+			Mimetype: image.Mimetype,
+			Size:     image.Size,
+			Data:     base64.StdEncoding.EncodeToString(image.Data),
+		})
+	}
+	communityUsers, err := s.db.GetCommunityUsers(communityId)
+	if err != nil {
+		respondWithError(w, 500, err)
+		return
+	}
+	communityProperties, err := s.db.GetCommunityProperties(communityId)
+	if err != nil {
+		respondWithError(w, 500, err)
+		return
+	}
+	communityFull := database.CommunityFull{
+		CommunityDetails:    communityDetails,
+		CommunityImages:     communityImagesExternal,
+		CommunityUsers:      communityUsers,
+		CommunityProperties: communityProperties,
+	}
+	respondWithJSON(w, 200, communityFull)
+}
+
+// GET /api/communities
+// NO AUTH
+// Public api to search through all communities
+func (s *Server) apiGetCommunitiesHandler(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query()
+
+	pageStr := query.Get("page")
+	limitStr := query.Get("limit")
+	filterAddress := query.Get("filterAddress")
+	filterName := query.Get("filterName")
+
+	// Parse offset and limit
+	var offset int
+	offset, err := strconv.Atoi(pageStr)
+	if err != nil {
+		respondWithError(w, 422, fmt.Errorf("unable to parse page: %s", pageStr))
+		return
+	}
+
+	var limit int
+	limit, err = strconv.Atoi(limitStr)
+	if err != nil {
+		respondWithError(w, 422, fmt.Errorf("unable to parse limit: %s", limitStr))
+		return
+	}
+
+	// Calculate the correct offset
+	offset = offset * limit
+
+	// Get communities with optional filters
+	communityIds, err := s.db.GetNextPageCommunities(int32(limit), int32(offset), filterAddress, filterName)
+	if err != nil {
+		respondWithError(w, 500, err)
+		return
+	}
+
+	respondWithJSON(w, 200, communityIds)
+}
+
+// POST /api/communities
+// AUTHED
+func (s *Server) apiCreateCommunitiesHandler(w http.ResponseWriter, r *http.Request) {
+	// Authenticate user
+	authedUserId, err := s.getAuthedUserId(r)
+	if err != nil {
+		respondWithError(w, 401, err)
+		return
+	}
+
+	// Define max mem to read from received body
+	MAX_SIZE := 55 << 20 // 55 MiB
+	r.Body = http.MaxBytesReader(w, r.Body, int64(MAX_SIZE))
+	err = r.ParseMultipartForm(int64(MAX_SIZE) + 512)
+	if err != nil {
+		respondWithError(w, 500, err)
+		return
+	}
+
+	// Unmarshal details data
+	detailsRaw := r.FormValue("details")
+	var communityDetails database.CommunityDetails
+	err = json.Unmarshal([]byte(detailsRaw), &communityDetails)
+	if err != nil {
+		respondWithError(w, 500, err)
+		return
+	}
+
+	// Validate community's admin is the same id in token
+	if authedUserId != communityDetails.AdminUserID {
+		respondWithError(w, 401, errors.New("userId in token does not match adminUserId of community details to be created"))
+		return
+	}
+
+	// Validate community details
+	err = ValidateCommnityDetails(communityDetails)
+	if err != nil {
+		respondWithError(w, 400, err)
+		return
+	}
+
+	// Get community images (optional, can be 0)
+	numberImagesRaw := r.FormValue("numImages")
+	numberImagesInt64, err := strconv.ParseInt(numberImagesRaw, 10, 16)
+	if err != nil {
+		respondWithError(w, 500, err)
+		return
+	}
+	numberImages := int16(numberImagesInt64)
+
+	var images []database.FileInternal
+	for i := range numberImages {
+		imageDataRaw, imageFileHeader, err := r.FormFile(fmt.Sprintf("image%d", i))
+		if err != nil {
+			respondWithError(w, 500, err)
+			return
+		}
+		var imageData []byte
+		if imageDataRaw == nil {
+			respondWithError(w, 500, errors.New("image data is empty"))
+			return
+		} else {
+			defer imageDataRaw.Close()
+
+			imageData, err = io.ReadAll(imageDataRaw)
+			if err != nil {
+				respondWithError(w, 500, err)
+				return
+			}
+		}
+
+		images = append(images, database.FileInternal{
+			Filename: imageFileHeader.Filename,
+			Mimetype: imageFileHeader.Header.Get("Content-Type"),
+			Size:     imageFileHeader.Size,
+			Data:     imageData,
+		})
+	}
+
+	// Create community in db
+	err = s.db.CreateCommunity(communityDetails, images)
+	if err != nil {
+		respondWithError(w, 500, err)
+		return
+	}
+
+	w.WriteHeader(201)
+}
+
+// POST /api/communities/users
+// AUTHED
+// adds a given userId to the given communityId, where the userid in the token must be an admin (currently only one admin per group allowed)
+func (s *Server) apiCreateCommunitiesUserHandler(w http.ResponseWriter, r *http.Request) {
+	// Authenticate user
+	authedUserId, err := s.getAuthedUserId(r)
+	if err != nil {
+		respondWithError(w, 401, err)
+		return
+	}
+
+	MAX_SIZE := 50
+	r.Body = http.MaxBytesReader(w, r.Body, int64(MAX_SIZE))
+	err = r.ParseMultipartForm(int64(MAX_SIZE + 10))
+	if err != nil {
+		respondWithError(w, 500, err)
+		return
+	}
+
+	type FormData struct {
+		CommunityID string `json:"communityId"`
+		UserID      string `json:"userId"`
+	}
+	var data FormData
+	formData := r.FormValue("data")
+	if len(formData) == 0 {
+		respondWithError(w, 400, errors.New("empty data given"))
+		return
+	}
+
+	err = json.Unmarshal([]byte(formData), &data)
+	if err != nil {
+		respondWithError(w, 500, err)
+		return
+	}
+
+	// Validate userId in JWT matches the adminId of the given community
+	communityDetails, err := s.db.GetCommunityDetails(data.CommunityID)
+	if err != nil {
+		respondWithError(w, 500, err)
+		return
+	}
+	if authedUserId != communityDetails.AdminUserID {
+		respondWithError(w, 401, errors.New("userId in JWT not the admin userId of community requested"))
+		return
+	}
+
+	// Add given user to given community
+	err = s.db.CreateCommunityUser(data.CommunityID, data.UserID)
+	if err != nil {
+		respondWithError(w, 500, err)
+		return
+	}
+
+	w.WriteHeader(201)
+}
+
+// POST /api/communities/properties
+// AUTHED
+// adds a given propertyId to the given communityId, where userid in token must be an admin
+func (s *Server) apiCreateCommunitiesPropertyHandler(w http.ResponseWriter, r *http.Request) {
+	// Authenticate user
+	authedUserId, err := s.getAuthedUserId(r)
+	if err != nil {
+		respondWithError(w, 401, err)
+		return
+	}
+
+	MAX_SIZE := 50
+	r.Body = http.MaxBytesReader(w, r.Body, int64(MAX_SIZE))
+	err = r.ParseMultipartForm(int64(MAX_SIZE + 10))
+	if err != nil {
+		respondWithError(w, 500, err)
+		return
+	}
+
+	type FormData struct {
+		CommunityID string `json:"communityId"`
+		PropertyID  string `json:"propertyId"`
+	}
+	var data FormData
+	formData := r.FormValue("data")
+	if len(formData) == 0 {
+		respondWithError(w, 400, errors.New("empty data given"))
+		return
+	}
+
+	err = json.Unmarshal([]byte(formData), &data)
+	if err != nil {
+		respondWithError(w, 500, err)
+		return
+	}
+
+	// Validate userId in JWT matches the adminId of the given community
+	communityDetails, err := s.db.GetCommunityDetails(data.CommunityID)
+	if err != nil {
+		respondWithError(w, 500, err)
+		return
+	}
+	if authedUserId != communityDetails.AdminUserID {
+		respondWithError(w, 401, errors.New("userId in JWT not the admin userId of community requested"))
+		return
+	}
+
+	// Add propertyID to this community
+	err = s.db.CreateCommunityProperty(communityDetails.CommunityID, data.PropertyID)
+	if err != nil {
+		respondWithError(w, 500, err)
+		return
+	}
+
+	w.WriteHeader(201)
+}
+
+// PUT /api/communities
+// AUTHED
+func (s *Server) apiUpdateCommunitiesHandler(w http.ResponseWriter, r *http.Request) {
+	// Authenticate user
+	authedUserId, err := s.getAuthedUserId(r)
+	if err != nil {
+		respondWithError(w, 401, err)
+		return
+	}
+
+	// Set max size to parse given data and parse
+	MAX_SIZE := 55 << 20 // 55 MiB
+	r.Body = http.MaxBytesReader(w, r.Body, int64(MAX_SIZE))
+	err = r.ParseMultipartForm(int64(MAX_SIZE + 512))
+	if err != nil {
+		respondWithError(w, 500, err)
+		return
+	}
+
+	// Unmarshal details data
+	detailsRaw := r.FormValue("details")
+	var communityDetails database.CommunityDetails
+	err = json.Unmarshal([]byte(detailsRaw), &communityDetails)
+	if err != nil {
+		respondWithError(w, 500, err)
+		return
+	}
+
+	// Validate community's admin is the same id in token
+	if authedUserId != communityDetails.AdminUserID {
+		respondWithError(w, 401, errors.New("userId in token does not match adminUserId of community details to be created"))
+		return
+	}
+
+	// Validate community details
+	err = ValidateCommnityDetails(communityDetails)
+	if err != nil {
+		respondWithError(w, 400, err)
+		return
+	}
+
+	// Get community images (optional, can be 0)
+	numberImagesRaw := r.FormValue("numImages")
+	numberImagesInt64, err := strconv.ParseInt(numberImagesRaw, 10, 16)
+	if err != nil {
+		respondWithError(w, 500, err)
+		return
+	}
+	numberImages := int16(numberImagesInt64)
+
+	var images []database.FileInternal
+	for i := range numberImages {
+		imageDataRaw, imageFileHeader, err := r.FormFile(fmt.Sprintf("image%d", i))
+		if err != nil {
+			respondWithError(w, 500, err)
+			return
+		}
+		var imageData []byte
+		if imageDataRaw == nil {
+			respondWithError(w, 500, errors.New("image data is empty"))
+			return
+		} else {
+			defer imageDataRaw.Close()
+
+			imageData, err = io.ReadAll(imageDataRaw)
+			if err != nil {
+				respondWithError(w, 500, err)
+				return
+			}
+		}
+
+		images = append(images, database.FileInternal{
+			Filename: imageFileHeader.Filename,
+			Mimetype: imageFileHeader.Header.Get("Content-Type"),
+			Size:     imageFileHeader.Size,
+			Data:     imageData,
+		})
+	}
+
+	// Update community details and images
+	err = s.db.UpdateCommunityDetails(communityDetails)
+	if err != nil {
+		respondWithError(w, 500, err)
+		return
+	}
+	err = s.db.UpdateCommunityImages(communityDetails.CommunityID, images)
+	if err != nil {
+		respondWithError(w, 500, err)
+		return
+	}
+
+	// Respond with ok
+	w.WriteHeader(200)
+}
+
+// DELETE /api/communities/{id}
+// AUTHED
+func (s *Server) apiDeleteCommunitiesHandler(w http.ResponseWriter, r *http.Request) {
+	// Authenticate user
+	authedUserId, err := s.getAuthedUserId(r)
+	if err != nil {
+		respondWithError(w, 401, err)
+		return
+	}
+
+	communityId := chi.URLParam(r, "communityId")
+	if len(communityId) == 0 {
+		respondWithError(w, 400, errors.New("no communityId given"))
+		return
+	}
+
+	// Try to get community
+	communityDetails, err := s.db.GetCommunityDetails(communityId)
+	if err != nil {
+		respondWithError(w, 500, err)
+		return
+	}
+
+	// Ensure user is an admin of the community and not admin of entire site.
+	if communityDetails.AdminUserID != communityId && authedUserId != s.AdminUserID {
+		respondWithError(w, 401, errors.New("account not authorized for this action"))
+		return
+	}
+
+	// Delete community
+	err = s.db.DeleteCommunity(communityId)
+	if err != nil {
+		respondWithError(w, 500, err)
+		return
+	}
+
+	w.WriteHeader(200)
+}
+
+// GET /api/account/communities
+// AUTHED
+func (s *Server) apiGetUserOwnedCommunities(w http.ResponseWriter, r *http.Request) {
+	// Authenticate user
+	authedUserId, err := s.getAuthedUserId(r)
+	if err != nil {
+		respondWithError(w, 401, err)
+		return
+	}
+
+	// Retrieve saved communities of authed user
+	communityIds, err := s.db.GetUserOwnedCommunities(authedUserId)
+	if err != nil {
+		respondWithError(w, 500, err)
+		return
+	}
+
+	respondWithJSON(w, 200, struct {
+		CommunityIDs []string `json:"communityIds"`
+	}{
+		CommunityIDs: communityIds,
+	})
+}
+
 // --------------------- MIDDLEWARES ------------------------------
 
 func (s *Server) corsMiddleware(next http.Handler) http.Handler {
@@ -1161,16 +1600,10 @@ func (s *Server) RegisterRoutes() http.Handler {
 	// DB uptime check
 	r.Get("/health", s.healthHandler)
 
-	// Oauth callback
+	// Auth
 	r.Get("/auth/{provider}/callback", s.authCallbackHandler)
-
-	// Being Oauth login
 	r.Get("/auth/{provider}", s.authLoginHandler)
-
-	// Simple auth check
 	r.Get("/auth/check", s.authCheckHandler)
-
-	// Logout
 	r.Post("/auth/logout", s.authLogoutHandler)
 
 	// Account
@@ -1187,13 +1620,25 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.Post("/api/admin/users/roles", s.apiUpdateUserRoleHandler)
 
 	// Properties
+	r.Get("/api/properties/{id}", s.apiGetPropertyHandler)
+	r.Get("/api/properties/total", s.apiGetPropertiesTotalCountHandler)
 	r.Get("/api/properties", s.apiGetPropertiesHandler)
-	r.Put("/api/properties", s.apiCreatePropertiesHandler)
-	r.Post("/api/properties", s.apiUpdatePropertiesHandler)
-	r.Delete("/api/properties", s.apiDeletePropertiesHandler)
+	r.Post("/api/properties", s.apiCreatePropertiesHandler)
+	r.Put("/api/properties", s.apiUpdatePropertiesHandler)
+	r.Delete("/api/properties/{id}", s.apiDeletePropertiesHandler)
 
 	// Public Lister info
 	r.Get("/api/lister", s.apiGetListerInfoHandler)
+
+	// Communities
+	r.Get("/api/communities/{id}", s.apiGetCommunityHandler)
+	r.Get("/api/communities", s.apiGetCommunitiesHandler)
+	r.Get("/api/account/communities", s.apiGetUserOwnedCommunities)
+	r.Post("/api/communities", s.apiCreateCommunitiesHandler)
+	r.Post("/api/communities/users", s.apiCreateCommunitiesUserHandler)
+	r.Post("/api/communities/properties", s.apiCreateCommunitiesPropertyHandler)
+	r.Put("/api/communities", s.apiUpdateCommunitiesHandler)
+	r.Delete("/api/communities/{id}", s.apiDeleteCommunitiesHandler)
 
 	return r
 }

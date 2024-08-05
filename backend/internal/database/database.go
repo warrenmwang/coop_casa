@@ -144,6 +144,7 @@ type Service interface {
 	GetCommunityImages(communityId string) ([]FileInternal, error)
 	GetCommunityUsers(communityId string) ([]string, error)
 	GetCommunityProperties(communityId string) ([]string, error)
+	GetNextPageCommunities(limit, offset int32, filterName, filterDescription string) ([]string, error)
 	UpdateCommunityDetails(details CommunityDetails) error
 	UpdateCommunityImages(communityId string, images []FileInternal) error
 	DeleteCommunity(communityId string) error
@@ -772,11 +773,11 @@ func (s *service) GetNextPageProperties(limit, offset int32, addressFilter strin
 		return propertyIDs, nil
 	}
 
-	// there is a addressFilter
+	// There is an addressFilter
 	propertyIDs, err := s.db_queries.GetNextPagePropertiesFilterByAddress(ctx, sqlc.GetNextPagePropertiesFilterByAddressParams{
-		Limit:       limit,
-		Offset:      offset,
-		Levenshtein: addressFilter,
+		Limit:      limit,
+		Offset:     offset,
+		Similarity: addressFilter,
 	})
 	if err != nil {
 		return nil, err
@@ -1066,6 +1067,52 @@ func (s *service) GetCommunityProperties(communityId string) ([]string, error) {
 		returnPropertyIds = append(returnPropertyIds, id.PropertyID)
 	}
 	return returnPropertyIds, nil
+}
+
+func (s *service) GetPageOfCommunities(limit, offset int32, filterName, filterDescription string) ([]string, error) {
+	ctx := context.Background()
+
+	if len(filterName) > 0 && len(filterDescription) > 0 {
+		communityIds, err := s.db_queries.GetNextPageCommunitiesFilteredByCombination(ctx, sqlc.GetNextPageCommunitiesFilteredByCombinationParams{
+			Limit:        limit,
+			Offset:       offset,
+			Similarity:   filterName,
+			Similarity_2: filterDescription,
+		})
+		if err != nil {
+			return nil, err
+		}
+		return communityIds, nil
+	} else if len(filterName) > 0 {
+		communityIds, err := s.db_queries.GetNextPageCommunitiesFilterByName(ctx, sqlc.GetNextPageCommunitiesFilterByNameParams{
+			Limit:      limit,
+			Offset:     offset,
+			Similarity: filterName,
+		})
+		if err != nil {
+			return nil, err
+		}
+		return communityIds, nil
+	} else if len(filterDescription) > 0 {
+		communityIds, err := s.db_queries.GetNextPageCommunitiesFilterByDescription(ctx, sqlc.GetNextPageCommunitiesFilterByDescriptionParams{
+			Limit:      limit,
+			Offset:     offset,
+			Similarity: filterDescription,
+		})
+		if err != nil {
+			return nil, err
+		}
+		return communityIds, nil
+	} else {
+		communityIds, err := s.db_queries.GetNextPageCommunities(ctx, sqlc.GetNextPageCommunitiesParams{
+			Limit:  limit,
+			Offset: offset,
+		})
+		if err != nil {
+			return nil, err
+		}
+		return communityIds, nil
+	}
 }
 
 func (s *service) UpdateCommunityDetails(details CommunityDetails) error {

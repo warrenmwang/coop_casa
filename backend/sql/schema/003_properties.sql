@@ -1,42 +1,41 @@
 -- +goose Up
-CREATE TABLE properties (
-    id SERIAL PRIMARY KEY,
-    property_id TEXT NOT NULL UNIQUE,
-    lister_user_id TEXT NOT NULL,
-    "name" TEXT NOT NULL,
-    "description" TEXT,
-    address_1 TEXT NOT NULL,
-    address_2 TEXT,
-    city TEXT NOT NULL,
-    "state" TEXT NOT NULL,
-    zipcode TEXT NOT NULL,
-    country TEXT NOT NULL,
-    square_feet INTEGER NOT NULL,
-    num_bedrooms SMALLINT NOT NULL,
-    num_toilets SMALLINT NOT NULL,
-    num_showers_baths SMALLINT NOT NULL,
-    cost_dollars BIGINT NOT NULL,
-    cost_cents SMALLINT NOT NULL,
-    misc_note TEXT,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE properties(
+    id serial PRIMARY KEY,
+    property_id text NOT NULL UNIQUE,
+    lister_user_id text NOT NULL,
+    "name" text NOT NULL,
+    "description" text,
+    address_1 text NOT NULL,
+    address_2 text,
+    city text NOT NULL,
+    "state" text NOT NULL,
+    zipcode text NOT NULL,
+    country text NOT NULL,
+    square_feet integer NOT NULL,
+    num_bedrooms smallint NOT NULL,
+    num_toilets smallint NOT NULL,
+    num_showers_baths smallint NOT NULL,
+    cost_dollars bigint NOT NULL,
+    cost_cents smallint NOT NULL,
+    misc_note text,
+    created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE properties_images (
-    id SERIAL PRIMARY KEY,
-    property_id TEXT NOT NULL,
-    order_num SMALLINT NOT NULL,
-    file_name TEXT NOT NULL,
-    mime_type TEXT NOT NULL,
-    "size" BIGINT NOT NULL,
-    "data" BYTEA NOT NULL,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_property_id_properties_images
-        FOREIGN KEY(property_id)
-        REFERENCES properties(property_id)
-        ON DELETE CASCADE
+CREATE TABLE properties_images(
+    id serial PRIMARY KEY,
+    property_id text NOT NULL,
+    order_num smallint NOT NULL,
+    file_name text NOT NULL,
+    mime_type text NOT NULL,
+    "size" bigint NOT NULL,
+    "data" bytea NOT NULL,
+    created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_property_id_properties_images FOREIGN KEY (property_id) REFERENCES properties(property_id) ON DELETE CASCADE
 );
 
 -- +goose Down
 DROP TABLE IF EXISTS properties_images;
+
 DROP TABLE IF EXISTS properties;
+

@@ -8,9 +8,10 @@ whether Coop will exist in the future.
 
 ### Tech Stack
 
-**Frontend:** Typescript, ReactJS, TailwindCSS, TanStack/React Query, React Router <br>
+**Frontend:** Typescript, ReactJS, TailwindCSS, TanStack/React Query, React Router, and many others <br>
 **Backend:** Go, PostgreSQL, Goose, SQLC, Goth <br>
-**Other:** Docker, Nginx
+**Other:** Docker, Nginx <br>
+**Formatters:** JS/TS/JSX/TSX => Prettier, Go => Gofmt, SQL => pgFormatter
 
 There's a lot more Javascript libraries than Go libraries that I use that are not mentioned. As for PostgreSQL extensions that I use, just look in the migrations folder.
 

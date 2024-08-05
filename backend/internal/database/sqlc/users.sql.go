@@ -11,8 +11,12 @@ import (
 )
 
 const adminGetUsers = `-- name: AdminGetUsers :many
-SELECt id, user_id, email, first_name, last_name, birth_date, gender, location, interests, created_at, updated_at FROM users
-ORDER BY id 
+SELECT
+    id, user_id, email, first_name, last_name, birth_date, gender, location, interests, created_at, updated_at
+FROM
+    users
+ORDER BY
+    id
 LIMIT $1 OFFSET $2
 `
 
@@ -57,8 +61,8 @@ func (q *Queries) AdminGetUsers(ctx context.Context, arg AdminGetUsersParams) ([
 }
 
 const createBareUser = `-- name: CreateBareUser :exec
-INSERT INTO users (user_id, email)
-VALUES ($1, $2)
+INSERT INTO users(user_id, email)
+    VALUES ($1, $2)
 `
 
 type CreateBareUserParams struct {
@@ -72,8 +76,8 @@ func (q *Queries) CreateBareUser(ctx context.Context, arg CreateBareUserParams) 
 }
 
 const createBareUserAvatar = `-- name: CreateBareUserAvatar :exec
-INSERT INTO users_avatars (user_id)
-VALUES ($1)
+INSERT INTO users_avatars(user_id)
+    VALUES ($1)
 `
 
 func (q *Queries) CreateBareUserAvatar(ctx context.Context, userID string) error {
@@ -82,7 +86,8 @@ func (q *Queries) CreateBareUserAvatar(ctx context.Context, userID string) error
 }
 
 const deleteUserAvatar = `-- name: DeleteUserAvatar :exec
-DELETE FROM users_avatars WHERE user_id = $1
+DELETE FROM users_avatars
+WHERE user_id = $1
 `
 
 func (q *Queries) DeleteUserAvatar(ctx context.Context, userID string) error {
@@ -91,7 +96,8 @@ func (q *Queries) DeleteUserAvatar(ctx context.Context, userID string) error {
 }
 
 const deleteUserDetails = `-- name: DeleteUserDetails :exec
-DELETE FROM users WHERE user_id = $1
+DELETE FROM users
+WHERE user_id = $1
 `
 
 func (q *Queries) DeleteUserDetails(ctx context.Context, userID string) error {
@@ -100,8 +106,12 @@ func (q *Queries) DeleteUserDetails(ctx context.Context, userID string) error {
 }
 
 const getUserAvatar = `-- name: GetUserAvatar :one
-SELECT id, user_id, file_name, mime_type, size, data, updated_at FROM users_avatars
-WHERE user_id = $1
+SELECT
+    id, user_id, file_name, mime_type, size, data, updated_at
+FROM
+    users_avatars
+WHERE
+    user_id = $1
 `
 
 func (q *Queries) GetUserAvatar(ctx context.Context, userID string) (UsersAvatar, error) {
@@ -120,8 +130,12 @@ func (q *Queries) GetUserAvatar(ctx context.Context, userID string) (UsersAvatar
 }
 
 const getUserDetails = `-- name: GetUserDetails :one
-SELECT id, user_id, email, first_name, last_name, birth_date, gender, location, interests, created_at, updated_at FROM users
-WHERE user_id = $1
+SELECT
+    id, user_id, email, first_name, last_name, birth_date, gender, location, interests, created_at, updated_at
+FROM
+    users
+WHERE
+    user_id = $1
 `
 
 func (q *Queries) GetUserDetails(ctx context.Context, userID string) (User, error) {
@@ -144,14 +158,16 @@ func (q *Queries) GetUserDetails(ctx context.Context, userID string) (User, erro
 }
 
 const updateUserAvatar = `-- name: UpdateUserAvatar :exec
-UPDATE users_avatars
+UPDATE
+    users_avatars
 SET
     file_name = $2,
     mime_type = $3,
     "size" = $4,
     "data" = $5,
     updated_at = CURRENT_TIMESTAMP
-WHERE user_id = $1
+WHERE
+    user_id = $1
 `
 
 type UpdateUserAvatarParams struct {
@@ -174,16 +190,18 @@ func (q *Queries) UpdateUserAvatar(ctx context.Context, arg UpdateUserAvatarPara
 }
 
 const updateUserDetails = `-- name: UpdateUserDetails :exec
-UPDATE users
-SET 
-    first_name = $2, 
-    last_name = $3, 
+UPDATE
+    users
+SET
+    first_name = $2,
+    last_name = $3,
     birth_date = $4,
     gender = $5,
     "location" = $6,
     interests = $7,
     updated_at = CURRENT_TIMESTAMP
-WHERE user_id = $1
+WHERE
+    user_id = $1
 `
 
 type UpdateUserDetailsParams struct {

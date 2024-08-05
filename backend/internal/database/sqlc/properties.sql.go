@@ -11,21 +11,16 @@ import (
 )
 
 const checkIsPropertyDuplicate = `-- name: CheckIsPropertyDuplicate :one
-SELECT count(*) FROM properties
-WHERE
-(
-    lower(trim(address_1)) = lower(trim($1)) 
-    AND 
-    lower(trim(coalesce(address_2, ''))) = lower(trim($2)) 
-    AND
-    lower(trim(city)) = lower(trim($3)) 
-    AND
-    lower(trim("state")) = lower(trim($4)) 
-    AND
-    lower(trim(zipcode)) = lower(trim($5)) 
-    AND
-    lower(trim(country)) = lower(trim($6))
-)
+SELECT
+    count(*)
+FROM
+    properties
+WHERE (lower(trim(address_1)) = lower(trim($1))
+    AND lower(trim(coalesce(address_2, ''))) = lower(trim($2))
+    AND lower(trim(city)) = lower(trim($3))
+    AND lower(trim("state")) = lower(trim($4))
+    AND lower(trim(zipcode)) = lower(trim($5))
+    AND lower(trim(country)) = lower(trim($6)))
 `
 
 type CheckIsPropertyDuplicateParams struct {
@@ -52,14 +47,8 @@ func (q *Queries) CheckIsPropertyDuplicate(ctx context.Context, arg CheckIsPrope
 }
 
 const createPropertyDetails = `-- name: CreatePropertyDetails :exec
-INSERT INTO properties 
-(
-    property_id, lister_user_id, "name", "description", 
-    address_1, address_2, city, "state", zipcode, country,
-    square_feet, num_bedrooms, num_toilets, num_showers_baths, cost_dollars, cost_cents, misc_note
-)
-VALUES 
-($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
+INSERT INTO properties(property_id, lister_user_id, "name", "description", address_1, address_2, city, "state", zipcode, country, square_feet, num_bedrooms, num_toilets, num_showers_baths, cost_dollars, cost_cents, misc_note)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
 `
 
 type CreatePropertyDetailsParams struct {
@@ -106,8 +95,8 @@ func (q *Queries) CreatePropertyDetails(ctx context.Context, arg CreatePropertyD
 }
 
 const createPropertyImage = `-- name: CreatePropertyImage :exec
-INSERT INTO properties_images (property_id, order_num, file_name, mime_type, "size", "data")
-VALUES ($1, $2, $3, $4, $5, $6)
+INSERT INTO properties_images(property_id, order_num, file_name, mime_type, "size", "data")
+    VALUES ($1, $2, $3, $4, $5, $6)
 `
 
 type CreatePropertyImageParams struct {
@@ -153,7 +142,8 @@ func (q *Queries) DeletePropertyDetails(ctx context.Context, propertyID string) 
 
 const deletePropertyImage = `-- name: DeletePropertyImage :exec
 DELETE FROM properties_images
-WHERE property_id = $1 AND order_num = $2
+WHERE property_id = $1
+    AND order_num = $2
 `
 
 type DeletePropertyImageParams struct {
@@ -177,8 +167,12 @@ func (q *Queries) DeletePropertyImages(ctx context.Context, propertyID string) e
 }
 
 const getNextPageProperties = `-- name: GetNextPageProperties :many
-SELECT property_id FROM properties
-ORDER BY id
+SELECT
+    property_id
+FROM
+    properties
+ORDER BY
+    id
 LIMIT $1 OFFSET $2
 `
 
@@ -211,23 +205,23 @@ func (q *Queries) GetNextPageProperties(ctx context.Context, arg GetNextPageProp
 }
 
 const getNextPagePropertiesFilterByAddress = `-- name: GetNextPagePropertiesFilterByAddress :many
-SELECT property_id FROM properties
+SELECT
+    property_id
+FROM
+    properties
 ORDER BY
-    levenshtein(
-        CONCAT (address_1, ', ', address_2, ', ', city, ', ', zipcode, ', ', country),
-        $3
-    ) ASC
+    similarity(CONCAT(address_1, ', ', address_2, ', ', city, ', ', zipcode, ', ', country), $3) ASC
 LIMIT $1 OFFSET $2
 `
 
 type GetNextPagePropertiesFilterByAddressParams struct {
-	Limit       int32
-	Offset      int32
-	Levenshtein string
+	Limit      int32
+	Offset     int32
+	Similarity string
 }
 
 func (q *Queries) GetNextPagePropertiesFilterByAddress(ctx context.Context, arg GetNextPagePropertiesFilterByAddressParams) ([]string, error) {
-	rows, err := q.db.QueryContext(ctx, getNextPagePropertiesFilterByAddress, arg.Limit, arg.Offset, arg.Levenshtein)
+	rows, err := q.db.QueryContext(ctx, getNextPagePropertiesFilterByAddress, arg.Limit, arg.Offset, arg.Similarity)
 	if err != nil {
 		return nil, err
 	}
@@ -250,8 +244,12 @@ func (q *Queries) GetNextPagePropertiesFilterByAddress(ctx context.Context, arg 
 }
 
 const getProperty = `-- name: GetProperty :one
-SELECT id, property_id, lister_user_id, name, description, address_1, address_2, city, state, zipcode, country, square_feet, num_bedrooms, num_toilets, num_showers_baths, cost_dollars, cost_cents, misc_note, created_at, updated_at FROM properties
-WHERE property_id = $1
+SELECT
+    id, property_id, lister_user_id, name, description, address_1, address_2, city, state, zipcode, country, square_feet, num_bedrooms, num_toilets, num_showers_baths, cost_dollars, cost_cents, misc_note, created_at, updated_at
+FROM
+    properties
+WHERE
+    property_id = $1
 `
 
 func (q *Queries) GetProperty(ctx context.Context, propertyID string) (Property, error) {
@@ -283,8 +281,12 @@ func (q *Queries) GetProperty(ctx context.Context, propertyID string) (Property,
 }
 
 const getPropertyImages = `-- name: GetPropertyImages :many
-SELECT id, property_id, order_num, file_name, mime_type, size, data, updated_at FROM properties_images
-WHERE property_id = $1
+SELECT
+    id, property_id, order_num, file_name, mime_type, size, data, created_at
+FROM
+    properties_images
+WHERE
+    property_id = $1
 `
 
 func (q *Queries) GetPropertyImages(ctx context.Context, propertyID string) ([]PropertiesImage, error) {
@@ -304,7 +306,7 @@ func (q *Queries) GetPropertyImages(ctx context.Context, propertyID string) ([]P
 			&i.MimeType,
 			&i.Size,
 			&i.Data,
-			&i.UpdatedAt,
+			&i.CreatedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -320,7 +322,10 @@ func (q *Queries) GetPropertyImages(ctx context.Context, propertyID string) ([]P
 }
 
 const getTotalCountProperties = `-- name: GetTotalCountProperties :one
-SELECT count(*) FROM properties
+SELECT
+    count(*)
+FROM
+    properties
 `
 
 func (q *Queries) GetTotalCountProperties(ctx context.Context) (int64, error) {
@@ -331,16 +336,17 @@ func (q *Queries) GetTotalCountProperties(ctx context.Context) (int64, error) {
 }
 
 const updatePropertyDetails = `-- name: UpdatePropertyDetails :exec
-UPDATE properties
-SET 
+UPDATE
+    properties
+SET
     "name" = $2,
-    "description" = $3, 
-    address_1 = $4, 
-    address_2 = $5, 
-    city = $6, 
-    "state" = $7, 
-    zipcode = $8, 
-    country = $9, 
+    "description" = $3,
+    address_1 = $4,
+    address_2 = $5,
+    city = $6,
+    "state" = $7,
+    zipcode = $8,
+    country = $9,
     square_feet = $10,
     num_bedrooms = $11,
     num_toilets = $12,
@@ -350,7 +356,8 @@ SET
     misc_note = $16,
     lister_user_id = $17,
     updated_at = CURRENT_TIMESTAMP
-WHERE property_id = $1
+WHERE
+    property_id = $1
 `
 
 type UpdatePropertyDetailsParams struct {

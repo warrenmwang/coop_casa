@@ -10,7 +10,7 @@ import { useSearchParams } from "react-router-dom";
 import "../styles/contentBody.css";
 import SubmitButton from "./SubmitButton";
 
-export const addressFilterQPKey = "addressFilter";
+export const filterAddressQPKey = "filterAddress";
 export const pageQPKey = "page";
 
 const DisplayProperties: React.FC = () => {
@@ -37,12 +37,12 @@ const DisplayProperties: React.FC = () => {
     setSearchParams(searchParams);
   }
 
-  let addressFilterQP: string | null = searchParams.get(addressFilterQPKey);
-  let addressFilterStr: string;
-  if (addressFilterQP !== null) {
-    addressFilterStr = addressFilterQP as string;
+  let filterAddressQP: string | null = searchParams.get(filterAddressQPKey);
+  let filterAddressStr: string;
+  if (filterAddressQP !== null) {
+    filterAddressStr = filterAddressQP as string;
   } else {
-    addressFilterStr = "";
+    filterAddressStr = "";
   }
 
   const [currentPage, _setCurrentPage] = useState<number>(startPageNum);
@@ -51,7 +51,7 @@ const DisplayProperties: React.FC = () => {
     searchParams.set(pageQPKey, `${page}`);
     setSearchParams(searchParams);
   };
-  const [addressFilter, setAddressFilter] = useState<string>(addressFilterStr);
+  const [filterAddress, setFilterAddress] = useState<string>(filterAddressStr);
 
   const searchPropertiesWithFilter = (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,8 +59,8 @@ const DisplayProperties: React.FC = () => {
   };
 
   const query = useQuery({
-    queryKey: ["propertiesPage", currentPage, addressFilter],
-    queryFn: () => apiGetProperties(currentPage, addressFilter),
+    queryKey: ["propertiesPage", currentPage, filterAddress],
+    queryFn: () => apiGetProperties(currentPage, filterAddress),
   });
   const queryClient = useQueryClient();
 
@@ -89,16 +89,16 @@ const DisplayProperties: React.FC = () => {
   // when new search is fired off, get the latest address filter
   useEffect(() => {
     if (searchIsSubmitting) {
-      let addressFilter: string | null = searchParams.get(addressFilterQPKey);
-      if (addressFilter === null) {
-        addressFilter = "";
+      let filterAddress: string | null = searchParams.get(filterAddressQPKey);
+      if (filterAddress === null) {
+        filterAddress = "";
       }
 
       // see if first page of the search is already cached.
       const pageCached: string[] | undefined = queryClient.getQueryData([
         "propertiesPage",
         0,
-        addressFilter,
+        filterAddress,
       ]);
       if (pageCached !== undefined) {
         setPages(() => new Map().set(0, pageCached));
@@ -107,7 +107,7 @@ const DisplayProperties: React.FC = () => {
       }
 
       setCurrentPage(0);
-      setAddressFilter(addressFilter);
+      setFilterAddress(filterAddress);
     }
   }, [searchIsSubmitting]);
 
@@ -123,7 +123,7 @@ const DisplayProperties: React.FC = () => {
         onSubmit={searchPropertiesWithFilter}
       >
         <SearchBar
-          searchQueryParamKey={addressFilterQPKey}
+          searchQueryParamKey={filterAddressQPKey}
           placeholder="Search by address."
         ></SearchBar>
         <SubmitButton isSubmitting={searchIsSubmitting} />

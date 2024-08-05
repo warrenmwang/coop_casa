@@ -9,64 +9,77 @@ import (
 	"github.com/google/uuid"
 )
 
-// Validate property details
-func ValidatePropertyDetails(propertyDetails database.PropertyDetails) error {
-	// Ensure property id is a valid uuidv4
-	if _, err := uuid.Parse(propertyDetails.PropertyID); err != nil {
-		return errors.New("invalid form state: property id is not a valid uuid")
+func ValidateCommnityDetails(details database.CommunityDetails) error {
+	if _, err := uuid.Parse(details.CommunityID); err != nil {
+		return errors.New("communityId is not a valid uuid")
 	}
 
-	// Ensure lister id is present
-	if len(propertyDetails.ListerUserID) == 0 {
-		return errors.New("invalid form state: property's lister id is empty")
+	if len(details.AdminUserID) == 0 {
+		return errors.New("adminUserId cannot be empty string")
 	}
 
-	// Ensure important fields are not empty or out of expected range
-	if len(propertyDetails.City) == 0 {
-		return errors.New("invalid form state: city is invalid")
-	}
-
-	if len(propertyDetails.State) == 0 {
-		return errors.New("invalid form state: State is invalid")
-	}
-
-	if len(propertyDetails.Zipcode) == 0 {
-		return errors.New("invalid form state: Zipcode is invalid")
-	}
-
-	if len(propertyDetails.Country) == 0 {
-		return errors.New("invalid form state: Country is invalid")
-	}
-
-	if v := propertyDetails.Square_feet; v <= 0 || v > 999999999 {
-		return errors.New("invalid form state: square feet invalid")
-	}
-
-	if v := propertyDetails.Num_bedrooms; v < 0 || v > 32767 {
-		return errors.New("invalid form state: number of bedrooms invalid")
-	}
-
-	if v := propertyDetails.Num_toilets; v < 0 || v > 32767 {
-		return errors.New("invalid form state: number of toilets invalid")
-	}
-
-	if v := propertyDetails.Num_showers_baths; v < 0 || v > 32767 {
-		return errors.New("invalid form state: number of showers/baths invalid")
-	}
-
-	if v := propertyDetails.Cost_dollars; v <= 0 || v > 999999999999 {
-		return errors.New("invalid form state: cost in dollars invalid")
-	}
-
-	if v := propertyDetails.Cost_cents; v < 0 || v > 99 {
-		return errors.New("invalid form state: cost in cents invalid")
+	if len(details.Name) == 0 {
+		return errors.New("name cannot be empty string")
 	}
 
 	return nil
 }
 
-// Validate the user details field values
-// Returns an error
+func ValidatePropertyDetails(propertyDetails database.PropertyDetails) error {
+	// Ensure property id is a valid uuidv4
+	if _, err := uuid.Parse(propertyDetails.PropertyID); err != nil {
+		return errors.New("property id is not a valid uuid")
+	}
+
+	// Ensure lister id is present
+	if len(propertyDetails.ListerUserID) == 0 {
+		return errors.New("property's lister id is empty")
+	}
+
+	// Ensure important fields are not empty or out of expected range
+	if len(propertyDetails.City) == 0 {
+		return errors.New("city is invalid")
+	}
+
+	if len(propertyDetails.State) == 0 {
+		return errors.New("State is invalid")
+	}
+
+	if len(propertyDetails.Zipcode) == 0 {
+		return errors.New("Zipcode is invalid")
+	}
+
+	if len(propertyDetails.Country) == 0 {
+		return errors.New("Country is invalid")
+	}
+
+	if v := propertyDetails.Square_feet; v <= 0 || v > 999999999 {
+		return errors.New("square feet invalid")
+	}
+
+	if v := propertyDetails.Num_bedrooms; v < 0 || v > 32767 {
+		return errors.New("number of bedrooms invalid")
+	}
+
+	if v := propertyDetails.Num_toilets; v < 0 || v > 32767 {
+		return errors.New("number of toilets invalid")
+	}
+
+	if v := propertyDetails.Num_showers_baths; v < 0 || v > 32767 {
+		return errors.New("number of showers/baths invalid")
+	}
+
+	if v := propertyDetails.Cost_dollars; v <= 0 || v > 999999999999 {
+		return errors.New("cost in dollars invalid")
+	}
+
+	if v := propertyDetails.Cost_cents; v < 0 || v > 99 {
+		return errors.New("cost in cents invalid")
+	}
+
+	return nil
+}
+
 func ValidateUserDetails(userDetails database.UserDetails) error {
 	// Ensure id field is present
 	if len(userDetails.UserID) == 0 {
