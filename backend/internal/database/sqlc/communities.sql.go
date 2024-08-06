@@ -330,7 +330,7 @@ SELECT
 FROM
     communities
 ORDER BY
-    similarity("description", $3) ASC
+    similarity("description", $3) DESC
 LIMIT $1 OFFSET $2
 `
 
@@ -369,7 +369,7 @@ SELECT
 FROM
     communities
 ORDER BY
-    similarity("name", $3) ASC
+    similarity("name", $3) DESC
 LIMIT $1 OFFSET $2
 `
 
@@ -414,7 +414,7 @@ SELECT
 FROM
     communities
 ORDER BY
-    0.4 * similarity("name", $3) + 0.6 * similarity("description", $4) ASC
+    0.4 * similarity("name", $3) + 0.6 * similarity("description", $4) DESC
 LIMIT $1 OFFSET $2
 `
 

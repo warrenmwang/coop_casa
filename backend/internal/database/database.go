@@ -1069,7 +1069,7 @@ func (s *service) GetCommunityProperties(communityId string) ([]string, error) {
 	return returnPropertyIds, nil
 }
 
-func (s *service) GetPageOfCommunities(limit, offset int32, filterName, filterDescription string) ([]string, error) {
+func (s *service) GetNextPageCommunities(limit, offset int32, filterName, filterDescription string) ([]string, error) {
 	ctx := context.Background()
 
 	if len(filterName) > 0 && len(filterDescription) > 0 {

@@ -210,7 +210,7 @@ SELECT
 FROM
     properties
 ORDER BY
-    similarity(CONCAT(address_1, ', ', address_2, ', ', city, ', ', zipcode, ', ', country), $3) ASC
+    similarity(CONCAT(address_1, ', ', address_2, ', ', city, ', ', zipcode, ', ', country), $3) DESC
 LIMIT $1 OFFSET $2
 `
 
