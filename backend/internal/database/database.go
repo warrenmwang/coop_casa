@@ -145,10 +145,12 @@ type Service interface {
 	GetCommunityUsers(communityId string) ([]string, error)
 	GetCommunityProperties(communityId string) ([]string, error)
 	GetNextPageCommunities(limit, offset int32, filterName, filterDescription string) ([]string, error)
+	GetUserOwnedCommunities(userId string) ([]string, error)
 	UpdateCommunityDetails(details CommunityDetails) error
 	UpdateCommunityImages(communityId string, images []FileInternal) error
 	DeleteCommunity(communityId string) error
-	GetUserOwnedCommunities(userId string) ([]string, error)
+	DeleteCommunityUser(communityId, userId string) error
+	DeleteCommunityProperty(communityId, propertyId string) error
 }
 
 // Test database connection
@@ -1150,6 +1152,23 @@ func (s *service) UpdateCommunityImages(communityId string, images []FileInterna
 func (s *service) DeleteCommunity(communityId string) error {
 	ctx := context.Background()
 	err := s.db_queries.DeleteCommunity(ctx, communityId)
+	return err
+}
+
+func (s *service) DeleteCommunityUser(communityId, userId string) error {
+	ctx := context.Background()
+	err := s.db_queries.DeleteCommunityUser(ctx, sqlc.DeleteCommunityUserParams{
+		CommunityID: communityId,
+		UserID:      userId,
+	})
+	return err
+}
+func (s *service) DeleteCommunityProperty(communityId, propertyId string) error {
+	ctx := context.Background()
+	err := s.db_queries.DeleteCommunityProperty(ctx, sqlc.DeleteCommunityPropertyParams{
+		CommunityID: communityId,
+		PropertyID:  propertyId,
+	})
 	return err
 }
 

@@ -8,12 +8,18 @@ import {
   Property,
   APIPropertyReceived,
   OrderedFile,
+  APICommunityReceived,
+  Community,
+  CommunityDetails,
 } from "../types/Types";
 import {
   apiAccountLink,
   apiAccountUpdateLink,
   apiAuthCheckLink,
   apiAuthLogoutLink,
+  apiCommunitiesLink,
+  apiCommunitiesPropertiesLink,
+  apiCommunitiesUsersLink,
   apiListerLink,
   apiPropertiesLink,
   apiUserRoleLink,
@@ -21,6 +27,11 @@ import {
 import { apiFile2ClientFile } from "../utils/utils";
 import axios from "axios";
 import { filterAddressQPKey, pageQPKey } from "../components/DisplayProperties";
+import {
+  filterDescriptionQPKey,
+  filterNameQPKey,
+  MAX_NUMBER_PROPERTIES_PER_PAGE,
+} from "../constants";
 
 // Delete Account Function
 export const apiAccountDelete = async (): Promise<any> => {
@@ -135,9 +146,13 @@ export const apiUpdateProperty = async (
     }
   }
 
-  return axios.put(apiPropertiesLink, formData, {
-    withCredentials: true,
-  });
+  return axios.put(
+    `${apiPropertiesLink}/${property.details.propertyId}`,
+    formData,
+    {
+      withCredentials: true,
+    },
+  );
 };
 
 // Get a single property based off of id
@@ -171,7 +186,7 @@ export const apiGetProperties = async (
   if (filterAddress === undefined) filterAddress = "";
   return axios
     .get(
-      `${apiPropertiesLink}?${pageQPKey}=${page}&${filterAddressQPKey}=${filterAddress}&limit=9`, // TODO: move limit definition to somewhere else
+      `${apiPropertiesLink}?${pageQPKey}=${page}&${filterAddressQPKey}=${filterAddress}&limit=${MAX_NUMBER_PROPERTIES_PER_PAGE}`,
       {
         headers: {
           Accept: "application/json",
@@ -180,12 +195,10 @@ export const apiGetProperties = async (
     )
     .then((res) => res.data)
     .then((data) => {
-      const tmp = data as string[];
-      if (tmp == null) {
-        // no more property ids in db
-        return [];
+      if (data === null) {
+        return []; // no more property ids in db
       }
-      return tmp;
+      return data as string[];
     });
 };
 
@@ -223,4 +236,151 @@ export const apiGetListerInfo = async (
     })
     .then((res) => res.data)
     .then((data) => data as ListerBasicInfo);
+};
+
+export const apiGetCommunity = async (
+  communityID: string,
+): Promise<Community> => {
+  return axios
+    .get(`${apiCommunitiesLink}/${communityID}`, {
+      headers: {
+        Accept: "application/json",
+      },
+    })
+    .then((res) => res.data)
+    .then((data) => data as APICommunityReceived)
+    .then((data) => {
+      return {
+        details: data.details,
+        images: data.images.map((image) => {
+          return apiFile2ClientFile(image);
+        }) as File[],
+        users: data.users,
+        properties: data.properties,
+      } as Community;
+    });
+};
+
+export const apiGetCommunities = async (
+  page: number,
+  filterName: string,
+  filterDescription: string,
+): Promise<string[]> => {
+  return axios
+    .get(
+      `${apiCommunitiesLink}?${pageQPKey}=${page}&${filterNameQPKey}=${filterName}&${filterDescriptionQPKey}=${filterDescription}`,
+      {
+        headers: {
+          Accept: "application/json",
+        },
+      },
+    )
+    .then((res) => res.data)
+    .then((data) => {
+      if (data === null) {
+        return []; // no more communities
+      }
+      return data as string[];
+    });
+};
+
+export const apiCreateCommunity = async (
+  details: CommunityDetails,
+  images: File[],
+): Promise<Response | null> => {
+  const formData = new FormData();
+  formData.append("details", JSON.stringify(details));
+  formData.append("numImages", `${images.length}`);
+  if (images.length > 0) {
+    for (let i = 0; i < images.length; i++) {
+      formData.append(`image${i}`, images[i]);
+    }
+  }
+
+  return axios.post(`${apiCommunitiesLink}`, formData, {
+    withCredentials: true,
+  });
+};
+
+export const apiCreateCommunityUser = async (
+  communityId: string,
+  userId: string,
+): Promise<Response | null> => {
+  const formData = new FormData();
+  formData.append(
+    "data",
+    JSON.stringify({ communityId: communityId, userId: userId }),
+  );
+
+  return axios.post(`${apiCommunitiesUsersLink}`, formData, {
+    withCredentials: true,
+  });
+};
+
+export const apiCreateCommunityProperty = async (
+  communityId: string,
+  propertyId: string,
+): Promise<Response | null> => {
+  const formData = new FormData();
+  formData.append(
+    "data",
+    JSON.stringify({
+      communityId: communityId,
+      propertyId: propertyId,
+    }),
+  );
+
+  return axios.post(`${apiCommunitiesPropertiesLink}`, formData, {
+    withCredentials: true,
+  });
+};
+
+export const apiUpdateCommunity = async (
+  details: CommunityDetails,
+  images: File[],
+): Promise<Response | null> => {
+  const formData = new FormData();
+  formData.append("details", JSON.stringify(details));
+  formData.append("numImages", `${images.length}`);
+  if (images.length > 0) {
+    for (let i = 0; i < images.length; i++) {
+      formData.append(`image${i}`, images[i]);
+    }
+  }
+
+  return axios.put(`${apiCommunitiesLink}/${details.communityId}`, formData, {
+    withCredentials: true,
+  });
+};
+
+export const apiDeleteCommunity = async (
+  communityId: string,
+): Promise<Response | null> => {
+  return axios.delete(`${apiCommunitiesLink}/${communityId}`, {
+    withCredentials: true,
+  });
+};
+
+export const apiDeleteCommunityUser = async (
+  communityId: string,
+  userId: string,
+): Promise<Response | null> => {
+  return axios.delete(
+    `${apiCommunitiesUsersLink}?communityId=${communityId}&userId=${userId}`,
+    {
+      withCredentials: true,
+    },
+  );
+};
+
+export const apiDeleteCommunityProperty = async (
+  communityId: string,
+  propertyId: string,
+): Promise<Response | null> => {
+  return axios.delete(
+    `${apiCommunitiesPropertiesLink}?communityId=${communityId}&propertyId=${propertyId}`,
+    {
+      withCredentials: true,
+    },
+  );
 };

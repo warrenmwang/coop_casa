@@ -109,3 +109,24 @@ export type Property = {
 export type ErrorBody = {
   error: string;
 };
+
+export type CommunityDetails = {
+  communityId: string;
+  adminUserId: string;
+  name: string;
+  description: string;
+};
+
+export type APICommunityReceived = {
+  details: CommunityDetails;
+  images: APIFileReceived[];
+  users: string[];
+  properties: string[];
+};
+
+export type Community = {
+  details: CommunityDetails;
+  images: File[];
+  users: string[];
+  properties: string[];
+};

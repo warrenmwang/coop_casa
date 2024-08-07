@@ -924,7 +924,7 @@ func (s *Server) apiCreatePropertiesHandler(w http.ResponseWriter, r *http.Reque
 	w.WriteHeader(201)
 }
 
-// Endpoint: PUT /api/properties
+// PUT /api/properties/{id}
 // AUTHED
 func (s *Server) apiUpdatePropertiesHandler(w http.ResponseWriter, r *http.Request) {
 	// Authenticate the user and make sure they have write access to properties db
@@ -959,6 +959,12 @@ func (s *Server) apiUpdatePropertiesHandler(w http.ResponseWriter, r *http.Reque
 	err = json.Unmarshal([]byte(detailsRaw), &propertyDetails)
 	if err != nil {
 		respondWithError(w, 500, err)
+		return
+	}
+
+	// Validate propertyId of URLParam matches propertyId of data in request body
+	if propertyDetails.PropertyID != chi.URLParam(r, "id") {
+		respondWithError(w, http.StatusBadRequest, errors.New("propertyId of URLParam does not match propertyId of data in request body"))
 		return
 	}
 
@@ -1051,7 +1057,7 @@ func (s *Server) apiDeletePropertiesHandler(w http.ResponseWriter, r *http.Reque
 	}
 
 	// Get the property ID they want to delete from the URL param
-	propertyID := chi.URLParam(r, "propertyID")
+	propertyID := chi.URLParam(r, "id")
 	if len(propertyID) == 0 {
 		respondWithError(w, 400, errors.New("no communityId given"))
 		return
@@ -1171,8 +1177,8 @@ func (s *Server) apiGetCommunitiesHandler(w http.ResponseWriter, r *http.Request
 
 	pageStr := query.Get("page")
 	limitStr := query.Get("limit")
-	filterAddress := query.Get("filterAddress")
 	filterName := query.Get("filterName")
+	filterDescription := query.Get("filterDescription")
 
 	// Parse offset and limit
 	var offset int
@@ -1193,7 +1199,7 @@ func (s *Server) apiGetCommunitiesHandler(w http.ResponseWriter, r *http.Request
 	offset = offset * limit
 
 	// Get communities with optional filters
-	communityIds, err := s.db.GetNextPageCommunities(int32(limit), int32(offset), filterAddress, filterName)
+	communityIds, err := s.db.GetNextPageCommunities(int32(limit), int32(offset), filterName, filterDescription)
 	if err != nil {
 		respondWithError(w, 500, err)
 		return
@@ -1405,7 +1411,7 @@ func (s *Server) apiCreateCommunitiesPropertyHandler(w http.ResponseWriter, r *h
 	w.WriteHeader(201)
 }
 
-// PUT /api/communities
+// PUT /api/communities/{id}
 // AUTHED
 func (s *Server) apiUpdateCommunitiesHandler(w http.ResponseWriter, r *http.Request) {
 	// Authenticate user
@@ -1430,6 +1436,12 @@ func (s *Server) apiUpdateCommunitiesHandler(w http.ResponseWriter, r *http.Requ
 	err = json.Unmarshal([]byte(detailsRaw), &communityDetails)
 	if err != nil {
 		respondWithError(w, 500, err)
+		return
+	}
+
+	// Validate communityId in the data in the request body matches the id in the URL
+	if communityDetails.CommunityID != chi.URLParam(r, "id") {
+		respondWithError(w, http.StatusBadRequest, errors.New("communityId in url does not match communityId in request body"))
 		return
 	}
 
@@ -1510,7 +1522,7 @@ func (s *Server) apiDeleteCommunitiesHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	communityId := chi.URLParam(r, "communityId")
+	communityId := chi.URLParam(r, "id")
 	if len(communityId) == 0 {
 		respondWithError(w, 400, errors.New("no communityId given"))
 		return
@@ -1537,6 +1549,101 @@ func (s *Server) apiDeleteCommunitiesHandler(w http.ResponseWriter, r *http.Requ
 	}
 
 	w.WriteHeader(200)
+}
+
+// DELETE /api/communities/user
+// AUTHED
+func (s *Server) apiDeleteCommunitiesUserHandler(w http.ResponseWriter, r *http.Request) {
+	// Authenticate user
+	authedUserId, err := s.getAuthedUserId(r)
+	if err != nil {
+		respondWithError(w, http.StatusUnauthorized, err)
+		return
+	}
+
+	query := r.URL.Query()
+	communityId := query.Get("communityId")
+	userId := query.Get("userId")
+
+	// Ensure presence of both query parameters
+	if communityId == "" || userId == "" {
+		respondWithError(w, http.StatusBadRequest, errors.New("missing query parameters in either/both communityId and userId"))
+		return
+	}
+
+	// Try to get community details to validate existence of community
+	communityDetails, err := s.db.GetCommunityDetails(communityId)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	// Ensure authedUserId is the same as the adminId of community
+	if communityDetails.AdminUserID != authedUserId {
+		respondWithError(w, http.StatusUnauthorized, err)
+		return
+	}
+
+	// Ensure userId is NOT adminId of community
+	// (Don't allow admin to remove themselves, they should delete the community instead)
+	if authedUserId == userId {
+		respondWithError(w, http.StatusBadRequest, errors.New("community admin cannot remove themselves from the community"))
+		return
+	}
+
+	// Attempt user deletion
+	err = s.db.DeleteCommunityUser(communityId, userId)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	// Respond ok
+	w.WriteHeader(http.StatusOK)
+}
+
+// DELETE /api/communities/properties
+// AUTHED
+func (s *Server) apiDeleteCommunitiesPropertiesHandler(w http.ResponseWriter, r *http.Request) {
+	// Authenticate user
+	authedUserId, err := s.getAuthedUserId(r)
+	if err != nil {
+		respondWithError(w, http.StatusUnauthorized, err)
+		return
+	}
+
+	query := r.URL.Query()
+	communityId := query.Get("communityId")
+	propertyId := query.Get("propertyId")
+
+	// Ensure presence of query parameters
+	if communityId == "" || propertyId == "" {
+		respondWithError(w, http.StatusBadRequest, errors.New("missing query parameters in either/both communityId and propertyId"))
+		return
+	}
+
+	// Try to get community details to validate existence of community
+	communityDetails, err := s.db.GetCommunityDetails(communityId)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	// Ensure authedUserId is the same as the adminId of community
+	if communityDetails.AdminUserID != authedUserId {
+		respondWithError(w, http.StatusUnauthorized, err)
+		return
+	}
+
+	// Try to delete property marking from this community
+	err = s.db.DeleteCommunityProperty(communityId, propertyId)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	// Respond ok
+	w.WriteHeader(http.StatusOK)
 }
 
 // GET /api/account/communities
@@ -1604,10 +1711,11 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.Get("/auth/{provider}/callback", s.authCallbackHandler)
 	r.Get("/auth/{provider}", s.authLoginHandler)
 	r.Get("/auth/check", s.authCheckHandler)
-	r.Post("/auth/logout", s.authLogoutHandler)
+	r.Post("/auth/logout", s.authLogoutHandler) // TODO: wait a minute, where is the {provider} urlparam ?? why does it work without it?
 
 	// Account
 	r.Get("/api/account", s.apiGetAccountDetailsHandler)
+	r.Get("/api/account/communities", s.apiGetUserOwnedCommunities)
 	r.Post("/api/account", s.apiUpdateAccountDetailsHandler)
 	r.Delete("/api/account", s.apiDeleteAccountHandler)
 
@@ -1624,7 +1732,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.Get("/api/properties/total", s.apiGetPropertiesTotalCountHandler)
 	r.Get("/api/properties", s.apiGetPropertiesHandler)
 	r.Post("/api/properties", s.apiCreatePropertiesHandler)
-	r.Put("/api/properties", s.apiUpdatePropertiesHandler)
+	r.Put("/api/properties/{id}", s.apiUpdatePropertiesHandler)
 	r.Delete("/api/properties/{id}", s.apiDeletePropertiesHandler)
 
 	// Public Lister info
@@ -1633,12 +1741,13 @@ func (s *Server) RegisterRoutes() http.Handler {
 	// Communities
 	r.Get("/api/communities/{id}", s.apiGetCommunityHandler)
 	r.Get("/api/communities", s.apiGetCommunitiesHandler)
-	r.Get("/api/account/communities", s.apiGetUserOwnedCommunities)
 	r.Post("/api/communities", s.apiCreateCommunitiesHandler)
 	r.Post("/api/communities/users", s.apiCreateCommunitiesUserHandler)
 	r.Post("/api/communities/properties", s.apiCreateCommunitiesPropertyHandler)
-	r.Put("/api/communities", s.apiUpdateCommunitiesHandler)
+	r.Put("/api/communities/{id}", s.apiUpdateCommunitiesHandler)
 	r.Delete("/api/communities/{id}", s.apiDeleteCommunitiesHandler)
+	r.Delete("/api/communities/users", s.apiDeleteCommunitiesUserHandler)
+	r.Delete("/api/communities/properties", s.apiDeleteCommunitiesPropertiesHandler)
 
 	return r
 }
