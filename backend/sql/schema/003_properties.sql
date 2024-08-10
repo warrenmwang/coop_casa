@@ -19,7 +19,8 @@ CREATE TABLE properties(
     cost_cents smallint NOT NULL,
     misc_note text,
     created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+    updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_list_user_id_properties FOREIGN KEY (lister_user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
 CREATE TABLE properties_images(

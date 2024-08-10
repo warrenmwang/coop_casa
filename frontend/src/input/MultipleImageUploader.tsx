@@ -2,27 +2,28 @@ import React, { useEffect, useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { MAX_IMAGE_FILE_SIZE, MAX_PROPERTY_IMGS_ALLOWED } from "../constants";
 import { OrderedFile } from "../types/Types";
+import {
+  orderedFileArray2FileArray,
+  fileArray2OrderedFileArray,
+} from "../utils/utils";
 
-const orderedFileArray2FileArray = (arr: OrderedFile[]): File[] => {
-  const newArr: File[] = Array(arr.length);
-  let file: OrderedFile;
-  for (let i = 0; i < arr.length; i++) {
-    file = arr[i];
-    newArr[file.orderNum] = file.file;
-  }
-  return newArr;
-};
+/*
 
-const fileArray2OrderedFileArray = (arr: File[]): OrderedFile[] => {
-  const newArr: OrderedFile[] = Array(arr.length);
-  for (let i = 0; i < arr.length; i++) {
-    newArr[i] = {
-      orderNum: i,
-      file: arr[i],
-    } as OrderedFile;
-  }
-  return newArr;
-};
+In hindsight, the creation of the "ordered file" is a stupid thing to do.
+If you need any ordering of the files, it should just use the position in the array of File[].
+Why are you adding an extra thing to complicate things. Stupid design.
+
+I believe the only reason the idea of OrderedFile was created was because we assume that
+whatever backend we use (even though I'm literally creating the supposed to simple backend myself)
+does not guarantee the same order of files that we send them to be created in.
+Although, that doesn't make any sense, it's like saying we send them a bytestream
+and we don't expect it to give us the bytestream back in the same order when requested?
+No, that doesn't make any sense, it's supposed to have the same order. 
+
+Why did I make this stupid decision. God.
+Do I keep this stupid design and work with it, or refactor everything that uses this stupid thing?
+
+*/
 
 type MultipleImageUploaderProps = {
   onImagesUploaded: (files: OrderedFile[]) => void;

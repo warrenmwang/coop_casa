@@ -1,33 +1,34 @@
 import React, { useState, useEffect } from "react";
-import { apiGetProperties } from "../api/api";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { MAX_NUMBER_PROPERTIES_PER_PAGE } from "../constants";
+import { apiGetCommunities } from "../api/api";
 import CardGridSkeleton from "../skeleton/CardGridSkeleton";
+import PageOfCommunities from "./PageOfCommunities";
+
+import Title from "../components/Title";
 import SearchBar from "../input/SearchBar";
-import PageOfProperties from "../components/PageOfProperties";
+import "../styles/colors.css";
+import SubmitButton from "../components/SubmitButton";
 import { useSearchParams } from "react-router-dom";
-import SubmitButton from "./SubmitButton";
-import Title from "./Title";
-import "../styles/contentBody.css";
-import "../styles/form.css";
+import {
+  pageQPKey,
+  filterNameQPKey,
+  filterDescriptionQPKey,
+  MAX_NUMBER_COMMUNITIES_PER_PAGE,
+} from "../constants";
 
-export const filterAddressQPKey = "filterAddress";
-export const pageQPKey = "page";
-
-const DisplayProperties: React.FC = () => {
-  const [searchIsSubmitting, setSearchIsSubmitting] = useState(false);
+const CommunitiesMainBody: React.FC = () => {
+  const [searchIsSubmitting, setSearchIsSubmitting] = useState<boolean>(false);
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [pages, setPages] = useState<Map<number, string[]>>(new Map()); // <page num, property ids>
 
-  // Sync query params with state
-  // page num
-  let pageQP: string | null = searchParams.get(pageQPKey);
+  // Grab the search params, to init our state.
+  let startPage: string | null = searchParams.get(pageQPKey);
   let startPageNum: number;
-  if (pageQP !== null && pageQP.length > 0) {
+  if (startPage !== null && startPage.length > 0) {
     // use the given page num, or use 0 if not a valid number
-    pageQP = pageQP as string;
-    startPageNum = Number(pageQP);
+    startPage = startPage as string;
+    startPageNum = Number(startPage);
     if (Number.isNaN(startPageNum)) {
       startPageNum = 0;
     }
@@ -41,35 +42,48 @@ const DisplayProperties: React.FC = () => {
     setSearchParams(searchParams);
   }
 
-  let filterAddressQP: string | null = searchParams.get(filterAddressQPKey);
-  let filterAddressStr: string;
-  if (filterAddressQP !== null) {
-    filterAddressStr = filterAddressQP as string;
+  let filterNameQP: string | null = searchParams.get(filterNameQPKey);
+  let filterNameStr: string;
+  if (filterNameQP !== null) {
+    filterNameStr = filterNameQP as string;
   } else {
-    filterAddressStr = "";
+    filterNameStr = "";
   }
 
-  // Init our states from the query params
-  // Current page number
+  let filterDescriptionQP: string | null = searchParams.get(
+    filterDescriptionQPKey,
+  );
+  let filterDescriptionStr: string;
+  if (filterDescriptionQP !== null) {
+    filterDescriptionStr = filterDescriptionQP as string;
+  } else {
+    filterDescriptionStr = "";
+  }
+
+  // Init our state from the query params
+  const [name, setName] = useState<string>(filterNameStr);
+  const [description, setDescription] = useState<string>(filterDescriptionStr);
   const [currentPage, _setCurrentPage] = useState<number>(startPageNum);
   const setCurrentPage = (page: number) => {
+    // Want to update the query param for page number whenever the page
+    // state is updated. This is fired by the pagination navigation buttons.
+    // The other filters handled by the input forms are automatically handled by
+    // the binding between the input elements and the query params.
     _setCurrentPage(page);
     searchParams.set(pageQPKey, `${page}`);
     setSearchParams(searchParams);
   };
-  // Filter - address
-  const [filterAddress, setFilterAddress] = useState<string>(filterAddressStr);
 
   // Use react query hook to handle our data fetching and async state w/ caching of query results.
   const query = useQuery({
-    queryKey: ["propertiesPage", currentPage, filterAddress],
-    queryFn: () => apiGetProperties(currentPage, filterAddress),
+    queryKey: ["communitiesPage", currentPage, name, description],
+    queryFn: () => apiGetCommunities(currentPage, name, description),
   });
   // Use query client hook to get the query client for access to the cache
   const queryClient = useQueryClient();
 
   // Define search form submission handler
-  const searchPropertiesWithFilter = (e: React.FormEvent) => {
+  const searchCommunitiesWithFilters = (e: React.FormEvent) => {
     e.preventDefault();
     setSearchIsSubmitting(true);
   };
@@ -100,17 +114,23 @@ const DisplayProperties: React.FC = () => {
   // When new search is fired off, get the latest address filter
   useEffect(() => {
     if (searchIsSubmitting) {
-      let filterAddressTmp: string | null =
-        searchParams.get(filterAddressQPKey);
-      if (filterAddressTmp === null) {
-        filterAddressTmp = "";
+      let filterNameTmp: string | null = searchParams.get(filterNameQPKey);
+      if (filterNameTmp === null) {
+        filterNameTmp = "";
+      }
+      let filterDescriptionTmp: string | null = searchParams.get(
+        filterDescriptionQPKey,
+      );
+      if (filterDescriptionTmp === null) {
+        filterDescriptionTmp = "";
       }
 
       // See if first page of the search is already cached.
       const pageCached: string[] | undefined = queryClient.getQueryData([
-        "propertiesPage",
+        "communitiesPage",
         0,
-        filterAddressTmp,
+        filterNameTmp,
+        filterDescriptionTmp,
       ]);
 
       // If page exists, then just use that page and don't
@@ -123,47 +143,55 @@ const DisplayProperties: React.FC = () => {
 
       // Update filter variables to trigger fetch.
       setCurrentPage(0);
-      setFilterAddress(filterAddressTmp);
+      setName(filterNameTmp);
+      setDescription(filterDescriptionTmp);
     }
   }, [searchIsSubmitting]);
 
-  const noPropertiesOnPlatform: boolean =
+  const noCommunitiesOnPlatform: boolean =
     query.status === "success" && pages.get(0)?.length === 0;
 
   return (
     <>
-      <div className="banner__green">
+      {/* Input form for applying filters to search */}
+      <div className="banner__blue">
         <Title
-          title="Search Properties"
-          description="You can use optional filters to narrow down your search here."
-        />
+          title="Search Communities"
+          description="Find people with similar interests!"
+        ></Title>
       </div>
-      <form
-        className="form__searchProperties"
-        onSubmit={searchPropertiesWithFilter}
-      >
-        <label className="text_input_field_label_gray">Address</label>
-        <SearchBar
-          searchQueryParamKey={filterAddressQPKey}
-          placeholder="Search by address."
-        ></SearchBar>
+      <form className="flex gap-2" onSubmit={searchCommunitiesWithFilters}>
+        <div className="flex-col flex-grow">
+          <label className="text_input_field_label_gray">Name</label>
+          <SearchBar
+            searchQueryParamKey={filterNameQPKey}
+            placeholder="Name"
+          ></SearchBar>
+        </div>
+        <div className="flex-col flex-grow">
+          <label className="text_input_field_label_gray">Description</label>
+          <SearchBar
+            searchQueryParamKey={filterDescriptionQPKey}
+            placeholder="Description"
+          ></SearchBar>
+        </div>
         <SubmitButton isSubmitting={searchIsSubmitting} />
       </form>
 
-      {/* Display of Page of Properties */}
+      {/* Display of Page of Communities */}
       {/* If query is pending, display a skeleton. */}
       {query.status === "pending" && <CardGridSkeleton />}
 
-      {/* If query is successful and there are properties, then show the current page of them! */}
+      {/* If query is successful and there are communities, then show the current page of them! */}
       {pages.has(currentPage) && (
-        <PageOfProperties
+        <PageOfCommunities
           key={currentPage}
-          propertyIDs={pages.get(currentPage) as string[]}
+          communityIDs={pages.get(currentPage) as string[]}
         />
       )}
 
-      {/* If no properties exist on platform, display a message. */}
-      {noPropertiesOnPlatform && (
+      {/* If no communities exist on platform, display a message. */}
+      {noCommunitiesOnPlatform && (
         <h1 className="text-center text-red-600 text-xl font-bold">
           Sorry, there are no communities on Coop right now! Create your own or
           come back later.
@@ -171,9 +199,9 @@ const DisplayProperties: React.FC = () => {
       )}
 
       {/* Flex box for the pagination navigation buttons. */}
-      {!noPropertiesOnPlatform && (
+      {!noCommunitiesOnPlatform && (
         <div
-          id="DisplayProperties__navigationBtnsContainer"
+          id="CommunitiesMainBody__navigationBtnsContainer"
           className="flex gap-1"
         >
           {Array(currentPage + 1)
@@ -191,7 +219,7 @@ const DisplayProperties: React.FC = () => {
             ))}
           {pages.has(currentPage) &&
             (pages.get(currentPage) as string[]).length ===
-              MAX_NUMBER_PROPERTIES_PER_PAGE && (
+              MAX_NUMBER_COMMUNITIES_PER_PAGE && (
               <button
                 key="next"
                 className="bg-gray-500 hover:bg-gray-600 text-white p-3 rounded"
@@ -205,5 +233,4 @@ const DisplayProperties: React.FC = () => {
     </>
   );
 };
-
-export default DisplayProperties;
+export default CommunitiesMainBody;

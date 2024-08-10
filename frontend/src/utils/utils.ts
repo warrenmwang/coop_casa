@@ -1,4 +1,4 @@
-import { APIFileReceived } from "../types/Types";
+import { APIFileReceived, OrderedFile } from "../types/Types";
 
 // Function to convert a File to Base64 string, useful for arbitrary binary format
 // user input into a string format for passing it around (i.e. serializing and sending over network)
@@ -41,6 +41,28 @@ export const apiFile2ClientFile = (fileIn: APIFileReceived): File | null => {
   return new File([blob], fileIn.fileName, { type: fileIn.mimeType });
 };
 
+// Convenience function to create a file from blob with filename
 export const createFileFromBlob = (blob: Blob, fileName: string): File => {
   return new File([blob], fileName, { type: blob.type });
+};
+
+export const orderedFileArray2FileArray = (arr: OrderedFile[]): File[] => {
+  const newArr: File[] = Array(arr.length);
+  let file: OrderedFile;
+  for (let i = 0; i < arr.length; i++) {
+    file = arr[i];
+    newArr[file.orderNum] = file.file;
+  }
+  return newArr;
+};
+
+export const fileArray2OrderedFileArray = (arr: File[]): OrderedFile[] => {
+  const newArr: OrderedFile[] = Array(arr.length);
+  for (let i = 0; i < arr.length; i++) {
+    newArr[i] = {
+      orderNum: i,
+      file: arr[i],
+    } as OrderedFile;
+  }
+  return newArr;
 };

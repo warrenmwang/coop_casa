@@ -17,7 +17,6 @@ import { EmptyUser } from "../types/Objects";
 
 // Authenticated Endpoint
 const DashboardPage: React.FC = () => {
-  console.log("DashboardPage");
   const navigate = useNavigate();
 
   const userQuery = useQuery({

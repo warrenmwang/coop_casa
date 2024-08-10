@@ -2,7 +2,7 @@
 CREATE TABLE communities(
     id serial PRIMARY KEY,
     community_id text NOT NULL UNIQUE,
-    admin_user_id text NOT NULL UNIQUE,
+    admin_user_id text NOT NULL,
     "name" text NOT NULL,
     "description" text,
     created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,

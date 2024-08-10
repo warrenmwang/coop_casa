@@ -653,17 +653,19 @@ func (s *service) DeleteUserRole(userId string) error {
 }
 
 // Properties
-// Just encrypt the lister user id
-// all other fields can be in plaintext
-
-// Create a row in both the properties and properties_images tables
 func (s *service) CreateProperty(propertyDetails PropertyDetails, images []OrderedFileInternal) error {
 	ctx := context.Background()
 
+	// Encrypt user id
+	encryptedListerUserID, err := s.encryptString(propertyDetails.ListerUserID)
+	if err != nil {
+		return err
+	}
+
 	// Insert property data into db
-	err := s.db_queries.CreatePropertyDetails(ctx, sqlc.CreatePropertyDetailsParams{
+	err = s.db_queries.CreatePropertyDetails(ctx, sqlc.CreatePropertyDetailsParams{
 		PropertyID:      propertyDetails.PropertyID,
-		ListerUserID:    propertyDetails.ListerUserID,
+		ListerUserID:    encryptedListerUserID,
 		Name:            propertyDetails.Name,
 		Description:     utils.CreateSQLNullString(propertyDetails.Description),
 		Address1:        propertyDetails.Address_1,
@@ -712,9 +714,15 @@ func (s *service) GetPropertyDetails(propertyId string) (PropertyDetails, error)
 		return PropertyDetails{}, err
 	}
 
+	// Decrypt user id
+	decryptedListerUserID, err := s.decryptString(property.ListerUserID)
+	if err != nil {
+		return PropertyDetails{}, err
+	}
+
 	propertyDetails := PropertyDetails{
 		PropertyID:        propertyId,
-		ListerUserID:      property.ListerUserID,
+		ListerUserID:      decryptedListerUserID,
 		Name:              property.Name,
 		Description:       property.Description.String,
 		Address_1:         property.Address1,
@@ -792,10 +800,16 @@ func (s *service) GetNextPageProperties(limit, offset int32, addressFilter strin
 func (s *service) UpdatePropertyDetails(details PropertyDetails) error {
 	ctx := context.Background()
 
+	// Encrypt user id
+	encryptedListerUserID, err := s.encryptString(details.ListerUserID)
+	if err != nil {
+		return err
+	}
+
 	// Construct the new details struct to insert into db
-	err := s.db_queries.UpdatePropertyDetails(ctx, sqlc.UpdatePropertyDetailsParams{
+	err = s.db_queries.UpdatePropertyDetails(ctx, sqlc.UpdatePropertyDetailsParams{
 		PropertyID:      details.PropertyID,
-		ListerUserID:    details.ListerUserID,
+		ListerUserID:    encryptedListerUserID,
 		Name:            details.Name,
 		Description:     utils.CreateSQLNullString(details.Description),
 		Address1:        details.Address_1,
@@ -960,9 +974,16 @@ func (s *service) AdminGetUsersRoles(userIds []string) ([]string, error) {
 func (s *service) CreateCommunity(details CommunityDetails, images []FileInternal) error {
 	ctx := context.Background()
 
-	err := s.db_queries.CreateCommunityDetails(ctx, sqlc.CreateCommunityDetailsParams{
+	// Encrypt the community's admin user id
+	encryptedAdminUserID, err := s.encryptString(details.AdminUserID)
+	if err != nil {
+		return err
+	}
+
+	// Create community details with all plain text details except admin user id
+	err = s.db_queries.CreateCommunityDetails(ctx, sqlc.CreateCommunityDetailsParams{
 		CommunityID: details.CommunityID,
-		AdminUserID: details.AdminUserID,
+		AdminUserID: encryptedAdminUserID,
 		Name:        details.Name,
 		Description: utils.CreateSQLNullString(details.Description),
 	})
@@ -973,12 +994,13 @@ func (s *service) CreateCommunity(details CommunityDetails, images []FileInterna
 	// Add the community admin as the first user
 	err = s.db_queries.CreateCommunityUser(ctx, sqlc.CreateCommunityUserParams{
 		CommunityID: details.CommunityID,
-		UserID:      details.AdminUserID,
+		UserID:      encryptedAdminUserID,
 	})
 	if err != nil {
 		return err
 	}
 
+	// Insert all provided community images
 	for _, image := range images {
 		err = s.db_queries.CreateCommunityImage(ctx, sqlc.CreateCommunityImageParams{
 			CommunityID: details.CommunityID,
@@ -997,9 +1019,16 @@ func (s *service) CreateCommunity(details CommunityDetails, images []FileInterna
 
 func (s *service) CreateCommunityUser(communityId, userId string) error {
 	ctx := context.Background()
-	err := s.db_queries.CreateCommunityUser(ctx, sqlc.CreateCommunityUserParams{
+
+	// Encrypt user id
+	encryptedUserID, err := s.encryptString(userId)
+	if err != nil {
+		return err
+	}
+
+	err = s.db_queries.CreateCommunityUser(ctx, sqlc.CreateCommunityUserParams{
 		CommunityID: communityId,
-		UserID:      userId,
+		UserID:      encryptedUserID,
 	})
 	return err
 }
@@ -1019,9 +1048,16 @@ func (s *service) GetCommunityDetails(communityId string) (CommunityDetails, err
 	if err != nil {
 		return CommunityDetails{}, err
 	}
+
+	// Decrypt user id
+	decryptedUserID, err := s.decryptString(details.AdminUserID)
+	if err != nil {
+		return CommunityDetails{}, err
+	}
+
 	return CommunityDetails{
 		CommunityID: details.CommunityID,
-		AdminUserID: details.AdminUserID,
+		AdminUserID: decryptedUserID,
 		Name:        details.Name,
 		Description: details.Description.String,
 	}, nil
@@ -1053,7 +1089,12 @@ func (s *service) GetCommunityUsers(communityId string) ([]string, error) {
 	}
 	var returnUserIds []string
 	for _, id := range userIds {
-		returnUserIds = append(returnUserIds, id.UserID)
+		// Decrypt each user id of the community
+		decryptedUserID, err := s.decryptString(id.UserID)
+		if err != nil {
+			return nil, err
+		}
+		returnUserIds = append(returnUserIds, decryptedUserID)
 	}
 	return returnUserIds, nil
 }
@@ -1119,9 +1160,14 @@ func (s *service) GetNextPageCommunities(limit, offset int32, filterName, filter
 
 func (s *service) UpdateCommunityDetails(details CommunityDetails) error {
 	ctx := context.Background()
-	err := s.db_queries.UpdateCommunityDetails(ctx, sqlc.UpdateCommunityDetailsParams{
+	// Encrypt user id
+	encryptedAdminUserID, err := s.encryptString(details.AdminUserID)
+	if err != nil {
+		return err
+	}
+	err = s.db_queries.UpdateCommunityDetails(ctx, sqlc.UpdateCommunityDetailsParams{
 		CommunityID: details.CommunityID,
-		AdminUserID: details.AdminUserID,
+		AdminUserID: encryptedAdminUserID,
 		Name:        details.Name,
 		Description: utils.CreateSQLNullString(details.Description),
 	})
@@ -1157,9 +1203,16 @@ func (s *service) DeleteCommunity(communityId string) error {
 
 func (s *service) DeleteCommunityUser(communityId, userId string) error {
 	ctx := context.Background()
-	err := s.db_queries.DeleteCommunityUser(ctx, sqlc.DeleteCommunityUserParams{
+
+	// Encrypt user id
+	encryptedUserID, err := s.encryptString(userId)
+	if err != nil {
+		return err
+	}
+
+	err = s.db_queries.DeleteCommunityUser(ctx, sqlc.DeleteCommunityUserParams{
 		CommunityID: communityId,
-		UserID:      userId,
+		UserID:      encryptedUserID,
 	})
 	return err
 }
@@ -1174,7 +1227,14 @@ func (s *service) DeleteCommunityProperty(communityId, propertyId string) error 
 
 func (s *service) GetUserOwnedCommunities(userId string) ([]string, error) {
 	ctx := context.Background()
-	communities, err := s.db_queries.GetUserOwnedCommunities(ctx, userId)
+
+	// Encrypt user id
+	encryptedUserID, err := s.encryptString(userId)
+	if err != nil {
+		return nil, err
+	}
+
+	communities, err := s.db_queries.GetUserOwnedCommunities(ctx, encryptedUserID)
 	if err != nil {
 		return nil, err
 	}

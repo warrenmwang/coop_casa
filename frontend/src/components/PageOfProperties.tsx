@@ -8,6 +8,10 @@ import { Property } from "../types/Types";
 type PageOfPropertiesProps = {
   propertyIDs: string[];
 };
+
+// TODO: is propertyIDs array being reconstructed?
+// if so, memo's shallow copy will consider a new array of the same IDs
+// to be different and will re-render.
 const PageOfProperties: React.FC<PageOfPropertiesProps> = ({ propertyIDs }) => {
   const propertyQueries = useQueries({
     queries: propertyIDs.map((propertyID) => {

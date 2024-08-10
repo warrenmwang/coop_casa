@@ -31,6 +31,7 @@ import {
   filterDescriptionQPKey,
   filterNameQPKey,
   MAX_NUMBER_PROPERTIES_PER_PAGE,
+  MAX_NUMBER_COMMUNITIES_PER_PAGE,
 } from "../constants";
 
 // Delete Account Function
@@ -250,13 +251,22 @@ export const apiGetCommunity = async (
     .then((res) => res.data)
     .then((data) => data as APICommunityReceived)
     .then((data) => {
+      // For potentially nullable fields, check and if null replace with empty array
+      const usersTmp: string[] = data.users !== null ? data.users : [];
+      const propertiesTmp: string[] =
+        data.properties !== null ? data.properties : [];
+      let imagesTmp: File[] = [];
+      if (data.images !== null) {
+        imagesTmp = data.images.map((image) =>
+          apiFile2ClientFile(image),
+        ) as File[];
+      }
+      // Return full Community obj
       return {
         details: data.details,
-        images: data.images.map((image) => {
-          return apiFile2ClientFile(image);
-        }) as File[],
-        users: data.users,
-        properties: data.properties,
+        images: imagesTmp,
+        users: usersTmp,
+        properties: propertiesTmp,
       } as Community;
     });
 };
@@ -268,7 +278,7 @@ export const apiGetCommunities = async (
 ): Promise<string[]> => {
   return axios
     .get(
-      `${apiCommunitiesLink}?${pageQPKey}=${page}&${filterNameQPKey}=${filterName}&${filterDescriptionQPKey}=${filterDescription}`,
+      `${apiCommunitiesLink}?${pageQPKey}=${page}&${filterNameQPKey}=${filterName}&${filterDescriptionQPKey}=${filterDescription}&limit=${MAX_NUMBER_COMMUNITIES_PER_PAGE}`,
       {
         headers: {
           Accept: "application/json",
@@ -285,9 +295,14 @@ export const apiGetCommunities = async (
 };
 
 export const apiCreateCommunity = async (
-  details: CommunityDetails,
-  images: File[],
+  community: Community,
 ): Promise<Response | null> => {
+  // TODO: at creation time, allow adding users and properties
+  // for now they are ignored here.
+
+  const details: CommunityDetails = community.details;
+  const images: File[] = community.images;
+
   const formData = new FormData();
   formData.append("details", JSON.stringify(details));
   formData.append("numImages", `${images.length}`);
@@ -336,9 +351,14 @@ export const apiCreateCommunityProperty = async (
 };
 
 export const apiUpdateCommunity = async (
-  details: CommunityDetails,
-  images: File[],
+  community: Community,
 ): Promise<Response | null> => {
+  // TODO: at creation time, allow adding users and properties
+  // for now they are ignored here.
+
+  const details: CommunityDetails = community.details;
+  const images: File[] = community.images;
+
   const formData = new FormData();
   formData.append("details", JSON.stringify(details));
   formData.append("numImages", `${images.length}`);

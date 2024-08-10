@@ -29,6 +29,7 @@ import {
   accountSettingsPageLink,
   accountSetupPageLink,
 } from "../urls";
+import CommunityDetail from "../pages/CommunityDetail";
 
 const RouteRenderer: React.FC = () => {
   // console.log("RouteRenderer");
@@ -41,6 +42,10 @@ const RouteRenderer: React.FC = () => {
       <Route
         path={`${propertiesPageLink}/:propertyID`}
         element={<PropertyDetail />}
+      />
+      <Route
+        path={`${communitiesPageLink}/:communityID`}
+        element={<CommunityDetail />}
       />
       {/* <Route path={mapPageLink} element={<MapPage />} /> */}
       <Route path={aboutPageLink} element={<AboutPage />} />

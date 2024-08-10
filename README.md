@@ -6,12 +6,32 @@ Just a project to learn about building full stack web applications around a them
 that this project is currently not a legal entity nor a real company. This does not indicate anything about
 whether Coop will exist in the future.
 
-### Tech Stack
+### Technical Details
 
-**Frontend:** Typescript, ReactJS, TailwindCSS, TanStack/React Query, React Router, and many others <br>
-**Backend:** Go, PostgreSQL, Goose, SQLC, Goth <br>
-**Other:** Docker, Nginx <br>
-**Formatters:** JS/TS/JSX/TSX => Prettier, Go => Gofmt, SQL => pgFormatter
+Architecture Design
+
+- Monolith, RESTful
+
+Frontend
+
+- Language: Typescript, TSX <br>
+- Node JS Libraries: React, TanStack/React Query, React Router, and many others <br>
+- CSS Libraries: TailwindCSS
+- Transpilers: Babel, TSC
+- Bundler: Webpack
+
+Backend
+
+- Language: Golang, SQL <br>
+- Golang Libraries: Goth, pgx, chi, jwt, and others <br>
+- Database: PostgreSQL <br>
+- Golang Tools: Goose, SQLC, <br>
+  Other: Docker, Nginx <br>
+
+Code Formatters:
+
+- JS/TS/JSX/TSX => Prettier <br>
+- Go => Gofmt, SQL => pgFormatter
 
 There's a lot more Javascript libraries than Go libraries that I use that are not mentioned. As for PostgreSQL extensions that I use, just look in the migrations folder.
 

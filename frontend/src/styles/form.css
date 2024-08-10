@@ -5,3 +5,7 @@
 .form__update_property {
   @apply w-full max-w-lg mt-3;
 }
+
+.form__searchProperties {
+  @apply flex-col gap-y-3 p-3;
+}

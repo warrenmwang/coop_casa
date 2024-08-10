@@ -1,0 +1,7 @@
+.banner__blue {
+  @apply rounded bg-gradient-to-l from-[#40c0ff] to-[#1482b8] p-5 my-3;
+}
+
+.banner__green {
+  @apply rounded bg-gradient-to-l from-green-500 to-green-600 p-5 my-3;
+}

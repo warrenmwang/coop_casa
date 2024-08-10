@@ -1249,7 +1249,7 @@ func (s *Server) apiCreateCommunitiesHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	// Get community images (optional, can be 0)
+	// Get community images if any
 	numberImagesRaw := r.FormValue("numImages")
 	numberImagesInt64, err := strconv.ParseInt(numberImagesRaw, 10, 16)
 	if err != nil {
