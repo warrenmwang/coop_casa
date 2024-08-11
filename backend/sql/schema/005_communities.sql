@@ -6,7 +6,8 @@ CREATE TABLE communities(
     "name" text NOT NULL,
     "description" text,
     created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+    updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_admin_user_id_communities FOREIGN KEY (admin_user_id) REFERENCES users(user_id)
 );
 
 CREATE TABLE communities_images(
