@@ -1177,8 +1177,8 @@ func (s *Server) apiGetCommunitiesHandler(w http.ResponseWriter, r *http.Request
 
 	pageStr := query.Get("page")
 	limitStr := query.Get("limit")
-	filterName := query.Get("filterName")
-	filterDescription := query.Get("filterDescription")
+	filterName := query.Get("communityFilterName")
+	filterDescription := query.Get("communityFilterDescription")
 
 	// Parse offset and limit
 	var offset int

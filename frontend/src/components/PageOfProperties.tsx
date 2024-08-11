@@ -28,8 +28,6 @@ const PageOfProperties: React.FC<PageOfPropertiesProps> = ({ propertyIDs }) => {
       return value !== undefined;
     });
 
-  // console.log("PageOfProperties");
-
   return (
     <div className="flex justify-center">
       <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4">

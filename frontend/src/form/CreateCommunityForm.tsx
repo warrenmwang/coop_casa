@@ -164,8 +164,6 @@ const CreateCommunityForm: React.FC = () => {
         }
       }
 
-      console.log(communityDetails);
-
       // Format community with the details and images
       const community: Community = {
         details: communityDetails,

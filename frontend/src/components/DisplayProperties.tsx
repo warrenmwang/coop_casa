@@ -132,21 +132,26 @@ const DisplayProperties: React.FC = () => {
 
   return (
     <>
+      {/* Aesthetic Banner */}
       <div className="banner__green">
         <Title
           title="Search Properties"
           description="You can use optional filters to narrow down your search here."
         />
       </div>
+
+      {/* Input form for applying filters to search */}
       <form
         className="form__searchProperties"
         onSubmit={searchPropertiesWithFilter}
       >
-        <label className="text_input_field_label_gray">Address</label>
-        <SearchBar
-          searchQueryParamKey={filterAddressQPKey}
-          placeholder="Search by address."
-        ></SearchBar>
+        <div className="flex-col flex-grow">
+          <label className="text_input_field_label_gray">Address</label>
+          <SearchBar
+            searchQueryParamKey={filterAddressQPKey}
+            placeholder="Search by address."
+          ></SearchBar>
+        </div>
         <SubmitButton isSubmitting={searchIsSubmitting} />
       </form>
 

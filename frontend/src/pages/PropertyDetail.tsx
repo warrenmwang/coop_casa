@@ -1,7 +1,9 @@
 import React, { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Box } from "@mui/material";
-import CustomImageGallery from "../components/CustomImageGallery";
+import CustomImageGallery, {
+  ImageGalleryItemsInput,
+} from "../components/CustomImageGallery";
 import { apiGetListerInfo, apiGetProperty } from "../api/api";
 import { propertiesPageLink } from "../urls";
 import { Property } from "../types/Types";
@@ -58,7 +60,7 @@ const PropertyDetailContent: React.FC<PropertyDetailContentProps> = ({
   const images = property.images.map((image) =>
     URL.createObjectURL(image.file),
   );
-  const imageData = images.map((image) => ({
+  const imageData: ImageGalleryItemsInput[] = images.map((image) => ({
     img: image,
     title: "default title",
     rows: 2,
@@ -112,6 +114,7 @@ const PropertyDetailContent: React.FC<PropertyDetailContentProps> = ({
 
   return (
     <Box className="bg-white p-4 shadow-lg rounded-lg mx-auto w-11/12 md:w-3/5 lg:w-1/2 z-50">
+      {/* Top row of buttons */}
       <div className="flex">
         <button
           className="block m-3 p-3 bg-gray-500 hover:bg-gray-400 text-white rounded"
@@ -127,12 +130,15 @@ const PropertyDetailContent: React.FC<PropertyDetailContentProps> = ({
         </button>
         <ShareLinkButton />
       </div>
+      {/* Images */}
       <CustomImageGallery imageData={imageData} />
+      {/* Cost, Address, core property details */}
       <div id="transition-modal-title">
         <div className="text-3xl font-bold">{costString}</div>
         <div className="text-2xl">{addressString}</div>
         {basicInfoElement}
       </div>
+      {/* Lister given name and description of listing */}
       <div id="transition-modal-description">
         <div className="text-xl font-bold pt-2">Property Description</div>
         <div className="flex gap-2">
@@ -143,12 +149,13 @@ const PropertyDetailContent: React.FC<PropertyDetailContentProps> = ({
           <div className="text-lg">Description: </div>
           <div className="text-lg">{property.details.description}</div>
         </div>
+        {/* Lister name and contact information */}
         <ListerInfo listerID={property.details.listerUserId} />
         <div className="text-lg">Miscellaneous Lister Comments: </div>
         <div className="text-lg">{property.details.miscNote}</div>
-        <div className="text-sm pt-5">
+        {/* <div className="text-sm pt-5">
           Property ID: {property.details.propertyId}
-        </div>
+        </div> */}
       </div>
     </Box>
   );

@@ -3,18 +3,14 @@ import ImageGallery, { ReactImageGalleryItem } from "react-image-gallery";
 import "react-image-gallery/styles/css/image-gallery.css";
 import { createThumbnail } from "./Thumbnail";
 
-type ImageGalleryItemsInput = {
+export type ImageGalleryItemsInput = {
   img: string;
   title: string;
   rows: number;
   cols: number;
 };
 
-type CustomImageGalleryProps = {
-  imageData: ImageGalleryItemsInput[];
-};
-
-const CustomImageGallery: React.FC<CustomImageGalleryProps> = ({
+const CustomImageGallery: React.FC<{ imageData: ImageGalleryItemsInput[] }> = ({
   imageData,
 }) => {
   const getImageThumbnail = async (

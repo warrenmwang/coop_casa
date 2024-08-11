@@ -6,12 +6,9 @@ import { propertiesPageLink } from "../urls";
 
 interface PropertyCardProps {
   property: Property;
-  openOnLoad?: boolean;
 }
 
 const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
-  console.log("PropertyCard");
-
   const propertyDetailPage = `${propertiesPageLink}/${property.details.propertyId}`;
   let cardImage: string = useMemo(
     () => URL.createObjectURL(property.images[0].file),
@@ -62,9 +59,6 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
       : `${property.details.address1}, ${property.details.address2}, ${property.details.city}, ${property.details.state} ${property.details.zipcode}, ${property.details.country}`;
 
   const basicInfoElement = basicInfoConstructor(property);
-
-  // console.log(property.details.propertyId);
-  // console.log("PropertyCard");
 
   return (
     <>

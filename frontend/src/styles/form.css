@@ -7,5 +7,9 @@
 }
 
 .form__searchProperties {
-  @apply flex-col gap-y-3 p-3;
+  @apply flex gap-2 mb-3;
+}
+
+.form__searchCommunities {
+  @apply flex gap-2 mb-3;
 }

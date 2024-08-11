@@ -32,8 +32,6 @@ import {
 import CommunityDetail from "../pages/CommunityDetail";
 
 const RouteRenderer: React.FC = () => {
-  // console.log("RouteRenderer");
-
   return (
     <Routes>
       <Route path={homePageLink} element={<HomePage />} />

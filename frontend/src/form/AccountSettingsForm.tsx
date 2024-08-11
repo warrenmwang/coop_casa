@@ -79,7 +79,6 @@ const AccountSettingsForm: React.FC = () => {
         avatar: userAvatar,
       });
     }
-    console.log("hi");
   }, [userQuery.status]);
 
   const ready: boolean = user.userId !== "" && formData.userId !== "";

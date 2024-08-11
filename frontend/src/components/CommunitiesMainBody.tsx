@@ -153,14 +153,19 @@ const CommunitiesMainBody: React.FC = () => {
 
   return (
     <>
-      {/* Input form for applying filters to search */}
+      {/* Aesthetic Banner */}
       <div className="banner__blue">
         <Title
           title="Search Communities"
           description="Find people with similar interests!"
         ></Title>
       </div>
-      <form className="flex gap-2" onSubmit={searchCommunitiesWithFilters}>
+
+      {/* Input form for applying filters to search */}
+      <form
+        className="form__searchCommunities"
+        onSubmit={searchCommunitiesWithFilters}
+      >
         <div className="flex-col flex-grow">
           <label className="text_input_field_label_gray">Name</label>
           <SearchBar
