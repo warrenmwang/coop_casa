@@ -1,7 +1,3 @@
-.env*
-personal/
-psql_connect.sh
-manual_goose_migrate.sh
-dev.sh
-localDockerTestStart.sh
+.dev/
 .vscode/
+.ignore

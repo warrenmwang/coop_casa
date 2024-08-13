@@ -6,28 +6,23 @@ import (
 	"crypto/md5"
 	"database/sql"
 	"encoding/base64"
+	"net/mail"
 	"regexp"
-	"time"
 )
 
 func IsValidEmail(email string) bool {
+	/* Emails must pass 2 checks:
+	   1. stdlib's mail parser.
+	   2. custom regex ripped from stackoverflow.
+	*/
 	const emailRegexPattern = `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
 	re := regexp.MustCompile(emailRegexPattern)
-	return re.MatchString(email)
-}
+	regexRes := re.MatchString(email)
 
-// Parse a string representing a date in format `layout`
-// as a time.Time object and return that.
-func ParseStringToNullTime(timeStr string) (time.Time, error) {
-	layout := "2006-01-02"
+	_, err := mail.ParseAddress(email)
+	mailParseRes := err == nil
 
-	// Parse the string into a time.Time object
-	parsedTime, err := time.Parse(layout, timeStr)
-	if err != nil {
-		return time.Time{}, err
-	}
-
-	return parsedTime, nil
+	return regexRes && mailParseRes
 }
 
 // Encrypt bytes

@@ -35,6 +35,12 @@ Code Formatters:
 
 There's a lot more Javascript libraries than Go libraries that I use that are not mentioned. As for PostgreSQL extensions that I use, just look in the migrations folder.
 
+### Getting Started
+
+#### Development and Testing
+
+> TODO
+
 ## Connecting Communities, Empowering Ownership.
 
 Coop wants to provide a platform for people to meet specifically with the idea in mind to

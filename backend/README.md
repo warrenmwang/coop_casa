@@ -16,10 +16,14 @@ These instructions will get you a copy of the project up and running on your loc
 
 To run the backend tests run:
 
+Note, this requires the PostgreSQL database to be up and running, with an `.env` file in the `backend` directory that contains the DB's details that are to be read by both the DB and the go process. Once the DB is up and running, then you can run the tests:
+
 ```
 cd tests
 go test
 ```
+
+Honestly, just use the bash script that aims to run tests across all parts of the app in the `test` dir at root of this repo.
 
 --
 

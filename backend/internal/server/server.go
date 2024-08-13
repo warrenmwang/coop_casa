@@ -22,11 +22,7 @@ type Server struct {
 	db database.Service
 }
 
-func NewServer() *http.Server {
-	backendPort, err := strconv.Atoi(os.Getenv("INTERNAL_BACKEND_PORT"))
-	if err != nil {
-		log.Fatal("failed to parse INTERNAL_BACKEND_PORT")
-	}
+func NewInternalServer() *Server {
 	frontendPort, err := strconv.Atoi(os.Getenv("EXTERNAL_FRONTEND_PORT"))
 	if err != nil {
 		log.Fatal("failed to parse EXTERNAL_FRONTEND_PORT")
@@ -68,6 +64,16 @@ func NewServer() *http.Server {
 
 		db: database.New(),
 	}
+	return NewServer
+}
+
+func NewServer() *http.Server {
+	backendPort, err := strconv.Atoi(os.Getenv("INTERNAL_BACKEND_PORT"))
+	if err != nil {
+		log.Fatal("failed to parse INTERNAL_BACKEND_PORT")
+	}
+
+	NewServer := NewInternalServer()
 
 	// Declare Server config
 	server := &http.Server{
