@@ -65,41 +65,33 @@ func DecryptBytes(cipherbytes []byte, key string) ([]byte, error) {
 
 // EncryptString encrypts plaintext using the given key.
 func EncryptString(plaintext, key string) (string, error) {
-	block, err := aes.NewCipher([]byte(key))
+	// View string as []byte and encrypt.
+	cipherBytes, err := EncryptBytes([]byte(plaintext), key)
 	if err != nil {
 		return "", err
 	}
 
-	// Use a fixed IV (initialization vector)
-	iv := md5.Sum([]byte(key)) // Using MD5 hash of the key as the IV
-	ciphertext := make([]byte, len(plaintext))
-
-	stream := cipher.NewCFBEncrypter(block, iv[:])
-	stream.XORKeyStream(ciphertext, []byte(plaintext))
-
-	return base64.StdEncoding.EncodeToString(ciphertext), nil
+	// Convert encrypted bytes into a string via base64 encoding.
+	return base64.StdEncoding.EncodeToString(cipherBytes), nil
 }
 
 // DecryptString decrypts ciphertext using the given key.
 func DecryptString(ciphertext, key string) (string, error) {
-	data, err := base64.StdEncoding.DecodeString(ciphertext)
+	// Convert ciphertext, expected to be base64 encoded string of cipher bytes,
+	// into the byte array of cipher bytes
+	cipherBytes, err := base64.StdEncoding.DecodeString(ciphertext)
 	if err != nil {
 		return "", err
 	}
 
-	block, err := aes.NewCipher([]byte(key))
+	// Decrypt cipher bytes
+	plainBytes, err := DecryptBytes(cipherBytes, key)
 	if err != nil {
 		return "", err
 	}
 
-	// Use the same fixed IV (initialization vector)
-	iv := md5.Sum([]byte(key))
-	plaintext := make([]byte, len(data))
-
-	stream := cipher.NewCFBDecrypter(block, iv[:])
-	stream.XORKeyStream(plaintext, data)
-
-	return string(plaintext), nil
+	// Convert plain bytes into string and return
+	return string(plainBytes), nil
 }
 
 func CreateSQLNullString(s string) sql.NullString {

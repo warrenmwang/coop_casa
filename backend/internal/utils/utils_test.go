@@ -2,6 +2,7 @@ package utils
 
 import (
 	"bytes"
+	"database/sql"
 	"fmt"
 	"testing"
 )
@@ -284,13 +285,139 @@ func TestDecryptBytes(t *testing.T) {
 }
 
 func TestEncryptString(t *testing.T) {
+	type test struct {
+		plaintext   string
+		encryptKey  string
+		expectError bool
+	}
 
+	// Define some keys for the tests
+	validKey1 := "RdHFZi8zTaQA159oWhbZgpKk"
+	validKey2 := "mAq92XO8hDYAu0FOwk4CkOc8"
+	invalidKey1 := ""
+	invalidKey2 := "imtooshort"
+
+	// Define all tests
+	tests := []test{
+		{"", validKey1, false},
+		{"helloworld", validKey1, false},
+		{"!@#$%^*()&+_JKLKLVJ~|}{_{LDJKFKL}}", validKey1, false},
+		{"", validKey2, false},
+		{"helloworld", validKey2, false},
+		{"!@#$%^*()&+_JKLKLVJ~|}{_{LDJKFKL}}", validKey2, false},
+		{"", invalidKey1, true},
+		{"helloworld", invalidKey1, true},
+		{"!@#$%^*()&+_JKLKLVJ~|}{_{LDJKFKL}}", invalidKey1, true},
+		{"", invalidKey2, true},
+		{"helloworld", invalidKey2, true},
+		{"!@#$%^*()&+_JKLKLVJ~|}{_{LDJKFKL}}", invalidKey2, true},
+	}
+
+	for i, test := range tests {
+		encryptedStr, err := EncryptString(test.plaintext, test.encryptKey)
+		if test.expectError {
+			if err == nil {
+				t.Errorf("test #%d - expected error not nil but got error is nil", i)
+			}
+		} else {
+			if err != nil {
+				t.Errorf("test #%d - expected error nil but got error is not nil", i)
+			}
+			if len(test.plaintext) > 0 && encryptedStr == test.plaintext {
+				t.Errorf("test #%d - expected encryptedStr to be different from input plaintext, but they are same", i)
+			}
+		}
+	}
 }
 
 func TestDecryptString(t *testing.T) {
+	type test struct {
+		plaintext   string
+		encryptKey  string
+		decryptKey  string
+		expectError bool
+		isDiffKeys  bool
+	}
 
+	// Define some keys for the tests
+	// (Once again using 24 byte keys for AES-192)
+	validKey1 := "RdHFZi8zTaQA159oWhbZgpKk"
+	validKey2 := "mAq92XO8hDYAu0FOwk4CkOc8"
+	invalidKey1 := ""
+	invalidKey2 := "imtooshort"
+
+	// Define all tests, in which all encryption works
+	tests := []test{
+		// Expected, regular operation with correct inputs
+		{"", validKey1, validKey1, false, false},
+		{"helloworld", validKey1, validKey1, false, false},
+		{"!@#$%^*()&+_JKLKLVJ~|}{_{LDJKFKL}}", validKey1, validKey1, false, false},
+		{"", validKey2, validKey2, false, false},
+		{"helloworld", validKey2, validKey2, false, false},
+		{"!@#$%^*()&+_JKLKLVJ~|}{_{LDJKFKL}}", validKey2, validKey2, false, false},
+		// Use different encryption and decryption keys
+		{"", validKey1, validKey2, false, true},
+		{"helloworld", validKey1, validKey2, false, true},
+		{"!@#$%^*()&+_JKLKLVJ~|}{_{LDJKFKL}}", validKey1, validKey2, false, true},
+		{"", validKey2, validKey1, false, true},
+		{"helloworld", validKey2, validKey1, false, true},
+		{"!@#$%^*()&+_JKLKLVJ~|}{_{LDJKFKL}}", validKey2, validKey1, false, true},
+		// Use invalid decryption keys
+		{"", validKey1, invalidKey1, true, true},
+		{"helloworld", validKey1, invalidKey1, true, true},
+		{"!@#$%^*()&+_JKLKLVJ~|}{_{LDJKFKL}}", validKey1, invalidKey1, true, true},
+		{"", validKey2, invalidKey2, true, true},
+		{"helloworld", validKey2, invalidKey2, true, true},
+		{"!@#$%^*()&+_JKLKLVJ~|}{_{LDJKFKL}}", validKey2, invalidKey2, true, true},
+	}
+
+	for i, test := range tests {
+		// Setup for decryption
+		encryptedStr, err := EncryptString(test.plaintext, test.encryptKey)
+		if err != nil {
+			t.Errorf("unexpected err -- fix this test")
+		}
+
+		decryptedStr, err := DecryptString(encryptedStr, test.decryptKey)
+		if test.expectError {
+			if err == nil {
+				t.Errorf("test #%d - expected error but didn't get one", i)
+				continue
+			}
+		} else {
+			if err != nil {
+				t.Errorf("test #%d - didn't expect error but got one", i)
+				continue
+			}
+		}
+
+		if test.isDiffKeys {
+			if len(test.plaintext) > 0 && decryptedStr == test.plaintext {
+				t.Errorf("test #%d - expected decryptedStr to be different than input plaintext since using different decryption key, but got correct output", i)
+			}
+		} else {
+			if decryptedStr != test.plaintext {
+				t.Errorf("test #%d - expected decryptedStr to be the same as input plaintext since using same key for encrypt and decrypt, but got different outputs", i)
+			}
+		}
+	}
 }
 
 func TestCreateSQLNullString(t *testing.T) {
+	type test struct {
+		input          string
+		expectedOutput sql.NullString
+	}
 
+	tests := []test{
+		{"", sql.NullString{String: "", Valid: false}},
+		{"helloworld", sql.NullString{String: "helloworld", Valid: true}},
+		{"!@#$%^*()&+_JKLKLVJ~|}{_{LDJKFKL}}", sql.NullString{String: "!@#$%^*()&+_JKLKLVJ~|}{_{LDJKFKL}}", Valid: true}},
+	}
+
+	for i, test := range tests {
+		if CreateSQLNullString(test.input) != test.expectedOutput {
+			t.Errorf("test #%d - incorrect null string output", i)
+		}
+	}
 }
