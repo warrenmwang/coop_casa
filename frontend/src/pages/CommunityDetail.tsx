@@ -1,6 +1,4 @@
 import React from "react";
-import TopNavbar from "../components/TopNavbar";
-import Footer from "../components/Footer";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { apiGetCommunity } from "../api/api";
@@ -68,7 +66,6 @@ const CommunityDetail: React.FC = () => {
 
   return (
     <>
-      <TopNavbar />
       {communityQuery.status === "pending" && (
         <div className="flex justify-center">
           {" "}
@@ -85,7 +82,6 @@ const CommunityDetail: React.FC = () => {
           Sorry, we are unable to find that particular property.
         </h1>
       )}
-      <Footer />
     </>
   );
 };

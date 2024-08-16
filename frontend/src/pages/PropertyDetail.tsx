@@ -7,20 +7,17 @@ import CustomImageGallery, {
 import { apiGetListerInfo, apiGetProperty } from "../api/api";
 import { propertiesPageLink } from "../urls";
 import { Property } from "../types/Types";
-import TopNavbar from "../components/TopNavbar";
-import Footer from "../components/Footer";
 import { useQuery } from "@tanstack/react-query";
 import CardSkeleton from "../skeleton/CardSkeleton";
 import { ListerBasicInfo } from "../types/Types";
 import ShareLinkButton from "../components/ShareLinkButton";
-import { toast } from "react-toastify";
 
 type ListerInfoProps = {
   listerID: string;
 };
 
 const ListerInfo: React.FC<ListerInfoProps> = ({ listerID }) => {
-  const { data, status, error } = useQuery({
+  const { data, status } = useQuery({
     queryKey: ["lister", listerID],
     queryFn: () => apiGetListerInfo(listerID),
   });
@@ -44,6 +41,12 @@ const ListerInfo: React.FC<ListerInfoProps> = ({ listerID }) => {
             <div className="text-lg">{lister.email}</div>
           </div>
         </>
+      )}
+      {status === "error" && (
+        <h1 className="text-xl text-red-600 font-bold flex justify-center">
+          Sorry, we are unable to find the lister of this property at the
+          moment.
+        </h1>
       )}
     </>
   );
@@ -173,7 +176,6 @@ const PropertyDetail: React.FC = () => {
 
   return (
     <>
-      <TopNavbar />
       {propertyQuery.status === "pending" && (
         <div className="flex justify-center">
           {" "}
@@ -190,7 +192,6 @@ const PropertyDetail: React.FC = () => {
           Sorry, we are unable to find that particular property.
         </h1>
       )}
-      <Footer />
     </>
   );
 };

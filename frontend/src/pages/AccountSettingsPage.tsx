@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from "react";
-import TopNavbar from "../components/TopNavbar";
-import Footer from "../components/Footer";
 import Title from "../components/Title";
 import Modal from "../components/Modal";
 import AccountSettingsForm from "../form/AccountSettingsForm";
@@ -8,10 +6,10 @@ import { apiAccountDelete, apiGetUserAuth, apiGetUserRole } from "../api/api";
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { homePageLink } from "../urls";
-
 import TextSkeleton from "../skeleton/TextSkeleton";
 import axios, { AxiosError } from "axios";
 import { toast } from "react-toastify";
+import "../styles/contentBody.css";
 
 // Authenticated Endpoint
 const AccountSettingsPage: React.FC = () => {
@@ -69,9 +67,7 @@ const AccountSettingsPage: React.FC = () => {
   }, [authQuery]);
 
   return (
-    <div>
-      <TopNavbar></TopNavbar>
-
+    <div className="content-body">
       {ready ? (
         <>
           <Title
@@ -132,8 +128,6 @@ const AccountSettingsPage: React.FC = () => {
       ) : (
         <TextSkeleton />
       )}
-
-      <Footer></Footer>
     </div>
   );
 };

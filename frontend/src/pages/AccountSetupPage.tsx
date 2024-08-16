@@ -4,8 +4,6 @@ import { useNavigate } from "react-router-dom";
 
 // Components
 import Title from "../components/Title";
-import TopNavbar from "../components/TopNavbar";
-import Footer from "../components/Footer";
 import { APIUserReceived, User, UserDetails } from "../types/Types";
 import { apiGetUser, apiUpdateUserAccountDetails } from "../api/api";
 import LocationInput from "../input/LocationInput";
@@ -17,6 +15,7 @@ import { EmptyUser } from "../types/Objects";
 
 // Styles
 import "../styles/form.css";
+import "../styles/contentBody.css";
 import SubmitButton from "../components/SubmitButton";
 import { dashboardPageLink } from "../urls";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -116,8 +115,7 @@ const AccountSetupPage: React.FC = () => {
   const ready: boolean = userQuery.isFetched && formData.userId !== "";
 
   return (
-    <div>
-      <TopNavbar />
+    <div className="content-body">
       {ready ? (
         <>
           <Title
@@ -219,7 +217,6 @@ const AccountSetupPage: React.FC = () => {
       ) : (
         <TextSkeleton />
       )}
-      <Footer />
     </div>
   );
 };

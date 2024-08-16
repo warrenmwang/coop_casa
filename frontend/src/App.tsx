@@ -1,18 +1,18 @@
-import { Suspense } from "react";
+// import { Suspense } from "react";
 import RouteRenderer from "./components/RouteRenderer";
-import { BrowserRouter as Router } from "react-router-dom";
+import { BrowserRouter } from "react-router-dom";
 import TextSkeleton from "./skeleton/TextSkeleton";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   return (
-    <Router>
+    <BrowserRouter>
       <ToastContainer />
-      <Suspense fallback={<TextSkeleton />}>
-        <RouteRenderer />
-      </Suspense>
-    </Router>
+      {/* <Suspense fallback={<TextSkeleton />}> */}
+      <RouteRenderer />
+      {/* </Suspense> */}
+    </BrowserRouter>
   );
 }
 

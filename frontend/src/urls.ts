@@ -18,7 +18,6 @@ export const attributionsPageLink = "/attributions";
 export const contactPageLink = "/contact";
 export const communitiesPageLink = "/communities";
 export const propertiesPageLink = "/properties";
-export const mapPageLink = "/map";
 export const dashboardPageLink = "/dashboard";
 
 // BACK END

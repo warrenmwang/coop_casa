@@ -8,13 +8,9 @@ import CommunitiesMainBody from "../components/CommunitiesMainBody";
 
 const CommunitiesPage: React.FC = () => {
   return (
-    <div>
-      <TopNavbar></TopNavbar>
-      <div className="content-body">
-        <CommunitiesHomeBanner />
-        <CommunitiesMainBody />
-      </div>
-      <Footer></Footer>
+    <div className="content-body">
+      <CommunitiesHomeBanner />
+      <CommunitiesMainBody />
     </div>
   );
 };

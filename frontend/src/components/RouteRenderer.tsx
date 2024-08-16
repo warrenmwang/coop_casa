@@ -6,7 +6,6 @@ import AboutPage from "../pages/AboutPage";
 import DashboardPage from "../pages/DashboardPage";
 import ContactPage from "../pages/ContactPage";
 import CommunitiesPage from "../pages/CommunitiesPage";
-// import MapPage from "../pages/MapPage";
 import PrivacyPolicyPage from "../pages/PrivacyPolicyPage";
 import TermsOfServicePage from "../pages/TermsOfServicePage";
 
@@ -21,7 +20,6 @@ import {
   communitiesPageLink,
   contactPageLink,
   homePageLink,
-  mapPageLink,
   privacypolicyPageLink,
   propertiesPageLink,
   termsOfServicePageLink,
@@ -30,34 +28,42 @@ import {
   accountSetupPageLink,
 } from "../urls";
 import CommunityDetail from "../pages/CommunityDetail";
+import TopNavbar from "./TopNavbar";
+import Footer from "./Footer";
 
 const RouteRenderer: React.FC = () => {
   return (
-    <Routes>
-      <Route path={homePageLink} element={<HomePage />} />
-      <Route path={communitiesPageLink} element={<CommunitiesPage />} />
-      <Route path={propertiesPageLink} element={<PropertiesPage />} />
-      <Route
-        path={`${propertiesPageLink}/:propertyID`}
-        element={<PropertyDetail />}
-      />
-      <Route
-        path={`${communitiesPageLink}/:communityID`}
-        element={<CommunityDetail />}
-      />
-      {/* <Route path={mapPageLink} element={<MapPage />} /> */}
-      <Route path={aboutPageLink} element={<AboutPage />} />
-      <Route path={privacypolicyPageLink} element={<PrivacyPolicyPage />} />
-      <Route path={termsOfServicePageLink} element={<TermsOfServicePage />} />
-      <Route path={attributionsPageLink} element={<AttributionsPage />} />
-      <Route path={contactPageLink} element={<ContactPage />} />
-      {/* authed routes */}
-      <Route path={dashboardPageLink} element={<DashboardPage />} />
-      <Route path={accountSettingsPageLink} element={<AccountSettingsPage />} />
-      <Route path={accountSetupPageLink} element={<AccountSetupPage />} />
-      {/* Catch all route for non-existent routes */}
-      <Route path="*" element={<Navigate to={homePageLink} replace />} />
-    </Routes>
+    <>
+      <TopNavbar />
+      <Routes>
+        <Route path={homePageLink} element={<HomePage />} />
+        <Route path={communitiesPageLink} element={<CommunitiesPage />} />
+        <Route path={propertiesPageLink} element={<PropertiesPage />} />
+        <Route
+          path={`${propertiesPageLink}/:propertyID`}
+          element={<PropertyDetail />}
+        />
+        <Route
+          path={`${communitiesPageLink}/:communityID`}
+          element={<CommunityDetail />}
+        />
+        <Route path={aboutPageLink} element={<AboutPage />} />
+        <Route path={privacypolicyPageLink} element={<PrivacyPolicyPage />} />
+        <Route path={termsOfServicePageLink} element={<TermsOfServicePage />} />
+        <Route path={attributionsPageLink} element={<AttributionsPage />} />
+        <Route path={contactPageLink} element={<ContactPage />} />
+        {/* Authed routes */}
+        <Route path={dashboardPageLink} element={<DashboardPage />} />
+        <Route
+          path={accountSettingsPageLink}
+          element={<AccountSettingsPage />}
+        />
+        <Route path={accountSetupPageLink} element={<AccountSetupPage />} />
+        {/* Catch all route for non-existent routes */}
+        <Route path="*" element={<Navigate to={homePageLink} replace />} />
+      </Routes>
+      <Footer />
+    </>
   );
 };
 

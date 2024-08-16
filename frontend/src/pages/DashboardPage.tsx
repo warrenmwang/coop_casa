@@ -1,7 +1,5 @@
 import React, { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import TopNavbar from "../components/TopNavbar";
-import Footer from "../components/Footer";
 import Title from "../components/Title";
 
 import TextSkeleton from "../skeleton/TextSkeleton";
@@ -14,6 +12,8 @@ import { useQuery } from "@tanstack/react-query";
 import { apiGetUser, apiGetUserAuth, apiGetUserRole } from "../api/api";
 import ListerDashboard from "../components/ListerDashboard";
 import { EmptyUser } from "../types/Objects";
+
+import "../styles/contentBody.css";
 
 // Authenticated Endpoint
 const DashboardPage: React.FC = () => {
@@ -65,8 +65,7 @@ const DashboardPage: React.FC = () => {
   }, [authQuery]);
 
   return (
-    <>
-      <TopNavbar></TopNavbar>
+    <div className="content-body">
       {ready ? (
         <>
           <Title
@@ -93,8 +92,7 @@ const DashboardPage: React.FC = () => {
       ) : (
         <TextSkeleton />
       )}
-      <Footer></Footer>
-    </>
+    </div>
   );
 };
 
