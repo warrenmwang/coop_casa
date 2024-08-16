@@ -11,6 +11,7 @@ import { useQuery } from "@tanstack/react-query";
 import CardSkeleton from "../skeleton/CardSkeleton";
 import { ListerBasicInfo } from "../types/Types";
 import ShareLinkButton from "../components/ShareLinkButton";
+import FetchErrorText from "../components/FetchErrorText";
 
 type ListerInfoProps = {
   listerID: string;
@@ -43,10 +44,10 @@ const ListerInfo: React.FC<ListerInfoProps> = ({ listerID }) => {
         </>
       )}
       {status === "error" && (
-        <h1 className="text-xl text-red-600 font-bold flex justify-center">
+        <FetchErrorText>
           Sorry, we are unable to find the lister of this property at the
           moment.
-        </h1>
+        </FetchErrorText>
       )}
     </>
   );
@@ -188,9 +189,9 @@ const PropertyDetail: React.FC = () => {
         ></PropertyDetailContent>
       )}
       {propertyQuery.status === "error" && (
-        <h1 className="text-xl text-red-600 font-bold flex justify-center">
+        <FetchErrorText>
           Sorry, we are unable to find that particular property.
-        </h1>
+        </FetchErrorText>
       )}
     </>
   );

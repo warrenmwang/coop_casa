@@ -380,7 +380,12 @@ func (s *Server) apiGetAccountDetailsHandler(w http.ResponseWriter, r *http.Requ
 		BirthDate: user.BirthDate.String,
 		Gender:    user.Gender.String,
 		Location:  user.Location.String,
-		Interests: user.Interests.String,
+		Interests: user.Interests,
+	}
+
+	// Make interests an empty list if nil
+	if userDetails.Interests == nil {
+		userDetails.Interests = []string{}
 	}
 
 	// Return as JSON data, need to convert userAvatar to base64 str
@@ -624,7 +629,7 @@ func (s *Server) apiAdminGetUsers(w http.ResponseWriter, r *http.Request) {
 			BirthDate: user.BirthDate.String,
 			Gender:    user.Gender.String,
 			Location:  user.Location.String,
-			Interests: user.Interests.String,
+			Interests: user.Interests,
 		})
 	}
 

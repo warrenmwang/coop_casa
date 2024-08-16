@@ -8,7 +8,7 @@ CREATE TABLE users(
     birth_date text,
     gender text,
     "location" text,
-    interests text,
+    interests text[],
     created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

@@ -10,6 +10,7 @@ import ShareLinkButton from "../components/ShareLinkButton";
 import CustomImageGallery, {
   ImageGalleryItemsInput,
 } from "../components/CustomImageGallery";
+import FetchErrorText from "../components/FetchErrorText";
 
 const CommunityDetailContent: React.FC<{ community: Community }> = ({
   community,
@@ -78,9 +79,9 @@ const CommunityDetail: React.FC = () => {
         ></CommunityDetailContent>
       )}
       {communityQuery.status === "error" && (
-        <h1 className="text-xl text-red-600 font-bold flex justify-center">
+        <FetchErrorText>
           Sorry, we are unable to find that particular property.
-        </h1>
+        </FetchErrorText>
       )}
     </>
   );

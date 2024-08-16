@@ -2,15 +2,15 @@ import React from "react";
 import { User } from "../types/Types";
 import "../styles/input.css";
 
-interface InputInterestsArgs {
+interface InterestsInputProps {
   formData: User;
   setFormData: React.Dispatch<React.SetStateAction<User>>;
   setError?: (key: string, value: boolean) => void;
   setIsChanged?: (value: React.SetStateAction<boolean>) => void;
-  required?: boolean; // NOTE: this only toggles the appearance of a red * and doesn't actually make the html field require anything...im sorry.
+  required?: boolean; // NOTE: this only toggles the appearance of a red asterisk. Actual validation of input existence is done in outer component.
 }
 
-const InterestsInput: React.FC<InputInterestsArgs> = ({
+const InterestsInput: React.FC<InterestsInputProps> = ({
   formData,
   setFormData,
   setError,
@@ -41,20 +41,16 @@ const InterestsInput: React.FC<InputInterestsArgs> = ({
     const { value, checked } = e.target;
 
     // Start with current interests
-    let updatedInterests: string = formData.interests;
+    let updatedInterests: string[] = formData.interests;
 
     if (checked) {
-      // Append the new value to the current interests in format:
-      // interest1, interest2, interest3
-      // so only commas inbetween values with no trailing comma
-      updatedInterests =
-        updatedInterests.length === 0 ? value : `${updatedInterests},${value}`;
+      // Append the new value to the current interests
+      updatedInterests.push(value);
     } else {
       // Remove the unchecked interest from the interests string
-      const interestsArray = updatedInterests
-        .split(",")
-        .filter((interest) => interest !== value);
-      updatedInterests = interestsArray.join(",");
+      updatedInterests = updatedInterests.filter(
+        (interest) => interest !== value,
+      );
     }
 
     setFormData((prevState) => ({
@@ -63,7 +59,7 @@ const InterestsInput: React.FC<InputInterestsArgs> = ({
     }));
 
     if (setError) {
-      setError("interests", updatedInterests.length === 0);
+      setError("interests", updatedInterests.length === 0); // enforce at least 1 interest
     }
     if (setIsChanged) {
       setIsChanged(true);

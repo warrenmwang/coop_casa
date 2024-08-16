@@ -12,6 +12,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import TextSkeleton from "../skeleton/TextSkeleton";
 import { toast } from "react-toastify";
 import { EmptyUser } from "../types/Objects";
+import FetchErrorText from "../components/FetchErrorText";
 
 const AccountSettingsForm: React.FC = () => {
   const [user, setUser] = useState<User>(EmptyUser);
@@ -81,111 +82,118 @@ const AccountSettingsForm: React.FC = () => {
     }
   }, [userQuery.status]);
 
-  const ready: boolean = user.userId !== "" && formData.userId !== "";
+  const ready: boolean = userQuery.isFetched;
 
-  return ready ? (
+  return (
     <>
-      <div className="default-form-1">
-        {/* First Name */}
-        <TextInput
-          setFormData={textInputSetFormData}
-          setIsChanged={setIsChanged}
-          type="text"
-          label="First Name"
-          id="firstName"
-          value={formData.firstName}
-          classNameCustom="w-full"
-          required={true}
-        />
+      {ready && userQuery.isError && (
+        <FetchErrorText>
+          Sorry, we couldn't fetch your data at this moment. Please try again
+          later.
+        </FetchErrorText>
+      )}
+      {ready && userQuery.isSuccess && (
+        <div className="default-form-1">
+          {/* First Name */}
+          <TextInput
+            setFormData={textInputSetFormData}
+            setIsChanged={setIsChanged}
+            type="text"
+            label="First Name"
+            id="firstName"
+            value={formData.firstName}
+            classNameCustom="w-full"
+            required={true}
+          />
 
-        {/* Last Name */}
-        <TextInput
-          setFormData={textInputSetFormData}
-          setIsChanged={setIsChanged}
-          type="text"
-          label="Last Name"
-          id="lastName"
-          value={formData.lastName}
-          classNameCustom="w-full"
-          required={true}
-        />
+          {/* Last Name */}
+          <TextInput
+            setFormData={textInputSetFormData}
+            setIsChanged={setIsChanged}
+            type="text"
+            label="Last Name"
+            id="lastName"
+            value={formData.lastName}
+            classNameCustom="w-full"
+            required={true}
+          />
 
-        {/* Birthdate  */}
-        <TextInput
-          setFormData={textInputSetFormData}
-          setIsChanged={setIsChanged}
-          type="date"
-          label="Birthdate"
-          id="birthDate"
-          value={formData.birthDate}
-          classNameCustom="w-full"
-          required={true}
-        />
+          {/* Birthdate  */}
+          <TextInput
+            setFormData={textInputSetFormData}
+            setIsChanged={setIsChanged}
+            type="date"
+            label="Birthdate"
+            id="birthDate"
+            value={formData.birthDate}
+            classNameCustom="w-full"
+            required={true}
+          />
 
-        {/* Gender */}
-        <GenderInput
-          formData={formData}
-          setFormData={setFormData}
-          setIsChanged={setIsChanged}
-          classNameCustom="w-full"
-          required={true}
-        />
+          {/* Gender */}
+          <GenderInput
+            formData={formData}
+            setFormData={setFormData}
+            setIsChanged={setIsChanged}
+            classNameCustom="w-full"
+            required={true}
+          />
 
-        {/* Location */}
-        <LocationInput
-          formData={formData}
-          setFormData={setFormData}
-          setIsChanged={setIsChanged}
-          required={true}
-        />
+          {/* Location */}
+          <LocationInput
+            formData={formData}
+            setFormData={setFormData}
+            setIsChanged={setIsChanged}
+            required={true}
+          />
 
-        {/* Interests */}
-        <InterestsInput
-          formData={formData}
-          setFormData={setFormData}
-          setIsChanged={setIsChanged}
-          required={true}
-        />
+          {/* Interests */}
+          <InterestsInput
+            formData={formData}
+            setFormData={setFormData}
+            setIsChanged={setIsChanged}
+            required={true}
+          />
 
-        {/* Avatar */}
-        <ImageInput
-          setFormData={setFormData}
-          setIsChanged={setIsChanged}
-          label="Avatar Image"
-          id="avatar"
-          value={formData.avatar}
-        />
-        {/* Clear Image Button */}
-        {formData.avatar && (
-          <button
-            onClick={handleClearAvatarImage}
-            className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-          >
-            Clear Image
-          </button>
-        )}
-
-        {/* Save / discard buttons */}
-        {isChanged && (
-          <div className="flex justify-end space-x-4">
+          {/* Avatar */}
+          <ImageInput
+            setFormData={setFormData}
+            setIsChanged={setIsChanged}
+            label="Avatar Image"
+            id="avatar"
+            value={formData.avatar}
+          />
+          {/* Clear Image Button */}
+          {formData.avatar && (
             <button
-              onClick={handleSaveChanges}
-              className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-            >
-              Save Changes
-            </button>
-            <button
-              onClick={handleDiscardChanges}
+              onClick={handleClearAvatarImage}
               className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
             >
-              Discard Changes
+              Clear Image
             </button>
-          </div>
-        )}
-      </div>
+          )}
+
+          {/* Save / discard buttons */}
+          {isChanged && (
+            <div className="flex justify-end space-x-4">
+              <button
+                onClick={handleSaveChanges}
+                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+              >
+                Save Changes
+              </button>
+              <button
+                onClick={handleDiscardChanges}
+                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+              >
+                Discard Changes
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+      {!ready && <TextSkeleton />}
     </>
-  ) : (
-    <TextSkeleton />
   );
 };
 

@@ -8,6 +8,8 @@ package sqlc
 import (
 	"context"
 	"database/sql"
+
+	"github.com/lib/pq"
 )
 
 const adminGetUsers = `-- name: AdminGetUsers :many
@@ -43,7 +45,7 @@ func (q *Queries) AdminGetUsers(ctx context.Context, arg AdminGetUsersParams) ([
 			&i.BirthDate,
 			&i.Gender,
 			&i.Location,
-			&i.Interests,
+			pq.Array(&i.Interests),
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -150,7 +152,7 @@ func (q *Queries) GetUserDetails(ctx context.Context, userID string) (User, erro
 		&i.BirthDate,
 		&i.Gender,
 		&i.Location,
-		&i.Interests,
+		pq.Array(&i.Interests),
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -211,7 +213,7 @@ type UpdateUserDetailsParams struct {
 	BirthDate sql.NullString
 	Gender    sql.NullString
 	Location  sql.NullString
-	Interests sql.NullString
+	Interests []string
 }
 
 func (q *Queries) UpdateUserDetails(ctx context.Context, arg UpdateUserDetailsParams) error {
@@ -222,7 +224,7 @@ func (q *Queries) UpdateUserDetails(ctx context.Context, arg UpdateUserDetailsPa
 		arg.BirthDate,
 		arg.Gender,
 		arg.Location,
-		arg.Interests,
+		pq.Array(arg.Interests),
 	)
 	return err
 }

@@ -1,14 +1,6 @@
 export type NullUser = User | null;
 
-export type User = {
-  userId: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  birthDate: string;
-  gender: string;
-  location: string;
-  interests: string;
+export type User = UserDetails & {
   avatar: File | null;
 };
 
@@ -32,7 +24,7 @@ export type UserDetails = {
   birthDate: string;
   gender: string;
   location: string;
-  interests: string;
+  interests: string[];
 };
 
 export type ListerBasicInfo = {

@@ -10,6 +10,7 @@ import SubmitButton from "./SubmitButton";
 import Title from "./Title";
 import "../styles/contentBody.css";
 import "../styles/form.css";
+import FetchErrorText from "./FetchErrorText";
 
 export const filterAddressQPKey = "filterAddress";
 export const pageQPKey = "page";
@@ -169,10 +170,10 @@ const DisplayProperties: React.FC = () => {
 
       {/* If no properties exist on platform, display a message. */}
       {noPropertiesOnPlatform && (
-        <h1 className="text-center text-red-600 text-xl font-bold">
+        <FetchErrorText>
           Sorry, there are no communities on Coop right now! Create your own or
           come back later.
-        </h1>
+        </FetchErrorText>
       )}
 
       {/* Flex box for the pagination navigation buttons. */}

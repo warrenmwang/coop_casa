@@ -91,16 +91,9 @@ type User struct {
 	BirthDate sql.NullString
 	Gender    sql.NullString
 	Location  sql.NullString
-	Interests sql.NullString
+	Interests []string
 	CreatedAt time.Time
 	UpdatedAt time.Time
-}
-
-type UserSavedProperty struct {
-	ID         int32
-	UserID     string
-	PropertyID string
-	CreatedAt  time.Time
 }
 
 type UsersAvatar struct {

@@ -80,7 +80,5 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
   );
 };
 
-// only use memo if certain PropertyCard is pure!
-// (only re-render this comp if the props change.)
+// Export memoized version, since PropertyCard is pure.
 export default React.memo(PropertyCard);
-// export default PropertyCard;

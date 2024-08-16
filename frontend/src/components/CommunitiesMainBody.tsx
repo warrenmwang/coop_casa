@@ -15,6 +15,7 @@ import {
   filterDescriptionQPKey,
   MAX_NUMBER_COMMUNITIES_PER_PAGE,
 } from "../constants";
+import FetchErrorText from "./FetchErrorText";
 
 const CommunitiesMainBody: React.FC = () => {
   const [searchIsSubmitting, setSearchIsSubmitting] = useState<boolean>(false);
@@ -197,10 +198,10 @@ const CommunitiesMainBody: React.FC = () => {
 
       {/* If no communities exist on platform, display a message. */}
       {noCommunitiesOnPlatform && (
-        <h1 className="text-center text-red-600 text-xl font-bold">
+        <FetchErrorText>
           Sorry, there are no communities on Coop right now! Create your own or
           come back later.
-        </h1>
+        </FetchErrorText>
       )}
 
       {/* Flex box for the pagination navigation buttons. */}

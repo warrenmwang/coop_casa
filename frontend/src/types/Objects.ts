@@ -8,6 +8,6 @@ export const EmptyUser: User = {
   birthDate: "",
   gender: "",
   location: "",
-  interests: "",
+  interests: [],
   avatar: null,
 };

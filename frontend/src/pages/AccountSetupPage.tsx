@@ -95,7 +95,7 @@ const AccountSetupPage: React.FC = () => {
 
   // Set interests error to true at first render
   useEffect(() => {
-    if (formData.interests === "") {
+    if (formData.interests.length === 0) {
       setError("interests", true);
     }
   }, []);
