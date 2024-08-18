@@ -214,19 +214,47 @@ func (s *Server) healthHandler(w http.ResponseWriter, r *http.Request) {
 
 // ----------------------- AUTH -----------------------------------
 
+// Endpoint: GET /auth/{provider}
+func (s *Server) authLoginHandler(w http.ResponseWriter, r *http.Request) {
+	// insert the provider context
+	provider := chi.URLParam(r, "provider")
+	r = r.WithContext(context.WithValue(context.Background(), "provider", provider))
+
+	if _, err := gothic.CompleteUserAuth(w, r); err == nil {
+		// User is already authenticated
+		// We don't actually expect the code to ever reach this point because our app
+		// will hit the /auth/check endpoint instead of this auth/{provider}
+		// endpoint to check if the user is still logged in or not based off of the JWT
+		// expiration, therefore, if we ever reach this state something has gone wrong and we
+		// should return error.
+		respondWithError(w, http.StatusInternalServerError, errors.New("something went wrong"))
+	} else {
+		// User is not authed, initialize the auth process
+		gothic.BeginAuthHandler(w, r)
+	}
+}
+
 // Endpoint: GET /auth/{provider}/callback
 func (s *Server) authCallbackHandler(w http.ResponseWriter, r *http.Request) {
 	// Callback function called by the OAuth provider after the user initializes oauth process.
 	// Finish auth, create JWT, and save it into a cookie.
 
-	// Insert the provider context
 	provider := chi.URLParam(r, "provider")
+
+	// Ensure provider is google, which is the only one accepted at current moment
+	if provider != "google" {
+		respondWithError(w, http.StatusBadRequest, errors.New("invalid oauth provider callback"))
+		return
+	}
+
+	// Insert the provider context from url param
 	r = r.WithContext(context.WithValue(context.Background(), "provider", provider))
 
 	// Complete OAuth
 	gothUser, err := gothic.CompleteUserAuth(w, r)
 	if err != nil {
-		fmt.Fprintln(w, r)
+		// oauth was likely cancelled by user, redirect to home page
+		http.Redirect(w, r, s.FrontendOrigin, http.StatusFound)
 		return
 	}
 
@@ -284,30 +312,16 @@ func (s *Server) authCallbackHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, fmt.Sprintf("%s/dashboard", s.FrontendOrigin), http.StatusFound)
 }
 
-// ----------------- AUTH -------------
-
-// Endpoint: GET /auth/{provider}
-func (s *Server) authLoginHandler(w http.ResponseWriter, r *http.Request) {
-	// insert the provider context
-	provider := chi.URLParam(r, "provider")
-	r = r.WithContext(context.WithValue(context.Background(), "provider", provider))
-
-	if _, err := gothic.CompleteUserAuth(w, r); err == nil {
-		// User is already authenticated
-		// We don't actually expect the code to ever reach this point because our app
-		// will hit the /auth/check endpoint instead of this auth/{provider}
-		// endpoint to check if the user is still logged in or not based off of the JWT
-		// expiration, therefore, if we ever reach this state something has gone wrong and we
-		// should return error explaining that we need to check logic flow again.
-		respondWithError(w, 500, errors.New("something went wrong with logic flow in code, should not have reached this point in /auth/{provider}"))
-	} else {
-		// User is not authed, initialize the auth process
-		gothic.BeginAuthHandler(w, r)
-	}
-}
-
-// Endpoint: GET /auth/check
+// Endpoint: GET /auth/{provider}/check
 func (s *Server) authCheckHandler(w http.ResponseWriter, r *http.Request) {
+
+	// Validate auth provider first
+	provider := chi.URLParam(r, "provider")
+	if provider != "google" {
+		respondWithError(w, http.StatusBadRequest, errors.New("invalid auth provider"))
+		return
+	}
+
 	// return a json with the account status being authed or not as a bool
 	// true for yes authed, false for no
 	type returnVal struct {
@@ -327,16 +341,23 @@ func (s *Server) authCheckHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Endpoint: POST /auth/logout
+// Endpoint: POST /auth/{provider}/logout
 func (s *Server) authLogoutHandler(w http.ResponseWriter, r *http.Request) {
 	// Logout function that completes the oauth logout and invalidate the user's auth token
+
+	provider := chi.URLParam(r, "provider")
+
+	// Ensure using the right provider
+	if provider != "google" {
+		respondWithError(w, http.StatusBadRequest, errors.New("invalid auth provider"))
+		return
+	}
 
 	// Invalidate their JWT.
 	s.InvalidateToken(w)
 
 	// Complete logout for oauth
 	// Insert the provider context
-	provider := chi.URLParam(r, "provider")
 	r = r.WithContext(context.WithValue(context.Background(), "provider", provider))
 
 	// Logout oauth
@@ -1719,10 +1740,10 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.Get("/health", s.healthHandler)
 
 	// Auth
-	r.Get("/auth/{provider}/callback", s.authCallbackHandler)
 	r.Get("/auth/{provider}", s.authLoginHandler)
-	r.Get("/auth/check", s.authCheckHandler)
-	r.Post("/auth/logout", s.authLogoutHandler) // TODO: wait a minute, where is the {provider} urlparam ?? why does it work without it?
+	r.Get("/auth/{provider}/callback", s.authCallbackHandler)
+	r.Get("/auth/{provider}/check", s.authCheckHandler)
+	r.Post("/auth/{provider}/logout", s.authLogoutHandler)
 
 	// Account
 	r.Get("/api/account", s.apiGetAccountDetailsHandler)

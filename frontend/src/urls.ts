@@ -22,8 +22,8 @@ export const dashboardPageLink = "/dashboard";
 
 // BACK END
 export const apiAuthGoogleOAuthLink = `${API_HOST}:${API_PORT}/auth/google`;
-export const apiAuthLogoutLink = `${API_HOST}:${API_PORT}/auth/logout`;
-export const apiAuthCheckLink = `${API_HOST}:${API_PORT}/auth/check`;
+export const apiAuthLogoutLink = `${API_HOST}:${API_PORT}/auth/google/logout`;
+export const apiAuthCheckLink = `${API_HOST}:${API_PORT}/auth/google/check`;
 
 export const apiAccountLink = `${API_HOST}:${API_PORT}/api/account`;
 export const apiAccountUpdateLink = `${API_HOST}:${API_PORT}/api/account`;
