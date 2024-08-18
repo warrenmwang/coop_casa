@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { apiGetProperties } from "../api/api";
+import { apiGetProperties } from "../api/property";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { MAX_NUMBER_PROPERTIES_PER_PAGE } from "../constants";
 import CardGridSkeleton from "../skeleton/CardGridSkeleton";
@@ -11,9 +11,7 @@ import Title from "./Title";
 import "../styles/contentBody.css";
 import "../styles/form.css";
 import FetchErrorText from "./FetchErrorText";
-
-export const filterAddressQPKey = "filterAddress";
-export const pageQPKey = "page";
+import { pageQPKey, filterAddressQPKey } from "../constants";
 
 const DisplayProperties: React.FC = () => {
   const [searchIsSubmitting, setSearchIsSubmitting] = useState(false);

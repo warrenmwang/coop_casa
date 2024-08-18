@@ -1,10 +1,10 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Box } from "@mui/material";
 import CustomImageGallery, {
   ImageGalleryItemsInput,
 } from "../components/CustomImageGallery";
-import { apiGetListerInfo, apiGetProperty } from "../api/api";
+import { apiGetListerInfo, apiGetProperty } from "../api/property";
 import { propertiesPageLink } from "../urls";
 import { Property } from "../types/Types";
 import { useQuery } from "@tanstack/react-query";

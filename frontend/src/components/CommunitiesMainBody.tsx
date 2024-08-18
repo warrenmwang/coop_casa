@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { apiGetCommunities } from "../api/api";
+import { apiGetCommunities } from "../api/community";
 import CardGridSkeleton from "../skeleton/CardGridSkeleton";
 import PageOfCommunities from "./PageOfCommunities";
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { apiCreateCommunity, apiGetUser } from "../api/api";
+import { apiCreateCommunity } from "../api/community";
+import { apiGetUser } from "../api/account";
 
 import TextInput from "../input/TextInput";
 import SubmitButton from "../components/SubmitButton";

@@ -5,35 +5,18 @@ import {
   apiDeleteCommunity,
   apiGetCommunity,
   apiUpdateCommunity,
-} from "../api/api";
+} from "../api/community";
 import { OrderedFile, Community, CommunityDetails } from "../types/Types";
 import TextInput from "../input/TextInput";
 import MultipleImageUploader from "../input/MultipleImageUploader";
 import { MAX_COMMUNITY_IMGS_ALLOWED } from "../constants";
 import { useMutation } from "@tanstack/react-query";
-import { validateNumber } from "../utils/inputValidation";
 import "../styles/input.css";
 import { toast } from "react-toastify";
 import {
   fileArray2OrderedFileArray,
   orderedFileArray2FileArray,
 } from "../utils/utils";
-
-// const communityRequiredFields: string[] = [
-//   "name",
-//   "address1",
-//   "city",
-//   "state",
-//   "zipcode",
-//   "country",
-//   "squareFeet",
-//   "numBedrooms",
-//   "numToilets",
-//   "numShowersBaths",
-//   "costDollars",
-//   "costCents",
-//   "images",
-// ];
 
 const UpdateCommunityForm: React.FC<{
   community: Community;

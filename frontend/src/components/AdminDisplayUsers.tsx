@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { toast } from "react-toastify";
-import { UserDetails } from "../types/Types";
 import { apiAdminGetUsersDetails, apiAdminGetUsersRoles } from "../api/admin";
 import { useQuery } from "@tanstack/react-query";
 import TextSkeleton from "../skeleton/TextSkeleton";

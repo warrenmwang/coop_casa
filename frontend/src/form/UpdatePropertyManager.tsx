@@ -5,7 +5,7 @@ import {
   apiDeleteProperty,
   apiGetProperty,
   apiUpdateProperty,
-} from "../api/api";
+} from "../api/property";
 import { OrderedFile, Property, PropertyDetails } from "../types/Types";
 import TextInput from "../input/TextInput";
 import MultipleImageUploader from "../input/MultipleImageUploader";

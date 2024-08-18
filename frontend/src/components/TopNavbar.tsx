@@ -10,7 +10,7 @@ import {
   homePageLink,
 } from "../urls";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { apiGetUser, apiGetUserAuth, apiLogoutUser } from "../api/api";
+import { apiGetUser, apiGetUserAuth, apiLogoutUser } from "../api/account";
 import { APIUserReceived } from "../types/Types";
 import { apiFile2ClientFile } from "../utils/utils";
 import { toast } from "react-toastify";

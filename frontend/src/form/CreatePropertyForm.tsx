@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { apiCreateNewProperty, apiGetUser } from "../api/api";
+import { apiCreateNewProperty } from "../api/property";
+import { apiGetUser } from "../api/account";
 import { validateNumber } from "../utils/inputValidation";
 
 import TextInput from "../input/TextInput";

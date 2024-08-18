@@ -1,7 +1,7 @@
 import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { apiGetCommunity } from "../api/api";
+import { apiGetCommunity } from "../api/community";
 import CardSkeleton from "../skeleton/CardSkeleton";
 import { Community } from "../types/Types";
 import { Box } from "@mui/material";

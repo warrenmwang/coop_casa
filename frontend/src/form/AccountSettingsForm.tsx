@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { apiUpdateUserAccountDetails, apiGetUser } from "../api/api";
+import { apiUpdateUserAccountDetails, apiGetUser } from "../api/account";
 import InterestsInput from "../input/InterestsInput";
 import LocationInput from "../input/LocationInput";
 import GenderInput from "../input/GenderInput";

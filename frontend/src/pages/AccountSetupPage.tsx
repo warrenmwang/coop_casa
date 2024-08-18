@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 // Components
 import Title from "../components/Title";
 import { APIUserReceived, User, UserDetails } from "../types/Types";
-import { apiGetUser, apiUpdateUserAccountDetails } from "../api/api";
+import { apiGetUser, apiUpdateUserAccountDetails } from "../api/account";
 import LocationInput from "../input/LocationInput";
 import InterestsInput from "../input/InterestsInput";
 import GenderInput from "../input/GenderInput";

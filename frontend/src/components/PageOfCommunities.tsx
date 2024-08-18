@@ -1,6 +1,6 @@
 import React from "react";
 import { useQueries } from "@tanstack/react-query";
-import { apiGetCommunity } from "../api/api";
+import { apiGetCommunity } from "../api/community";
 import { Community } from "../types/Types";
 import CommunityCard from "./CommunityCard";
 

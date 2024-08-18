@@ -3,7 +3,7 @@ import { apiAdminUsersRolesLink } from "../urls";
 import SubmitButton from "../components/SubmitButton";
 import "../styles/input.css";
 import { useQuery } from "@tanstack/react-query";
-import { apiGetUser } from "../api/api";
+import { apiGetUser } from "../api/account";
 import { APIUserReceived, User, UserDetails } from "../types/Types";
 import { EmptyUser } from "../types/Objects";
 import { toast } from "react-toastify";

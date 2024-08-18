@@ -1,6 +1,6 @@
 import React from "react";
 import { useQueries } from "@tanstack/react-query";
-import { apiGetProperty } from "../api/api";
+import { apiGetProperty } from "../api/property";
 import PropertyCard from "./PropertyCard";
 
 import { Property } from "../types/Types";

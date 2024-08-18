@@ -9,7 +9,7 @@ import { accountSetupPageLink, homePageLink } from "../urls";
 import { APIUserReceived, UserDetails } from "../types/Types";
 
 import { useQuery } from "@tanstack/react-query";
-import { apiGetUser, apiGetUserAuth, apiGetUserRole } from "../api/api";
+import { apiGetUser, apiGetUserAuth, apiGetUserRole } from "../api/account";
 import ListerDashboard from "../components/ListerDashboard";
 import { EmptyUser } from "../types/Objects";
 
