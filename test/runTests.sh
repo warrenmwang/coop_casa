@@ -96,7 +96,9 @@ run_backend_tests() {
     echo "Run Backend Tests"
 
     cd ../backend
-    go test ./...
+    # note usage of -count=1 flag is only to prevent go from caching test results.
+    # this is useful if we want to test the same code for different db data (WIP)
+    go test ./... -count=1 
 }
 
 run_frontend_tests() {
