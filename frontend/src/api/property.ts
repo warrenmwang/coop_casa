@@ -5,9 +5,12 @@ import {
   ListerBasicInfo,
 } from "../types/Types";
 import { apiPropertiesLink, apiListerLink } from "../urls";
-import { pageQPKey, filterAddressQPKey } from "../constants";
+import {
+  pageQPKey,
+  filterAddressQPKey,
+  MAX_NUMBER_PROPERTIES_PER_PAGE,
+} from "../constants";
 import { apiFile2ClientFile } from "../utils/utils";
-import { MAX_NUMBER_PROPERTIES_PER_PAGE } from "../constants";
 
 import axios from "axios";
 

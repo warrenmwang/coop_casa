@@ -1,37 +1,39 @@
-import React, { useEffect, useState } from "react";
-import { apiAdminUsersRolesLink } from "../urls";
+import React, { useState } from "react";
 import SubmitButton from "../components/SubmitButton";
 import "../styles/input.css";
-import { useQuery } from "@tanstack/react-query";
-import { apiGetUser } from "../api/account";
-import { APIUserReceived, User, UserDetails } from "../types/Types";
-import { EmptyUser } from "../types/Objects";
 import { toast } from "react-toastify";
-import { apiFile2ClientFile } from "../utils/utils";
-import TextSkeleton from "../skeleton/TextSkeleton";
+import { useMutation } from "@tanstack/react-query";
+import { apiAdminUpdateUserRole } from "../api/admin";
+import axios, { AxiosError } from "axios";
 
 const AdminManageUserRoles: React.FC = () => {
-  const userQuery = useQuery({
-    queryKey: ["user", "details"],
-    queryFn: apiGetUser,
-  });
-
   const roleTypes = ["lister", "regular"];
-
-  const [user, setUser] = useState<User>(EmptyUser);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [userID, setUserID] = useState<string>("");
   const [role, setRole] = useState<string>("");
 
+  const mutation = useMutation({
+    mutationKey: ["admin", "userRole", userID],
+    mutationFn: () => apiAdminUpdateUserRole(userID, role),
+    onSuccess: () => {
+      toast.success("User role updated.");
+      setUserID("");
+      setRole("");
+      setIsSubmitting(false);
+    },
+    onError: (error: Error | AxiosError) => {
+      let errMsg: string = error.message;
+      if (axios.isAxiosError(error)) {
+        errMsg = `${(error as AxiosError).response?.data}`;
+      }
+      toast.error(`Failed to update because: ${errMsg}`);
+      setIsSubmitting(false);
+    },
+  });
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
-    // prevent admin from recking their own account
-    if (userID === user.userId) {
-      toast.warn("Don't be stupid now, admin.");
-      setIsSubmitting(false);
-      return;
-    }
+    setIsSubmitting(true);
 
     if (userID === "") {
       toast.warn("Cannot update an empty user ID");
@@ -45,7 +47,7 @@ const AdminManageUserRoles: React.FC = () => {
       return;
     }
 
-    setIsSubmitting(true);
+    mutation.mutate();
   };
 
   const handleChange = (
@@ -59,42 +61,7 @@ const AdminManageUserRoles: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    if (userQuery.status === "success") {
-      const received: APIUserReceived = userQuery.data;
-      const details: UserDetails = received.userDetails;
-      const avatarImg: File | null = apiFile2ClientFile(
-        received.avatarImageB64,
-      );
-      setUser({
-        ...details,
-        avatar: avatarImg,
-      });
-    } else if (userQuery.status === "error") {
-      toast.error("Unable to fetch user data.");
-    }
-  }, [userQuery.status]);
-
-  useEffect(() => {
-    if (isSubmitting) {
-      fetch(`${apiAdminUsersRolesLink}?userID=${userID}&role=${role}`, {
-        method: "POST",
-        credentials: "include",
-      })
-        .then(() => {
-          setIsSubmitting(false);
-          setUserID("");
-        })
-        .catch((err) => {
-          console.error(err);
-          setIsSubmitting(false);
-        });
-    }
-  }, [isSubmitting]);
-
-  const ready: boolean = userQuery.isFetched;
-
-  return ready ? (
+  return (
     <>
       <div className="flex justify-center items-center space-x-4 mt-4 py-1">
         <h1 className="h1_custom">Update User Role</h1>
@@ -124,9 +91,7 @@ const AdminManageUserRoles: React.FC = () => {
           onChange={handleChange}
           defaultValue=""
         >
-          <option value="" disabled>
-            Select Option
-          </option>
+          <option value="">Select Option</option>
           {roleTypes.map((role) => {
             return (
               <option key={role} value={role}>
@@ -140,8 +105,6 @@ const AdminManageUserRoles: React.FC = () => {
         <SubmitButton isSubmitting={isSubmitting} onClick={handleSubmit} />
       </form>
     </>
-  ) : (
-    <TextSkeleton />
   );
 };
 

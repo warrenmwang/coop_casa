@@ -13,6 +13,7 @@ import TextSkeleton from "../skeleton/TextSkeleton";
 import { toast } from "react-toastify";
 import { EmptyUser } from "../types/Objects";
 import FetchErrorText from "../components/FetchErrorText";
+import axios, { AxiosError } from "axios";
 
 const AccountSettingsForm: React.FC = () => {
   const [user, setUser] = useState<User>(EmptyUser);
@@ -35,8 +36,12 @@ const AccountSettingsForm: React.FC = () => {
       setUser(formData);
       setIsChanged(false);
     },
-    onError: () => {
-      toast.error(`Failed to update because: ${mutation.error}`);
+    onError: (error: Error | AxiosError) => {
+      let errMsg: string = error.message;
+      if (axios.isAxiosError(error)) {
+        errMsg = `${(error as AxiosError).response?.data}`;
+      }
+      toast.error(`Failed to update because: ${errMsg}`);
     },
   });
 

@@ -14,6 +14,7 @@ import { apiGetUser, apiGetUserAuth, apiLogoutUser } from "../api/account";
 import { APIUserReceived } from "../types/Types";
 import { apiFile2ClientFile } from "../utils/utils";
 import { toast } from "react-toastify";
+import axios, { AxiosError } from "axios";
 
 function classNames(...classes: (string | undefined | null | false)[]) {
   return classes.filter(Boolean).join(" ");
@@ -42,8 +43,12 @@ const TopNavbar: React.FC = () => {
       profileImg = defaultProfileImg;
       navigate(homePageLink);
     },
-    onError: () => {
-      toast.error(`Failed to logout: ${mutation.error}`);
+    onError: (error: Error | AxiosError) => {
+      let errMsg: string = error.message;
+      if (axios.isAxiosError(error)) {
+        errMsg = `${(error as AxiosError).response?.data}`;
+      }
+      toast.error(`Failed to logout: ${errMsg}`);
     },
   });
   const queryClient = useQueryClient();

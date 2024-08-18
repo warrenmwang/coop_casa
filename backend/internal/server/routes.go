@@ -711,6 +711,12 @@ func (s *Server) apiUpdateUserRoleHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	// Reject requests to alter admin's own user role
+	if userID == callerUserId {
+		respondWithError(w, http.StatusBadRequest, errors.New("admin cannot change own user role. baka"))
+		return
+	}
+
 	// Update role for the user specified in the request body in the db
 	err = s.db.UpdateUserRole(userID, role)
 	if err != nil {

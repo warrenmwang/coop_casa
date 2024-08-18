@@ -38,3 +38,18 @@ export const apiAdminGetUsersRoles = async (
     .then((resp) => resp.data)
     .catch((err) => console.error(err));
 };
+
+export const apiAdminUpdateUserRole = async (
+  userID: string,
+  role: string,
+): Promise<any> => {
+  return axios
+    .post(
+      `${apiAdminUsersRolesLink}?userID=${userID}&role=${role}`,
+      {},
+      {
+        withCredentials: true,
+      },
+    )
+    .then((resp) => resp.data);
+};

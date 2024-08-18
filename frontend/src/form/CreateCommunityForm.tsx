@@ -2,12 +2,10 @@ import React, { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { apiCreateCommunity } from "../api/community";
 import { apiGetUser } from "../api/account";
-
 import TextInput from "../input/TextInput";
 import SubmitButton from "../components/SubmitButton";
 import MultipleImageUploader from "../input/MultipleImageUploader";
 import { MAX_COMMUNITY_IMGS_ALLOWED } from "../constants";
-
 import {
   APIUserReceived,
   OrderedFile,
@@ -17,11 +15,11 @@ import {
 } from "../types/Types";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import TextSkeleton from "../skeleton/TextSkeleton";
-
 import "../styles/font.css";
 import "../styles/input.css";
 import "../styles/form.css";
 import { toast } from "react-toastify";
+import axios, { AxiosError } from "axios";
 
 type TextFieldsConstruct = {
   id: string;
@@ -182,10 +180,13 @@ const CreateCommunityForm: React.FC = () => {
           setIsSubmitting(false);
           toast.success("Community created.");
         },
-        onError: (error: any) => {
+        onError: (error: Error | AxiosError) => {
           // Notify user of creation error
-          const errorMessage = error.response?.data || error.message;
-          toast.error("Could not create community because: " + errorMessage);
+          let errMsg: string = error.message;
+          if (axios.isAxiosError(error)) {
+            errMsg = `${(error as AxiosError).response?.data}`;
+          }
+          toast.error("Could not create community because: " + errMsg);
         },
       });
     }

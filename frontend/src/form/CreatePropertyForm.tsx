@@ -3,12 +3,10 @@ import { v4 as uuidv4 } from "uuid";
 import { apiCreateNewProperty } from "../api/property";
 import { apiGetUser } from "../api/account";
 import { validateNumber } from "../utils/inputValidation";
-
 import TextInput from "../input/TextInput";
 import SubmitButton from "../components/SubmitButton";
 import MultipleImageUploader from "../input/MultipleImageUploader";
 import { MAX_PROPERTY_IMGS_ALLOWED } from "../constants";
-
 import {
   APIUserReceived,
   OrderedFile,
@@ -18,11 +16,11 @@ import {
 } from "../types/Types";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import TextSkeleton from "../skeleton/TextSkeleton";
-
 import "../styles/font.css";
 import "../styles/input.css";
 import "../styles/form.css";
 import { toast } from "react-toastify";
+import axios, { AxiosError } from "axios";
 
 type TextFieldsConstruct = {
   id: string;
@@ -345,9 +343,12 @@ const CreatePropertyForm: React.FC = () => {
           setIsSubmitting(false);
           toast.success("Property created.");
         },
-        onError: (error: any) => {
-          const errorMessage = error.response?.data || error.message;
-          toast.error("Could not create property because: " + errorMessage);
+        onError: (error: Error | AxiosError) => {
+          let errMsg: string = error.message;
+          if (axios.isAxiosError(error)) {
+            errMsg = `${(error as AxiosError).response?.data}`;
+          }
+          toast.error("Could not create property because: " + errMsg);
         },
       });
     }
