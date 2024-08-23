@@ -49,7 +49,10 @@ const AboutPage: React.FC = () => {
       home with your friends and community. Find your community and be a
       property owner today without doing it alone. Coop, connecting communities
       empowering ownership.
-      <Title title="Meet The Team"></Title>
+      <Title title="Meet The Team" />
+      These founders truly believe in the idea of our generation of people being
+      about to own a home at some point in their lives, and if not hey at least
+      we made some friends along the way.
       <Card
         title="Elizabeth Addo"
         description={
@@ -103,7 +106,7 @@ const AboutPage: React.FC = () => {
         }
         imageUrl={barbara_img}
       />
-      <Card
+      {/* <Card
         title="Warren Wang"
         description={
           <div>
@@ -119,7 +122,7 @@ const AboutPage: React.FC = () => {
           </div>
         }
         imageUrl={warren_img}
-      />
+      /> */}
     </div>
   );
 };

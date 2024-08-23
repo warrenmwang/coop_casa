@@ -167,7 +167,7 @@ const CommunitiesMainBody: React.FC = () => {
         className="form__searchCommunities"
         onSubmit={searchCommunitiesWithFilters}
       >
-        <div className="flex-col flex-grow">
+        <div className="flex-col flex-grow items-center">
           <label className="text_input_field_label_gray">Name</label>
           <SearchBar
             searchQueryParamKey={filterNameQPKey}
