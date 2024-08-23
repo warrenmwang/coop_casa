@@ -158,6 +158,16 @@ func (q *Queries) DeleteCommunityUsers(ctx context.Context, communityID string) 
 	return err
 }
 
+const deleteUserOwnedCommunities = `-- name: DeleteUserOwnedCommunities :exec
+DELETE FROM communities
+WHERE admin_user_id = $1
+`
+
+func (q *Queries) DeleteUserOwnedCommunities(ctx context.Context, adminUserID string) error {
+	_, err := q.db.ExecContext(ctx, deleteUserOwnedCommunities, adminUserID)
+	return err
+}
+
 const getCommunityDetails = `-- name: GetCommunityDetails :one
 SELECT
     id, community_id, admin_user_id, name, description, created_at, updated_at

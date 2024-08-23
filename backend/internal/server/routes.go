@@ -528,13 +528,22 @@ func (s *Server) apiDeleteAccountHandler(w http.ResponseWriter, r *http.Request)
 	}
 
 	// Delete all the properties that are listed by this user
-	err = s.db.DeleteProperties(userId)
+	err = s.db.DeleteUserOwnedProperties(userId)
 	if err != nil {
 		respondWithError(w, 500, err)
 		return
 	}
 
-	// TODO: delete all communities owned by this user ?
+	// Delete all communities owned by this user
+	// If this is not desired behavior, it is the frontend's job to warn the user
+	// that all their properties and communities will be deleted. Therefore, they
+	// should transfer ownership of their properties/communities before deleting their
+	// acount.
+	err = s.db.DeleteUserOwnedCommunities(userId)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err)
+		return
+	}
 
 	// Invalidate their token
 	s.InvalidateToken(w)

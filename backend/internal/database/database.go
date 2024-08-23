@@ -133,7 +133,7 @@ type Service interface {
 	DeletePropertyImage(propertyId string, imageOrderNum int16) error
 	GetNextPageProperties(limit, offset int32, addressFilter string) ([]string, error)
 	GetTotalCountProperties() (int64, error)
-	DeleteProperties(userID string) error
+	DeleteUserOwnedProperties(userID string) error
 	CheckDuplicateProperty(propertyDetails PropertyDetails) error
 
 	// Communities
@@ -151,6 +151,7 @@ type Service interface {
 	DeleteCommunity(communityId string) error
 	DeleteCommunityUser(communityId, userId string) error
 	DeleteCommunityProperty(communityId, propertyId string) error
+	DeleteUserOwnedCommunities(userID string) error
 }
 
 // Test database connection
@@ -905,7 +906,7 @@ func (s *service) DeletePropertyImage(propertyId string, imageOrderNum int16) er
 }
 
 // Delete all properties that whose lister id is the user id given
-func (s *service) DeleteProperties(userID string) error {
+func (s *service) DeleteUserOwnedProperties(userID string) error {
 	ctx := context.Background()
 	err := s.db_queries.DeleteListerProperties(ctx, userID)
 	return err
@@ -1249,6 +1250,12 @@ func (s *service) GetUserOwnedCommunities(userId string) ([]string, error) {
 		return nil, err
 	}
 	return communities, nil
+}
+
+func (s *service) DeleteUserOwnedCommunities(userID string) error {
+	ctx := context.Background()
+	err := s.db_queries.DeleteUserOwnedCommunities(ctx, userID)
+	return err
 }
 
 // DB entrance func to init

@@ -134,3 +134,7 @@ WHERE community_id = $1
 DELETE FROM communities
 WHERE community_id = $1;
 
+-- name: DeleteUserOwnedCommunities :exec
+DELETE FROM communities
+WHERE admin_user_id = $1;
+
