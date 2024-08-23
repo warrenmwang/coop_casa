@@ -72,6 +72,7 @@ type CreateBareUserParams struct {
 	Email  string
 }
 
+// -------------------------- PRivate Users API Queries (for each account) --------------------------
 func (q *Queries) CreateBareUser(ctx context.Context, arg CreateBareUserParams) error {
 	_, err := q.db.ExecContext(ctx, createBareUser, arg.UserID, arg.Email)
 	return err
@@ -105,6 +106,43 @@ WHERE user_id = $1
 func (q *Queries) DeleteUserDetails(ctx context.Context, userID string) error {
 	_, err := q.db.ExecContext(ctx, deleteUserDetails, userID)
 	return err
+}
+
+const getNextPageOfPublicUsers = `-- name: GetNextPageOfPublicUsers :many
+SELECT
+    user_id
+FROM
+    users
+LIMIT $1 OFFSET $2
+`
+
+type GetNextPageOfPublicUsersParams struct {
+	Limit  int32
+	Offset int32
+}
+
+// -------------------------- Public Users API Queries --------------------------
+func (q *Queries) GetNextPageOfPublicUsers(ctx context.Context, arg GetNextPageOfPublicUsersParams) ([]string, error) {
+	rows, err := q.db.QueryContext(ctx, getNextPageOfPublicUsers, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []string
+	for rows.Next() {
+		var user_id string
+		if err := rows.Scan(&user_id); err != nil {
+			return nil, err
+		}
+		items = append(items, user_id)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const getUserAvatar = `-- name: GetUserAvatar :one

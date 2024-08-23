@@ -1,3 +1,4 @@
+-- -------------------------- PRivate Users API Queries (for each account) --------------------------
 -- name: CreateBareUser :exec
 INSERT INTO users(user_id, email)
     VALUES ($1, $2);
@@ -64,4 +65,12 @@ WHERE user_id = $1;
 -- name: DeleteUserAvatar :exec
 DELETE FROM users_avatars
 WHERE user_id = $1;
+
+-- -------------------------- Public Users API Queries --------------------------
+-- name: GetNextPageOfPublicUsers :many
+SELECT
+    user_id
+FROM
+    users
+LIMIT $1 OFFSET $2;
 

@@ -8,7 +8,30 @@ import (
 	"encoding/base64"
 	"net/mail"
 	"regexp"
+	"time"
 )
+
+func CalculateAge(birthdate string) (int16, error) {
+	// Parse the birthdate string
+	layout := "2006-01-02"
+	birthTime, err := time.Parse(layout, birthdate)
+	if err != nil {
+		return 0, err
+	}
+
+	// Get the current time
+	currentTime := time.Now()
+
+	// Calculate the age
+	age := currentTime.Year() - birthTime.Year()
+
+	// Adjust if the birthdate hasn't occurred yet this year
+	if currentTime.YearDay() < birthTime.YearDay() {
+		age--
+	}
+
+	return int16(age), nil
+}
 
 func IsValidEmail(email string) bool {
 	/* Emails must pass 2 checks:

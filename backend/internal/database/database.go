@@ -12,6 +12,7 @@ import (
 	"backend/internal/utils"
 	"context"
 	"database/sql"
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"log"
@@ -96,6 +97,21 @@ type CommunityFull struct {
 	CommunityProperties []string         `json:"properties"` // property ids
 }
 
+type PublicUserProfileDetails struct {
+	UserID     string   `json:"userId"`
+	FirstName  string   `json:"firstName"`
+	LastName   string   `json:"lastName"`
+	AgeInYears int16    `json:"ageInYears"`
+	Gender     string   `json:"gender"`
+	Location   string   `json:"location"`
+	Interests  []string `json:"interests"`
+}
+
+type PublicUserProfile struct {
+	Details PublicUserProfileDetails `json:"details"`
+	Images  []FileExternal           `json:"images"`
+}
+
 type service struct {
 	db             *sql.DB
 	db_queries     *sqlc.Queries
@@ -152,6 +168,10 @@ type Service interface {
 	DeleteCommunityUser(communityId, userId string) error
 	DeleteCommunityProperty(communityId, propertyId string) error
 	DeleteUserOwnedCommunities(userID string) error
+
+	// Public User Discovery API
+	GetNextPagePublicUserIDs(limit, offset int32) ([]string, error)
+	GetPublicUserProfile(userID string) (PublicUserProfile, error)
 }
 
 // Test database connection
@@ -1257,6 +1277,77 @@ func (s *service) DeleteUserOwnedCommunities(userID string) error {
 	err := s.db_queries.DeleteUserOwnedCommunities(ctx, userID)
 	return err
 }
+
+func (s *service) GetNextPagePublicUserIDs(limit, offset int32) ([]string, error) {
+	ctx := context.Background()
+
+	userIdsEncrypted, err := s.db_queries.GetNextPageOfPublicUsers(ctx, sqlc.GetNextPageOfPublicUsersParams{
+		Limit:  limit,
+		Offset: offset,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	// Decrypt userIDs
+	var userIDs []string
+	for _, userID := range userIdsEncrypted {
+		decryptedUserID, err := utils.DecryptString(userID, s.db_encrypt_key)
+		if err != nil {
+			return nil, err
+		}
+		userIDs = append(userIDs, decryptedUserID)
+	}
+
+	return userIDs, nil
+}
+
+func (s *service) GetPublicUserProfile(userID string) (PublicUserProfile, error) {
+	plainTextUserID := userID
+
+	userDetails, err := s.GetUserDetails(plainTextUserID)
+	if err != nil {
+		return PublicUserProfile{}, err
+	}
+
+	// TODO: for now users only have one image, but in the future they will have multiple.
+	userAvatar, err := s.GetUserAvatar(plainTextUserID)
+	if err != nil {
+		return PublicUserProfile{}, err
+	}
+
+	// Calculate user age in years
+	ageInYears, err := utils.CalculateAge(userDetails.BirthDate)
+	if err != nil {
+		return PublicUserProfile{}, err
+	}
+
+	var userImages []FileExternal
+	// TODO: for now users only have one image, but in the future they will have multiple.
+	userImages = append(userImages, FileExternal{
+		Filename: userAvatar.Filename,
+		Mimetype: userAvatar.Mimetype,
+		Size:     userAvatar.Size,
+		Data:     base64.StdEncoding.EncodeToString(userAvatar.Data),
+	})
+
+	userProfile := PublicUserProfile{
+		Details: PublicUserProfileDetails{
+			UserID:     userDetails.UserID,
+			FirstName:  userDetails.FirstName,
+			LastName:   userDetails.LastName,
+			AgeInYears: ageInYears,
+			Gender:     userDetails.Gender,
+			Location:   userDetails.Location,
+			Interests:  userDetails.Interests,
+		},
+		Images: userImages,
+	}
+
+	return userProfile, nil
+}
+
+// -----------------------------------------------------
 
 // DB entrance func to init
 func New() Service {
