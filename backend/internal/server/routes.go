@@ -380,7 +380,7 @@ func (s *Server) apiGetAccountDetailsHandler(w http.ResponseWriter, r *http.Requ
 	}
 
 	// Get user details
-	user, err := s.db.GetUserDetails(userId)
+	userDetails, err := s.db.GetUserDetails(userId)
 	if err != nil {
 		respondWithError(w, 405, err)
 		return
@@ -391,17 +391,6 @@ func (s *Server) apiGetAccountDetailsHandler(w http.ResponseWriter, r *http.Requ
 	if err != nil {
 		respondWithError(w, 405, err)
 		return
-	}
-
-	userDetails := database.UserDetails{
-		UserID:    user.UserID,
-		Email:     user.Email,
-		FirstName: user.FirstName.String,
-		LastName:  user.LastName.String,
-		BirthDate: user.BirthDate.String,
-		Gender:    user.Gender.String,
-		Location:  user.Location.String,
-		Interests: user.Interests,
 	}
 
 	// Make interests an empty list if nil
@@ -635,27 +624,8 @@ func (s *Server) apiAdminGetUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Need to convert all users from type
-	// sqlc.User to type User_New
-
-	// Create a new slice of User_New
-	var usersNew []database.UserDetails
-	for _, user := range users {
-		// Append the user to the new slice
-		usersNew = append(usersNew, database.UserDetails{
-			UserID:    user.UserID,
-			Email:     user.Email,
-			FirstName: user.FirstName.String,
-			LastName:  user.LastName.String,
-			BirthDate: user.BirthDate.String,
-			Gender:    user.Gender.String,
-			Location:  user.Location.String,
-			Interests: user.Interests,
-		})
-	}
-
 	// Return the users
-	respondWithJSON(w, 200, usersNew)
+	respondWithJSON(w, 200, users)
 }
 
 // Endpoint: GET /api/admin/users/roles
@@ -1153,8 +1123,8 @@ func (s *Server) apiGetListerInfoHandler(w http.ResponseWriter, r *http.Request)
 		LastName  string `json:"lastName"`
 		Email     string `json:"email"`
 	}{
-		FirstName: lister.FirstName.String,
-		LastName:  lister.LastName.String,
+		FirstName: lister.FirstName,
+		LastName:  lister.LastName,
 		Email:     lister.Email,
 	})
 }
@@ -1702,6 +1672,21 @@ func (s *Server) apiGetUserOwnedCommunities(w http.ResponseWriter, r *http.Reque
 	})
 }
 
+// --------------- Public Users API ---------------
+
+// GET /api/users
+// NO AUTH
+func (s *Server) apiGetUsersHandler(w http.ResponseWriter, r *http.Request) {
+	// TODO:
+}
+
+// GET /api/users/{id}
+// NO AUTH
+func (s *Server) apiGetUserHandler(w http.ResponseWriter, r *http.Request) {
+	// TODO:
+
+}
+
 // --------------------- MIDDLEWARES ------------------------------
 
 func (s *Server) corsMiddleware(next http.Handler) http.Handler {
@@ -1780,6 +1765,10 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.Delete("/api/communities/{id}", s.apiDeleteCommunitiesHandler)
 	r.Delete("/api/communities/users", s.apiDeleteCommunitiesUserHandler)
 	r.Delete("/api/communities/properties", s.apiDeleteCommunitiesPropertiesHandler)
+
+	// Users
+	r.Get("/api/users", s.apiGetUsersHandler)
+	r.Get("/api/users/{id}", s.apiGetUserHandler)
 
 	return r
 }

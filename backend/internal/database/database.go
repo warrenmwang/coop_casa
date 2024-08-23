@@ -107,12 +107,12 @@ type Service interface {
 	Health() map[string]string
 
 	// Admin functions
-	AdminGetUsers(limit, offset int32) ([]sqlc.User, error)
+	AdminGetUsers(limit, offset int32) ([]UserDetails, error)
 	AdminGetUsersRoles(userIds []string) ([]string, error)
 
 	// Users
 	CreateUser(userId, email string) error
-	GetUserDetails(userId string) (sqlc.User, error)
+	GetUserDetails(userId string) (UserDetails, error)
 	UpdateUser(updatedUserData UserDetails, avatarImage FileInternal) error
 	DeleteUser(userId string) error
 	GetUserAvatar(userId string) (FileInternal, error)
@@ -249,7 +249,7 @@ func (s *service) encryptString(plainText string) (string, error) {
 }
 
 // Admin functions
-func (s *service) AdminGetUsers(limit, offset int32) ([]sqlc.User, error) {
+func (s *service) AdminGetUsers(limit, offset int32) ([]UserDetails, error) {
 	ctx := context.Background()
 
 	// Get users using the limit and offset provided
@@ -262,7 +262,7 @@ func (s *service) AdminGetUsers(limit, offset int32) ([]sqlc.User, error) {
 	}
 
 	// Decrypt user data
-	var decryptedUsers []sqlc.User
+	var decryptedUsers []UserDetails
 	for _, userEncrypted := range usersEncrypted {
 		userId, err := s.decryptString(userEncrypted.UserID)
 		if err != nil {
@@ -274,27 +274,27 @@ func (s *service) AdminGetUsers(limit, offset int32) ([]sqlc.User, error) {
 			return nil, err
 		}
 
-		firstName, err := s.decryptNullString(userEncrypted.FirstName)
+		firstName, err := s.decryptString(userEncrypted.FirstName.String)
 		if err != nil {
 			return nil, err
 		}
 
-		lastName, err := s.decryptNullString(userEncrypted.LastName)
+		lastName, err := s.decryptString(userEncrypted.LastName.String)
 		if err != nil {
 			return nil, err
 		}
 
-		birthDate, err := s.decryptNullString(userEncrypted.BirthDate)
+		birthDate, err := s.decryptString(userEncrypted.BirthDate.String)
 		if err != nil {
 			return nil, err
 		}
 
-		gender, err := s.decryptNullString(userEncrypted.Gender)
+		gender, err := s.decryptString(userEncrypted.Gender.String)
 		if err != nil {
 			return nil, err
 		}
 
-		location, err := s.decryptNullString(userEncrypted.Location)
+		location, err := s.decryptString(userEncrypted.Location.String)
 		if err != nil {
 			return nil, err
 		}
@@ -308,7 +308,7 @@ func (s *service) AdminGetUsers(limit, offset int32) ([]sqlc.User, error) {
 			interestsDecrypted = append(interestsDecrypted, decryptedInterest)
 		}
 
-		decryptedUsers = append(decryptedUsers, sqlc.User{
+		decryptedUsers = append(decryptedUsers, UserDetails{
 			UserID:    userId,
 			Email:     email,
 			FirstName: firstName,
@@ -356,61 +356,61 @@ func (s *service) CreateUser(userId, email string) error {
 	return nil
 }
 
-func (s *service) GetUserDetails(userId string) (sqlc.User, error) {
+func (s *service) GetUserDetails(userId string) (UserDetails, error) {
 	ctx := context.Background()
 
 	// Need to use the encrypted userId to search
 	userIDEncrypted, err := s.encryptString(userId)
 	if err != nil {
-		return sqlc.User{}, err
+		return UserDetails{}, err
 	}
 
 	userEncrypted, err := s.db_queries.GetUserDetails(ctx, userIDEncrypted)
 	if err != nil {
-		return sqlc.User{}, err
+		return UserDetails{}, err
 	}
 
 	// Decrypt user data
 	emailDecrypted, err := s.decryptString(userEncrypted.Email)
 	if err != nil {
-		return sqlc.User{}, err
+		return UserDetails{}, err
 	}
 
-	firstNameDecrypted, err := s.decryptNullString(userEncrypted.FirstName)
+	firstNameDecrypted, err := s.decryptString(userEncrypted.FirstName.String)
 	if err != nil {
-		return sqlc.User{}, err
+		return UserDetails{}, err
 	}
 
-	lastNameDecrypted, err := s.decryptNullString(userEncrypted.LastName)
+	lastNameDecrypted, err := s.decryptString(userEncrypted.LastName.String)
 	if err != nil {
-		return sqlc.User{}, err
+		return UserDetails{}, err
 	}
 
-	birthDateDecrypted, err := s.decryptNullString(userEncrypted.BirthDate)
+	birthDateDecrypted, err := s.decryptString(userEncrypted.BirthDate.String)
 	if err != nil {
-		return sqlc.User{}, err
+		return UserDetails{}, err
 	}
 
-	genderDecrypted, err := s.decryptNullString(userEncrypted.Gender)
+	genderDecrypted, err := s.decryptString(userEncrypted.Gender.String)
 	if err != nil {
-		return sqlc.User{}, err
+		return UserDetails{}, err
 	}
 
-	locationDecrypted, err := s.decryptNullString(userEncrypted.Location)
+	locationDecrypted, err := s.decryptString(userEncrypted.Location.String)
 	if err != nil {
-		return sqlc.User{}, err
+		return UserDetails{}, err
 	}
 
 	var interestsDecrypted []string
 	for _, interest := range userEncrypted.Interests {
 		decryptedInterest, err := utils.DecryptString(interest, s.db_encrypt_key)
 		if err != nil {
-			return sqlc.User{}, err
+			return UserDetails{}, err
 		}
 		interestsDecrypted = append(interestsDecrypted, decryptedInterest)
 	}
 
-	return sqlc.User{
+	return UserDetails{
 		UserID:    userId,
 		Email:     emailDecrypted,
 		FirstName: firstNameDecrypted,
@@ -419,8 +419,6 @@ func (s *service) GetUserDetails(userId string) (sqlc.User, error) {
 		Gender:    genderDecrypted,
 		Location:  locationDecrypted,
 		Interests: interestsDecrypted,
-		CreatedAt: userEncrypted.CreatedAt, // Note createdat and updatedat timestamps are not encrypted
-		UpdatedAt: userEncrypted.UpdatedAt,
 	}, nil
 }
 
