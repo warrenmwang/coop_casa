@@ -72,5 +72,12 @@ SELECT
     user_id
 FROM
     users
+WHERE
+    first_name IS NOT NULL
+    AND last_name IS NOT NULL
+    AND birth_date IS NOT NULL
+    AND gender IS NOT NULL
+    AND "location" IS NOT NULL
+    AND interests IS NOT NULL
 LIMIT $1 OFFSET $2;
 

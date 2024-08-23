@@ -1686,7 +1686,7 @@ func (s *Server) apiGetUserOwnedCommunities(w http.ResponseWriter, r *http.Reque
 // GET /api/users
 // NO AUTH
 //
-// Return a list of userIds for the given query
+// Return a list of userIds for the given query, only returning userIDs whose accounts have been setup.
 // Expects query parameters to filter for / get pages of userIds
 func (s *Server) apiGetUsersHandler(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
