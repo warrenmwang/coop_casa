@@ -1,5 +1,5 @@
 services:
-  proxy:
+  coop_casa_proxy:
     build: ./proxy
     networks:
       - frontend
