@@ -1,5 +1,5 @@
 services:
-  beta_proxy:
+  proxy:
     build: ./proxy
     networks:
       - frontend
@@ -9,11 +9,11 @@ services:
       INTERNAL_FRONTEND_PORT: ${INTERNAL_FRONTEND_PORT}
       INTERNAL_BACKEND_PORT: ${INTERNAL_BACKEND_PORT}
     depends_on:
-      - beta_psql_db
-      - beta_go_backend
-      - beta_ts_frontend
+      - psql_db
+      - backend
+      - frontend
 
-  beta_psql_db:
+  psql_db:
     image: postgres:latest
     restart: always
     environment:
@@ -23,13 +23,13 @@ services:
     networks:
       - backend
     volumes:
-      - beta_psql_volume:/var/lib/postgresql/data # external : internal
+      - psql_volume:/var/lib/postgresql/data # external : internal
 
-  beta_go_backend:
+  backend:
     build: ./backend
     restart: always
     depends_on:
-      - beta_psql_db
+      - psql_db
     networks:
       - backend
     environment:
@@ -55,7 +55,7 @@ services:
     command: >
       sh -c "./goose_migrate.sh && ./main"
 
-  beta_ts_frontend:
+  frontend:
     build:
       context: ./frontend
       args:
@@ -64,21 +64,21 @@ services:
         REACT_APP_API_PORT: ${REACT_APP_API_PORT}
     restart: always
     depends_on:
-      - beta_go_backend
+      - backend
     networks:
       - frontend
     command: >
       serve -s build -l ${INTERNAL_FRONTEND_PORT}
 
 volumes:
-  beta_psql_volume:
+  psql_volume:
 
 networks:
   frontend:
-    name: beta_coop_frontend_nw
+    name: coop_casa_frontend_nw
     driver: bridge
   backend:
-    name: beta_coop_backend_nw
+    name: coop_casa_backend_nw
     driver: bridge
   webnet:
     external: true
