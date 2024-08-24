@@ -171,6 +171,7 @@ type Service interface {
 
 	// Public User Discovery API
 	GetNextPagePublicUserIDs(limit, offset int32) ([]string, error)
+	GetNextPagePublicUserIDsFilterByName(limit, offset int32, firstName, lastName string) ([]string, error)
 	GetPublicUserProfile(userID string) (PublicUserProfile, error)
 }
 
@@ -1284,6 +1285,41 @@ func (s *service) GetNextPagePublicUserIDs(limit, offset int32) ([]string, error
 	userIdsEncrypted, err := s.db_queries.GetNextPageOfPublicUsers(ctx, sqlc.GetNextPageOfPublicUsersParams{
 		Limit:  limit,
 		Offset: offset,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	// Decrypt userIDs
+	var userIDs []string
+	for _, userID := range userIdsEncrypted {
+		decryptedUserID, err := utils.DecryptString(userID, s.db_encrypt_key)
+		if err != nil {
+			return nil, err
+		}
+		userIDs = append(userIDs, decryptedUserID)
+	}
+
+	return userIDs, nil
+}
+
+func (s *service) GetNextPagePublicUserIDsFilterByName(limit, offset int32, firstName, lastName string) ([]string, error) {
+	ctx := context.Background()
+
+	encryptedFirstName, err := utils.EncryptString(firstName, s.db_encrypt_key)
+	if err != nil {
+		return nil, err
+	}
+	encryptedLastName, err := utils.EncryptString(lastName, s.db_encrypt_key)
+	if err != nil {
+		return nil, err
+	}
+
+	userIdsEncrypted, err := s.db_queries.GetNextPageOfPublicUsersFilterByName(ctx, sqlc.GetNextPageOfPublicUsersFilterByNameParams{
+		Limit:        limit,
+		Offset:       offset,
+		Similarity:   encryptedFirstName,
+		Similarity_2: encryptedLastName,
 	})
 	if err != nil {
 		return nil, err

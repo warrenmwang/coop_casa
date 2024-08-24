@@ -1715,8 +1715,15 @@ func (s *Server) apiGetUsersHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	limitInt := int32(tmp)
 
-	// TODO: maybe add more filter options (e.g. name, age, gender, interests, etc.)
-	userIDs, err := s.db.GetNextPagePublicUserIDs(limitInt, offsetInt)
+	// Look for extra filters, if they exist
+	firstNameFilter := query.Get("filterFirstName")
+	lastNameFilter := query.Get("filterLastName")
+	var userIDs []string
+	if firstNameFilter != "" || lastNameFilter != "" {
+		userIDs, err = s.db.GetNextPagePublicUserIDsFilterByName(limitInt, offsetInt, firstNameFilter, lastNameFilter)
+	} else {
+		userIDs, err = s.db.GetNextPagePublicUserIDs(limitInt, offsetInt)
+	}
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err)
 		return
