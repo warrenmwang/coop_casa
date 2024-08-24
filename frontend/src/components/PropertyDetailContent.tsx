@@ -112,9 +112,9 @@ const PropertyDetailContent: React.FC<PropertyDetailContentProps> = ({
         <ListerInfo listerID={property.details.listerUserId} />
         <div className="text-lg">Miscellaneous Lister Comments: </div>
         <div className="text-lg">{property.details.miscNote}</div>
-        {/* <div className="text-sm pt-5">
+        <div className="text-sm pt-5">
           Property ID: {property.details.propertyId}
-        </div> */}
+        </div>
       </div>
     </Box>
   );

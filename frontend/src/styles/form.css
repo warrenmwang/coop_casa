@@ -13,3 +13,7 @@
 .form__searchCommunities {
   @apply flex gap-2 mb-3;
 }
+
+.form__searchUserProfiles {
+  @apply flex gap-2 mb-3;
+}

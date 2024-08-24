@@ -1,22 +1,20 @@
-import React, { useState, useEffect } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { apiGetCommunities } from "../api/community";
-import CardGridSkeleton from "../skeleton/CardGridSkeleton";
-import PageOfCommunities from "./PageOfCommunities";
-
-import SearchBar from "../input/SearchBar";
-import "../styles/colors.css";
-import SubmitButton from "../components/SubmitButton";
+import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import {
+  filterFirstNameQPKey,
+  filterLastNameQPKey,
+  MAX_NUMBER_USER_PROFILES_PER_PAGE,
   pageQPKey,
-  filterNameQPKey,
-  filterDescriptionQPKey,
-  MAX_NUMBER_COMMUNITIES_PER_PAGE,
 } from "../constants";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { apiGetUserProfiles } from "../api/user";
 import FetchErrorText from "./FetchErrorText";
+import CardGridSkeleton from "../skeleton/CardGridSkeleton";
+import SearchBar from "../input/SearchBar";
+import SubmitButton from "./SubmitButton";
+import PageOfUserProfiles from "./PageOfUserProfiles";
 
-const CommunitiesMainBody: React.FC = () => {
+const UserProfilesMainBody: React.FC = () => {
   const [searchIsSubmitting, setSearchIsSubmitting] = useState<boolean>(false);
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -42,27 +40,25 @@ const CommunitiesMainBody: React.FC = () => {
     setSearchParams(searchParams);
   }
 
-  let filterNameQP: string | null = searchParams.get(filterNameQPKey);
-  let filterNameStr: string;
-  if (filterNameQP !== null) {
-    filterNameStr = filterNameQP as string;
+  let filterFirstNameQP: string | null = searchParams.get(filterFirstNameQPKey);
+  let filterFirstNameStr: string;
+  if (filterFirstNameQP !== null) {
+    filterFirstNameStr = filterFirstNameQP as string;
   } else {
-    filterNameStr = "";
+    filterFirstNameStr = "";
   }
 
-  let filterDescriptionQP: string | null = searchParams.get(
-    filterDescriptionQPKey,
-  );
-  let filterDescriptionStr: string;
-  if (filterDescriptionQP !== null) {
-    filterDescriptionStr = filterDescriptionQP as string;
+  let filterLastNameQP: string | null = searchParams.get(filterLastNameQPKey);
+  let filterLastNameStr: string;
+  if (filterLastNameQP !== null) {
+    filterLastNameStr = filterLastNameQP as string;
   } else {
-    filterDescriptionStr = "";
+    filterLastNameStr = "";
   }
 
   // Init our state from the query params
-  const [name, setName] = useState<string>(filterNameStr);
-  const [description, setDescription] = useState<string>(filterDescriptionStr);
+  const [firstName, setFirstName] = useState<string>(filterFirstNameStr);
+  const [lastName, setLastName] = useState<string>(filterLastNameStr);
   const [currentPage, _setCurrentPage] = useState<number>(startPageNum);
   const setCurrentPage = (page: number) => {
     // Want to update the query param for page number whenever the page
@@ -76,14 +72,20 @@ const CommunitiesMainBody: React.FC = () => {
 
   // Use react query hook to handle our data fetching and async state w/ caching of query results.
   const query = useQuery({
-    queryKey: ["communitiesPage", currentPage, name, description],
-    queryFn: () => apiGetCommunities(currentPage, name, description),
+    queryKey: ["userProfilesPage", currentPage, firstName, lastName],
+    queryFn: () =>
+      apiGetUserProfiles(
+        currentPage,
+        MAX_NUMBER_USER_PROFILES_PER_PAGE,
+        firstName,
+        lastName,
+      ),
   });
   // Use query client hook to get the query client for access to the cache
   const queryClient = useQueryClient();
 
   // Define search form submission handler
-  const searchCommunitiesWithFilters = (e: React.FormEvent) => {
+  const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setSearchIsSubmitting(true);
   };
@@ -111,26 +113,26 @@ const CommunitiesMainBody: React.FC = () => {
     }
   }, [query.status, query.isRefetching]); // add isRefetching to dependency to allow us to use pages that were cached from previous queries
 
-  // When new search is fired off, get the latest search filters
+  // When new search is fired off, get the latest filters
   useEffect(() => {
     if (searchIsSubmitting) {
-      let filterNameTmp: string | null = searchParams.get(filterNameQPKey);
-      if (filterNameTmp === null) {
-        filterNameTmp = "";
+      let filterFirstNameTmp: string | null =
+        searchParams.get(filterFirstNameQPKey);
+      if (filterFirstNameTmp === null) {
+        filterFirstNameTmp = "";
       }
-      let filterDescriptionTmp: string | null = searchParams.get(
-        filterDescriptionQPKey,
-      );
-      if (filterDescriptionTmp === null) {
-        filterDescriptionTmp = "";
+      let filterLastNameTmp: string | null =
+        searchParams.get(filterLastNameQPKey);
+      if (filterLastNameTmp === null) {
+        filterLastNameTmp = "";
       }
 
       // See if first page of the search is already cached.
       const pageCached: string[] | undefined = queryClient.getQueryData([
-        "communitiesPage",
+        "userProfilesPage",
         0,
-        filterNameTmp,
-        filterDescriptionTmp,
+        filterFirstNameTmp,
+        filterLastNameTmp,
       ]);
 
       // If page exists, then just use that page and don't
@@ -143,62 +145,59 @@ const CommunitiesMainBody: React.FC = () => {
 
       // Update filter variables to trigger fetch.
       setCurrentPage(0);
-      setName(filterNameTmp);
-      setDescription(filterDescriptionTmp);
+      setFirstName(filterFirstNameTmp);
+      setLastName(filterLastNameTmp);
     }
   }, [searchIsSubmitting]);
 
-  const noCommunitiesOnPlatform: boolean =
+  const noUserProfilesOnPlatform: boolean =
     query.status === "success" && pages.get(0)?.length === 0;
 
   return (
     <>
       {/* Input form for applying filters to search */}
-      <form
-        className="form__searchCommunities"
-        onSubmit={searchCommunitiesWithFilters}
-      >
+      <form className="form__searchUserProfiles" onSubmit={handleFormSubmit}>
         <div className="flex-col flex-grow items-center">
-          <label className="text_input_field_label_gray">Name</label>
+          <label className="text_input_field_label_gray">First Name</label>
           <SearchBar
-            searchQueryParamKey={filterNameQPKey}
-            placeholder="Name"
+            searchQueryParamKey={filterFirstNameQPKey}
+            placeholder="First Name"
           ></SearchBar>
         </div>
         <div className="flex-col flex-grow">
-          <label className="text_input_field_label_gray">Description</label>
+          <label className="text_input_field_label_gray">Last Name</label>
           <SearchBar
-            searchQueryParamKey={filterDescriptionQPKey}
-            placeholder="Description"
+            searchQueryParamKey={filterLastNameQPKey}
+            placeholder="Last Name"
           ></SearchBar>
         </div>
         <SubmitButton isSubmitting={searchIsSubmitting} />
       </form>
 
-      {/* Display of Page of Communities */}
+      {/* Display of Page of User Profiles */}
       {/* If query is pending, display a skeleton. */}
       {query.status === "pending" && <CardGridSkeleton />}
 
-      {/* If query is successful and there are communities, then show the current page of them! */}
+      {/* If query is successful and there are user profiles, then show the current page of them! */}
       {pages.has(currentPage) && (
-        <PageOfCommunities
+        <PageOfUserProfiles
           key={currentPage}
-          communityIDs={pages.get(currentPage) as string[]}
+          userIDs={pages.get(currentPage) as string[]}
         />
       )}
 
-      {/* If no communities exist on platform, display a message. */}
-      {noCommunitiesOnPlatform && (
+      {/* If no user profiles exist on platform, display a message. */}
+      {noUserProfilesOnPlatform && (
         <FetchErrorText>
-          Sorry, there are no communities on Coop right now! Create your own or
-          come back later.
+          Sorry, there are no user profiles on Coop right now! Create your own
+          account to be the first one!
         </FetchErrorText>
       )}
 
       {/* Flex box for the pagination navigation buttons. */}
-      {!noCommunitiesOnPlatform && (
+      {!noUserProfilesOnPlatform && (
         <div
-          id="CommunitiesMainBody__navigationBtnsContainer"
+          id="UserProfilesMainBody__navigationBtnsContainer"
           className="flex gap-1"
         >
           {Array(currentPage + 1)
@@ -216,7 +215,7 @@ const CommunitiesMainBody: React.FC = () => {
             ))}
           {pages.has(currentPage) &&
             (pages.get(currentPage) as string[]).length ===
-              MAX_NUMBER_COMMUNITIES_PER_PAGE && (
+              MAX_NUMBER_USER_PROFILES_PER_PAGE && (
               <button
                 key="next"
                 className="bg-gray-500 hover:bg-gray-600 text-white p-3 rounded"
@@ -230,4 +229,5 @@ const CommunitiesMainBody: React.FC = () => {
     </>
   );
 };
-export default CommunitiesMainBody;
+
+export default UserProfilesMainBody;

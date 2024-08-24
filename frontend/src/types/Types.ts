@@ -124,7 +124,7 @@ export type Community = {
 };
 
 export type UserProfileDetails = {
-  userID: string;
+  userId: string;
   firstName: string;
   lastName: string;
   ageInYears: number;

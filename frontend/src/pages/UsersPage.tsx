@@ -1,5 +1,5 @@
 import React from "react";
-import UsersMainBody from "../components/UsersMainBody";
+import UserProfilesMainBody from "../components/UserProfilesMainBody";
 import Title from "../components/Title";
 
 const UsersPage: React.FC = () => {
@@ -11,7 +11,7 @@ const UsersPage: React.FC = () => {
           description="You can use optional filters to narrow down your search here."
         />
       </div>
-      <UsersMainBody />
+      <UserProfilesMainBody />
     </div>
   );
 };

@@ -32,6 +32,7 @@ import CommunityDetailPage from "../pages/CommunityDetailPage";
 import TopNavbar from "./TopNavbar";
 import Footer from "./Footer";
 import UsersPage from "../pages/UsersPage";
+import UserProfilePage from "../pages/UserProfilePage";
 
 const RouteRenderer: React.FC = () => {
   return (
@@ -49,6 +50,10 @@ const RouteRenderer: React.FC = () => {
         <Route
           path={`${communitiesPageLink}/:communityID`}
           element={<CommunityDetailPage />}
+        />
+        <Route
+          path={`${usersPageLink}/:userID`}
+          element={<UserProfilePage />}
         />
         <Route path={aboutPageLink} element={<AboutPage />} />
         <Route path={privacypolicyPageLink} element={<PrivacyPolicyPage />} />

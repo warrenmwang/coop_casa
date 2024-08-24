@@ -14,7 +14,7 @@ type PageOfCommunitiesProps = {
 const PageOfCommunities: React.FC<PageOfCommunitiesProps> = ({
   communityIDs,
 }) => {
-  const propertyQueries = useQueries({
+  const communityQueries = useQueries({
     queries: communityIDs.map((communityID) => {
       return {
         queryKey: ["communities", communityID],
@@ -23,7 +23,7 @@ const PageOfCommunities: React.FC<PageOfCommunitiesProps> = ({
     }),
   });
 
-  const properties = propertyQueries
+  const communities = communityQueries
     .map((value) => value.data)
     .filter((value) => {
       return value !== undefined;
@@ -32,7 +32,7 @@ const PageOfCommunities: React.FC<PageOfCommunitiesProps> = ({
   return (
     <div className="flex justify-center">
       <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4">
-        {properties.map((value: Community | undefined) => {
+        {communities.map((value: Community | undefined) => {
           if (value) {
             return (
               <CommunityCard
