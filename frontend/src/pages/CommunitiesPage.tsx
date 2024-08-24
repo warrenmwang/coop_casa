@@ -1,15 +1,18 @@
 import React from "react";
-import TopNavbar from "../components/TopNavbar";
-import Footer from "../components/Footer";
-
 import "../styles/contentBody.css";
-import CommunitiesHomeBanner from "../components/CommunitiesHomeBanner";
 import CommunitiesMainBody from "../components/CommunitiesMainBody";
+import Title from "../components/Title";
 
 const CommunitiesPage: React.FC = () => {
   return (
     <div className="content-body">
-      <CommunitiesHomeBanner />
+      {/* Aesthetic Banner */}
+      <div className="banner__green">
+        <Title
+          title="Search Communities"
+          description="Find people with similar interests!"
+        ></Title>
+      </div>
       <CommunitiesMainBody />
     </div>
   );

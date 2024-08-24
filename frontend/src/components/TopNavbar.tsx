@@ -8,6 +8,10 @@ import {
   apiAuthGoogleOAuthLink,
   accountSettingsPageLink,
   homePageLink,
+  dashboardPageLink,
+  usersPageLink,
+  communitiesPageLink,
+  propertiesPageLink,
 } from "../urls";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiGetUser, apiGetUserAuth, apiLogoutUser } from "../api/account";
@@ -75,11 +79,11 @@ const TopNavbar: React.FC = () => {
 
   const navigation = [
     ...(authenticated
-      ? [{ name: "Dashboard", href: "/dashboard", current: false }]
+      ? [{ name: "Dashboard", href: dashboardPageLink, current: false }]
       : []),
-    { name: "Communities", href: "/communities", current: false },
-    { name: "Properties", href: "/properties", current: false },
-    // { name: "Map", href: "/map", current: false },
+    { name: "Users", href: usersPageLink, current: false },
+    { name: "Communities", href: communitiesPageLink, current: false },
+    { name: "Properties", href: propertiesPageLink, current: false },
   ];
 
   return (

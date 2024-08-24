@@ -19,6 +19,7 @@ export const contactPageLink = "/contact";
 export const communitiesPageLink = "/communities";
 export const propertiesPageLink = "/properties";
 export const dashboardPageLink = "/dashboard";
+export const usersPageLink = "/users";
 
 // BACK END
 export const apiAuthGoogleOAuthLink = `${API_HOST}:${API_PORT}/auth/google`;
@@ -40,3 +41,5 @@ export const apiListerLink = `${API_HOST}:${API_PORT}/api/lister`;
 export const apiCommunitiesLink = `${API_HOST}:${API_PORT}/api/communities`;
 export const apiCommunitiesUsersLink = `${API_HOST}:${API_PORT}/api/communities/users`;
 export const apiCommunitiesPropertiesLink = `${API_HOST}:${API_PORT}/api/communities/properties`;
+
+export const apiUsersLink = `${API_HOST}:${API_PORT}/api/users`;

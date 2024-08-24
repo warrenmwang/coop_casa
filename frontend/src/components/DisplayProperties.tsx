@@ -7,7 +7,6 @@ import SearchBar from "../input/SearchBar";
 import PageOfProperties from "../components/PageOfProperties";
 import { useSearchParams } from "react-router-dom";
 import SubmitButton from "./SubmitButton";
-import Title from "./Title";
 import "../styles/contentBody.css";
 import "../styles/form.css";
 import FetchErrorText from "./FetchErrorText";
@@ -131,14 +130,6 @@ const DisplayProperties: React.FC = () => {
 
   return (
     <>
-      {/* Aesthetic Banner */}
-      <div className="banner__green">
-        <Title
-          title="Search Properties"
-          description="You can use optional filters to narrow down your search here."
-        />
-      </div>
-
       {/* Input form for applying filters to search */}
       <form
         className="form__searchProperties"

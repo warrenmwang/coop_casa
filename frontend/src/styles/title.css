@@ -5,6 +5,5 @@
   font-weight: bold;
 }
 .title-description {
-  font-size: 15px;
-  margin: 0;
+  @apply text-lg;
 }

@@ -4,7 +4,6 @@ import { apiGetCommunities } from "../api/community";
 import CardGridSkeleton from "../skeleton/CardGridSkeleton";
 import PageOfCommunities from "./PageOfCommunities";
 
-import Title from "../components/Title";
 import SearchBar from "../input/SearchBar";
 import "../styles/colors.css";
 import SubmitButton from "../components/SubmitButton";
@@ -154,14 +153,6 @@ const CommunitiesMainBody: React.FC = () => {
 
   return (
     <>
-      {/* Aesthetic Banner */}
-      <div className="banner__blue">
-        <Title
-          title="Search Communities"
-          description="Find people with similar interests!"
-        ></Title>
-      </div>
-
       {/* Input form for applying filters to search */}
       <form
         className="form__searchCommunities"

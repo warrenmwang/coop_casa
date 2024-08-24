@@ -2,7 +2,6 @@ import React from "react";
 import Title from "../components/Title";
 import Card from "../components/Card";
 import elizabeth_img from "../assets/elizabeth.jpeg";
-import warren_img from "../assets/warren.png";
 import gloria_img from "../assets/gloria.jpeg";
 import barbara_img from "../assets/barbara.jpeg";
 

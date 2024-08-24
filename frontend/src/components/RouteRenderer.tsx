@@ -1,7 +1,7 @@
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 
-import HomePage from "../pages/HomePage";
+import LandingPage from "../pages/LandingPage";
 import AboutPage from "../pages/AboutPage";
 import DashboardPage from "../pages/DashboardPage";
 import ContactPage from "../pages/ContactPage";
@@ -26,17 +26,20 @@ import {
   dashboardPageLink,
   accountSettingsPageLink,
   accountSetupPageLink,
+  usersPageLink,
 } from "../urls";
 import CommunityDetail from "../pages/CommunityDetail";
 import TopNavbar from "./TopNavbar";
 import Footer from "./Footer";
+import UsersPage from "../pages/UsersPage";
 
 const RouteRenderer: React.FC = () => {
   return (
     <>
       <TopNavbar />
       <Routes>
-        <Route path={homePageLink} element={<HomePage />} />
+        <Route path={homePageLink} element={<LandingPage />} />
+        <Route path={usersPageLink} element={<UsersPage />} />
         <Route path={communitiesPageLink} element={<CommunitiesPage />} />
         <Route path={propertiesPageLink} element={<PropertiesPage />} />
         <Route

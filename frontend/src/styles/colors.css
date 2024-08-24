@@ -5,3 +5,7 @@
 .banner__green {
   @apply rounded bg-gradient-to-l from-green-500 to-green-600 p-5 my-3;
 }
+
+.banner__red {
+  @apply rounded bg-gradient-to-l from-red-400 to-red-500 p-5 my-3;
+}
