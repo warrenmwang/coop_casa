@@ -16,7 +16,7 @@ func CalculateAge(birthdate string) (int16, error) {
 	layout := "2006-01-02"
 	birthTime, err := time.Parse(layout, birthdate)
 	if err != nil {
-		return 0, err
+		return -1, err
 	}
 
 	// Get the current time

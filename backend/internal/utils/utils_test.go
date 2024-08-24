@@ -8,7 +8,55 @@ import (
 )
 
 func TestCalculateAge(t *testing.T) {
-	t.Error("TODO: implement TestCalculateAge test")
+	// Valid test case, considering that time cannot flow backwards
+	// we'll use minimum age tests
+
+	test1 := "2000-01-01"
+	var expectedMinAge int16 = 24
+	testResult1, err := CalculateAge(test1)
+	if err != nil {
+		t.Fatal("received error from calculated age when did not expect")
+	}
+	if testResult1 < expectedMinAge {
+		t.Error("calculated age is less than minimum age expected from test 1")
+	}
+
+	// Invalid tests
+	test2 := ""
+	testResult2, err := CalculateAge(test2)
+	if err == nil {
+		t.Error("did not receive error from calculated age when expected")
+	}
+	if testResult2 != -1 {
+		t.Error("did not receive -1 age for failed time parsing test case")
+	}
+
+	test3 := "j001-01-01"
+	testResult3, err := CalculateAge(test3)
+	if err == nil {
+		t.Error("did not receive error from calculated age when expected")
+	}
+	if testResult3 != -1 {
+		t.Error("did not receive -1 age for failed time parsing test case")
+	}
+
+	test4 := "2001-k1-01"
+	testResult4, err := CalculateAge(test4)
+	if err == nil {
+		t.Error("did not receive error from calculated age when expected")
+	}
+	if testResult4 != -1 {
+		t.Error("did not receive -1 age for failed time parsing test case")
+	}
+
+	test5 := "2001-01-0k"
+	testResult5, err := CalculateAge(test5)
+	if err == nil {
+		t.Error("did not receive error from calculated age when expected")
+	}
+	if testResult5 != -1 {
+		t.Error("did not receive -1 age for failed time parsing test case")
+	}
 }
 
 func TestIsValidEmail(t *testing.T) {
