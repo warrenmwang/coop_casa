@@ -1,16 +1,11 @@
-import React from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { apiGetCommunity } from "../api/community";
-import CardSkeleton from "../skeleton/CardSkeleton";
-import { Community } from "../types/Types";
 import { Box } from "@mui/material";
 import { communitiesPageLink } from "../urls";
 import ShareLinkButton from "../components/ShareLinkButton";
 import CustomImageGallery, {
   ImageGalleryItemsInput,
 } from "../components/CustomImageGallery";
-import FetchErrorText from "../components/FetchErrorText";
+import { useNavigate } from "react-router-dom";
+import { Community } from "../types/Types";
 
 const CommunityDetailContent: React.FC<{ community: Community }> = ({
   community,
@@ -56,35 +51,4 @@ const CommunityDetailContent: React.FC<{ community: Community }> = ({
   );
 };
 
-const CommunityDetail: React.FC = () => {
-  const { communityID } = useParams<{ communityID: string }>();
-  const communityIDStr: string = communityID as string;
-
-  const communityQuery = useQuery({
-    queryKey: ["communities", communityID],
-    queryFn: () => apiGetCommunity(communityIDStr),
-  });
-
-  return (
-    <>
-      {communityQuery.status === "pending" && (
-        <div className="flex justify-center">
-          {" "}
-          <CardSkeleton />
-        </div>
-      )}
-      {communityQuery.status === "success" && (
-        <CommunityDetailContent
-          community={communityQuery.data as Community}
-        ></CommunityDetailContent>
-      )}
-      {communityQuery.status === "error" && (
-        <FetchErrorText>
-          Sorry, we are unable to find that particular property.
-        </FetchErrorText>
-      )}
-    </>
-  );
-};
-
-export default CommunityDetail;
+export default CommunityDetailContent;

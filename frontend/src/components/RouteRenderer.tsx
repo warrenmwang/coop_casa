@@ -12,7 +12,7 @@ import TermsOfServicePage from "../pages/TermsOfServicePage";
 import AccountSettingsPage from "../pages/AccountSettingsPage";
 import AccountSetupPage from "../pages/AccountSetupPage";
 import PropertiesPage from "../pages/PropertiesPage";
-import PropertyDetail from "../pages/PropertyDetail";
+import PropertyDetailPage from "../pages/PropertyDetailPage";
 import AttributionsPage from "../pages/AttributionsPage";
 import {
   aboutPageLink,
@@ -28,7 +28,7 @@ import {
   accountSetupPageLink,
   usersPageLink,
 } from "../urls";
-import CommunityDetail from "../pages/CommunityDetail";
+import CommunityDetailPage from "../pages/CommunityDetailPage";
 import TopNavbar from "./TopNavbar";
 import Footer from "./Footer";
 import UsersPage from "../pages/UsersPage";
@@ -44,11 +44,11 @@ const RouteRenderer: React.FC = () => {
         <Route path={propertiesPageLink} element={<PropertiesPage />} />
         <Route
           path={`${propertiesPageLink}/:propertyID`}
-          element={<PropertyDetail />}
+          element={<PropertyDetailPage />}
         />
         <Route
           path={`${communitiesPageLink}/:communityID`}
-          element={<CommunityDetail />}
+          element={<CommunityDetailPage />}
         />
         <Route path={aboutPageLink} element={<AboutPage />} />
         <Route path={privacypolicyPageLink} element={<PrivacyPolicyPage />} />

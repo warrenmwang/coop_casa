@@ -1,57 +1,12 @@
-import React from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { propertiesPageLink } from "../urls";
 import { Box } from "@mui/material";
 import CustomImageGallery, {
   ImageGalleryItemsInput,
 } from "../components/CustomImageGallery";
-import { apiGetListerInfo, apiGetProperty } from "../api/property";
-import { propertiesPageLink } from "../urls";
-import { Property } from "../types/Types";
-import { useQuery } from "@tanstack/react-query";
-import CardSkeleton from "../skeleton/CardSkeleton";
-import { ListerBasicInfo } from "../types/Types";
 import ShareLinkButton from "../components/ShareLinkButton";
-import FetchErrorText from "../components/FetchErrorText";
-
-type ListerInfoProps = {
-  listerID: string;
-};
-
-const ListerInfo: React.FC<ListerInfoProps> = ({ listerID }) => {
-  const { data, status } = useQuery({
-    queryKey: ["lister", listerID],
-    queryFn: () => apiGetListerInfo(listerID),
-  });
-
-  const lister = data as ListerBasicInfo;
-
-  return (
-    <>
-      {status === "pending" && "Loading lister info..."}
-      {status === "success" && (
-        <>
-          <div className="text-xl font-bold pt-2">Lister Information</div>
-          <div className="flex gap-2">
-            <div className="text-lg">Name: </div>
-            <div className="text-lg">
-              {lister.firstName} {lister.lastName}
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <div className="text-lg">Email: </div>
-            <div className="text-lg">{lister.email}</div>
-          </div>
-        </>
-      )}
-      {status === "error" && (
-        <FetchErrorText>
-          Sorry, we are unable to find the lister of this property at the
-          moment.
-        </FetchErrorText>
-      )}
-    </>
-  );
-};
+import ListerInfo from "../components/ListerInfo";
+import { Property } from "../types/Types";
+import { useNavigate } from "react-router-dom";
 
 type PropertyDetailContentProps = {
   property: Property;
@@ -165,36 +120,4 @@ const PropertyDetailContent: React.FC<PropertyDetailContentProps> = ({
   );
 };
 
-const PropertyDetail: React.FC = () => {
-  const { propertyID } = useParams<{ propertyID: string }>();
-
-  const propertyIDStr: string = propertyID as string;
-
-  const propertyQuery = useQuery({
-    queryKey: ["properties", propertyIDStr],
-    queryFn: () => apiGetProperty(propertyIDStr),
-  });
-
-  return (
-    <>
-      {propertyQuery.status === "pending" && (
-        <div className="flex justify-center">
-          {" "}
-          <CardSkeleton />
-        </div>
-      )}
-      {propertyQuery.status === "success" && (
-        <PropertyDetailContent
-          property={propertyQuery.data as Property}
-        ></PropertyDetailContent>
-      )}
-      {propertyQuery.status === "error" && (
-        <FetchErrorText>
-          Sorry, we are unable to find that particular property.
-        </FetchErrorText>
-      )}
-    </>
-  );
-};
-
-export default PropertyDetail;
+export default PropertyDetailContent;
