@@ -7,7 +7,7 @@ CREATE TABLE communities(
     "description" text,
     created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_admin_user_id_communities FOREIGN KEY (admin_user_id) REFERENCES users(user_id)
+    CONSTRAINT fk_admin_user_id_communities FOREIGN KEY (admin_user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
 CREATE TABLE communities_images(
