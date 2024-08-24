@@ -122,3 +122,23 @@ export type Community = {
   users: string[];
   properties: string[];
 };
+
+export type UserProfileDetails = {
+  userID: string;
+  firstName: string;
+  lastName: string;
+  ageInYears: number;
+  gender: string;
+  location: string;
+  interests: string[];
+};
+
+export type APIUserProfileReceived = {
+  details: UserProfileDetails;
+  images: APIFileReceived[];
+};
+
+export type UserProfile = {
+  details: UserProfileDetails;
+  images: File[];
+};

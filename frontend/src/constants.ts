@@ -10,8 +10,12 @@ export const MAX_NUMBER_PROPERTIES_PER_PAGE = 9;
 export const MAX_NUMBER_COMMUNITIES_PER_PAGE = 9;
 
 export const pageQPKey = "page";
+export const limitQPKey = "limit";
 
 export const filterNameQPKey = "communityFilterName";
 export const filterDescriptionQPKey = "communityFilterDescription";
 
 export const filterAddressQPKey = "filterAddress";
+
+export const filterFirstNameQPKey = "filterFirstName";
+export const filterLastNameQPKey = "filterLastName";
