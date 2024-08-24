@@ -25,7 +25,9 @@ export const apiGetUserProfiles = async (
       },
     )
     .then((res) => res.data)
-    .then((data) => data.userIDs as string[]);
+    .then((data) => {
+      return data.userIDs !== null ? (data.userIDs as string[]) : [];
+    });
 };
 
 export const apiGetUserProfile = async (

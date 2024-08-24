@@ -65,10 +65,7 @@ export const apiGetCommunities = async (
     )
     .then((res) => res.data)
     .then((data) => {
-      if (data === null) {
-        return []; // no more communities
-      }
-      return data as string[];
+      return data.communityIDs !== null ? (data.communityIDs as string[]) : [];
     });
 };
 

@@ -822,7 +822,11 @@ func (s *Server) apiGetPropertiesHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	respondWithJSON(w, 200, properties)
+	respondWithJSON(w, 200, struct {
+		PropertyIDs []string `json:"propertyIDs"`
+	}{
+		PropertyIDs: properties,
+	})
 }
 
 // Endpoint: POST /api/properties
@@ -1216,7 +1220,11 @@ func (s *Server) apiGetCommunitiesHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	respondWithJSON(w, 200, communityIds)
+	respondWithJSON(w, 200, struct {
+		CommunityIDs []string `json:"communityIDs"`
+	}{
+		CommunityIDs: communityIds,
+	})
 }
 
 // POST /api/communities

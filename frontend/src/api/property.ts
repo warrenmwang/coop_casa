@@ -94,10 +94,7 @@ export const apiGetProperties = async (
     )
     .then((res) => res.data)
     .then((data) => {
-      if (data === null) {
-        return []; // no more property ids in db
-      }
-      return data as string[];
+      return data.propertyIDs !== null ? (data.propertyIDs as string[]) : [];
     });
 };
 
