@@ -2,7 +2,6 @@ import React, { Fragment } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
-import defaultProfileImg from "../assets/profile.jpg";
 import coopImg from "../assets/coopAlt1.svg";
 import {
   apiAuthGoogleOAuthLink,
@@ -19,6 +18,9 @@ import { APIUserReceived } from "../types/Types";
 import { apiFile2ClientFile } from "../utils/utils";
 import { toast } from "react-toastify";
 import axios, { AxiosError } from "axios";
+import UserProfileIcon from "../icons/UserProfileIcon/UserProfileIcon";
+import DefaultUserProfileIcon from "../icons/DefaultUserProfile/DefaultUserProfileIcon";
+import { JsxElement } from "typescript";
 
 function classNames(...classes: (string | undefined | null | false)[]) {
   return classes.filter(Boolean).join(" ");
@@ -44,7 +46,7 @@ const TopNavbar: React.FC = () => {
       queryClient.invalidateQueries({
         queryKey: ["user"], // invalidate all queries that start with user
       });
-      profileImg = defaultProfileImg;
+      authenticated = false;
       navigate(homePageLink);
     },
     onError: (error: Error | AxiosError) => {
@@ -57,14 +59,18 @@ const TopNavbar: React.FC = () => {
   });
   const queryClient = useQueryClient();
 
-  let profileImg: string = defaultProfileImg;
+  let profileImageElement: JSX.Element = (
+    <DefaultUserProfileIcon color="white" />
+  );
   if (userQuery.status === "success") {
     const receivedUser: APIUserReceived = userQuery.data;
     const avatarFile: File | null = apiFile2ClientFile(
       receivedUser.avatarImageB64,
     );
     if (avatarFile !== null) {
-      profileImg = URL.createObjectURL(avatarFile);
+      profileImageElement = (
+        <UserProfileIcon userProfileImage={URL.createObjectURL(avatarFile)} />
+      );
     }
   }
 
@@ -72,9 +78,6 @@ const TopNavbar: React.FC = () => {
   if (authQuery.status === "success") {
     const receivedAuth: boolean = authQuery.data;
     authenticated = receivedAuth;
-  }
-  if (!authenticated) {
-    profileImg = defaultProfileImg;
   }
 
   const navigation = [
@@ -137,11 +140,7 @@ const TopNavbar: React.FC = () => {
                     <Menu.Button className="relative flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                       <span className="absolute -inset-1.5" />
                       <span className="sr-only">Open user menu</span>
-                      <img
-                        className="h-8 w-8 rounded-full"
-                        src={profileImg}
-                        alt="profileImg"
-                      />
+                      {profileImageElement}
                     </Menu.Button>
                   </div>
                   <Transition

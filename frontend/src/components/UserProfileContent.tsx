@@ -7,12 +7,15 @@ import ShareLinkButton from "./ShareLinkButton";
 import CustomImageGallery, {
   ImageGalleryItemsInput,
 } from "./CustomImageGallery";
+import defaultProfileImage from "../assets/profile.jpg";
 
 const UserProfileContent: React.FC<{ userProfile: UserProfile }> = ({
   userProfile,
 }) => {
   const navigate = useNavigate();
-  const images = userProfile.images.map((image) => URL.createObjectURL(image));
+  const images = userProfile.images.map((image) =>
+    image !== null ? URL.createObjectURL(image) : defaultProfileImage,
+  );
   const imageData: ImageGalleryItemsInput[] = images.map((image) => ({
     img: image,
     title: "default title",

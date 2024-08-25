@@ -69,7 +69,7 @@ const PropertyDetailContent: React.FC<PropertyDetailContentProps> = ({
       ? `${property.details.address1}, ${property.details.city}, ${property.details.state} ${property.details.zipcode}, ${property.details.country}`
       : `${property.details.address1}, ${property.details.address2}, ${property.details.city}, ${property.details.state} ${property.details.zipcode}, ${property.details.country}`;
 
-  const basicInfoElement = basicInfoConstructor(property);
+  const basicInfoElement: JSX.Element = basicInfoConstructor(property);
 
   return (
     <Box className="bg-white p-4 shadow-lg rounded-lg mx-auto w-11/12 md:w-3/5 lg:w-1/2 z-50">

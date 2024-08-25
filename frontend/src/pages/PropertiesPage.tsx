@@ -1,5 +1,5 @@
 import React from "react";
-import DisplayProperties from "../components/DisplayProperties";
+import PropertiesMainBody from "../components/PropertiesMainBody";
 import Title from "../components/Title";
 
 const PropertiesPage: React.FC = () => {
@@ -12,7 +12,7 @@ const PropertiesPage: React.FC = () => {
           description="You can use optional filters to narrow down your search here."
         />
       </div>
-      <DisplayProperties />
+      <PropertiesMainBody />
     </div>
   );
 };

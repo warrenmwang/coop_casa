@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { MAX_NUMBER_PROPERTIES_PER_PAGE } from "../constants";
 import CardGridSkeleton from "../skeleton/CardGridSkeleton";
 import SearchBar from "../input/SearchBar";
-import PageOfProperties from "../components/PageOfProperties";
+import PageOfProperties from "./PageOfProperties";
 import { useSearchParams } from "react-router-dom";
 import SubmitButton from "./SubmitButton";
 import "../styles/contentBody.css";
@@ -12,7 +12,7 @@ import "../styles/form.css";
 import FetchErrorText from "./FetchErrorText";
 import { pageQPKey, filterAddressQPKey } from "../constants";
 
-const DisplayProperties: React.FC = () => {
+const PropertiesMainBody: React.FC = () => {
   const [searchIsSubmitting, setSearchIsSubmitting] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -160,8 +160,8 @@ const DisplayProperties: React.FC = () => {
       {/* If no properties exist on platform, display a message. */}
       {noPropertiesOnPlatform && (
         <FetchErrorText>
-          Sorry, there are no communities on Coop right now! Create your own or
-          come back later.
+          Sorry, there are no properties on Coop right now! There will be
+          listings soon, we promise.
         </FetchErrorText>
       )}
 
@@ -201,4 +201,4 @@ const DisplayProperties: React.FC = () => {
   );
 };
 
-export default DisplayProperties;
+export default PropertiesMainBody;
