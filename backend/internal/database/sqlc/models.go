@@ -96,6 +96,16 @@ type User struct {
 	UpdatedAt time.Time
 }
 
+type UserImage struct {
+	ID        int32
+	UserID    string
+	FileName  string
+	MimeType  string
+	Size      int64
+	Data      []byte
+	CreatedAt time.Time
+}
+
 type UsersAvatar struct {
 	ID        int32
 	UserID    string

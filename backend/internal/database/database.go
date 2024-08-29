@@ -133,6 +133,11 @@ type Service interface {
 	DeleteUser(userId string) error
 	GetUserAvatar(userId string) (FileInternal, error)
 
+	// User Profile Images
+	CreateUserProfileImages(userID string, images []FileInternal) error
+	GetUserProfileImages(userID string) ([]FileInternal, error)
+	DeleteUserProfileImages(userID string) error
+
 	// Roles
 	CreateNewUserRole(userId, role string) error
 	GetUserRole(userId string) (string, error)
@@ -591,6 +596,98 @@ func (s *service) DeleteUser(userId string) error {
 
 	// Delete the user with the matching encrypyted id
 	err = s.db_queries.DeleteUserDetails(ctx, userIDEncrypted)
+	return err
+}
+
+// User Profile information
+func (s *service) CreateUserProfileImages(userID string, images []FileInternal) error {
+	ctx := context.Background()
+
+	// Encrypt all of the user information and their images
+	encryptedUserID, err := utils.EncryptString(userID, s.db_encrypt_key)
+	if err != nil {
+		return errors.New("couldn't encrypt userID for image")
+	}
+
+	for i, image := range images {
+		// Encrypt what we can for the image
+		encryptedFilename, err := utils.EncryptString(image.Filename, s.db_encrypt_key)
+		if err != nil {
+			return fmt.Errorf("couldn't encrypt filename for image %d", i+1)
+		}
+		encryptedMimetype, err := utils.EncryptString(image.Mimetype, s.db_encrypt_key)
+		if err != nil {
+			return fmt.Errorf("couldn't encrypt mimtype for image %d", i+1)
+		}
+		encryptedData, err := utils.EncryptBytes(image.Data, s.db_encrypt_key)
+		if err != nil {
+			return fmt.Errorf("couldn't encrypt data for image %d", i+1)
+		}
+
+		// Insert into the db
+		err = s.db_queries.CreateUserImage(ctx, sqlc.CreateUserImageParams{
+			UserID:   encryptedUserID,
+			FileName: encryptedFilename,
+			MimeType: encryptedMimetype,
+			Size:     image.Size,
+			Data:     encryptedData,
+		})
+		if err != nil {
+			return fmt.Errorf("couldn't create user profile image for image %d", i+1)
+		}
+	}
+	return nil
+}
+
+func (s *service) GetUserProfileImages(userID string) ([]FileInternal, error) {
+	ctx := context.Background()
+
+	// Encrypt all of the user information and their images
+	userID_E, err := utils.EncryptString(userID, s.db_encrypt_key)
+	if err != nil {
+		return nil, errors.New("couldn't encrypt userID for image")
+	}
+
+	// Find images by encrypted user id
+	images_E, err := s.db_queries.GetUserImages(ctx, userID_E)
+	if err != nil {
+		return nil, err
+	}
+
+	var images_D []FileInternal
+	for i, image_E := range images_E {
+		// Decrypt each image's data
+		fileName_D, err := utils.DecryptString(image_E.FileName, s.db_encrypt_key)
+		if err != nil {
+			return nil, fmt.Errorf("couldn't decrypt filename for user image %d", i+1)
+		}
+		mimeType_D, err := utils.DecryptString(image_E.MimeType, s.db_encrypt_key)
+		if err != nil {
+			return nil, fmt.Errorf("couldn't decrypt mimetype for user image %d", i+1)
+		}
+		data_D, err := utils.DecryptBytes(image_E.Data, s.db_encrypt_key)
+		if err != nil {
+			return nil, fmt.Errorf("couldn't decrypt data for user image %d", i+1)
+		}
+
+		images_D = append(images_D, FileInternal{
+			Filename: fileName_D,
+			Mimetype: mimeType_D,
+			Size:     image_E.Size,
+			Data:     data_D,
+		})
+	}
+
+	return images_D, nil
+}
+
+func (s *service) DeleteUserProfileImages(userID string) error {
+	ctx := context.Background()
+	userID_E, err := utils.EncryptString(userID, s.db_encrypt_key)
+	if err != nil {
+		return err
+	}
+	err = s.db_queries.DeleteUserImages(ctx, userID_E)
 	return err
 }
 

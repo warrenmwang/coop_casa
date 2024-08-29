@@ -72,7 +72,7 @@ type CreateBareUserParams struct {
 	Email  string
 }
 
-// -------------------------- PRivate Users API Queries (for each account) --------------------------
+// Private Users API Queries (for each account)
 func (q *Queries) CreateBareUser(ctx context.Context, arg CreateBareUserParams) error {
 	_, err := q.db.ExecContext(ctx, createBareUser, arg.UserID, arg.Email)
 	return err
@@ -106,102 +106,6 @@ WHERE user_id = $1
 func (q *Queries) DeleteUserDetails(ctx context.Context, userID string) error {
 	_, err := q.db.ExecContext(ctx, deleteUserDetails, userID)
 	return err
-}
-
-const getNextPageOfPublicUsers = `-- name: GetNextPageOfPublicUsers :many
-SELECT
-    user_id
-FROM
-    users
-WHERE
-    first_name IS NOT NULL
-    AND last_name IS NOT NULL
-    AND birth_date IS NOT NULL
-    AND gender IS NOT NULL
-    AND "location" IS NOT NULL
-    AND interests IS NOT NULL
-LIMIT $1 OFFSET $2
-`
-
-type GetNextPageOfPublicUsersParams struct {
-	Limit  int32
-	Offset int32
-}
-
-// -------------------------- Public Users API Queries --------------------------
-func (q *Queries) GetNextPageOfPublicUsers(ctx context.Context, arg GetNextPageOfPublicUsersParams) ([]string, error) {
-	rows, err := q.db.QueryContext(ctx, getNextPageOfPublicUsers, arg.Limit, arg.Offset)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []string
-	for rows.Next() {
-		var user_id string
-		if err := rows.Scan(&user_id); err != nil {
-			return nil, err
-		}
-		items = append(items, user_id)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const getNextPageOfPublicUsersFilterByName = `-- name: GetNextPageOfPublicUsersFilterByName :many
-SELECT
-    user_id
-FROM
-    users
-WHERE
-    first_name IS NOT NULL
-    AND last_name IS NOT NULL
-    AND birth_date IS NOT NULL
-    AND gender IS NOT NULL
-    AND "location" IS NOT NULL
-    AND interests IS NOT NULL
-ORDER BY
-    0.5 * similarity("first_name", $3) + 0.5 * similarity("last_name", $4) DESC
-LIMIT $1 OFFSET $2
-`
-
-type GetNextPageOfPublicUsersFilterByNameParams struct {
-	Limit        int32
-	Offset       int32
-	Similarity   string
-	Similarity_2 string
-}
-
-func (q *Queries) GetNextPageOfPublicUsersFilterByName(ctx context.Context, arg GetNextPageOfPublicUsersFilterByNameParams) ([]string, error) {
-	rows, err := q.db.QueryContext(ctx, getNextPageOfPublicUsersFilterByName,
-		arg.Limit,
-		arg.Offset,
-		arg.Similarity,
-		arg.Similarity_2,
-	)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []string
-	for rows.Next() {
-		var user_id string
-		if err := rows.Scan(&user_id); err != nil {
-			return nil, err
-		}
-		items = append(items, user_id)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
 }
 
 const getUserAvatar = `-- name: GetUserAvatar :one
