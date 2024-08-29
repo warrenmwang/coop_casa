@@ -6,10 +6,30 @@ import (
 	"crypto/md5"
 	"database/sql"
 	"encoding/base64"
+	"encoding/json"
+	"log"
+	"net/http"
 	"net/mail"
 	"regexp"
 	"time"
 )
+
+// Handles http requests and return json
+func RespondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(code)
+	response, err := json.Marshal(payload)
+	if err != nil {
+		log.Fatal(err)
+	}
+	w.Write(response)
+}
+
+// Responds with an error
+func RespondWithError(w http.ResponseWriter, code int, err error) {
+	http.Error(w, err.Error(), code)
+	log.Println("responded with err:", err.Error())
+}
 
 func CalculateAge(birthdate string) (int16, error) {
 	// Parse the birthdate string

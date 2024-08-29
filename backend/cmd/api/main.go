@@ -2,11 +2,13 @@ package main
 
 import (
 	"backend/internal/auth"
+	"backend/internal/config"
 	"backend/internal/server"
 	"fmt"
 )
 
 func main() {
+	config.InitConfig()
 	auth.NewAuth()
 	server := server.NewServer()
 

@@ -8,6 +8,7 @@ package database
 */
 
 import (
+	"backend/internal/config"
 	"backend/internal/database/sqlc"
 	"backend/internal/utils"
 	"context"
@@ -16,7 +17,6 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"os"
 	"time"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
@@ -1484,33 +1484,8 @@ func (s *service) GetPublicUserProfile(userID string) (PublicUserProfile, error)
 
 // DB entrance func to init
 func New() Service {
-	database := os.Getenv("DB_DATABASE")
-	if database == "" {
-		log.Fatal("unexpected empty environment variable: DB_DATABASE")
-	}
-	password := os.Getenv("DB_PASSWORD")
-	if password == "" {
-		log.Fatal("unexpected empty environment variable: DB_PASSWORD")
-	}
-	username := os.Getenv("DB_USERNAME")
-	if username == "" {
-		log.Fatal("unexpected empty environment variable: DB_USERNAME")
-	}
-	port := os.Getenv("DB_PORT")
-	if port == "" {
-		log.Fatal("unexpected empty environment variable: DB_PORT")
-	}
-	host := os.Getenv("DB_HOST")
-	if host == "" {
-		log.Fatal("unexpected empty environment variable: DB_HOST")
-	}
-	dbEncryptKey := os.Getenv("DB_ENCRYPT_KEY_SECRET")
-	if dbEncryptKey == "" {
-		log.Fatal("unexpected empty environment variable: DB_ENCRYPT_KEY_SECRET")
-	}
-
 	// Raw sql connection
-	connStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", username, password, host, port, database)
+	connStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", config.GlobalConfig.DB_USERNAME, config.GlobalConfig.DB_PASSWORD, config.GlobalConfig.DB_HOST, config.GlobalConfig.DB_PORT, config.GlobalConfig.DB_DATABASE)
 	db, err := sql.Open("pgx", connStr)
 	if err != nil {
 		log.Fatal(err)
@@ -1522,7 +1497,7 @@ func New() Service {
 	s := &service{
 		db:             db,
 		db_queries:     db_queries,
-		db_encrypt_key: dbEncryptKey,
+		db_encrypt_key: config.GlobalConfig.DB_ENCRYPT_KEY_SECRET,
 	}
 	return s
 }
