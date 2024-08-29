@@ -10,4 +10,11 @@ export default [
   ...tseslint.configs.recommended,
   pluginReact.configs.flat.recommended,
   { ignores: ["build/", "node_modules"] },
+  {
+    settings: {
+      react: {
+        version: "detect",
+      },
+    },
+  },
 ];

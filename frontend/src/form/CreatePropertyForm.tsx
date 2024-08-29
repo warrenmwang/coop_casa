@@ -253,7 +253,7 @@ const CreatePropertyForm: React.FC = () => {
         return;
       }
       // save value for this field
-      setPropertyDetails((prevState: any) => ({
+      setPropertyDetails((prevState) => ({
         ...prevState,
         [id]: Number(value),
       }));
@@ -261,7 +261,7 @@ const CreatePropertyForm: React.FC = () => {
     }
 
     // o.w. set string value
-    setPropertyDetails((prevState: any) => ({
+    setPropertyDetails((prevState) => ({
       ...prevState,
       [id]: value,
     }));
@@ -300,7 +300,7 @@ const CreatePropertyForm: React.FC = () => {
 
       // Set values that we don't want the user to fill in themselves.
       // > property id as a UUIDV4, lister id (openauth id)
-      setPropertyDetails((prevState: any) => ({
+      setPropertyDetails((prevState) => ({
         ...prevState,
         propertyId: uuidv4(),
         listerUserId: userDetails.userId,

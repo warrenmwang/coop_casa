@@ -6,11 +6,14 @@ import {
   apiUserRoleLink,
 } from "../urls";
 import { User, APIUserReceived } from "../types/Types";
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
+import { DeleteUserResponse, LogoutUserResponse } from "../types/Responses";
 
 // Delete Account Function
-export const apiAccountDelete = async (): Promise<any> => {
-  return axios.delete(apiAccountLink, {
+export const apiAccountDelete = async (): Promise<
+  AxiosResponse<DeleteUserResponse>
+> => {
+  return axios.delete<DeleteUserResponse>(apiAccountLink, {
     withCredentials: true,
   });
 };
@@ -47,8 +50,10 @@ export const apiUpdateUserAccountDetails = async (
 };
 
 // Log out user from system, end session by invalidating the client side token
-export const apiLogoutUser = async (): Promise<any> => {
-  return axios.post(
+export const apiLogoutUser = async (): Promise<
+  AxiosResponse<LogoutUserResponse>
+> => {
+  return axios.post<LogoutUserResponse>(
     apiAuthLogoutLink,
     {},
     {

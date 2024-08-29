@@ -94,7 +94,7 @@ const CreateCommunityForm: React.FC = () => {
   ];
 
   const textInputHandleChange = (id: string, value: string) => {
-    setCommunityDetails((prevState: any) => ({
+    setCommunityDetails((prevState) => ({
       ...prevState,
       [id]: value,
     }));
@@ -134,7 +134,7 @@ const CreateCommunityForm: React.FC = () => {
 
       // Set values that we don't want the user to fill in themselves.
       // > community id as a UUIDV4, lister id (openauth id)
-      setCommunityDetails((prevState: any) => ({
+      setCommunityDetails((prevState) => ({
         ...prevState,
         communityId: uuidv4(),
         adminUserId: userDetails.userId,

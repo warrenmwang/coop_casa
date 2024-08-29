@@ -1,6 +1,7 @@
 import { apiAdminUsersLink, apiAdminUsersRolesLink } from "../urls";
 import { UserDetails } from "../types/Types";
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
+import { AdminUpdateUserRoleResponse } from "../types/Responses";
 
 export const apiAdminGetUsersDetails = async (
   limit: number,
@@ -42,14 +43,12 @@ export const apiAdminGetUsersRoles = async (
 export const apiAdminUpdateUserRole = async (
   userID: string,
   role: string,
-): Promise<any> => {
-  return axios
-    .post(
-      `${apiAdminUsersRolesLink}?userID=${userID}&role=${role}`,
-      {},
-      {
-        withCredentials: true,
-      },
-    )
-    .then((resp) => resp.data);
+): Promise<AxiosResponse<AdminUpdateUserRoleResponse>> => {
+  return axios.post<AdminUpdateUserRoleResponse>(
+    `${apiAdminUsersRolesLink}?userID=${userID}&role=${role}`,
+    {},
+    {
+      withCredentials: true,
+    },
+  );
 };
