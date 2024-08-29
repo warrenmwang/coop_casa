@@ -193,8 +193,11 @@ const CreateCommunityForm: React.FC = () => {
   }, [isSubmitting, communityDetails]);
 
   const ready: boolean = userQuery.isFetched;
+  if (!ready) {
+    return <TextSkeleton />;
+  }
 
-  return ready ? (
+  return (
     <div className="flex flex-col items-center">
       <h1 className="h1_custom">Add Community Listing</h1>
       <h4 className="h4_custom">
@@ -235,8 +238,6 @@ const CreateCommunityForm: React.FC = () => {
         </div>
       </form>
     </div>
-  ) : (
-    <TextSkeleton />
   );
 };
 

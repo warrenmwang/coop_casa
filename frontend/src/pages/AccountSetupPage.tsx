@@ -113,110 +113,107 @@ const AccountSetupPage: React.FC = () => {
   }, [userQuery.status]);
 
   const ready: boolean = userQuery.isFetched && formData.userId !== "";
+  if (!ready) {
+    return <TextSkeleton />;
+  }
 
   return (
     <div className="content-body">
-      {ready ? (
-        <>
-          <Title
-            title="Account Setup"
-            description="Please provide some information about yourself to be able to use this platform and connect with others!"
-          />
-          <div className="flex justify-center items-center min-h-full">
-            <form className="default-form-1" onSubmit={handleSubmit}>
-              <div>
-                {/* First Name */}
-                <TextInput
-                  setFormData={textInputSetFormData}
-                  setError={setError}
-                  type="text"
-                  label="First Name"
-                  placeholder="Jane"
-                  id="firstName"
-                  value={formData.firstName}
-                  required={true}
-                  classNameCustom="w-full"
-                />
+      <Title
+        title="Account Setup"
+        description="Please provide some information about yourself to be able to use this platform and connect with others!"
+      />
+      <div className="flex justify-center items-center min-h-full">
+        <form className="default-form-1" onSubmit={handleSubmit}>
+          <div>
+            {/* First Name */}
+            <TextInput
+              setFormData={textInputSetFormData}
+              setError={setError}
+              type="text"
+              label="First Name"
+              placeholder="Jane"
+              id="firstName"
+              value={formData.firstName}
+              required={true}
+              classNameCustom="w-full"
+            />
 
-                {/* Last Name */}
-                <TextInput
-                  setFormData={textInputSetFormData}
-                  setError={setError}
-                  type="text"
-                  label="Last Name"
-                  placeholder="Doe"
-                  id="lastName"
-                  value={formData.lastName}
-                  required={true}
-                  classNameCustom="w-full"
-                />
+            {/* Last Name */}
+            <TextInput
+              setFormData={textInputSetFormData}
+              setError={setError}
+              type="text"
+              label="Last Name"
+              placeholder="Doe"
+              id="lastName"
+              value={formData.lastName}
+              required={true}
+              classNameCustom="w-full"
+            />
 
-                {/* Birthdate  */}
-                <TextInput
-                  setFormData={textInputSetFormData}
-                  setError={setError}
-                  type="date"
-                  label="Birthdate"
-                  placeholder=""
-                  id="birthDate"
-                  value={formData.birthDate}
-                  required={true}
-                  classNameCustom="w-full"
-                />
+            {/* Birthdate  */}
+            <TextInput
+              setFormData={textInputSetFormData}
+              setError={setError}
+              type="date"
+              label="Birthdate"
+              placeholder=""
+              id="birthDate"
+              value={formData.birthDate}
+              required={true}
+              classNameCustom="w-full"
+            />
 
-                {/* Gender */}
-                <GenderInput
-                  formData={formData}
-                  setFormData={setFormData}
-                  setError={setError}
-                  required={true}
-                  classNameCustom="w-full"
-                />
+            {/* Gender */}
+            <GenderInput
+              formData={formData}
+              setFormData={setFormData}
+              setError={setError}
+              required={true}
+              classNameCustom="w-full"
+            />
 
-                {/* Location */}
-                <LocationInput
-                  formData={formData}
-                  setFormData={setFormData}
-                  setError={setError}
-                  required={true}
-                />
+            {/* Location */}
+            <LocationInput
+              formData={formData}
+              setFormData={setFormData}
+              setError={setError}
+              required={true}
+            />
 
-                {/* Avatar Image */}
-                <ImageInput
-                  setFormData={setFormData}
-                  setError={setError}
-                  label="Avatar Image (Max size 5 MiB)"
-                  id="avatar"
-                  value={formData.avatar}
-                  classNameCustom="w-full"
-                />
-                {/* Clear Image Button */}
-                {formData.avatar && (
-                  <button
-                    onClick={handleClearAvatarImage}
-                    className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-                  >
-                    Clear Image
-                  </button>
-                )}
+            {/* Avatar Image */}
+            <ImageInput
+              setFormData={setFormData}
+              setError={setError}
+              label="Avatar Image (Max size 5 MiB)"
+              id="avatar"
+              value={formData.avatar}
+              classNameCustom="w-full"
+            />
+            {/* Clear Image Button */}
+            {formData.avatar && (
+              <button
+                onClick={handleClearAvatarImage}
+                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+              >
+                Clear Image
+              </button>
+            )}
 
-                {/* Interests Multiple Choice Check Boxes */}
-                <InterestsInput
-                  formData={formData}
-                  setFormData={setFormData}
-                  setError={setError}
-                  required={true}
-                />
-              </div>
-
-              {/* Submit Button */}
-              <SubmitButton isSubmitting={isSubmitting} />
-            </form>
+            {/* Interests Multiple Choice Check Boxes */}
+            <InterestsInput
+              formData={formData}
+              setFormData={setFormData}
+              setError={setError}
+              required={true}
+            />
           </div>
-        </>
-      ) : (
-        <TextSkeleton />
-      )}
+
+          {/* Submit Button */}
+          <SubmitButton isSubmitting={isSubmitting} />
+        </form>
+      </div>
     </div>
   );
 };
