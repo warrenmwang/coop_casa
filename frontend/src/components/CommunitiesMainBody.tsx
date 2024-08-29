@@ -42,7 +42,7 @@ const CommunitiesMainBody: React.FC = () => {
     setSearchParams(searchParams);
   }
 
-  let filterNameQP: string | null = searchParams.get(filterNameQPKey);
+  const filterNameQP: string | null = searchParams.get(filterNameQPKey);
   let filterNameStr: string;
   if (filterNameQP !== null) {
     filterNameStr = filterNameQP as string;
@@ -50,7 +50,7 @@ const CommunitiesMainBody: React.FC = () => {
     filterNameStr = "";
   }
 
-  let filterDescriptionQP: string | null = searchParams.get(
+  const filterDescriptionQP: string | null = searchParams.get(
     filterDescriptionQPKey,
   );
   let filterDescriptionStr: string;

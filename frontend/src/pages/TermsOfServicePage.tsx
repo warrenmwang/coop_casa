@@ -9,11 +9,11 @@ const TermsOfServicePage: React.FC = () => {
 
       <h3 className="h3_custom">Introduction</h3>
       <p className="mb-4">
-        Welcome to Coop! These Terms of Service ("Terms") govern your use of the
-        Coop platform ("Platform"), operated by Coop™ ("we," "our," or "us").
-        By accessing or using the Platform, you agree to be bound by these
-        Terms. If you do not agree to these Terms, please do not use the
-        Platform.
+        Welcome to Coop! These Terms of Service (&quot;Terms&quot;) govern your
+        use of the Coop platform (&quot;Platform&quot;), operated by Coop™
+        (&quot;we,&quot; &quot;our,&quot; or &quot;us&quot;). By accessing or
+        using the Platform, you agree to be bound by these Terms. If you do not
+        agree to these Terms, please do not use the Platform.
       </p>
 
       <h3 className="h3_custom">Eligibility</h3>

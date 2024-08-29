@@ -12,12 +12,12 @@ const PrivacyPolicyPage: React.FC = () => {
       <section className="mb-8">
         <h2 className="h2_custom">Introduction</h2>
         <p className="mb-4">
-          Welcome to Coop App ("we," "our," or "us"). We are committed to
-          protecting your privacy and ensuring that your personal data is
-          handled responsibly. This Privacy Policy explains how we collect, use,
-          disclose, and safeguard your information when you use our mobile
-          application (the "App"). By using the App, you agree to the terms of
-          this Privacy Policy.
+          Welcome to Coop App (&quot;we,&quot; &quot;our,&quot; or
+          &quot;us&quot;). We are committed to protecting your privacy and
+          ensuring that your personal data is handled responsibly. This Privacy
+          Policy explains how we collect, use, disclose, and safeguard your
+          information when you use our mobile application (the &quot;App&quot;).
+          By using the App, you agree to the terms of this Privacy Policy.
         </p>
       </section>
 
@@ -298,8 +298,9 @@ const PrivacyPolicyPage: React.FC = () => {
         </p>
         <ul className="bullet_pt_list_default">
           <li>
-            <strong>Email Communications :</strong> Clicking the "unsubscribe"
-            link in any marketing email you receive from us.
+            <strong>Email Communications :</strong> Clicking the
+            &quot;unsubscribe&quot; link in any marketing email you receive from
+            us.
           </li>
           <li>
             <strong>App Settings :</strong> Adjusting your preferences in the
@@ -400,9 +401,9 @@ const PrivacyPolicyPage: React.FC = () => {
           We retain your personal data for as long as necessary to provide you
           with our services and to fulfill the purposes described in this
           Privacy Policy. This generally means that we will keep your personal
-          data for the duration of your account's active status and as long as
-          you use our app. Additionally, we may retain your personal data for a
-          period afterward to comply with our legal obligations, resolve
+          data for the duration of your account{"'"}s active status and as long
+          as you use our app. Additionally, we may retain your personal data for
+          a period afterward to comply with our legal obligations, resolve
           disputes, enforce our agreements, and for legitimate business
           purposes.
         </p>
@@ -477,8 +478,8 @@ const PrivacyPolicyPage: React.FC = () => {
           We may update this Privacy Policy from time to time to reflect changes
           in our practices, legal requirements, or for other operational, legal,
           or regulatory reasons. When we make changes to this Privacy Policy, we
-          will update the "Last Updated" date at the top of this document to
-          indicate when the changes were made.
+          will update the &quot;Last Updated&quot; date at the top of this
+          document to indicate when the changes were made.
         </p>
         <h3 className="h3_custom">Notification of Changes</h3>
         <p className="mb-4">

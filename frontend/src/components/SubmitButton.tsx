@@ -2,7 +2,7 @@ import React from "react";
 
 type SubmitButtonProps = {
   isSubmitting: boolean;
-  onClick?: any; // any function
+  onClick?: (e: React.FormEvent) => void;
   className?: string;
 };
 

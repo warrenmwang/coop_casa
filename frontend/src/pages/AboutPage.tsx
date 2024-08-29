@@ -13,7 +13,7 @@ const AboutPage: React.FC = () => {
       <Title title="About Us" description=""></Title>
       We are a small group of students that originally met at Bucknell
       University and we wanted to do something for other people in a way that
-      doesn't cost them much. Why was COOP created.
+      doesn{"'"}t cost them much. Why was COOP created.
       <br />
       <br />
       The target audience for Coop is young people. The goal of Coop is to
@@ -25,15 +25,15 @@ const AboutPage: React.FC = () => {
       have the desire to go to college. College provides an experience for young
       people that literally changes their lives, for better or for worse, where
       they learn both academic and technical skills as well as crucial social
-      and life skills. Undergrad enhances people’s intellectual curiosity and
-      drive to push the frontiers of knowledge or their employability in
+      and life skills. Undergrad enhances people{"'"}s intellectual curiosity
+      and drive to push the frontiers of knowledge or their employability in
       corporate America to achieve their dream job; it allows people to start
       their journey of self-discovery and newfound social life while balancing
       basic life chores. However, college is very expensive and once people
       leave college, many people have a hard to time to stay in touch with their
-      college friends. Furthermore, as with the boom and bust economic cycle,
-      it’s hard out there for many people, looking for jobs and looking to start
-      their adult life in new cities or whatever.
+      college friends. Furthermore, as with the boom and bust economic cycle, it
+      {"'"}s hard out there for many people, looking for jobs and looking to
+      start their adult life in new cities or whatever.
       <br />
       <br />
       This is where Coop comes in. We want to help with the process of

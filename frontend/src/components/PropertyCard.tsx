@@ -10,7 +10,7 @@ interface PropertyCardProps {
 
 const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
   const propertyDetailPage = `${propertiesPageLink}/${property.details.propertyId}`;
-  let cardImage: string = useMemo(
+  const cardImage: string = useMemo(
     () => URL.createObjectURL(property.images[0].file),
     [property.images],
   );
@@ -19,10 +19,10 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
     costDollars: number,
     costCents: number,
   ) => {
-    var start = `${costDollars}`;
-    var res = "";
-    var count = 0;
-    for (var i = start.length - 1; i >= 0; i--) {
+    const start = `${costDollars}`;
+    let res = "";
+    let count = 0;
+    for (let i = start.length - 1; i >= 0; i--) {
       count++;
       if (count === 4) {
         res = `${start[i]},${res}`;

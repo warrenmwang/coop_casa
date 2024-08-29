@@ -25,7 +25,7 @@ export const createThumbnail = (
     };
 
     img.onerror = (error) => {
-      reject(new Error("Failed to load image"));
+      reject(new Error(`Failed to load image ${error}`));
     };
   });
 };

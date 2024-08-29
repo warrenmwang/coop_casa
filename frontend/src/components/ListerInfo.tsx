@@ -1,3 +1,4 @@
+import React from "react";
 import { ListerBasicInfo } from "../types/Types";
 import { apiGetListerInfo } from "../api/property";
 import { useQuery } from "@tanstack/react-query";

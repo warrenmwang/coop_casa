@@ -1,12 +1,11 @@
 import React, { Fragment } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import coopImg from "../assets/coopAlt1.svg";
 import {
   apiAuthGoogleOAuthLink,
   accountSettingsPageLink,
-  homePageLink,
   dashboardPageLink,
   usersPageLink,
   communitiesPageLink,
@@ -20,15 +19,12 @@ import { toast } from "react-toastify";
 import axios, { AxiosError } from "axios";
 import UserProfileIcon from "../icons/UserProfileIcon/UserProfileIcon";
 import DefaultUserProfileIcon from "../icons/DefaultUserProfile/DefaultUserProfileIcon";
-import { JsxElement } from "typescript";
 
 function classNames(...classes: (string | undefined | null | false)[]) {
   return classes.filter(Boolean).join(" ");
 }
 
 const TopNavbar: React.FC = () => {
-  const navigate = useNavigate();
-
   const userQuery = useQuery({
     queryKey: ["user", "details"],
     queryFn: apiGetUser,
@@ -42,12 +38,10 @@ const TopNavbar: React.FC = () => {
   const mutation = useMutation({
     mutationFn: apiLogoutUser,
     onSuccess: () => {
-      // invalidate the query for user data.
+      // Invalidate the queries for user auth and data.
       queryClient.invalidateQueries({
-        queryKey: ["user"], // invalidate all queries that start with user
+        queryKey: ["user"], // invalidate all queries whose keys start with user
       });
-      authenticated = false;
-      navigate(homePageLink);
     },
     onError: (error: Error | AxiosError) => {
       let errMsg: string = error.message;
@@ -59,25 +53,29 @@ const TopNavbar: React.FC = () => {
   });
   const queryClient = useQueryClient();
 
-  let profileImageElement: JSX.Element = (
-    <DefaultUserProfileIcon color="white" />
-  );
-  if (userQuery.status === "success") {
-    const receivedUser: APIUserReceived = userQuery.data;
-    const avatarFile: File | null = apiFile2ClientFile(
-      receivedUser.avatarImageB64,
-    );
-    if (avatarFile !== null) {
-      profileImageElement = (
-        <UserProfileIcon userProfileImage={URL.createObjectURL(avatarFile)} />
-      );
-    }
-  }
-
   let authenticated: boolean = false;
   if (authQuery.status === "success") {
     const receivedAuth: boolean = authQuery.data;
     authenticated = receivedAuth;
+  }
+
+  // Initialize user profile to default profile icon
+  let profileImageElement: JSX.Element = (
+    <DefaultUserProfileIcon color="white" />
+  );
+  // Update user profile icon if logged in
+  if (authenticated) {
+    if (userQuery.status === "success") {
+      const receivedUser: APIUserReceived = userQuery.data;
+      const avatarFile: File | null = apiFile2ClientFile(
+        receivedUser.avatarImageB64,
+      );
+      if (avatarFile !== null) {
+        profileImageElement = (
+          <UserProfileIcon userProfileImage={URL.createObjectURL(avatarFile)} />
+        );
+      }
+    }
   }
 
   const navigation = [

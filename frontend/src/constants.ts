@@ -9,6 +9,15 @@ export const MAX_COMMUNITY_IMGS_ALLOWED = 5;
 export const MAX_NUMBER_PROPERTIES_PER_PAGE = 9;
 export const MAX_NUMBER_COMMUNITIES_PER_PAGE = 9;
 export const MAX_NUMBER_USER_PROFILES_PER_PAGE = 9;
+export const GENDER_OPTIONS = [
+  "Man",
+  "Woman",
+  "Transgender Woman",
+  "Transgender Man",
+  "Non-binary",
+  "Agender",
+  "Prefer Not To State",
+];
 
 export const pageQPKey = "page";
 export const limitQPKey = "limit";

@@ -90,8 +90,10 @@ const AccountSettingsPage: React.FC = () => {
               <p className="text-red-600">
                 Deleting your account is irreversible. If you have listed any
                 properties, they will be removed from public listings as well.
-                Please migrate them to another lister if you wish to keep them
-                present on the platform. Please be certain.
+                If you are the admin of any communities, you will not be able to
+                delete your account until you transfer those communities to
+                another user. Please migrate them to another lister if you wish
+                to keep them present on the platform. Please be certain.
               </p>
               <button
                 onClick={() => setIsModalOpen(true)}

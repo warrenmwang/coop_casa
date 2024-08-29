@@ -1,17 +1,15 @@
-import React, { ElementType, useMemo } from "react";
+import React, { useMemo } from "react";
 import { UserProfile } from "../types/Types";
 import { usersPageLink } from "../urls";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardMedia } from "@mui/material";
 import DefaultUserProfileIcon from "../icons/DefaultUserProfile/DefaultUserProfileIcon";
-import UserProfileIcon from "../icons/UserProfileIcon/UserProfileIcon";
-// import "../styles/card.css";
 
 const UserProfileCard: React.FC<{ userProfile: UserProfile }> = ({
   userProfile,
 }) => {
   const userProfileDetailPage = `${usersPageLink}/${userProfile.details.userId}`;
-  let cardImage: JSX.Element = useMemo(() => {
+  const cardImage: JSX.Element = useMemo(() => {
     // Return a default image if user account has no image
     if (userProfile.images.length === 0 || userProfile.images[0] === null) {
       return <DefaultUserProfileIcon color="black" className="w-72 ml-5" />;

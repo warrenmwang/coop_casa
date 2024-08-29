@@ -40,7 +40,8 @@ const UserProfilesMainBody: React.FC = () => {
     setSearchParams(searchParams);
   }
 
-  let filterFirstNameQP: string | null = searchParams.get(filterFirstNameQPKey);
+  const filterFirstNameQP: string | null =
+    searchParams.get(filterFirstNameQPKey);
   let filterFirstNameStr: string;
   if (filterFirstNameQP !== null) {
     filterFirstNameStr = filterFirstNameQP as string;
@@ -48,7 +49,7 @@ const UserProfilesMainBody: React.FC = () => {
     filterFirstNameStr = "";
   }
 
-  let filterLastNameQP: string | null = searchParams.get(filterLastNameQPKey);
+  const filterLastNameQP: string | null = searchParams.get(filterLastNameQPKey);
   let filterLastNameStr: string;
   if (filterLastNameQP !== null) {
     filterLastNameStr = filterLastNameQP as string;

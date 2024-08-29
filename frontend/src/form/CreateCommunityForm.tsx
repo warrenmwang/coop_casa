@@ -155,7 +155,7 @@ const CreateCommunityForm: React.FC = () => {
   useEffect(() => {
     if (isSubmitting) {
       // Only progress if no errors
-      for (let [k, v] of errors) {
+      for (const [k, v] of errors) {
         if (v) {
           setIsSubmitting(false);
           toast.error(`Fix field: ${k}`);

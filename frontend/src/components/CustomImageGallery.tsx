@@ -18,10 +18,11 @@ const CustomImageGallery: React.FC<{ imageData: ImageGalleryItemsInput[] }> = ({
     width: number,
     height: number,
   ) => {
-    var result: string;
+    let result: string;
     try {
       result = await createThumbnail(origImg, width, height);
     } catch (err) {
+      console.error(`unable to create thumbnail: ${err}`);
       result = "";
     }
     return result;
@@ -33,8 +34,8 @@ const CustomImageGallery: React.FC<{ imageData: ImageGalleryItemsInput[] }> = ({
 
   useEffect(() => {
     const foo = async () => {
-      var result: ReactImageGalleryItem[] = [];
-      for (var i = 0; i < imageData.length; i++) {
+      const result: ReactImageGalleryItem[] = [];
+      for (let i = 0; i < imageData.length; i++) {
         result.push({
           original: imageData[i].img,
           thumbnail: await getImageThumbnail(

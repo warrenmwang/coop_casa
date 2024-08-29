@@ -102,7 +102,7 @@ const UpdateCommunityForm: React.FC<{
   useEffect(() => {
     if (isSubmitting) {
       // ensure no errors
-      for (let key of errors.keys()) {
+      for (const key of errors.keys()) {
         if (errors.get(key)) {
           setIsSubmitting(false);
           toast.error(
@@ -267,7 +267,7 @@ const UpdateCommunityManager: React.FC = () => {
         <h1 className="h1_custom">Update Community</h1>
         <h4 className="h4_custom">
           This form allows you to update an existing community listing owned by
-          you. You will need the specific community's ID.
+          you. You will need the specific community{"'"}s ID.
         </h4>
         {/* query community data form */}
         <form className="" onSubmit={getCommunityDetails}>
@@ -309,7 +309,9 @@ const UpdateCommunityManager: React.FC = () => {
       {!inputChanged && isPendingDelete && <p>Deleting community...</p>}
       {!inputChanged && isSuccessDelete && <p>Community deleted.</p>}
       {!inputChanged && isErrorDelete && (
-        <p>Couldn't delete community. Try again. {errorDelete.message}</p>
+        <p>
+          Couldn{"'"}t delete community. Try again. {errorDelete.message}
+        </p>
       )}
 
       {community !== null && (

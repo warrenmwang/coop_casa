@@ -15,22 +15,6 @@ import { validateNumber } from "../utils/inputValidation";
 import "../styles/input.css";
 import { toast } from "react-toastify";
 
-const propertyRequiredFields: string[] = [
-  "name",
-  "address1",
-  "city",
-  "state",
-  "zipcode",
-  "country",
-  "squareFeet",
-  "numBedrooms",
-  "numToilets",
-  "numShowersBaths",
-  "costDollars",
-  "costCents",
-  "images",
-];
-
 const UpdatePropertyForm: React.FC<{
   property: Property;
   setProperty: React.Dispatch<React.SetStateAction<Property | null>>;
@@ -133,7 +117,7 @@ const UpdatePropertyForm: React.FC<{
   useEffect(() => {
     if (isSubmitting) {
       // ensure no errors
-      for (let key of errors.keys()) {
+      for (const key of errors.keys()) {
         if (errors.get(key)) {
           setIsSubmitting(false);
           toast.error(
@@ -426,7 +410,7 @@ const UpdatePropertyManager: React.FC = () => {
         <h1 className="h1_custom">Update Property</h1>
         <h4 className="h4_custom">
           This form allows you to update an existing property listing owned by
-          you. You will need the specific property's ID.
+          you. You will need the specific property{"'"}s ID.
         </h4>
         {/* query property data form */}
         <form className="" onSubmit={getPropertyDetails}>
@@ -468,7 +452,9 @@ const UpdatePropertyManager: React.FC = () => {
       {!inputChanged && isPendingDelete && <p>Deleting property...</p>}
       {!inputChanged && isSuccessDelete && <p>Property deleted.</p>}
       {!inputChanged && isErrorDelete && (
-        <p>Couldn't delete property. Try again. {errorDelete.message}</p>
+        <p>
+          Couldn{"'"}t delete property. Try again. {errorDelete.message}
+        </p>
       )}
 
       {property !== null && (

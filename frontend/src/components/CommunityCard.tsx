@@ -11,7 +11,7 @@ type CommunityCardProps = {
 const CommunityCard: React.FC<CommunityCardProps> = ({ community }) => {
   const communityDetailPage = `${communitiesPageLink}/${community.details.communityId}`;
 
-  let cardImage: string = useMemo(
+  const cardImage: string = useMemo(
     () => URL.createObjectURL(community.images[0]),
     [community.images],
   );

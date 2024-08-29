@@ -26,7 +26,7 @@ const UserProfilePage: React.FC = () => {
     <>
       {status === "error" && (
         <FetchErrorText>
-          Sorry, we are unable to find that user's profile.
+          Sorry, we are unable to find that user{"'"}s profile.
         </FetchErrorText>
       )}
 

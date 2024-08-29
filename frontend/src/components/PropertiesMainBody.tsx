@@ -39,7 +39,7 @@ const PropertiesMainBody: React.FC = () => {
     setSearchParams(searchParams);
   }
 
-  let filterAddressQP: string | null = searchParams.get(filterAddressQPKey);
+  const filterAddressQP: string | null = searchParams.get(filterAddressQPKey);
   let filterAddressStr: string;
   if (filterAddressQP !== null) {
     filterAddressStr = filterAddressQP as string;

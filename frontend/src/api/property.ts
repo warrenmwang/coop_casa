@@ -22,7 +22,7 @@ export const apiCreateNewProperty = async (
   formData.append("numImages", `${property.images.length}`);
   if (property.images.length > 0) {
     for (let i = 0; i < property.images.length; i++) {
-      let image = property.images[i];
+      const image = property.images[i];
       formData.append(`image${image.orderNum}`, image.file);
     }
   }
@@ -40,7 +40,7 @@ export const apiUpdateProperty = async (
   formData.append("numImages", `${property.images.length}`);
   if (property.images.length > 0) {
     for (let i = 0; i < property.images.length; i++) {
-      let image = property.images[i];
+      const image = property.images[i];
       formData.append(`image${image.orderNum}`, image.file);
     }
   }

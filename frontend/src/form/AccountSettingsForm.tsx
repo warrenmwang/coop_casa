@@ -93,8 +93,8 @@ const AccountSettingsForm: React.FC = () => {
     <>
       {ready && userQuery.isError && (
         <FetchErrorText>
-          Sorry, we couldn't fetch your data at this moment. Please try again
-          later.
+          Sorry, we couldn{"'"}t fetch your data at this moment. Please try
+          again later.
         </FetchErrorText>
       )}
       {ready && userQuery.isSuccess && (

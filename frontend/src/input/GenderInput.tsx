@@ -1,5 +1,6 @@
 import React from "react";
 import { User } from "../types/Types";
+import { GENDER_OPTIONS } from "../constants";
 import "../styles/input.css";
 
 interface GenderInputArgs {
@@ -49,16 +50,15 @@ const GenderInput: React.FC<GenderInputArgs> = ({
         defaultValue={formData.gender}
         required={required}
       >
-        <option value="" disabled>
-          Select Option
-        </option>
-        <option value="Man">Man</option>
-        <option value="Woman">Woman</option>
-        <option value="Transgender Woman">Transgender Woman</option>
-        <option value="Transgender Man">Transgender Man</option>
-        <option value="Non-Binary">Non-Binary</option>
-        <option value="Agender">Agender</option>
-        <option value="Prefer Not To State">Prefer Not To State</option>
+        {GENDER_OPTIONS.map((gender) => (
+          <option
+            key={gender}
+            value={gender}
+            selected={gender === formData.gender}
+          >
+            {gender}
+          </option>
+        ))}
       </select>
     </div>
   );

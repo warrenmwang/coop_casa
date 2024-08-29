@@ -1,3 +1,4 @@
+import React from "react";
 import { propertiesPageLink } from "../urls";
 import { Box } from "@mui/material";
 import CustomImageGallery, {
@@ -30,10 +31,10 @@ const PropertyDetailContent: React.FC<PropertyDetailContentProps> = ({
     costDollars: number,
     costCents: number,
   ) => {
-    var start = `${costDollars}`;
-    var res = "";
-    var count = 0;
-    for (var i = start.length - 1; i >= 0; i--) {
+    const start = `${costDollars}`;
+    let res = "";
+    let count = 0;
+    for (let i = start.length - 1; i >= 0; i--) {
       count++;
       if (count === 4) {
         res = `${start[i]},${res}`;

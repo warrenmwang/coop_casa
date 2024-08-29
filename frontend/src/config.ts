@@ -4,7 +4,7 @@ const IS_PROD_TMP = process.env.REACT_APP_IS_PROD;
 if (!IS_PROD_TMP) {
   throw new Error("Missing environment variables.");
 }
-var IS_PROD: boolean;
+let IS_PROD: boolean;
 if (IS_PROD_TMP.trim().toLowerCase() === "true") {
   IS_PROD = true;
 } else {
