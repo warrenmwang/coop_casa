@@ -67,6 +67,35 @@ func NewPropertyRouter(s interfaces.Server) http.Handler {
 	return r
 }
 
+func NewCommunityRouter(s interfaces.Server) http.Handler {
+	r := chi.NewRouter()
+
+	communityHandlers := handlers.NewCommunityHandlers(s)
+
+	r.Get("/{id}", communityHandlers.GetCommunityHandler)
+	r.Get("/", communityHandlers.GetCommunitiesHandler)
+
+	r.With(auth.AuthMiddleware).Post("", communityHandlers.CreateCommunitiesHandler)
+	r.With(auth.AuthMiddleware).Post("/users", communityHandlers.CreateCommunitiesUserHandler)
+	r.With(auth.AuthMiddleware).Post("/properties", communityHandlers.CreateCommunitiesPropertyHandler)
+	r.With(auth.AuthMiddleware).Put("/{id}", communityHandlers.UpdateCommunitiesHandler)
+	r.With(auth.AuthMiddleware).Delete("/{id}", communityHandlers.DeleteCommunitiesHandler)
+	r.With(auth.AuthMiddleware).Delete("/users", communityHandlers.DeleteCommunitiesUserHandler)
+	r.With(auth.AuthMiddleware).Delete("/properties", communityHandlers.DeleteCommunitiesPropertiesHandler)
+
+	return r
+}
+
+func NewUserProfileHandler(s interfaces.Server) http.Handler {
+	r := chi.NewRouter()
+
+	userProfileHandlers := handlers.NewUserProfileHandlers(s)
+	r.Get("/", userProfileHandlers.GetUsersHandler)
+	r.Get("/{id}", userProfileHandlers.GetUserHandler)
+
+	return r
+}
+
 func RegisterRoutes(s interfaces.Server) http.Handler {
 	r := chi.NewRouter()
 
@@ -84,9 +113,10 @@ func RegisterRoutes(s interfaces.Server) http.Handler {
 	authRouter := NewAuthRouter(s)
 	r.Mount("/auth", authRouter)
 
+	// API router
 	apiRouter := chi.NewRouter()
 
-	// Account
+	// Account - user accessing their own personal information
 	accountRouter := NewAccountRouter(s)
 	apiRouter.Mount("/account", accountRouter)
 
@@ -102,22 +132,14 @@ func RegisterRoutes(s interfaces.Server) http.Handler {
 	propertyRouter := NewPropertyRouter(s)
 	apiRouter.Mount("/properties", propertyRouter)
 
-	// // Public Lister info
+	// Communities
+	communityRouter := NewCommunityRouter(s)
+	apiRouter.Mount("/communities", communityRouter)
 
-	// // Communities
-	// r.Get("/api/communities/{id}", s.apiGetCommunityHandler)
-	// r.Get("/api/communities", s.apiGetCommunitiesHandler)
-	// r.Post("/api/communities", s.apiCreateCommunitiesHandler)
-	// r.Post("/api/communities/users", s.apiCreateCommunitiesUserHandler)
-	// r.Post("/api/communities/properties", s.apiCreateCommunitiesPropertyHandler)
-	// r.Put("/api/communities/{id}", s.apiUpdateCommunitiesHandler)
-	// r.Delete("/api/communities/{id}", s.apiDeleteCommunitiesHandler)
-	// r.Delete("/api/communities/users", s.apiDeleteCommunitiesUserHandler)
-	// r.Delete("/api/communities/properties", s.apiDeleteCommunitiesPropertiesHandler)
+	// Public Users Profile
+	userProfileRouter := NewUserProfileHandler(s)
+	apiRouter.Mount("/users", userProfileRouter)
 
-	// // Users
-	// r.Get("/api/users", s.apiGetUsersHandler)
-	// r.Get("/api/users/{id}", s.apiGetUserHandler)
 	// // r.Get("/api/users/{id}/images", s.apiGetUserProfileImagesHandler)
 
 	r.Mount("/api/v1", apiRouter)
