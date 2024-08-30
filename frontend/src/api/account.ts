@@ -71,7 +71,8 @@ export const apiGetUserAuth = async (): Promise<boolean> => {
       withCredentials: true,
     })
     .then((res) => res.data)
-    .then((data) => data.accountIsAuthed as boolean);
+    .then((data) => data.authed as boolean)
+    .catch((_) => false);
 };
 
 export const apiGetUser = async (): Promise<APIUserReceived> => {

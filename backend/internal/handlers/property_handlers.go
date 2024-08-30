@@ -27,6 +27,7 @@ func NewPropertyHandlers(s interfaces.Server) *PropertyHandler {
 	return &PropertyHandler{server: s, adminUserID: config.GlobalConfig.ADMIN_USER_ID}
 }
 
+// GET .../properties/{id}
 // NO AUTH
 func (h *PropertyHandler) GetPropertyHandler(w http.ResponseWriter, r *http.Request) {
 	propertyID := chi.URLParam(r, "id")
@@ -65,6 +66,7 @@ func (h *PropertyHandler) GetPropertyHandler(w http.ResponseWriter, r *http.Requ
 	utils.RespondWithJSON(w, 200, property)
 }
 
+// GET .../properties
 // NO AUTH
 func (h *PropertyHandler) GetPropertiesHandler(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
@@ -105,6 +107,7 @@ func (h *PropertyHandler) GetPropertiesHandler(w http.ResponseWriter, r *http.Re
 	})
 }
 
+// GET .../properties/lister
 // NO AUTH
 func (h *PropertyHandler) GetListerInfoHandler(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
@@ -143,6 +146,7 @@ func (h *PropertyHandler) GetListerInfoHandler(w http.ResponseWriter, r *http.Re
 	})
 }
 
+// GET .../properties/total
 // AUTHED
 func (h *PropertyHandler) GetPropertiesTotalCountHandler(w http.ResponseWriter, r *http.Request) {
 	// Validate properties
@@ -154,6 +158,7 @@ func (h *PropertyHandler) GetPropertiesTotalCountHandler(w http.ResponseWriter, 
 	utils.RespondWithJSON(w, 200, count)
 }
 
+// POST .../properties
 // AUTHED
 func (h *PropertyHandler) CreatePropertiesHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
@@ -262,6 +267,7 @@ func (h *PropertyHandler) CreatePropertiesHandler(w http.ResponseWriter, r *http
 	w.WriteHeader(201)
 }
 
+// PUT .../properties/{id}
 // AUTHED
 func (h *PropertyHandler) UpdatePropertiesHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
@@ -384,6 +390,7 @@ func (h *PropertyHandler) UpdatePropertiesHandler(w http.ResponseWriter, r *http
 	w.WriteHeader(200)
 }
 
+// DELETE .../properties/{id}
 // AUTHED
 func (h *PropertyHandler) DeletePropertiesHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id

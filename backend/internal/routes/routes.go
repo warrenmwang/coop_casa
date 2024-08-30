@@ -7,8 +7,8 @@ import (
 	"backend/internal/interfaces"
 	"net/http"
 
-	"github.com/go-chi/chi"
-	"github.com/go-chi/chi/middleware"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 )
 
 // /auth
@@ -24,7 +24,7 @@ func NewAuthRouter(s interfaces.Server) http.Handler {
 	return r
 }
 
-// /api/{v}/account
+// .../account
 func NewAccountRouter(s interfaces.Server) http.Handler {
 	r := chi.NewRouter()
 	r.Use(auth.AuthMiddleware)
@@ -39,6 +39,7 @@ func NewAccountRouter(s interfaces.Server) http.Handler {
 	return r
 }
 
+// .../admin
 func NewAdminRouter(s interfaces.Server) http.Handler {
 	r := chi.NewRouter()
 	r.Use(auth.AuthMiddleware)
@@ -51,6 +52,7 @@ func NewAdminRouter(s interfaces.Server) http.Handler {
 	return r
 }
 
+// .../properties
 func NewPropertyRouter(s interfaces.Server) http.Handler {
 	r := chi.NewRouter()
 
@@ -59,14 +61,15 @@ func NewPropertyRouter(s interfaces.Server) http.Handler {
 	r.Get("/", propertyHandlers.GetPropertiesHandler)
 	r.Get("/lister", propertyHandlers.GetListerInfoHandler)
 
+	r.With(auth.AuthMiddleware).Get("/total", propertyHandlers.GetPropertiesTotalCountHandler)
 	r.With(auth.AuthMiddleware).Post("/", propertyHandlers.CreatePropertiesHandler)
 	r.With(auth.AuthMiddleware).Put("/{id}", propertyHandlers.UpdatePropertiesHandler)
 	r.With(auth.AuthMiddleware).Delete("/{id}", propertyHandlers.DeletePropertiesHandler)
-	r.With(auth.AuthMiddleware).Get("/total", propertyHandlers.GetPropertiesTotalCountHandler)
 
 	return r
 }
 
+// .../communities
 func NewCommunityRouter(s interfaces.Server) http.Handler {
 	r := chi.NewRouter()
 
@@ -75,7 +78,7 @@ func NewCommunityRouter(s interfaces.Server) http.Handler {
 	r.Get("/{id}", communityHandlers.GetCommunityHandler)
 	r.Get("/", communityHandlers.GetCommunitiesHandler)
 
-	r.With(auth.AuthMiddleware).Post("", communityHandlers.CreateCommunitiesHandler)
+	r.With(auth.AuthMiddleware).Post("/", communityHandlers.CreateCommunitiesHandler)
 	r.With(auth.AuthMiddleware).Post("/users", communityHandlers.CreateCommunitiesUserHandler)
 	r.With(auth.AuthMiddleware).Post("/properties", communityHandlers.CreateCommunitiesPropertyHandler)
 	r.With(auth.AuthMiddleware).Put("/{id}", communityHandlers.UpdateCommunitiesHandler)
@@ -86,6 +89,7 @@ func NewCommunityRouter(s interfaces.Server) http.Handler {
 	return r
 }
 
+// .../users
 func NewUserProfileHandler(s interfaces.Server) http.Handler {
 	r := chi.NewRouter()
 

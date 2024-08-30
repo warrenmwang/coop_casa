@@ -35,6 +35,7 @@ func NewAuthHandlers(s interfaces.Server) *AuthHandler {
 }
 
 // GET /auth/{provider}
+// NO AUTH
 func (h *AuthHandler) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	// insert the provider context
 	provider := chi.URLParam(r, "provider")
@@ -54,7 +55,8 @@ func (h *AuthHandler) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Endpoint: GET /auth/{provider}/callback
+// GET /auth/{provider}/callback
+// NO AUTH
 func (h *AuthHandler) CallbackHandler(w http.ResponseWriter, r *http.Request) {
 	// Callback function called by the OAuth provider after the user initializes oauth process.
 	// Finish auth, create JWT, and save it into a cookie.
@@ -140,7 +142,8 @@ func (h *AuthHandler) CallbackHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, fmt.Sprintf("%s/dashboard", h.frontendOrigin), http.StatusFound)
 }
 
-// Endpoint: POST /auth/{provider}/logout
+// POST /auth/{provider}/logout
+// NO AUTH
 func (h *AuthHandler) LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	// Logout function that completes the oauth logout and invalidate the user's auth token
 
@@ -164,8 +167,8 @@ func (h *AuthHandler) LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-// Endpoint: GET /auth/{provider}/check
-// w/ auth middleware
+// GET /auth/{provider}/check
+// AUTHED
 // This handler is expected to be using an auth middleware, so client will receive
 // a 401 if they do not a valid jwt in their cookie with the request.
 func (h *AuthHandler) AuthCheckHandler(w http.ResponseWriter, r *http.Request) {

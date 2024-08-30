@@ -20,6 +20,7 @@ func NewAdminHandlers(s interfaces.Server) *AdminHandler {
 	return &AdminHandler{server: s, adminUserID: config.GlobalConfig.ADMIN_USER_ID}
 }
 
+// GET .../admin/users
 // AUTHED
 // Only returns the user details (no avatar images)
 func (h *AdminHandler) AdminGetUsers(w http.ResponseWriter, r *http.Request) {
@@ -77,6 +78,7 @@ func (h *AdminHandler) AdminGetUsers(w http.ResponseWriter, r *http.Request) {
 	utils.RespondWithJSON(w, 200, users)
 }
 
+// GET .../admin/users/roles
 // AUTHED
 func (h *AdminHandler) AdminGetUsersRoles(w http.ResponseWriter, r *http.Request) {
 	// Get user id
@@ -115,6 +117,7 @@ func (h *AdminHandler) AdminGetUsersRoles(w http.ResponseWriter, r *http.Request
 	utils.RespondWithJSON(w, 200, roles)
 }
 
+// POST .../admin/users/roles
 // AUTHED
 // NOTE: despite the name, it is currently only written to allow the changing of a single
 // user's role

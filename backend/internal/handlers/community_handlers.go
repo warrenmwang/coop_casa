@@ -25,7 +25,7 @@ func NewCommunityHandlers(s interfaces.Server) *CommunityHandler {
 	return &CommunityHandler{server: s}
 }
 
-// GET /communities/{id}
+// GET .../communities/{id}
 // NO AUTH
 func (h *CommunityHandler) GetCommunityHandler(w http.ResponseWriter, r *http.Request) {
 	communityId := chi.URLParam(r, "id")
@@ -67,7 +67,7 @@ func (h *CommunityHandler) GetCommunityHandler(w http.ResponseWriter, r *http.Re
 	utils.RespondWithJSON(w, 200, communityFull)
 }
 
-// GET /communities
+// GET .../communities
 // NO AUTH
 // Public api to search through all communities
 func (h *CommunityHandler) GetCommunitiesHandler(w http.ResponseWriter, r *http.Request) {
@@ -110,7 +110,7 @@ func (h *CommunityHandler) GetCommunitiesHandler(w http.ResponseWriter, r *http.
 	})
 }
 
-// POST /communities
+// POST .../communities
 // AUTHED
 func (h *CommunityHandler) CreateCommunitiesHandler(w http.ResponseWriter, r *http.Request) {
 	// Get authenticated user's ID
@@ -199,7 +199,7 @@ func (h *CommunityHandler) CreateCommunitiesHandler(w http.ResponseWriter, r *ht
 	w.WriteHeader(201)
 }
 
-// POST /communities/users
+// POST .../communities/users
 // AUTHED
 // adds a given userId to the given communityId, where the userid in the token must be an admin (currently only one admin per group allowed)
 func (h *CommunityHandler) CreateCommunitiesUserHandler(w http.ResponseWriter, r *http.Request) {
@@ -256,7 +256,7 @@ func (h *CommunityHandler) CreateCommunitiesUserHandler(w http.ResponseWriter, r
 	w.WriteHeader(201)
 }
 
-// POST /communities/properties
+// POST .../communities/properties
 // AUTHED
 // adds a given propertyId to the given communityId, where userid in token must be an admin
 func (h *CommunityHandler) CreateCommunitiesPropertyHandler(w http.ResponseWriter, r *http.Request) {
@@ -313,7 +313,7 @@ func (h *CommunityHandler) CreateCommunitiesPropertyHandler(w http.ResponseWrite
 	w.WriteHeader(201)
 }
 
-// PUT /communities/{id}
+// PUT .../communities/{id}
 // AUTHED
 func (h *CommunityHandler) UpdateCommunitiesHandler(w http.ResponseWriter, r *http.Request) {
 	// Get authenticated user's ID
@@ -414,7 +414,7 @@ func (h *CommunityHandler) UpdateCommunitiesHandler(w http.ResponseWriter, r *ht
 	w.WriteHeader(200)
 }
 
-// DELETE /communities/{id}
+// DELETE .../communities/{id}
 // AUTHED
 func (h *CommunityHandler) DeleteCommunitiesHandler(w http.ResponseWriter, r *http.Request) {
 	// Get authenticated user's ID
@@ -453,7 +453,7 @@ func (h *CommunityHandler) DeleteCommunitiesHandler(w http.ResponseWriter, r *ht
 	w.WriteHeader(200)
 }
 
-// DELETE /communities/user
+// DELETE .../communities/user
 // AUTHED
 func (h *CommunityHandler) DeleteCommunitiesUserHandler(w http.ResponseWriter, r *http.Request) {
 	// Get authenticated user's ID
@@ -504,7 +504,7 @@ func (h *CommunityHandler) DeleteCommunitiesUserHandler(w http.ResponseWriter, r
 	w.WriteHeader(http.StatusOK)
 }
 
-// DELETE /communities/properties
+// DELETE .../communities/properties
 // AUTHED
 func (h *CommunityHandler) DeleteCommunitiesPropertiesHandler(w http.ResponseWriter, r *http.Request) {
 	// Get authenticated user's ID

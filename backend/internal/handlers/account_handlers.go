@@ -24,6 +24,7 @@ func NewAccountHandlers(s interfaces.Server) *AccountHandler {
 	return &AccountHandler{server: s, isProd: config.GlobalConfig.IS_PROD}
 }
 
+// GET .../account
 // AUTHED
 // Returns the user data based on the userId in the auth token
 func (h *AccountHandler) GetAccountDetailsHandler(w http.ResponseWriter, r *http.Request) {
@@ -74,6 +75,7 @@ func (h *AccountHandler) GetAccountDetailsHandler(w http.ResponseWriter, r *http
 	})
 }
 
+// POST .../account
 // AUTHED
 func (h *AccountHandler) UpdateAccountDetailsHandler(w http.ResponseWriter, r *http.Request) {
 	userIdFromToken, ok := r.Context().Value(auth.UserIDKey).(string)
@@ -165,6 +167,7 @@ func (h *AccountHandler) UpdateAccountDetailsHandler(w http.ResponseWriter, r *h
 	w.WriteHeader(200)
 }
 
+// DELETE .../account
 // AUTHED
 func (h *AccountHandler) DeleteAccountHandler(w http.ResponseWriter, r *http.Request) {
 	// Delete a user account given their userId from the token
@@ -208,6 +211,7 @@ func (h *AccountHandler) DeleteAccountHandler(w http.ResponseWriter, r *http.Req
 	w.WriteHeader(200)
 }
 
+// GET .../account/role
 // AUTHED
 func (h *AccountHandler) GetUserRoleHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
@@ -232,6 +236,7 @@ func (h *AccountHandler) GetUserRoleHandler(w http.ResponseWriter, r *http.Reque
 	})
 }
 
+// GET .../account/communities
 // AUTHED
 func (h *AccountHandler) GetUserOwnedCommunities(w http.ResponseWriter, r *http.Request) {
 	// Get user id
