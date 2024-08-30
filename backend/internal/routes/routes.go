@@ -42,7 +42,7 @@ func NewAccountRouter(s interfaces.Server) http.Handler {
 // .../admin
 func NewAdminRouter(s interfaces.Server) http.Handler {
 	r := chi.NewRouter()
-	r.Use(auth.AuthMiddleware)
+	r.Use(auth.AdminAuthMiddleware)
 
 	adminHandlers := handlers.NewAdminHandlers(s)
 	r.Get("/users", adminHandlers.AdminGetUsers)

@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"backend/internal/auth"
 	"backend/internal/config"
 	"backend/internal/interfaces"
 	"backend/internal/utils"
@@ -24,19 +23,6 @@ func NewAdminHandlers(s interfaces.Server) *AdminHandler {
 // AUTHED
 // Only returns the user details (no avatar images)
 func (h *AdminHandler) AdminGetUsers(w http.ResponseWriter, r *http.Request) {
-	// Get user id
-	userId, ok := r.Context().Value(auth.UserIDKey).(string)
-	if !ok {
-		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("user id blank"))
-		return
-	}
-
-	// If userid is not the admin user id, return unauthorized
-	if userId != h.adminUserID {
-		utils.RespondWithError(w, 401, errors.New("unauthorized"))
-		return
-	}
-
 	// Get limit and offset from query params
 	query := r.URL.Query()
 	limitStr := query.Get("limit")
@@ -81,19 +67,6 @@ func (h *AdminHandler) AdminGetUsers(w http.ResponseWriter, r *http.Request) {
 // GET .../admin/users/roles
 // AUTHED
 func (h *AdminHandler) AdminGetUsersRoles(w http.ResponseWriter, r *http.Request) {
-	// Get user id
-	userId, ok := r.Context().Value(auth.UserIDKey).(string)
-	if !ok {
-		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("user id blank"))
-		return
-	}
-
-	// If userid is not the admin user id, return unauthorized
-	if userId != h.adminUserID {
-		utils.RespondWithError(w, 401, errors.New("unauthorized"))
-		return
-	}
-
 	// Get the userIds from the query parameter
 	query := r.URL.Query()
 	userIdsStr := query.Get("userIds")
@@ -119,23 +92,8 @@ func (h *AdminHandler) AdminGetUsersRoles(w http.ResponseWriter, r *http.Request
 
 // POST .../admin/users/roles
 // AUTHED
-// NOTE: despite the name, it is currently only written to allow the changing of a single
-// user's role
 func (h *AdminHandler) UpdateUserRoleHandler(w http.ResponseWriter, r *http.Request) {
 	// For now, expect that only the admin user can update roles
-
-	// Get user id
-	callerUserId, ok := r.Context().Value(auth.UserIDKey).(string)
-	if !ok {
-		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("user id blank"))
-		return
-	}
-
-	// If userid is not the admin user id, return unauthorized
-	if callerUserId != h.adminUserID {
-		utils.RespondWithError(w, 401, errors.New("unauthorized"))
-		return
-	}
 
 	// Get the role from the request body
 	query := r.URL.Query()
@@ -153,8 +111,8 @@ func (h *AdminHandler) UpdateUserRoleHandler(w http.ResponseWriter, r *http.Requ
 	}
 
 	// Reject requests to alter admin's own user role
-	if userID == callerUserId {
-		utils.RespondWithError(w, http.StatusBadRequest, errors.New("admin cannot change own user role. baka"))
+	if userID == h.adminUserID {
+		utils.RespondWithError(w, http.StatusBadRequest, errors.New("admin cannot change own user role. 𝕊𝕌𝕊𝕊𝕐 𝔹𝔸𝕂𝔸(❁ᴗ͈ˬᴗ͈)"))
 		return
 	}
 
