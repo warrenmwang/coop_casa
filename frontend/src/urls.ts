@@ -26,20 +26,20 @@ export const apiAuthGoogleOAuthLink = `${API_HOST}:${API_PORT}/auth/google`;
 export const apiAuthLogoutLink = `${API_HOST}:${API_PORT}/auth/google/logout`;
 export const apiAuthCheckLink = `${API_HOST}:${API_PORT}/auth/google/check`;
 
-export const apiAccountLink = `${API_HOST}:${API_PORT}/api/account`;
-export const apiAccountUpdateLink = `${API_HOST}:${API_PORT}/api/account`;
-export const apiUserRoleLink = `${API_HOST}:${API_PORT}/api/account/role`;
-export const apiUserCommunities = `${API_HOST}:${API_PORT}/api/account/communities`;
+export const apiAccountLink = `${API_HOST}:${API_PORT}/api/v1/account`;
+export const apiAccountUpdateLink = `${API_HOST}:${API_PORT}/api/v1/account`;
+export const apiUserRoleLink = `${API_HOST}:${API_PORT}/api/v1/account/role`;
+export const apiUserCommunities = `${API_HOST}:${API_PORT}/api/v1/account/communities`;
 
-export const apiAdminUsersLink = `${API_HOST}:${API_PORT}/api/admin/users`;
-export const apiAdminUsersRolesLink = `${API_HOST}:${API_PORT}/api/admin/users/roles`;
+export const apiAdminUsersLink = `${API_HOST}:${API_PORT}/api/v1/admin/users`;
+export const apiAdminUsersRolesLink = `${API_HOST}:${API_PORT}/api/v1/admin/users/roles`;
 
-export const apiPropertiesLink = `${API_HOST}:${API_PORT}/api/properties`;
+export const apiPropertiesLink = `${API_HOST}:${API_PORT}/api/v1/properties`;
 
-export const apiListerLink = `${API_HOST}:${API_PORT}/api/lister`;
+export const apiListerLink = `${API_HOST}:${API_PORT}/api/v1/properties/lister`;
 
-export const apiCommunitiesLink = `${API_HOST}:${API_PORT}/api/communities`;
-export const apiCommunitiesUsersLink = `${API_HOST}:${API_PORT}/api/communities/users`;
-export const apiCommunitiesPropertiesLink = `${API_HOST}:${API_PORT}/api/communities/properties`;
+export const apiCommunitiesLink = `${API_HOST}:${API_PORT}/api/v1/communities`;
+export const apiCommunitiesUsersLink = `${API_HOST}:${API_PORT}/api/v1/communities/users`;
+export const apiCommunitiesPropertiesLink = `${API_HOST}:${API_PORT}/api/v1/communities/properties`;
 
-export const apiUsersLink = `${API_HOST}:${API_PORT}/api/users`;
+export const apiUsersLink = `${API_HOST}:${API_PORT}/api/v1/users`;

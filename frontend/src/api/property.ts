@@ -120,16 +120,15 @@ export const apiGetListerInfo = async (
     .then((data) => data as ListerBasicInfo);
 };
 
-// Unused
 // Get total count of properties in db
-// export const apiGetTotalCountProperties = async (): Promise<number> => {
-//   return axios
-//     .get(`${apiPropertiesLink}/total`, {
-//       withCredentials: true,
-//     })
-//     .then((response) => response.data)
-//     .then((data) => data as number)
-//     .catch((error) => {
-//       throw error;
-//     });
-// };
+export const apiGetTotalCountProperties = async (): Promise<number> => {
+  return axios
+    .get(`${apiPropertiesLink}/total`, {
+      withCredentials: true,
+    })
+    .then((response) => response.data)
+    .then((data) => data as number)
+    .catch((error) => {
+      throw error;
+    });
+};

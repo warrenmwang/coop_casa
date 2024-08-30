@@ -51,6 +51,22 @@ func NewAdminRouter(s interfaces.Server) http.Handler {
 	return r
 }
 
+func NewPropertyRouter(s interfaces.Server) http.Handler {
+	r := chi.NewRouter()
+
+	propertyHandlers := handlers.NewPropertyHandlers(s)
+	r.Get("/{id}", propertyHandlers.GetPropertyHandler)
+	r.Get("/", propertyHandlers.GetPropertiesHandler)
+	r.Get("/lister", propertyHandlers.GetListerInfoHandler)
+
+	r.With(auth.AuthMiddleware).Post("/", propertyHandlers.CreatePropertiesHandler)
+	r.With(auth.AuthMiddleware).Put("/{id}", propertyHandlers.UpdatePropertiesHandler)
+	r.With(auth.AuthMiddleware).Delete("/{id}", propertyHandlers.DeletePropertiesHandler)
+	r.With(auth.AuthMiddleware).Get("/total", propertyHandlers.GetPropertiesTotalCountHandler)
+
+	return r
+}
+
 func RegisterRoutes(s interfaces.Server) http.Handler {
 	r := chi.NewRouter()
 
@@ -60,30 +76,17 @@ func RegisterRoutes(s interfaces.Server) http.Handler {
 	r.Use(customMiddleware.CorsMiddleware) // set headers for CORS
 
 	// Heartbeat endpoints
-	// r.Get("/", s.HelloWorldHandler)   // API uptime check
-	// r.Get("/health", s.healthHandler) // DB uptime check
 	heartBeatHandlers := handlers.NewHeartBeatHandlers(s)
 	r.Get("/health", heartBeatHandlers.HelloWorldHandler)
 	r.Get("/dbhealth", heartBeatHandlers.DatabaseHealthHandler)
 
 	// Auth
-	// r.Route("/auth", func(r chi.Router) {
-	// 	r.Get("/{provider}", s.authLoginHandler)
-	// 	r.Get("/{provider}/callback", s.authCallbackHandler)
-	// 	r.Get("/{provider}/check", s.authCheckHandler)
-	// 	r.Post("/{provider}/logout", s.authLogoutHandler)
-	// })
 	authRouter := NewAuthRouter(s)
 	r.Mount("/auth", authRouter)
 
 	apiRouter := chi.NewRouter()
 
 	// Account
-	// r.Get("/api/account", s.apiGetAccountDetailsHandler)
-	// r.Get("/api/account/communities", s.apiGetUserOwnedCommunities)
-	// r.Post("/api/account", s.apiUpdateAccountDetailsHandler)
-	// r.Delete("/api/account", s.apiDeleteAccountHandler)
-	// r.Get("/api/account/role", s.apiGetUserRoleHandler)
 	accountRouter := NewAccountRouter(s)
 	apiRouter.Mount("/account", accountRouter)
 
@@ -91,23 +94,15 @@ func RegisterRoutes(s interfaces.Server) http.Handler {
 	// r.Post("/api/account/images", s.apiCreateUserProfileImagesHandler)
 	// r.Delete("/api/account/images", s.apiDeleteUserProfileImagesHandler)
 
-	// // Admin
-	// r.Get("/api/admin/users", s.apiAdminGetUsers)
-	// r.Get("/api/admin/users/roles", s.apiAdminGetUsersRoles)
-	// r.Post("/api/admin/users/roles", s.apiUpdateUserRoleHandler)
+	// Admin
 	adminRouter := NewAdminRouter(s)
 	apiRouter.Mount("/admin", adminRouter)
 
-	// // Properties
-	// r.Get("/api/properties/{id}", s.apiGetPropertyHandler)
-	// r.Get("/api/properties/total", s.apiGetPropertiesTotalCountHandler)
-	// r.Get("/api/properties", s.apiGetPropertiesHandler)
-	// r.Post("/api/properties", s.apiCreatePropertiesHandler)
-	// r.Put("/api/properties/{id}", s.apiUpdatePropertiesHandler)
-	// r.Delete("/api/properties/{id}", s.apiDeletePropertiesHandler)
+	// Properties
+	propertyRouter := NewPropertyRouter(s)
+	apiRouter.Mount("/properties", propertyRouter)
 
 	// // Public Lister info
-	// r.Get("/api/lister", s.apiGetListerInfoHandler)
 
 	// // Communities
 	// r.Get("/api/communities/{id}", s.apiGetCommunityHandler)

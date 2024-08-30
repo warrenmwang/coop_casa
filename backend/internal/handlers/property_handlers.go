@@ -1,7 +1,12 @@
 package handlers
 
 import (
+	"backend/internal/auth"
+	"backend/internal/config"
 	"backend/internal/database"
+	"backend/internal/interfaces"
+	"backend/internal/utils"
+	"backend/internal/validation"
 	"encoding/base64"
 	"encoding/json"
 	"errors"
@@ -13,23 +18,29 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-// ----------------- PROPERTIES ---------------------
+type PropertyHandler struct {
+	server      interfaces.Server
+	adminUserID string
+}
 
-// GET /api/properties/{id}
+func NewPropertyHandlers(s interfaces.Server) *PropertyHandler {
+	return &PropertyHandler{server: s, adminUserID: config.GlobalConfig.ADMIN_USER_ID}
+}
+
 // NO AUTH
-func (s *Server) apiGetPropertyHandler(w http.ResponseWriter, r *http.Request) {
+func (h *PropertyHandler) GetPropertyHandler(w http.ResponseWriter, r *http.Request) {
 	propertyID := chi.URLParam(r, "id")
 
 	// Try to get property from db
-	propertyDetails, err := s.db.GetPropertyDetails(propertyID)
+	propertyDetails, err := h.server.DB().GetPropertyDetails(propertyID)
 	if err != nil {
-		respondWithError(w, 500, err)
+		utils.RespondWithError(w, 500, err)
 		return
 	}
 
-	propertyImagesBinary, err := s.db.GetPropertyImages(propertyID)
+	propertyImagesBinary, err := h.server.DB().GetPropertyImages(propertyID)
 	if err != nil {
-		respondWithError(w, 500, err)
+		utils.RespondWithError(w, 500, err)
 		return
 	}
 
@@ -51,31 +62,11 @@ func (s *Server) apiGetPropertyHandler(w http.ResponseWriter, r *http.Request) {
 		PropertyImages:  propertyImagesB64,
 	}
 
-	respondWithJSON(w, 200, property)
+	utils.RespondWithJSON(w, 200, property)
 }
 
-// GET /api/properties/total
-// AUTHED
-func (s *Server) apiGetPropertiesTotalCountHandler(w http.ResponseWriter, r *http.Request) {
-	// Authenticate user
-	_, err := s.authCheckAndGetClaims(r)
-	if err != nil {
-		respondWithError(w, 401, err)
-		return
-	}
-
-	// Validate properties
-	count, err := s.db.GetTotalCountProperties()
-	if err != nil {
-		respondWithError(w, 500, err)
-		return
-	}
-	respondWithJSON(w, 200, count)
-}
-
-// Endpoint: GET /api/properties
 // NO AUTH
-func (s *Server) apiGetPropertiesHandler(w http.ResponseWriter, r *http.Request) {
+func (h *PropertyHandler) GetPropertiesHandler(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
 
 	pageStr := query.Get("page")
@@ -86,14 +77,14 @@ func (s *Server) apiGetPropertiesHandler(w http.ResponseWriter, r *http.Request)
 	var offset int
 	offset, err := strconv.Atoi(pageStr)
 	if err != nil {
-		respondWithError(w, 422, fmt.Errorf("unable to parse page: %s", pageStr))
+		utils.RespondWithError(w, 422, fmt.Errorf("unable to parse page: %s", pageStr))
 		return
 	}
 
 	var limit int
 	limit, err = strconv.Atoi(limitStr)
 	if err != nil {
-		respondWithError(w, 422, fmt.Errorf("unable to parse limit: %s", limitStr))
+		utils.RespondWithError(w, 422, fmt.Errorf("unable to parse limit: %s", limitStr))
 		return
 	}
 
@@ -101,36 +92,83 @@ func (s *Server) apiGetPropertiesHandler(w http.ResponseWriter, r *http.Request)
 	offset = offset * limit
 
 	// Get the property IDs from DB
-	properties, err := s.db.GetNextPageProperties(int32(limit), int32(offset), filterAddress)
+	properties, err := h.server.DB().GetNextPageProperties(int32(limit), int32(offset), filterAddress)
 	if err != nil {
-		respondWithError(w, 500, err)
+		utils.RespondWithError(w, 500, err)
 		return
 	}
 
-	respondWithJSON(w, 200, struct {
+	utils.RespondWithJSON(w, 200, struct {
 		PropertyIDs []string `json:"propertyIDs"`
 	}{
 		PropertyIDs: properties,
 	})
 }
 
-// Endpoint: POST /api/properties
-// AUTHED
-func (s *Server) apiCreatePropertiesHandler(w http.ResponseWriter, r *http.Request) {
-	// Authenticate the user and make sure they have write access to properties db
-	// (i.e. Need to be either a lister or admin role, basically just not a regular user)
-	userID, err := s.getAuthedUserId(r)
-	if err != nil {
-		respondWithError(w, 401, err)
+// NO AUTH
+func (h *PropertyHandler) GetListerInfoHandler(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query()
+	listerID := query.Get("listerID")
+	if listerID == "" {
+		utils.RespondWithError(w, 422, errors.New("listerID empty"))
 		return
 	}
-	role, err := s.db.GetUserRole(userID)
+
+	// Check the role of the userid
+	role, err := h.server.DB().GetUserRole(listerID)
 	if err != nil {
-		respondWithError(w, 401, err)
+		utils.RespondWithError(w, 500, err)
+		return
+	}
+	if role != "lister" && role != "admin" {
+		utils.RespondWithError(w, 500, errors.New("user is not a lister"))
+		return
+	}
+
+	// userID is a lister, return the email and name for basic contact information
+	lister, err := h.server.DB().GetUserDetails(listerID)
+	if err != nil {
+		utils.RespondWithError(w, 500, err)
+		return
+	}
+
+	utils.RespondWithJSON(w, 200, struct {
+		FirstName string `json:"firstName"`
+		LastName  string `json:"lastName"`
+		Email     string `json:"email"`
+	}{
+		FirstName: lister.FirstName,
+		LastName:  lister.LastName,
+		Email:     lister.Email,
+	})
+}
+
+// AUTHED
+func (h *PropertyHandler) GetPropertiesTotalCountHandler(w http.ResponseWriter, r *http.Request) {
+	// Validate properties
+	count, err := h.server.DB().GetTotalCountProperties()
+	if err != nil {
+		utils.RespondWithError(w, 500, err)
+		return
+	}
+	utils.RespondWithJSON(w, 200, count)
+}
+
+// AUTHED
+func (h *PropertyHandler) CreatePropertiesHandler(w http.ResponseWriter, r *http.Request) {
+	// Get user id
+	userID, ok := r.Context().Value(auth.UserIDKey).(string)
+	if !ok {
+		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("user id blank"))
+		return
+	}
+	role, err := h.server.DB().GetUserRole(userID)
+	if err != nil {
+		utils.RespondWithError(w, 401, err)
 		return
 	}
 	if role == "regular" {
-		respondWithError(w, 401, err)
+		utils.RespondWithError(w, 401, err)
 		return
 	}
 
@@ -139,7 +177,7 @@ func (s *Server) apiCreatePropertiesHandler(w http.ResponseWriter, r *http.Reque
 	r.Body = http.MaxBytesReader(w, r.Body, int64(MAX_SIZE))
 	err = r.ParseMultipartForm(int64(MAX_SIZE + 512))
 	if err != nil {
-		respondWithError(w, 500, err)
+		utils.RespondWithError(w, 500, err)
 		return
 	}
 
@@ -148,21 +186,21 @@ func (s *Server) apiCreatePropertiesHandler(w http.ResponseWriter, r *http.Reque
 	var propertyDetails database.PropertyDetails
 	err = json.Unmarshal([]byte(detailsRaw), &propertyDetails)
 	if err != nil {
-		respondWithError(w, 500, err)
+		utils.RespondWithError(w, 500, err)
 		return
 	}
 
 	// Validate property details
-	err = ValidatePropertyDetails(propertyDetails)
+	err = validation.ValidatePropertyDetails(propertyDetails)
 	if err != nil {
-		respondWithError(w, 400, err)
+		utils.RespondWithError(w, 400, err)
 		return
 	}
 
 	// Check that property address is not a duplicate of an existing one before creation
-	err = s.db.CheckDuplicateProperty(propertyDetails)
+	err = h.server.DB().CheckDuplicateProperty(propertyDetails)
 	if err != nil {
-		respondWithError(w, 400, err)
+		utils.RespondWithError(w, 400, err)
 		return
 	}
 
@@ -170,14 +208,14 @@ func (s *Server) apiCreatePropertiesHandler(w http.ResponseWriter, r *http.Reque
 	numberImagesRaw := r.FormValue("numImages") // should be at most 10, limited on expected frontend.
 	numberImagesInt64, err := strconv.ParseInt(numberImagesRaw, 10, 16)
 	if err != nil {
-		respondWithError(w, 500, err)
+		utils.RespondWithError(w, 500, err)
 		return
 	}
 	numberImages := int16(numberImagesInt64)
 
 	// Ensure that at least a single image is given for the property
 	if numberImages == 0 {
-		respondWithError(w, 400, errors.New("property must have at least one property"))
+		utils.RespondWithError(w, 400, errors.New("property must have at least one property"))
 		return
 	}
 
@@ -185,19 +223,19 @@ func (s *Server) apiCreatePropertiesHandler(w http.ResponseWriter, r *http.Reque
 	for i := range numberImages {
 		imageDataRaw, imageFileHeader, err := r.FormFile(fmt.Sprintf("image%d", i))
 		if err != nil {
-			respondWithError(w, 500, err)
+			utils.RespondWithError(w, 500, err)
 			return
 		}
 		var imageData []byte
 		if imageDataRaw == nil {
-			respondWithError(w, 500, errors.New("image data is empty"))
+			utils.RespondWithError(w, 500, errors.New("image data is empty"))
 			return
 		} else {
 			defer imageDataRaw.Close()
 
 			imageData, err = io.ReadAll(imageDataRaw)
 			if err != nil {
-				respondWithError(w, 500, err)
+				utils.RespondWithError(w, 500, err)
 				return
 			}
 		}
@@ -214,9 +252,9 @@ func (s *Server) apiCreatePropertiesHandler(w http.ResponseWriter, r *http.Reque
 	}
 
 	// Create the property in the db
-	err = s.db.CreateProperty(propertyDetails, images)
+	err = h.server.DB().CreateProperty(propertyDetails, images)
 	if err != nil {
-		respondWithError(w, 500, err)
+		utils.RespondWithError(w, 500, err)
 		return
 	}
 
@@ -224,23 +262,23 @@ func (s *Server) apiCreatePropertiesHandler(w http.ResponseWriter, r *http.Reque
 	w.WriteHeader(201)
 }
 
-// PUT /api/properties/{id}
 // AUTHED
-func (s *Server) apiUpdatePropertiesHandler(w http.ResponseWriter, r *http.Request) {
-	// Authenticate the user and make sure they have write access to properties db
-	// (i.e. Need to be either a lister or admin role, basically just not a regular user)
-	userID, err := s.getAuthedUserId(r)
-	if err != nil {
-		respondWithError(w, 401, err)
+func (h *PropertyHandler) UpdatePropertiesHandler(w http.ResponseWriter, r *http.Request) {
+	// Get user id
+	userID, ok := r.Context().Value(auth.UserIDKey).(string)
+	if !ok {
+		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("user id blank"))
 		return
 	}
-	role, err := s.db.GetUserRole(userID)
+	// Ensure user has permission to create a property
+	// (i.e. a role of lister or admin)
+	role, err := h.server.DB().GetUserRole(userID)
 	if err != nil {
-		respondWithError(w, 401, err)
+		utils.RespondWithError(w, 401, err)
 		return
 	}
 	if role == "regular" {
-		respondWithError(w, 401, err)
+		utils.RespondWithError(w, 401, err)
 		return
 	}
 
@@ -249,7 +287,7 @@ func (s *Server) apiUpdatePropertiesHandler(w http.ResponseWriter, r *http.Reque
 	r.Body = http.MaxBytesReader(w, r.Body, int64(MAX_SIZE))
 	err = r.ParseMultipartForm(int64(MAX_SIZE + 512))
 	if err != nil {
-		respondWithError(w, 500, err)
+		utils.RespondWithError(w, 500, err)
 		return
 	}
 
@@ -258,20 +296,20 @@ func (s *Server) apiUpdatePropertiesHandler(w http.ResponseWriter, r *http.Reque
 	var propertyDetails database.PropertyDetails
 	err = json.Unmarshal([]byte(detailsRaw), &propertyDetails)
 	if err != nil {
-		respondWithError(w, 500, err)
+		utils.RespondWithError(w, 500, err)
 		return
 	}
 
 	// Validate propertyId of URLParam matches propertyId of data in request body
 	if propertyDetails.PropertyID != chi.URLParam(r, "id") {
-		respondWithError(w, http.StatusBadRequest, errors.New("propertyId of URLParam does not match propertyId of data in request body"))
+		utils.RespondWithError(w, http.StatusBadRequest, errors.New("propertyId of URLParam does not match propertyId of data in request body"))
 		return
 	}
 
 	// Validate property details
-	err = ValidatePropertyDetails(propertyDetails)
+	err = validation.ValidatePropertyDetails(propertyDetails)
 	if err != nil {
-		respondWithError(w, 400, err)
+		utils.RespondWithError(w, 400, err)
 		return
 	}
 
@@ -279,14 +317,14 @@ func (s *Server) apiUpdatePropertiesHandler(w http.ResponseWriter, r *http.Reque
 	numberImagesRaw := r.FormValue("numImages") // should be at most 10, limited on expected frontend.
 	numberImagesInt64, err := strconv.ParseInt(numberImagesRaw, 10, 16)
 	if err != nil {
-		respondWithError(w, 500, err)
+		utils.RespondWithError(w, 500, err)
 		return
 	}
 	numberImages := int16(numberImagesInt64)
 
 	// Ensure that at least a single image is given for the property
 	if numberImages == 0 {
-		respondWithError(w, 400, errors.New("property must have at least one property"))
+		utils.RespondWithError(w, 400, errors.New("property must have at least one property"))
 		return
 	}
 
@@ -294,19 +332,19 @@ func (s *Server) apiUpdatePropertiesHandler(w http.ResponseWriter, r *http.Reque
 	for i := range numberImages {
 		imageDataRaw, imageFileHeader, err := r.FormFile(fmt.Sprintf("image%d", i))
 		if err != nil {
-			respondWithError(w, 500, err)
+			utils.RespondWithError(w, 500, err)
 			return
 		}
 		var imageData []byte
 		if imageDataRaw == nil {
-			respondWithError(w, 500, errors.New("image data is empty"))
+			utils.RespondWithError(w, 500, errors.New("image data is empty"))
 			return
 		} else {
 			defer imageDataRaw.Close()
 
 			imageData, err = io.ReadAll(imageDataRaw)
 			if err != nil {
-				respondWithError(w, 500, err)
+				utils.RespondWithError(w, 500, err)
 				return
 			}
 		}
@@ -324,21 +362,21 @@ func (s *Server) apiUpdatePropertiesHandler(w http.ResponseWriter, r *http.Reque
 
 	// Listers can only update their own properties, admins can modify any who cares if they own it or not
 	if role == "lister" && userID != propertyDetails.ListerUserID {
-		respondWithError(w, 401, errors.New("you can only modify your own property as a lister"))
+		utils.RespondWithError(w, 401, errors.New("you can only modify your own property as a lister"))
 		return
 	}
 
 	// Update property details
-	err = s.db.UpdatePropertyDetails(propertyDetails)
+	err = h.server.DB().UpdatePropertyDetails(propertyDetails)
 	if err != nil {
-		respondWithError(w, 500, err)
+		utils.RespondWithError(w, 500, err)
 		return
 	}
 
 	// Update property images
-	err = s.db.UpdatePropertyImages(propertyDetails.PropertyID, images)
+	err = h.server.DB().UpdatePropertyImages(propertyDetails.PropertyID, images)
 	if err != nil {
-		respondWithError(w, 500, err)
+		utils.RespondWithError(w, 500, err)
 		return
 	}
 
@@ -346,83 +384,43 @@ func (s *Server) apiUpdatePropertiesHandler(w http.ResponseWriter, r *http.Reque
 	w.WriteHeader(200)
 }
 
-// Endpoint: DELETE /api/properties/{id}
 // AUTHED
-func (s *Server) apiDeletePropertiesHandler(w http.ResponseWriter, r *http.Request) {
-	// Authenticate user
-	userID, err := s.getAuthedUserId(r)
-	if err != nil {
-		respondWithError(w, 401, err)
+func (h *PropertyHandler) DeletePropertiesHandler(w http.ResponseWriter, r *http.Request) {
+	// Get user id
+	userID, ok := r.Context().Value(auth.UserIDKey).(string)
+	if !ok {
+		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("user id blank"))
 		return
 	}
 
 	// Get the property ID they want to delete from the URL param
 	propertyID := chi.URLParam(r, "id")
 	if len(propertyID) == 0 {
-		respondWithError(w, 400, errors.New("no communityId given"))
+		utils.RespondWithError(w, 400, errors.New("no communityId given"))
 		return
 	}
 
 	// Try to get the requested property
-	propertyDetails, err := s.db.GetPropertyDetails(propertyID)
+	propertyDetails, err := h.server.DB().GetPropertyDetails(propertyID)
 	if err != nil {
-		respondWithError(w, 500, err)
+		utils.RespondWithError(w, 500, err)
 		return
 	}
 
 	// Ensure that the user owns the property OR
 	// that the user is the admin
-	if propertyDetails.ListerUserID != userID && userID != s.AdminUserID {
-		respondWithError(w, 401, errors.New("account not authorized for this action"))
+	if propertyDetails.ListerUserID != userID && userID != h.adminUserID {
+		utils.RespondWithError(w, 401, errors.New("account not authorized for this action"))
 		return
 	}
 
 	// Delete the property
-	err = s.db.DeleteProperty(propertyID)
+	err = h.server.DB().DeleteProperty(propertyID)
 	if err != nil {
-		respondWithError(w, 500, err)
+		utils.RespondWithError(w, 500, err)
 		return
 	}
 
 	// Respond ok
 	w.WriteHeader(200)
-}
-
-// Endpoint: GET /api/lister
-// NO AUTH
-func (s *Server) apiGetListerInfoHandler(w http.ResponseWriter, r *http.Request) {
-	query := r.URL.Query()
-	listerID := query.Get("listerID")
-	if listerID == "" {
-		respondWithError(w, 422, errors.New("listerID empty"))
-		return
-	}
-
-	// Check the role of the userid
-	role, err := s.db.GetUserRole(listerID)
-	if err != nil {
-		respondWithError(w, 500, err)
-		return
-	}
-	if role != "lister" && role != "admin" {
-		respondWithError(w, 500, errors.New("user is not a lister"))
-		return
-	}
-
-	// userID is a lister, return the email and name for basic contact information
-	lister, err := s.db.GetUserDetails(listerID)
-	if err != nil {
-		respondWithError(w, 500, err)
-		return
-	}
-
-	respondWithJSON(w, 200, struct {
-		FirstName string `json:"firstName"`
-		LastName  string `json:"lastName"`
-		Email     string `json:"email"`
-	}{
-		FirstName: lister.FirstName,
-		LastName:  lister.LastName,
-		Email:     lister.Email,
-	})
 }
