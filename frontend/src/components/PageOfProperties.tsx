@@ -2,7 +2,7 @@ import React from "react";
 import PropertyCard from "./PropertyCard";
 
 import { Property } from "../types/Types";
-import { useGetPropertiesInfo } from "../hooks/properties";
+import { useGetProperties } from "../hooks/properties";
 
 type PageOfPropertiesProps = {
   propertyIDs: string[];
@@ -12,7 +12,7 @@ type PageOfPropertiesProps = {
 // if so, memo's shallow copy will consider a new array of the same IDs
 // to be different and will re-render.
 const PageOfProperties: React.FC<PageOfPropertiesProps> = ({ propertyIDs }) => {
-  const propertyQueries = useGetPropertiesInfo(propertyIDs);
+  const propertyQueries = useGetProperties(propertyIDs);
   const properties = propertyQueries
     .map((value) => value.data)
     .filter((value) => {

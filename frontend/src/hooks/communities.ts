@@ -13,7 +13,7 @@ export const useGetPageOfCommunityIDs = (
   });
 };
 
-export const useGetCommunitiesInfo = (
+export const useGetCommunities = (
   communityIDs: string[],
 ): UseQueryResult<Community, Error>[] => {
   return useQueries({

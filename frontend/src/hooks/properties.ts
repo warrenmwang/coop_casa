@@ -12,7 +12,7 @@ export const useGetPageOfPropertyIDs = (
   });
 };
 
-export const useGetPropertiesInfo = (
+export const useGetProperties = (
   propertyIDs: string[],
 ): UseQueryResult<Property, Error>[] => {
   return useQueries({

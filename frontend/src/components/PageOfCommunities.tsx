@@ -1,7 +1,7 @@
 import React from "react";
 import { Community } from "../types/Types";
 import CommunityCard from "./CommunityCard";
-import { useGetCommunitiesInfo } from "../hooks/communities";
+import { useGetCommunities } from "../hooks/communities";
 
 type PageOfCommunitiesProps = {
   communityIDs: string[];
@@ -13,7 +13,7 @@ type PageOfCommunitiesProps = {
 const PageOfCommunities: React.FC<PageOfCommunitiesProps> = ({
   communityIDs,
 }) => {
-  const communityQueries = useGetCommunitiesInfo(communityIDs);
+  const communityQueries = useGetCommunities(communityIDs);
 
   const communities = communityQueries
     .map((value) => value.data)
