@@ -60,7 +60,7 @@ const AccountSettingsForm: React.FC = () => {
     }));
   };
 
-  const handleSaveChanges = async () => {
+  const handleSaveChanges = () => {
     mutation.mutate();
   };
 
@@ -206,18 +206,16 @@ const AccountSettingsForm: React.FC = () => {
           {/* Save / discard buttons */}
           {isChanged && (
             <div className="flex justify-end space-x-4">
-              <button
+              <FormButton
                 onClick={handleSaveChanges}
+                displayText="Save changes"
                 className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-              >
-                Save Changes
-              </button>
-              <button
+              />
+              <FormButton
                 onClick={handleDiscardChanges}
+                displayText="Discard Changes"
                 className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-              >
-                Discard Changes
-              </button>
+              />
             </div>
           )}
         </form>

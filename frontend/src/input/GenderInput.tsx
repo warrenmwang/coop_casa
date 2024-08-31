@@ -50,6 +50,9 @@ const GenderInput: React.FC<GenderInputArgs> = ({
         defaultValue={formData.gender}
         required={required}
       >
+        <option value="" disabled>
+          Select an Option
+        </option>
         {GENDER_OPTIONS.map((gender) => (
           <option
             key={gender}

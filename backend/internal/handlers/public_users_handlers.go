@@ -4,7 +4,6 @@ import (
 	"backend/internal/interfaces"
 	"backend/internal/utils"
 	"errors"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -76,9 +75,6 @@ func (h *UserProfileHandler) GetUsersHandler(w http.ResponseWriter, r *http.Requ
 // NO AUTH
 func (h *UserProfileHandler) GetUserHandler(w http.ResponseWriter, r *http.Request) {
 	userID := chi.URLParam(r, "id")
-
-	log.Printf("Request URL: %s", r.URL.String())
-	log.Printf("userID: %s", userID)
 
 	userPublicProfile, err := h.server.DB().GetPublicUserProfile(userID)
 	if err != nil {
