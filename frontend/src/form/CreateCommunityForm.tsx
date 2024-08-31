@@ -20,6 +20,7 @@ import "../styles/input.css";
 import "../styles/form.css";
 import { toast } from "react-toastify";
 import axios, { AxiosError } from "axios";
+import { useGetUserAccountDetails } from "../hooks/account";
 
 type TextFieldsConstruct = {
   id: string;
@@ -54,10 +55,7 @@ const CreateCommunityForm: React.FC = () => {
 
   // Need to grab the user id from backend to use as adminUserId
   // for marking who the community belongs to.
-  const userQuery = useQuery({
-    queryKey: ["user", "details"],
-    queryFn: apiGetUser,
-  });
+  const userQuery = useGetUserAccountDetails();
   const { mutate: mutateCreate } = useMutation({
     mutationFn: (community: Community) => apiCreateCommunity(community),
   });

@@ -1,8 +1,7 @@
 import React from "react";
-import { useQueries } from "@tanstack/react-query";
-import { apiGetCommunity } from "../api/community";
 import { Community } from "../types/Types";
 import CommunityCard from "./CommunityCard";
+import { useGetCommunitiesInfo } from "../hooks/communities";
 
 type PageOfCommunitiesProps = {
   communityIDs: string[];
@@ -14,14 +13,7 @@ type PageOfCommunitiesProps = {
 const PageOfCommunities: React.FC<PageOfCommunitiesProps> = ({
   communityIDs,
 }) => {
-  const communityQueries = useQueries({
-    queries: communityIDs.map((communityID) => {
-      return {
-        queryKey: ["communities", communityID],
-        queryFn: () => apiGetCommunity(communityID),
-      };
-    }),
-  });
+  const communityQueries = useGetCommunitiesInfo(communityIDs);
 
   const communities = communityQueries
     .map((value) => value.data)

@@ -13,7 +13,7 @@ import {
   UserDetails,
 } from "../types/Types";
 import "../styles/form.css";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import TextSkeleton from "../skeleton/TextSkeleton";
 import { toast } from "react-toastify";
 import { EmptyUser } from "../types/Objects";
@@ -21,6 +21,7 @@ import FetchErrorText from "../components/FetchErrorText";
 import axios, { AxiosError } from "axios";
 import FormButton from "../components/FormButton";
 import MultipleImageUploader from "../input/MultipleImageUploader";
+import { useGetUserAccountDetails } from "../hooks/account";
 
 const AccountSettingsForm: React.FC = () => {
   const [user, setUser] = useState<User>(EmptyUser);
@@ -30,10 +31,7 @@ const AccountSettingsForm: React.FC = () => {
   // TODO:
   // const [userProfileImages, setUserProfileImages] = useState<OrderedFile[]>([]);
 
-  const userQuery = useQuery({
-    queryKey: ["user", "details"],
-    queryFn: apiGetUser,
-  });
+  const userQuery = useGetUserAccountDetails();
 
   const queryClient = useQueryClient();
   const mutation = useMutation({

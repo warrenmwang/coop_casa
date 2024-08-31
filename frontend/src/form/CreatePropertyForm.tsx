@@ -21,6 +21,7 @@ import "../styles/input.css";
 import "../styles/form.css";
 import { toast } from "react-toastify";
 import axios, { AxiosError } from "axios";
+import { useGetUserAccountDetails } from "../hooks/account";
 
 type TextFieldsConstruct = {
   id: string;
@@ -65,10 +66,7 @@ const CreatePropertyForm: React.FC = () => {
   ); // if any key value in errors is true, then there is a problem.
   const [images, setImages] = useState<OrderedFile[]>([]);
 
-  const userQuery = useQuery({
-    queryKey: ["user", "details"],
-    queryFn: apiGetUser,
-  });
+  const userQuery = useGetUserAccountDetails();
   const { mutate: mutateCreate } = useMutation({
     mutationFn: (property: Property) => apiCreateNewProperty(property),
   });

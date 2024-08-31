@@ -1,26 +1,20 @@
 import React, { useState } from "react";
 import { toast } from "react-toastify";
-import { apiAdminGetUsersDetails, apiAdminGetUsersRoles } from "../api/admin";
-import { useQuery } from "@tanstack/react-query";
 import TextSkeleton from "../skeleton/TextSkeleton";
+import { useAdminGetUserDetails, useAdminGetUserRoles } from "../hooks/admin";
 
 const AdminDisplayUsers: React.FC = () => {
   const limit = 10;
   const [page, setPage] = useState<number>(0);
 
-  const { data: userDetails, isFetching: userDetailsIsFetching } = useQuery({
-    queryKey: ["admin", "userDetails", limit, page],
-    queryFn: () => apiAdminGetUsersDetails(limit, page),
-  });
+  const { data: userDetails, isFetching: userDetailsIsFetching } =
+    useAdminGetUserDetails(limit, page);
 
   const userIDs: string[] =
     userDetails?.map((userDetail) => userDetail.userId) || [];
 
-  const { data: userRoles, isFetching: userRolesIsFetching } = useQuery({
-    queryKey: ["admin", "userRoles", limit, page],
-    queryFn: () => apiAdminGetUsersRoles(userIDs),
-    enabled: userIDs.length > 0,
-  });
+  const { data: userRoles, isFetching: userRolesIsFetching } =
+    useAdminGetUserRoles(userIDs);
 
   const isLastPage: boolean = (userDetails?.length || 0) < limit;
 

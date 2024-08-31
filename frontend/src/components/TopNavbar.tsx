@@ -11,29 +11,26 @@ import {
   communitiesPageLink,
   propertiesPageLink,
 } from "../urls";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { apiGetUser, apiGetUserAuth, apiLogoutUser } from "../api/account";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiLogoutUser } from "../api/account";
 import { APIUserReceived } from "../types/Types";
 import { apiFile2ClientFile } from "../utils/utils";
 import { toast } from "react-toastify";
 import axios, { AxiosError } from "axios";
 import UserProfileIcon from "../icons/UserProfileIcon/UserProfileIcon";
 import DefaultUserProfileIcon from "../icons/DefaultUserProfile/DefaultUserProfileIcon";
+import {
+  useGetUserAccountAuth,
+  useGetUserAccountDetails,
+} from "../hooks/account";
 
 function classNames(...classes: (string | undefined | null | false)[]) {
   return classes.filter(Boolean).join(" ");
 }
 
 const TopNavbar: React.FC = () => {
-  const userQuery = useQuery({
-    queryKey: ["user", "details"],
-    queryFn: apiGetUser,
-  });
-
-  const authQuery = useQuery({
-    queryKey: ["user", "auth"],
-    queryFn: apiGetUserAuth,
-  });
+  const userQuery = useGetUserAccountDetails();
+  const authQuery = useGetUserAccountAuth();
 
   const mutation = useMutation({
     mutationFn: apiLogoutUser,

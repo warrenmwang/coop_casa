@@ -1,9 +1,8 @@
 import React from "react";
-import { useQueries } from "@tanstack/react-query";
-import { apiGetProperty } from "../api/property";
 import PropertyCard from "./PropertyCard";
 
 import { Property } from "../types/Types";
+import { useGetPropertiesInfo } from "../hooks/properties";
 
 type PageOfPropertiesProps = {
   propertyIDs: string[];
@@ -13,15 +12,7 @@ type PageOfPropertiesProps = {
 // if so, memo's shallow copy will consider a new array of the same IDs
 // to be different and will re-render.
 const PageOfProperties: React.FC<PageOfPropertiesProps> = ({ propertyIDs }) => {
-  const propertyQueries = useQueries({
-    queries: propertyIDs.map((propertyID) => {
-      return {
-        queryKey: ["properties", propertyID],
-        queryFn: () => apiGetProperty(propertyID),
-      };
-    }),
-  });
-
+  const propertyQueries = useGetPropertiesInfo(propertyIDs);
   const properties = propertyQueries
     .map((value) => value.data)
     .filter((value) => {

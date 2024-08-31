@@ -6,13 +6,13 @@ import {
   MAX_NUMBER_USER_PROFILES_PER_PAGE,
   pageQPKey,
 } from "../constants";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { apiGetUserProfiles } from "../api/user";
+import { useQueryClient } from "@tanstack/react-query";
 import FetchErrorText from "./FetchErrorText";
 import CardGridSkeleton from "../skeleton/CardGridSkeleton";
 import SearchBar from "../input/SearchBar";
 import SubmitButton from "./SubmitButton";
 import PageOfUserProfiles from "./PageOfUserProfiles";
+import { useGetPageOfUserProfiles } from "../hooks/users";
 
 const UserProfilesMainBody: React.FC = () => {
   const [searchIsSubmitting, setSearchIsSubmitting] = useState<boolean>(false);
@@ -71,18 +71,7 @@ const UserProfilesMainBody: React.FC = () => {
     setSearchParams(searchParams);
   };
 
-  // Use react query hook to handle our data fetching and async state w/ caching of query results.
-  const query = useQuery({
-    queryKey: ["userProfilesPage", currentPage, firstName, lastName],
-    queryFn: () =>
-      apiGetUserProfiles(
-        currentPage,
-        MAX_NUMBER_USER_PROFILES_PER_PAGE,
-        firstName,
-        lastName,
-      ),
-  });
-  // Use query client hook to get the query client for access to the cache
+  const query = useGetPageOfUserProfiles(currentPage, firstName, lastName);
   const queryClient = useQueryClient();
 
   // Define search form submission handler

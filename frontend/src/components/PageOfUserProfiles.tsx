@@ -1,18 +1,10 @@
-import { useQueries } from "@tanstack/react-query";
 import React from "react";
-import { apiGetUserProfile } from "../api/user";
 import { UserProfile } from "../types/Types";
 import UserProfileCard from "./UserProfileCard";
+import { useGetUserProfiles } from "../hooks/users";
 
 const PageOfUserProfiles: React.FC<{ userIDs: string[] }> = ({ userIDs }) => {
-  const userProfileQueries = useQueries({
-    queries: userIDs.map((userID) => {
-      return {
-        queryKey: ["userProfile", userID],
-        queryFn: () => apiGetUserProfile(userID),
-      };
-    }),
-  });
+  const userProfileQueries = useGetUserProfiles(userIDs);
 
   const userProfiles = userProfileQueries
     .map((value) => value.data)

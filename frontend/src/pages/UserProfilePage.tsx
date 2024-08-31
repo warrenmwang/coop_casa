@@ -1,19 +1,16 @@
 import React from "react";
 import { useParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { apiGetUserProfile } from "../api/user";
 import CardSkeleton from "../skeleton/CardSkeleton";
 import FetchErrorText from "../components/FetchErrorText";
 import UserProfileContent from "../components/UserProfileContent";
+import { useGetUserProfile } from "../hooks/users";
 
 const UserProfilePage: React.FC = () => {
   const { userID } = useParams<{ userID: string }>();
   const userIDStr: string = userID as string;
 
-  const { data: userProfile, status } = useQuery({
-    queryKey: ["userProfile", userID],
-    queryFn: () => apiGetUserProfile(userIDStr),
-  });
+  const { data: userProfile, status } = useGetUserProfile(userIDStr);
+
   if (status === "pending") {
     return (
       <div className="flex justify-center">

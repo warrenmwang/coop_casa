@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { apiGetCommunities } from "../api/community";
+import { useQueryClient } from "@tanstack/react-query";
 import CardGridSkeleton from "../skeleton/CardGridSkeleton";
 import PageOfCommunities from "./PageOfCommunities";
 
@@ -15,6 +14,7 @@ import {
   MAX_NUMBER_COMMUNITIES_PER_PAGE,
 } from "../constants";
 import FetchErrorText from "./FetchErrorText";
+import { useGetPageOfCommunityIDs } from "../hooks/communities";
 
 const CommunitiesMainBody: React.FC = () => {
   const [searchIsSubmitting, setSearchIsSubmitting] = useState<boolean>(false);
@@ -75,10 +75,7 @@ const CommunitiesMainBody: React.FC = () => {
   };
 
   // Use react query hook to handle our data fetching and async state w/ caching of query results.
-  const query = useQuery({
-    queryKey: ["communitiesPage", currentPage, name, description],
-    queryFn: () => apiGetCommunities(currentPage, name, description),
-  });
+  const query = useGetPageOfCommunityIDs(currentPage, name, description);
   // Use query client hook to get the query client for access to the cache
   const queryClient = useQueryClient();
 

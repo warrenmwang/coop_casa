@@ -1,21 +1,16 @@
 import React from "react";
 import { useParams } from "react-router-dom";
-import { apiGetProperty } from "../api/property";
 import { Property } from "../types/Types";
-import { useQuery } from "@tanstack/react-query";
 import CardSkeleton from "../skeleton/CardSkeleton";
 import FetchErrorText from "../components/FetchErrorText";
 import PropertyDetailContent from "../components/PropertyDetailContent";
+import { useGetProperty } from "../hooks/properties";
 
 const PropertyDetailPage: React.FC = () => {
   const { propertyID } = useParams<{ propertyID: string }>();
-
   const propertyIDStr: string = propertyID as string;
 
-  const propertyQuery = useQuery({
-    queryKey: ["properties", propertyIDStr],
-    queryFn: () => apiGetProperty(propertyIDStr),
-  });
+  const propertyQuery = useGetProperty(propertyIDStr);
 
   return (
     <>

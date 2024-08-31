@@ -1,18 +1,14 @@
 import React from "react";
 import { ListerBasicInfo } from "../types/Types";
-import { apiGetListerInfo } from "../api/property";
-import { useQuery } from "@tanstack/react-query";
 import FetchErrorText from "../components/FetchErrorText";
+import { useGetLister } from "../hooks/lister";
 
 type ListerInfoProps = {
   listerID: string;
 };
 
 const ListerInfo: React.FC<ListerInfoProps> = ({ listerID }) => {
-  const { data, status } = useQuery({
-    queryKey: ["lister", listerID],
-    queryFn: () => apiGetListerInfo(listerID),
-  });
+  const { data, status } = useGetLister(listerID);
 
   const lister = data as ListerBasicInfo;
 

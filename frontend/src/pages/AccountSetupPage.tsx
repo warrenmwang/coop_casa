@@ -10,7 +10,7 @@ import {
   User,
   UserDetails,
 } from "../types/Types";
-import { apiGetUser, apiUpdateUserAccountDetails } from "../api/account";
+import { apiUpdateUserAccountDetails } from "../api/account";
 import LocationInput from "../input/LocationInput";
 import InterestsInput from "../input/InterestsInput";
 import GenderInput from "../input/GenderInput";
@@ -23,7 +23,7 @@ import "../styles/form.css";
 import "../styles/contentBody.css";
 import SubmitButton from "../components/SubmitButton";
 import { dashboardPageLink } from "../urls";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import TextSkeleton from "../skeleton/TextSkeleton";
 import { apiFile2ClientFile } from "../utils/utils";
 
@@ -32,6 +32,7 @@ import { toast } from "react-toastify";
 import MultipleImageUploader from "../input/MultipleImageUploader";
 import { MAX_USER_PROFILE_IMGS_ALLOWED } from "../constants";
 import FormButton from "../components/FormButton";
+import { useGetUserAccountDetails } from "../hooks/account";
 
 const AccountSetupPage: React.FC = () => {
   const navigate = useNavigate();
@@ -46,10 +47,7 @@ const AccountSetupPage: React.FC = () => {
   const [userProfileImages, setUserProfileImages] = useState<OrderedFile[]>([]);
 
   // need to get user's to get the id and email
-  const userQuery = useQuery({
-    queryKey: ["user", "details"],
-    queryFn: apiGetUser,
-  });
+  const userQuery = useGetUserAccountDetails();
 
   const mutation = useMutation({
     mutationKey: ["user", "details"],

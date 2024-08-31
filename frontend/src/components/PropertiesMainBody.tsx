@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { apiGetProperties } from "../api/property";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { MAX_NUMBER_PROPERTIES_PER_PAGE } from "../constants";
 import CardGridSkeleton from "../skeleton/CardGridSkeleton";
 import SearchBar from "../input/SearchBar";
@@ -11,6 +10,7 @@ import "../styles/contentBody.css";
 import "../styles/form.css";
 import FetchErrorText from "./FetchErrorText";
 import { pageQPKey, filterAddressQPKey } from "../constants";
+import { useGetPageOfPropertyIDs } from "../hooks/properties";
 
 const PropertiesMainBody: React.FC = () => {
   const [searchIsSubmitting, setSearchIsSubmitting] = useState(false);
@@ -59,10 +59,7 @@ const PropertiesMainBody: React.FC = () => {
   const [filterAddress, setFilterAddress] = useState<string>(filterAddressStr);
 
   // Use react query hook to handle our data fetching and async state w/ caching of query results.
-  const query = useQuery({
-    queryKey: ["propertiesPage", currentPage, filterAddress],
-    queryFn: () => apiGetProperties(currentPage, filterAddress),
-  });
+  const query = useGetPageOfPropertyIDs(currentPage, filterAddress);
   // Use query client hook to get the query client for access to the cache
   const queryClient = useQueryClient();
 

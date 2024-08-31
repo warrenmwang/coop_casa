@@ -8,31 +8,23 @@ import AdminDashboard from "../components/AdminDashboard";
 import { accountSetupPageLink, homePageLink } from "../urls";
 import { APIUserReceived, UserDetails } from "../types/Types";
 
-import { useQuery } from "@tanstack/react-query";
-import { apiGetUser, apiGetUserAuth, apiGetUserRole } from "../api/account";
 import ListerDashboard from "../components/ListerDashboard";
 import { EmptyUser } from "../types/Objects";
 
 import "../styles/contentBody.css";
+import {
+  useGetUserAccountAuth,
+  useGetUserAccountDetails,
+  useGetUserAccountRole,
+} from "../hooks/account";
 
 // Authenticated Endpoint
 const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
 
-  const userQuery = useQuery({
-    queryKey: ["user", "details"],
-    queryFn: apiGetUser,
-  });
-
-  const authQuery = useQuery({
-    queryKey: ["user", "auth"],
-    queryFn: apiGetUserAuth,
-  });
-
-  const roleQuery = useQuery({
-    queryKey: ["user", "role"],
-    queryFn: apiGetUserRole,
-  });
+  const userQuery = useGetUserAccountDetails();
+  const authQuery = useGetUserAccountAuth();
+  const roleQuery = useGetUserAccountRole();
 
   let userDetails: UserDetails = EmptyUser;
   if (userQuery.status === "success") {

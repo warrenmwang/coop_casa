@@ -14,21 +14,15 @@ import TextSkeleton from "../skeleton/TextSkeleton";
 import axios, { AxiosError } from "axios";
 import { toast } from "react-toastify";
 import "../styles/contentBody.css";
+import { useGetUserAccountAuth, useGetUserAccountRole } from "../hooks/account";
 
 // Authenticated Endpoint
 const AccountSettingsPage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
-  const authQuery = useQuery({
-    queryKey: ["user", "auth"],
-    queryFn: apiGetUserAuth,
-  });
-
-  const roleQuery = useQuery({
-    queryKey: ["user", "role"],
-    queryFn: apiGetUserRole,
-  });
+  const authQuery = useGetUserAccountAuth();
+  const roleQuery = useGetUserAccountRole();
 
   const queryClient = useQueryClient();
   const mutation = useMutation({
