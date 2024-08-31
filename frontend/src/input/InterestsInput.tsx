@@ -68,7 +68,7 @@ const InterestsInput: React.FC<InterestsInputProps> = ({
 
   return (
     <div className="min-h-full w-full px-3">
-      <label className="text_input_field_label_gray" htmlFor="interests">
+      <label className="label__text_input_gray" htmlFor="interests">
         Interests (Multiple Answer, Select at least 1){" "}
         {required && <span className="text-red-500">*</span>}
       </label>

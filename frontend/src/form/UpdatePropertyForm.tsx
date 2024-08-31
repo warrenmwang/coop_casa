@@ -279,7 +279,7 @@ const UpdatePropertyForm: React.FC<{
         />
       </form>
       <div className="px-3">
-        <label className="text_input_field_label_gray">
+        <label className="label__text_input_gray">
           Upload some images of the property. At least 1 image is required.
           <span className="text-red-500">*</span>
         </label>

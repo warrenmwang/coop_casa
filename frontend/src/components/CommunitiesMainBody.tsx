@@ -159,14 +159,14 @@ const CommunitiesMainBody: React.FC = () => {
         onSubmit={searchCommunitiesWithFilters}
       >
         <div className="flex-col flex-grow items-center">
-          <label className="text_input_field_label_gray">Name</label>
+          <label className="label__text_input_gray">Name</label>
           <SearchBar
             searchQueryParamKey={filterNameQPKey}
             placeholder="Name"
           ></SearchBar>
         </div>
         <div className="flex-col flex-grow">
-          <label className="text_input_field_label_gray">Description</label>
+          <label className="label__text_input_gray">Description</label>
           <SearchBar
             searchQueryParamKey={filterDescriptionQPKey}
             placeholder="Description"

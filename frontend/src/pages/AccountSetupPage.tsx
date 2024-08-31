@@ -4,7 +4,12 @@ import { useNavigate } from "react-router-dom";
 
 // Components
 import Title from "../components/Title";
-import { APIUserReceived, User, UserDetails } from "../types/Types";
+import {
+  APIUserReceived,
+  OrderedFile,
+  User,
+  UserDetails,
+} from "../types/Types";
 import { apiGetUser, apiUpdateUserAccountDetails } from "../api/account";
 import LocationInput from "../input/LocationInput";
 import InterestsInput from "../input/InterestsInput";
@@ -24,8 +29,10 @@ import { apiFile2ClientFile } from "../utils/utils";
 
 import axios, { AxiosError } from "axios";
 import { toast } from "react-toastify";
+import MultipleImageUploader from "../input/MultipleImageUploader";
+import { MAX_USER_PROFILE_IMGS_ALLOWED } from "../constants";
+import FormButton from "../components/FormButton";
 
-// Authenticated Endpoint
 const AccountSetupPage: React.FC = () => {
   const navigate = useNavigate();
 
@@ -34,6 +41,9 @@ const AccountSetupPage: React.FC = () => {
   const [errors, setMyMap] = useState<Map<string, boolean>>(
     new Map<string, boolean>(),
   ); // if any key value in errors is true, then there is a problem.
+
+  // User Profile Images (opt)
+  const [userProfileImages, setUserProfileImages] = useState<OrderedFile[]>([]);
 
   // need to get user's to get the id and email
   const userQuery = useQuery({
@@ -66,6 +76,20 @@ const AccountSetupPage: React.FC = () => {
     });
   };
 
+  // User Profile Images are optional as well.
+  const handleImagesUploaded = (files: OrderedFile[]) => {
+    // Ensure number of images uploaded < MAX
+    if (files.length > MAX_USER_PROFILE_IMGS_ALLOWED) {
+      setError("user profile images", true);
+      toast.error(
+        `Cannot upload more than ${MAX_USER_PROFILE_IMGS_ALLOWED} for profile images.`,
+      );
+      return;
+    }
+    setError("user profile images", false);
+    setUserProfileImages(files);
+  };
+
   const handleClearAvatarImage = () => {
     setFormData((prevState) => ({
       ...prevState,
@@ -91,6 +115,9 @@ const AccountSetupPage: React.FC = () => {
     // Send update
     setIsSubmitting(true);
     mutation.mutate();
+
+    // TODO: handle user profile images
+    console.log(userProfileImages);
   };
 
   // Set interests error to true at first render
@@ -100,6 +127,7 @@ const AccountSetupPage: React.FC = () => {
     }
   }, []);
 
+  // Retrieve the ID and email
   useEffect(() => {
     if (userQuery.status === "success") {
       const received: APIUserReceived = userQuery.data;
@@ -123,97 +151,107 @@ const AccountSetupPage: React.FC = () => {
         title="Account Setup"
         description="Please provide some information about yourself to be able to use this platform and connect with others!"
       />
-      <div className="flex justify-center items-center min-h-full">
-        <form className="default-form-1" onSubmit={handleSubmit}>
-          <div>
-            {/* First Name */}
-            <TextInput
-              setFormData={textInputSetFormData}
-              setError={setError}
-              type="text"
-              label="First Name"
-              placeholder="Jane"
-              id="firstName"
-              value={formData.firstName}
-              required={true}
-              classNameCustom="w-full"
-            />
+      <form className="form__vertical_inputs" onSubmit={handleSubmit}>
+        <div>
+          {/* First Name */}
+          <TextInput
+            setFormData={textInputSetFormData}
+            setError={setError}
+            type="text"
+            label="First Name"
+            placeholder="Jane"
+            id="firstName"
+            value={formData.firstName}
+            required={true}
+            classNameCustom="w-full"
+          />
 
-            {/* Last Name */}
-            <TextInput
-              setFormData={textInputSetFormData}
-              setError={setError}
-              type="text"
-              label="Last Name"
-              placeholder="Doe"
-              id="lastName"
-              value={formData.lastName}
-              required={true}
-              classNameCustom="w-full"
-            />
+          {/* Last Name */}
+          <TextInput
+            setFormData={textInputSetFormData}
+            setError={setError}
+            type="text"
+            label="Last Name"
+            placeholder="Doe"
+            id="lastName"
+            value={formData.lastName}
+            required={true}
+            classNameCustom="w-full"
+          />
 
-            {/* Birthdate  */}
-            <TextInput
-              setFormData={textInputSetFormData}
-              setError={setError}
-              type="date"
-              label="Birthdate"
-              placeholder=""
-              id="birthDate"
-              value={formData.birthDate}
-              required={true}
-              classNameCustom="w-full"
-            />
+          {/* Birthdate  */}
+          <TextInput
+            setFormData={textInputSetFormData}
+            setError={setError}
+            type="date"
+            label="Birthdate"
+            placeholder=""
+            id="birthDate"
+            value={formData.birthDate}
+            required={true}
+            classNameCustom="w-full"
+          />
 
-            {/* Gender */}
-            <GenderInput
-              formData={formData}
-              setFormData={setFormData}
-              setError={setError}
-              required={true}
-              classNameCustom="w-full"
-            />
+          {/* Gender */}
+          <GenderInput
+            formData={formData}
+            setFormData={setFormData}
+            setError={setError}
+            required={true}
+            classNameCustom="w-full"
+          />
 
-            {/* Location */}
-            <LocationInput
-              formData={formData}
-              setFormData={setFormData}
-              setError={setError}
-              required={true}
-            />
+          {/* Location */}
+          <LocationInput
+            formData={formData}
+            setFormData={setFormData}
+            setError={setError}
+            required={true}
+          />
 
-            {/* Avatar Image */}
-            <ImageInput
-              setFormData={setFormData}
-              setError={setError}
-              label="Avatar Image (Max size 5 MiB)"
-              id="avatar"
-              value={formData.avatar}
-              classNameCustom="w-full"
-            />
-            {/* Clear Image Button */}
-            {formData.avatar && (
-              <button
+          {/* Avatar Image */}
+          <ImageInput
+            setFormData={setFormData}
+            setError={setError}
+            label="Avatar Image (Max size 5 MiB)"
+            id="avatar"
+            value={formData.avatar}
+            classNameCustom="w-full"
+          />
+          {/* Clear Image Button */}
+          {formData.avatar && (
+            <div className="input__container">
+              <FormButton
                 onClick={handleClearAvatarImage}
-                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-              >
-                Clear Image
-              </button>
-            )}
+                displayText="Clear Avatar Image"
+              />
+            </div>
+          )}
 
-            {/* Interests Multiple Choice Check Boxes */}
-            <InterestsInput
-              formData={formData}
-              setFormData={setFormData}
-              setError={setError}
-              required={true}
+          {/* User Profile Images */}
+          <div className="input__container">
+            <label className="label__text_input_gray">
+              Additional User Profile Images, displayed after avatar image.
+              (opt.)
+            </label>
+            <MultipleImageUploader
+              images={userProfileImages}
+              onImagesUploaded={handleImagesUploaded}
             />
           </div>
 
-          {/* Submit Button */}
-          <SubmitButton isSubmitting={isSubmitting} />
-        </form>
-      </div>
+          {/* Interests Multiple Choice Check Boxes */}
+          <InterestsInput
+            formData={formData}
+            setFormData={setFormData}
+            setError={setError}
+            required={true}
+          />
+        </div>
+
+        {/* Submit Button */}
+        <SubmitButton isSubmitting={isSubmitting} />
+      </form>
     </div>
   );
 };

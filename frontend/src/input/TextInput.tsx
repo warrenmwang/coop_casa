@@ -6,6 +6,7 @@ import {
 } from "../utils/inputValidation";
 import { MAX_TEXT_INPUT_LENGTH } from "../constants";
 import "../styles/input.css";
+import "../styles/label.css";
 
 interface TextInputArgs {
   setFormData: (id: string, value: string) => void;
@@ -74,12 +75,12 @@ const TextInput: React.FC<TextInputArgs> = ({
   };
 
   return (
-    <div className="w-full px-3 py-1">
-      <label className="text_input_field_label_gray" htmlFor={id}>
+    <div className="input__container">
+      <label className="label__text_input_gray" htmlFor={id}>
         {label} {required && <span className="text-red-500">*</span>}
       </label>
       <input
-        className={`text_input_field_box_gray ${classNameCustom}`}
+        className={`input__text_gray_box ${classNameCustom}`}
         id={id}
         type={type}
         placeholder={placeholder}

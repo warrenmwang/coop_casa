@@ -98,7 +98,7 @@ const UpdateCommunityManager: React.FC = () => {
         {/* query community data form */}
         <form className="" onSubmit={getCommunityDetails}>
           <div className="flex flex-col">
-            <label className="text_input_field_label_gray">
+            <label className="label__text_input_gray">
               Get community details via ID.
             </label>
             <input
@@ -107,7 +107,7 @@ const UpdateCommunityManager: React.FC = () => {
               placeholder="Community ID"
               value={communityID}
               onChange={handleChange}
-              className="text_input_field_box_gray w-full"
+              className="input__text_gray_box w-full"
             />
           </div>
           <div className="flex gap-2">

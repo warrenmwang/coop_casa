@@ -204,7 +204,7 @@ const CreateCommunityForm: React.FC = () => {
         This form allows you to create a new community on the platform.
       </h4>
       {/* create a new community */}
-      <form className="default-form-1" onSubmit={handleSubmit}>
+      <form className="form__vertical_inputs" onSubmit={handleSubmit}>
         {communityTextFieldsConstructs.map((value, index) => (
           <TextInput
             key={index}
@@ -224,7 +224,7 @@ const CreateCommunityForm: React.FC = () => {
 
         {/* Images */}
         <div className="px-3">
-          <label className="text_input_field_label_gray">
+          <label className="label__text_input_gray">
             Upload some images of the community. At least 1 image is required.
             <span className="text-red-500">*</span>
           </label>

@@ -6,6 +6,7 @@ import {
   orderedFileArray2FileArray,
   fileArray2OrderedFileArray,
 } from "../utils/utils";
+import FormButton from "../components/FormButton";
 
 /*
 
@@ -115,24 +116,20 @@ const MultipleImageUploader: React.FC<MultipleImageUploaderProps> = ({
               alt={`preview-${index}`}
               className="w-full h-32 object-cover rounded-lg"
             />
-            <button
-              type="button"
+            <FormButton
               onClick={() => removeFile(index)}
-              className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1"
-            >
-              &times;
-            </button>
+              displayText="&times;"
+              className="absolute top-1 right-1 bg-red-500 text-white rounded-lg p-1 hover:bg-red-600"
+            />
           </div>
         ))}
       </div>
       {uploadedFiles.length > 0 && (
-        <button
-          type="button"
+        <FormButton
           onClick={removeAllFiles}
-          className="mt-4 bg-red-500 text-white p-2 rounded-lg w-3/5"
-        >
-          Remove All
-        </button>
+          displayText="Remove All"
+          color="red"
+        />
       )}
     </>
   );

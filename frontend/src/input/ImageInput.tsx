@@ -54,12 +54,12 @@ const ImageInput: React.FC<ImageInputArgs> = ({
   };
 
   return (
-    <div className="w-full px-3">
-      <label className="text_input_field_label_gray" htmlFor={id}>
+    <div className="input__container">
+      <label className="label__text_input_gray" htmlFor={id}>
         {label}
       </label>
       {value && (
-        <div className="mb-3">
+        <div className="flex justify-center mb-3">
           <img
             src={URL.createObjectURL(value)}
             alt="Avatar"
@@ -68,7 +68,7 @@ const ImageInput: React.FC<ImageInputArgs> = ({
         </div>
       )}
       <input
-        className={`text_input_field_box_gray ${classNameCustom}`}
+        className={`input__text_gray_box ${classNameCustom}`}
         id={id}
         type="file"
         accept="image/*"

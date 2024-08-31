@@ -98,7 +98,7 @@ const UpdatePropertyManager: React.FC = () => {
         {/* query property data form */}
         <form className="" onSubmit={getPropertyDetails}>
           <div className="flex flex-col">
-            <label className="text_input_field_label_gray">
+            <label className="label__text_input_gray">
               Get property details via ID.
             </label>
             <input
@@ -107,7 +107,7 @@ const UpdatePropertyManager: React.FC = () => {
               placeholder="Property ID"
               value={propertyID}
               onChange={handleChange}
-              className="text_input_field_box_gray w-full"
+              className="input__text_gray_box w-full"
             />
           </div>
           <div className="flex gap-2">

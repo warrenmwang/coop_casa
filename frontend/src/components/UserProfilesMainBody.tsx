@@ -159,14 +159,14 @@ const UserProfilesMainBody: React.FC = () => {
       {/* Input form for applying filters to search */}
       <form className="form__searchUserProfiles" onSubmit={handleFormSubmit}>
         <div className="flex-col flex-grow items-center">
-          <label className="text_input_field_label_gray">First Name</label>
+          <label className="label__text_input_gray">First Name</label>
           <SearchBar
             searchQueryParamKey={filterFirstNameQPKey}
             placeholder="First Name"
           ></SearchBar>
         </div>
         <div className="flex-col flex-grow">
-          <label className="text_input_field_label_gray">Last Name</label>
+          <label className="label__text_input_gray">Last Name</label>
           <SearchBar
             searchQueryParamKey={filterLastNameQPKey}
             placeholder="Last Name"

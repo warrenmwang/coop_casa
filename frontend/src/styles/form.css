@@ -1,5 +1,5 @@
-.default-form-1 {
-  @apply w-full max-w-lg mx-auto mt-8;
+.form__vertical_inputs {
+  @apply w-full max-w-lg mx-auto mt-3;
 }
 
 .form__update_property {

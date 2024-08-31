@@ -6,7 +6,12 @@ import GenderInput from "../input/GenderInput";
 import TextInput from "../input/TextInput";
 import ImageInput from "../input/ImageInput";
 import { apiFile2ClientFile } from "../utils/utils";
-import { APIUserReceived, User, UserDetails } from "../types/Types";
+import {
+  APIUserReceived,
+  OrderedFile,
+  User,
+  UserDetails,
+} from "../types/Types";
 import "../styles/form.css";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import TextSkeleton from "../skeleton/TextSkeleton";
@@ -14,11 +19,16 @@ import { toast } from "react-toastify";
 import { EmptyUser } from "../types/Objects";
 import FetchErrorText from "../components/FetchErrorText";
 import axios, { AxiosError } from "axios";
+import FormButton from "../components/FormButton";
+import MultipleImageUploader from "../input/MultipleImageUploader";
 
 const AccountSettingsForm: React.FC = () => {
   const [user, setUser] = useState<User>(EmptyUser);
   const [formData, setFormData] = useState<User>(EmptyUser);
   const [isChanged, setIsChanged] = useState(false);
+
+  // TODO:
+  // const [userProfileImages, setUserProfileImages] = useState<OrderedFile[]>([]);
 
   const userQuery = useQuery({
     queryKey: ["user", "details"],
@@ -69,6 +79,10 @@ const AccountSettingsForm: React.FC = () => {
     }));
   };
 
+  // const handleImagesUploaded = (files: OrderedFile[]) => {
+  //   // TODO: update our form data
+  // };
+
   useEffect(() => {
     if (userQuery.status === "success") {
       const userReceived: APIUserReceived = userQuery.data;
@@ -98,7 +112,7 @@ const AccountSettingsForm: React.FC = () => {
         </FetchErrorText>
       )}
       {ready && userQuery.isSuccess && (
-        <div className="default-form-1">
+        <form className="form__vertical_inputs">
           {/* First Name */}
           <TextInput
             setFormData={textInputSetFormData}
@@ -170,13 +184,26 @@ const AccountSettingsForm: React.FC = () => {
           />
           {/* Clear Image Button */}
           {formData.avatar && (
-            <button
-              onClick={handleClearAvatarImage}
-              className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-            >
-              Clear Image
-            </button>
+            <div className="input__container">
+              <FormButton
+                onClick={handleClearAvatarImage}
+                displayText="Clear Avatar Image"
+              />
+            </div>
           )}
+
+          {/* TODO: */}
+          {/* User Profile Images */}
+          {/* <div className="input__container">
+            <label className="label__text_input_gray">
+              Additional User Profile Images, displayed after avatar image.
+              (opt.)
+            </label>
+            <MultipleImageUploader
+              images={userProfileImages}
+              onImagesUploaded={handleImagesUploaded}
+            />
+          </div> */}
 
           {/* Save / discard buttons */}
           {isChanged && (
@@ -195,7 +222,7 @@ const AccountSettingsForm: React.FC = () => {
               </button>
             </div>
           )}
-        </div>
+        </form>
       )}
       {!ready && <TextSkeleton />}
     </>

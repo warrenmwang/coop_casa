@@ -67,9 +67,9 @@ const AdminManageUserRoles: React.FC = () => {
         <h1 className="h1_custom">Update User Role</h1>
       </div>
       {/* Allow for querying for the user's current role */}
-      <form className="default-form-1">
+      <form className="form__vertical_inputs">
         {/* user id input */}
-        <label className="text_input_field_label_gray" htmlFor="user_id">
+        <label className="label__text_input_gray" htmlFor="user_id">
           User ID
         </label>
         <input
@@ -78,16 +78,16 @@ const AdminManageUserRoles: React.FC = () => {
           placeholder="User ID"
           value={userID}
           onChange={handleChange}
-          className="text_input_field_box_gray w-full"
+          className="input__text_gray_box w-full"
         />
 
         {/* drop down of role types */}
-        <label className="text_input_field_label_gray" htmlFor="role">
+        <label className="label__text_input_gray" htmlFor="role">
           Role
         </label>
         <select
           id="role"
-          className="text_input_field_box_gray w-full"
+          className="input__text_gray_box w-full"
           onChange={handleChange}
           defaultValue=""
         >

@@ -39,13 +39,13 @@ const GenderInput: React.FC<GenderInputArgs> = ({
   };
 
   return (
-    <div className="w-full px-3 py-1">
-      <label className="text_input_field_label_gray" htmlFor="gender">
+    <div className="input__container">
+      <label className="label__text_input_gray" htmlFor="gender">
         Gender {required && <span className="text-red-500">*</span>}
       </label>
       <select
         id="gender"
-        className={`text_input_field_box_gray ${classNameCustom}`}
+        className={`input__text_gray_box ${classNameCustom}`}
         onChange={handleChange}
         defaultValue={formData.gender}
         required={required}

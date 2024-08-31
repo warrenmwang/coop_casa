@@ -136,7 +136,7 @@ const PropertiesMainBody: React.FC = () => {
         onSubmit={searchPropertiesWithFilter}
       >
         <div className="flex-col flex-grow">
-          <label className="text_input_field_label_gray">Address</label>
+          <label className="label__text_input_gray">Address</label>
           <SearchBar
             searchQueryParamKey={filterAddressQPKey}
             placeholder="Search by address."

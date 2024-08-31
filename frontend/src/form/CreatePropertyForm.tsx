@@ -366,7 +366,7 @@ const CreatePropertyForm: React.FC = () => {
         This form allows you to upload a new property listing to the platform.
       </h4>
       {/* create a new property */}
-      <form className="default-form-1" onSubmit={handleSubmit}>
+      <form className="form__vertical_inputs" onSubmit={handleSubmit}>
         {propertyTextFieldsConstructs.map((value, index) => (
           <TextInput
             key={index}
@@ -386,7 +386,7 @@ const CreatePropertyForm: React.FC = () => {
 
         {/* Images */}
         <div className="px-3">
-          <label className="text_input_field_label_gray">
+          <label className="label__text_input_gray">
             Upload some images of the property. At least 1 image is required.
             <span className="text-red-500">*</span>
           </label>
