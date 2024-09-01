@@ -38,6 +38,22 @@ func NewAccountRouter(s interfaces.Server) http.Handler {
 	r.Get("/images", accountHandlers.GetUserProfileImages)
 	r.Post("/images", accountHandlers.UpdateUserProfileImages)
 
+	// saved entities
+	r.Get("/saved/properties", accountHandlers.GetUserSavedProperties)
+	r.Post("/saved/properties", accountHandlers.CreateUserSavedProperty)
+	r.Delete("/saved/properties/{id}", accountHandlers.DeleteUserSavedProperty)
+	r.Delete("/saved/properties/", accountHandlers.DeleteUserSavedProperties)
+
+	r.Get("/saved/communities", accountHandlers.GetUserSavedCommunities)
+	r.Post("/saved/communities", accountHandlers.CreateUserSavedCommunity)
+	r.Delete("/saved/communities/{id}", accountHandlers.DeleteUserSavedCommunity)
+	r.Delete("/saved/communities/", accountHandlers.DeleteUserSavedCommunities)
+
+	r.Get("/saved/users", accountHandlers.GetUserSavedUsers)
+	r.Post("/saved/users", accountHandlers.CreateUserSavedUser)
+	r.Delete("/saved/users/{id}", accountHandlers.DeleteUserSavedUser)
+	r.Delete("/saved/users/", accountHandlers.DeleteUserSavedUsers)
+
 	return r
 }
 

@@ -15,6 +15,8 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+
+	"github.com/go-chi/chi/v5"
 )
 
 type AccountHandler struct {
@@ -383,6 +385,311 @@ func (h *AccountHandler) UpdateUserProfileImages(w http.ResponseWriter, r *http.
 			utils.RespondWithError(w, http.StatusInternalServerError, errors.New("error reverting to old images"))
 		}
 
+		return
+	}
+
+	// Respond with ok
+	w.WriteHeader(http.StatusOK)
+}
+
+// User saved entities
+
+// GET .../account/saved/properties
+// AUTHED
+func (h *AccountHandler) GetUserSavedProperties(w http.ResponseWriter, r *http.Request) {
+	// Get user id
+	userID, ok := r.Context().Value(auth.UserIDKey).(string)
+	if !ok {
+		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("user id blank"))
+		return
+	}
+
+	// Get user saved properties
+	propertyIds, err := h.server.DB().GetUserSavedProperties(userID)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	utils.RespondWithJSON(w, 200, struct {
+		PropertyIDs []string `json:"propertyIDs"`
+	}{
+		PropertyIDs: propertyIds,
+	})
+}
+
+// POST .../account/saved/properties
+// AUTHED
+func (h *AccountHandler) CreateUserSavedProperty(w http.ResponseWriter, r *http.Request) {
+	// Get user id
+	userID, ok := r.Context().Value(auth.UserIDKey).(string)
+	if !ok {
+		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("user id blank"))
+		return
+	}
+
+	// Retrieve property id from form
+	propertyID := r.FormValue("propertyID")
+	if propertyID == "" {
+		utils.RespondWithError(w, http.StatusBadRequest, errors.New("property id blank"))
+		return
+	}
+
+	// Save property id to user saved properties
+	err := h.server.DB().CreateUserSavedProperty(userID, propertyID)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	// Respond with created
+	w.WriteHeader(http.StatusCreated)
+}
+
+// DELETE .../account/saved/properties/{id}
+// AUTHED
+func (h *AccountHandler) DeleteUserSavedProperty(w http.ResponseWriter, r *http.Request) {
+	// Get user id
+	userID, ok := r.Context().Value(auth.UserIDKey).(string)
+	if !ok {
+		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("user id blank"))
+		return
+	}
+
+	// Retrieve property id url param
+	propertyID := chi.URLParam(r, "id")
+	if propertyID == "" {
+		utils.RespondWithError(w, http.StatusBadRequest, errors.New("property id blank"))
+		return
+	}
+
+	// Delete property id from user saved properties
+	err := h.server.DB().DeleteUserSavedProperty(userID, propertyID)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	// Respond with ok
+	w.WriteHeader(http.StatusOK)
+}
+
+// DELETE .../account/saved/properties
+// AUTHED
+func (h *AccountHandler) DeleteUserSavedProperties(w http.ResponseWriter, r *http.Request) {
+	// Get user id
+	userID, ok := r.Context().Value(auth.UserIDKey).(string)
+	if !ok {
+		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("user id blank"))
+		return
+	}
+
+	// Delete all user saved properties
+	err := h.server.DB().DeleteUserSavedProperties(userID)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	// Respond with ok
+	w.WriteHeader(http.StatusOK)
+}
+
+// GET .../account/saved/communities
+// AUTHED
+func (h *AccountHandler) GetUserSavedCommunities(w http.ResponseWriter, r *http.Request) {
+	// Get user id
+	userID, ok := r.Context().Value(auth.UserIDKey).(string)
+	if !ok {
+		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("user id blank"))
+		return
+	}
+
+	// Retrieve the users saved communities
+	communityIds, err := h.server.DB().GetUserSavedCommunities(userID)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	utils.RespondWithJSON(w, 200, struct {
+		CommunityIDs []string `json:"communityIDs"`
+	}{
+		CommunityIDs: communityIds,
+	})
+}
+
+// POST .../account/saved/communities
+// AUTHED
+func (h *AccountHandler) CreateUserSavedCommunity(w http.ResponseWriter, r *http.Request) {
+	// Get user id
+	userID, ok := r.Context().Value(auth.UserIDKey).(string)
+	if !ok {
+		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("user id blank"))
+		return
+	}
+
+	// Get community id from form
+	communityID := r.FormValue("communityID")
+	if communityID == "" {
+		utils.RespondWithError(w, http.StatusBadRequest, errors.New("community id blank"))
+		return
+	}
+
+	// Save community id to user saved communities
+	err := h.server.DB().CreateUserSavedCommunity(userID, communityID)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	// Respond with created
+	w.WriteHeader(http.StatusCreated)
+}
+
+// DELETE .../account/saved/communities/{id}
+// AUTHED
+func (h *AccountHandler) DeleteUserSavedCommunity(w http.ResponseWriter, r *http.Request) {
+	// Get user id
+	userID, ok := r.Context().Value(auth.UserIDKey).(string)
+	if !ok {
+		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("user id blank"))
+		return
+	}
+
+	// Get community id from url param
+	communityID := chi.URLParam(r, "id")
+	if communityID == "" {
+		utils.RespondWithError(w, http.StatusBadRequest, errors.New("community id blank"))
+		return
+	}
+
+	// Delete community id from user saved communities
+	err := h.server.DB().DeleteUserSavedCommunity(userID, communityID)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	// Respond with ok
+	w.WriteHeader(http.StatusOK)
+}
+
+// DELETE .../account/saved/communities
+// AUTHED
+func (h *AccountHandler) DeleteUserSavedCommunities(w http.ResponseWriter, r *http.Request) {
+	// Get user id
+	userID, ok := r.Context().Value(auth.UserIDKey).(string)
+	if !ok {
+		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("user id blank"))
+		return
+	}
+
+	// Delete all user saved communities
+	err := h.server.DB().DeleteUserSavedCommunities(userID)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	// Respond with ok
+	w.WriteHeader(http.StatusOK)
+}
+
+// GET ../account/saved/users
+// AUTHED
+func (h *AccountHandler) GetUserSavedUsers(w http.ResponseWriter, r *http.Request) {
+	// Get user id
+	userId, ok := r.Context().Value(auth.UserIDKey).(string)
+	if !ok {
+		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("userId blank"))
+		return
+	}
+
+	// Get user saved users
+	userIds, err := h.server.DB().GetUserSavedUsers(userId)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	utils.RespondWithJSON(w, 200, struct {
+		UserIDs []string `json:"userIDs"`
+	}{
+		UserIDs: userIds,
+	})
+}
+
+// POST .../account/saved/users
+// AUTHED
+func (h *AccountHandler) CreateUserSavedUser(w http.ResponseWriter, r *http.Request) {
+	// Get user id
+	userId, ok := r.Context().Value(auth.UserIDKey).(string)
+	if !ok {
+		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("userId blank"))
+		return
+	}
+
+	// Retrieve user id from form
+	userIdToSave := r.FormValue("userID")
+	if userIdToSave == "" {
+		utils.RespondWithError(w, http.StatusBadRequest, errors.New("userID blank"))
+		return
+	}
+
+	// Save user id to user saved users
+	err := h.server.DB().CreateUserSavedUser(userId, userIdToSave)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	// Respond with created
+	w.WriteHeader(http.StatusCreated)
+}
+
+// DELETE .../account/saved/users/{id}
+// AUTHED
+func (h *AccountHandler) DeleteUserSavedUser(w http.ResponseWriter, r *http.Request) {
+	// Get user id
+	userId, ok := r.Context().Value(auth.UserIDKey).(string)
+	if !ok {
+		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("userId blank"))
+		return
+	}
+
+	// Retrieve user id from url param
+	userIdToDelete := chi.URLParam(r, "id")
+	if userIdToDelete == "" {
+		utils.RespondWithError(w, http.StatusBadRequest, errors.New("userID blank"))
+		return
+	}
+
+	// Delete user id from user saved users
+	err := h.server.DB().DeleteUserSavedUser(userId, userIdToDelete)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	// Respond with ok
+	w.WriteHeader(http.StatusOK)
+}
+
+// DELETE .../account/saved/users
+// AUTHED
+func (h *AccountHandler) DeleteUserSavedUsers(w http.ResponseWriter, r *http.Request) {
+	// Get user id
+	userId, ok := r.Context().Value(auth.UserIDKey).(string)
+	if !ok {
+		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("userId blank"))
+		return
+	}
+
+	// Delete all user saved users
+	err := h.server.DB().DeleteUserSavedUsers(userId)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 
