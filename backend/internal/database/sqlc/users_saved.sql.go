@@ -34,7 +34,6 @@ type CreateUserSavedPropertyParams struct {
 	PropertyID string
 }
 
-// Setters
 func (q *Queries) CreateUserSavedProperty(ctx context.Context, arg CreateUserSavedPropertyParams) error {
 	_, err := q.db.ExecContext(ctx, createUserSavedProperty, arg.UserID, arg.PropertyID)
 	return err
@@ -60,6 +59,7 @@ DELETE FROM users_saved_communities
 WHERE user_id = $1
 `
 
+// Delete's all of the user's saved communities.
 func (q *Queries) DeleteUserSavedCommunities(ctx context.Context, userID string) error {
 	_, err := q.db.ExecContext(ctx, deleteUserSavedCommunities, userID)
 	return err
@@ -86,7 +86,7 @@ DELETE FROM users_saved_properties
 WHERE user_id = $1
 `
 
-// Delete all of user's saved properties, communities, and users
+// Delete's all of the user's saved properties.
 func (q *Queries) DeleteUserSavedProperties(ctx context.Context, userID string) error {
 	_, err := q.db.ExecContext(ctx, deleteUserSavedProperties, userID)
 	return err
@@ -130,6 +130,7 @@ DELETE FROM users_saved_users
 WHERE user_id = $1
 `
 
+// Delete's all of the user's saved users.
 func (q *Queries) DeleteUserSavedUsers(ctx context.Context, userID string) error {
 	_, err := q.db.ExecContext(ctx, deleteUserSavedUsers, userID)
 	return err
@@ -181,9 +182,6 @@ WHERE
     user_id = $1
 `
 
-// Queries for saving properties, communities, and users.
-//
-// Getters
 func (q *Queries) GetUserSavedProperties(ctx context.Context, userID string) ([]UsersSavedProperty, error) {
 	rows, err := q.db.QueryContext(ctx, getUserSavedProperties, userID)
 	if err != nil {

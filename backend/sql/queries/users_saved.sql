@@ -1,6 +1,3 @@
--- Queries for saving properties, communities, and users.
---
--- Getters
 -- name: GetUserSavedProperties :many
 SELECT
     *
@@ -25,7 +22,6 @@ FROM
 WHERE
     user_id = $1;
 
--- Setters
 -- name: CreateUserSavedProperty :exec
 INSERT INTO users_saved_properties(user_id, property_id)
     VALUES ($1, $2);
@@ -54,15 +50,17 @@ DELETE FROM users_saved_users
 WHERE user_id = $1
     AND saved_user_id = $2;
 
--- Delete all of user's saved properties, communities, and users
+-- Delete's all of the user's saved properties.
 -- name: DeleteUserSavedProperties :exec
 DELETE FROM users_saved_properties
 WHERE user_id = $1;
 
+-- Delete's all of the user's saved communities.
 -- name: DeleteUserSavedCommunities :exec
 DELETE FROM users_saved_communities
 WHERE user_id = $1;
 
+-- Delete's all of the user's saved users.
 -- name: DeleteUserSavedUsers :exec
 DELETE FROM users_saved_users
 WHERE user_id = $1;

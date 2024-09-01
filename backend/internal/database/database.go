@@ -37,17 +37,31 @@ type Service interface {
 	AdminGetUsers(limit, offset int32) ([]UserDetails, error)
 	AdminGetUsersRoles(userIds []string) ([]string, error)
 
-	// Users
+	// Users Account
 	CreateUser(userId, email string) error
 	GetUserDetails(userId string) (UserDetails, error)
 	UpdateUser(updatedUserData UserDetails, avatarImage FileInternal) error
 	DeleteUser(userId string) error
 	GetUserAvatar(userId string) (FileInternal, error)
 
-	// User Profile Images
+	// Users Account Profile Images
 	CreateUserProfileImages(userID string, images []FileInternal) error
 	GetUserProfileImages(userID string) ([]FileInternal, error)
 	DeleteUserProfileImages(userID string) error
+
+	// Users Saved Entities
+	GetUserSavedProperties(userID string) ([]string, error)
+	GetUserSavedCommunities(userID string) ([]string, error)
+	GetUserSavedUsers(userID string) ([]string, error)
+	CreateUserSavedProperty(userID, propertyID string) error
+	CreateUserSavedCommunity(userID, communityID string) error
+	CreateUserSavedUser(userID, savedUserID string) error
+	DeleteUserSavedProperty(userID, propertyID string) error
+	DeleteUserSavedCommunity(userID, communityID string) error
+	DeleteUserSavedUser(userID, savedUserID string) error
+	DeleteUserSavedProperties(userID string) error
+	DeleteUserSavedCommunities(userID string) error
+	DeleteUserSavedUsers(userID string) error
 
 	// Roles
 	CreateNewUserRole(userId, role string) error
@@ -106,6 +120,7 @@ func (s *service) Health() map[string]string {
 	}
 }
 
+// -------------- ADMIN FUNCTIONS ------------------
 // Admin functions
 func (s *service) AdminGetUsers(limit, offset int32) ([]UserDetails, error) {
 	ctx := context.Background()
@@ -181,7 +196,7 @@ func (s *service) AdminGetUsers(limit, offset int32) ([]UserDetails, error) {
 	return decryptedUsers, nil
 }
 
-// Users
+// -------------- USERS ACCOUNT ------------------
 
 func (s *service) CreateUser(userId, email string) error {
 	ctx := context.Background()
@@ -514,6 +529,234 @@ func (s *service) DeleteUserProfileImages(userID string) error {
 	return err
 }
 
+// -------------- USERS SAVED ENTITIES ------------------
+// All user's personal entities are encrypted in the database
+
+func (s *service) GetUserSavedProperties(userID string) ([]string, error) {
+	ctx := context.Background()
+
+	// Encrypt user id
+	encryptedUserID, err := utils.EncryptString(userID, s.db_encrypt_key)
+	if err != nil {
+		return nil, err
+	}
+
+	// Get the encrypted property ids
+	propertyIDs, err := s.db_queries.GetUserSavedProperties(ctx, encryptedUserID)
+	if err != nil {
+		return nil, err
+	}
+
+	// Decrypt the property ids
+	var decryptedPropertyIDs []string
+	for _, propertyID_E := range propertyIDs {
+		propertyID_D, err := utils.DecryptString(propertyID_E.PropertyID, s.db_encrypt_key)
+		if err != nil {
+			return nil, err
+		}
+		decryptedPropertyIDs = append(decryptedPropertyIDs, propertyID_D)
+	}
+
+	// Return the decrypted property ids
+	return decryptedPropertyIDs, nil
+}
+
+func (s *service) GetUserSavedCommunities(userID string) ([]string, error) {
+	ctx := context.Background()
+
+	// Encrypt user id
+	encryptedUserID, err := utils.EncryptString(userID, s.db_encrypt_key)
+	if err != nil {
+		return nil, err
+	}
+
+	// Get the encrypted community ids
+	communityIDs, err := s.db_queries.GetUserSavedCommunities(ctx, encryptedUserID)
+	if err != nil {
+		return nil, err
+	}
+
+	// Decrypt the community ids
+	var decryptedCommunityIDs []string
+	for _, communityID_E := range communityIDs {
+		communityID_D, err := utils.DecryptString(communityID_E.CommunityID, s.db_encrypt_key)
+		if err != nil {
+			return nil, err
+		}
+		decryptedCommunityIDs = append(decryptedCommunityIDs, communityID_D)
+	}
+
+	return decryptedCommunityIDs, nil
+}
+
+func (s *service) GetUserSavedUsers(userID string) ([]string, error) {
+	ctx := context.Background()
+
+	// Encrypt user id
+	encryptedUserID, err := utils.EncryptString(userID, s.db_encrypt_key)
+	if err != nil {
+		return nil, err
+	}
+
+	// Get the encrypted user ids
+	userIDs, err := s.db_queries.GetUserSavedUsers(ctx, encryptedUserID)
+	if err != nil {
+		return nil, err
+	}
+
+	// Decrypt the user ids
+	var decryptedUserIDs []string
+	for _, userID_E := range userIDs {
+		userID_D, err := utils.DecryptString(userID_E.SavedUserID, s.db_encrypt_key)
+		if err != nil {
+			return nil, err
+		}
+		decryptedUserIDs = append(decryptedUserIDs, userID_D)
+	}
+
+	return decryptedUserIDs, nil
+}
+
+func (s *service) CreateUserSavedProperty(userID, propertyID string) error {
+	ctx := context.Background()
+
+	encryptedUserID, err := utils.EncryptString(userID, s.db_encrypt_key)
+	if err != nil {
+		return err
+	}
+
+	encryptedPropertyID, err := utils.EncryptString(propertyID, s.db_encrypt_key)
+	if err != nil {
+		return err
+	}
+
+	err = s.db_queries.CreateUserSavedProperty(ctx, sqlc.CreateUserSavedPropertyParams{
+		UserID:     encryptedUserID,
+		PropertyID: encryptedPropertyID,
+	})
+	return err
+}
+
+func (s *service) CreateUserSavedCommunity(userID, communityID string) error {
+	ctx := context.Background()
+
+	encryptedUserID, err := utils.EncryptString(userID, s.db_encrypt_key)
+	if err != nil {
+		return err
+	}
+
+	encryptedCommunityID, err := utils.EncryptString(communityID, s.db_encrypt_key)
+	if err != nil {
+		return err
+	}
+
+	err = s.db_queries.CreateUserSavedCommunity(ctx, sqlc.CreateUserSavedCommunityParams{
+		UserID:      encryptedUserID,
+		CommunityID: encryptedCommunityID,
+	})
+	return err
+
+}
+
+func (s *service) CreateUserSavedUser(userID, savedUserID string) error {
+	ctx := context.Background()
+
+	encryptedUserID, err := utils.EncryptString(userID, s.db_encrypt_key)
+	if err != nil {
+		return err
+	}
+
+	encryptedSavedUserID, err := utils.EncryptString(savedUserID, s.db_encrypt_key)
+	if err != nil {
+		return err
+	}
+
+	err = s.db_queries.CreateUserSavedUser(ctx, sqlc.CreateUserSavedUserParams{
+		UserID:      encryptedUserID,
+		SavedUserID: encryptedSavedUserID,
+	})
+	return err
+}
+
+func (s *service) DeleteUserSavedProperty(userID, propertyID string) error {
+	ctx := context.Background()
+
+	encryptedUserID, err := utils.EncryptString(userID, s.db_encrypt_key)
+	if err != nil {
+		return err
+	}
+
+	encryptedPropertyID, err := utils.EncryptString(propertyID, s.db_encrypt_key)
+	if err != nil {
+		return err
+	}
+
+	err = s.db_queries.DeleteUserSavedProperty(ctx, sqlc.DeleteUserSavedPropertyParams{
+		UserID:     encryptedUserID,
+		PropertyID: encryptedPropertyID,
+	})
+	return err
+}
+
+func (s *service) DeleteUserSavedCommunity(userID, communityID string) error {
+	ctx := context.Background()
+
+	encryptedUserID, err := utils.EncryptString(userID, s.db_encrypt_key)
+	if err != nil {
+		return err
+	}
+
+	encryptedCommunityID, err := utils.EncryptString(communityID, s.db_encrypt_key)
+	if err != nil {
+		return err
+	}
+
+	err = s.db_queries.DeleteUserSavedCommunity(ctx, sqlc.DeleteUserSavedCommunityParams{
+		UserID:      encryptedUserID,
+		CommunityID: encryptedCommunityID,
+	})
+	return err
+}
+
+func (s *service) DeleteUserSavedUser(userID, savedUserID string) error {
+	ctx := context.Background()
+
+	encryptedUserID, err := utils.EncryptString(userID, s.db_encrypt_key)
+	if err != nil {
+		return err
+	}
+
+	encryptedSavedUserID, err := utils.EncryptString(savedUserID, s.db_encrypt_key)
+	if err != nil {
+		return err
+	}
+
+	err = s.db_queries.DeleteUserSavedUser(ctx, sqlc.DeleteUserSavedUserParams{
+		UserID:      encryptedUserID,
+		SavedUserID: encryptedSavedUserID,
+	})
+	return err
+}
+
+func (s *service) DeleteUserSavedProperties(userID string) error {
+	ctx := context.Background()
+	err := s.db_queries.DeleteUserSavedProperties(ctx, userID)
+	return err
+}
+
+func (s *service) DeleteUserSavedCommunities(userID string) error {
+	ctx := context.Background()
+	err := s.db_queries.DeleteUserSavedCommunities(ctx, userID)
+	return err
+}
+
+func (s *service) DeleteUserSavedUsers(userID string) error {
+	ctx := context.Background()
+	err := s.db_queries.DeleteUserSavedUsers(ctx, userID)
+	return err
+}
+
+// -------------- ROLES ------------------
 // Roles
 // Create a new role for a user, limited to one role per user
 func (s *service) CreateNewUserRole(userId, role string) error {

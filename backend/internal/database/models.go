@@ -1,5 +1,7 @@
 package database
 
+import "time"
+
 type FileInternal struct {
 	Filename string
 	Mimetype string
@@ -33,6 +35,12 @@ type UserDetails struct {
 	Gender    string   `json:"gender"`
 	Location  string   `json:"location"`
 	Interests []string `json:"interests"`
+}
+
+type UsersSavedProperty struct {
+	UserID     string    `json:"userID"`
+	PropertyID string    `json:"propertyID"`
+	CreatedAt  time.Time `json:"createdAt"`
 }
 
 type PropertyDetails struct {
