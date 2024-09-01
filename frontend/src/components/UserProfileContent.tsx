@@ -3,7 +3,7 @@ import { UserProfile } from "../types/Types";
 import { Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { usersPageLink } from "../urls";
-import ShareLinkButton from "./ShareLinkButton";
+import ShareLinkButton from "./buttons/ShareLinkButton";
 import CustomImageGallery, {
   ImageGalleryItemsInput,
 } from "./CustomImageGallery";

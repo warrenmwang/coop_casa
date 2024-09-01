@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 import { apiCreateNewProperty } from "../api/property";
 import { validateNumber } from "../utils/inputValidation";
 import TextInput from "../input/TextInput";
-import SubmitButton from "../components/SubmitButton";
+import SubmitButton from "../components/buttons/SubmitButton";
 import MultipleImageUploader from "../input/MultipleImageUploader";
 import { MAX_PROPERTY_IMGS_ALLOWED } from "../constants";
 import {

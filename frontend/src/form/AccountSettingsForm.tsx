@@ -19,7 +19,7 @@ import { toast } from "react-toastify";
 import { EmptyUser } from "../types/Objects";
 import FetchErrorText from "../components/FetchErrorText";
 import axios, { AxiosError } from "axios";
-import FormButton from "../components/FormButton";
+import FormButton from "../components/buttons/FormButton";
 import MultipleImageUploader from "../input/MultipleImageUploader";
 import {
   useGetAccountUserProfileImages,
@@ -31,6 +31,7 @@ const AccountSettingsForm: React.FC = () => {
   const [user, setUser] = useState<User>(EmptyUser);
   const [formData, setFormData] = useState<User>(EmptyUser);
   const [isChanged, setIsChanged] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [userProfileImages, setUserProfileImages] = useState<OrderedFile[]>([]);
   const [formProfileImages, setFormProfileImages] = useState<OrderedFile[]>([]);
@@ -55,6 +56,7 @@ const AccountSettingsForm: React.FC = () => {
       setUser(formData);
       setUserProfileImages(formProfileImages);
       setIsChanged(false);
+      setIsSubmitting(false);
     },
     onError: (error: Error | AxiosError) => {
       let errMsg: string = error.message;
@@ -73,6 +75,7 @@ const AccountSettingsForm: React.FC = () => {
   };
 
   const handleSaveChanges = () => {
+    setIsSubmitting(true);
     mutation.mutate();
   };
 
@@ -237,11 +240,15 @@ const AccountSettingsForm: React.FC = () => {
             <div className="flex justify-end space-x-4">
               <FormButton
                 onClick={handleSaveChanges}
+                disabled={isSubmitting}
+                disabledText="Saving..."
                 displayText="Save changes"
                 className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
               />
               <FormButton
                 onClick={handleDiscardChanges}
+                disabled={isSubmitting}
+                disabledText="Pending Save"
                 displayText="Discard Changes"
                 className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
               />

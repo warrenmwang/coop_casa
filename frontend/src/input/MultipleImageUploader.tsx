@@ -6,7 +6,7 @@ import {
   orderedFileArray2FileArray,
   fileArray2OrderedFileArray,
 } from "../utils/utils";
-import FormButton from "../components/FormButton";
+import FormButton from "../components/buttons/FormButton";
 
 /*
 

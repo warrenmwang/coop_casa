@@ -5,7 +5,7 @@ import PageOfCommunities from "./PageOfCommunities";
 
 import SearchBar from "../input/SearchBar";
 import "../styles/colors.css";
-import SubmitButton from "../components/SubmitButton";
+import SubmitButton from "./buttons/SubmitButton";
 import { useSearchParams } from "react-router-dom";
 import {
   pageQPKey,

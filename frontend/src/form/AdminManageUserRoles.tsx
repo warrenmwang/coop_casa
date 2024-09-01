@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import SubmitButton from "../components/SubmitButton";
+import SubmitButton from "../components/buttons/SubmitButton";
 import "../styles/input.css";
 import { toast } from "react-toastify";
 import { useMutation } from "@tanstack/react-query";

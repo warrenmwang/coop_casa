@@ -1,7 +1,7 @@
 import React from "react";
 import { Box } from "@mui/material";
 import { communitiesPageLink } from "../urls";
-import ShareLinkButton from "../components/ShareLinkButton";
+import ShareLinkButton from "./buttons/ShareLinkButton";
 import CustomImageGallery, {
   ImageGalleryItemsInput,
 } from "../components/CustomImageGallery";

@@ -4,7 +4,7 @@ import { Box } from "@mui/material";
 import CustomImageGallery, {
   ImageGalleryItemsInput,
 } from "../components/CustomImageGallery";
-import ShareLinkButton from "../components/ShareLinkButton";
+import ShareLinkButton from "./buttons/ShareLinkButton";
 import ListerInfo from "../components/ListerInfo";
 import { Property } from "../types/Types";
 import { useNavigate } from "react-router-dom";

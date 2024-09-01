@@ -21,7 +21,7 @@ import { EmptyUser } from "../types/Objects";
 // Styles
 import "../styles/form.css";
 import "../styles/contentBody.css";
-import SubmitButton from "../components/SubmitButton";
+import SubmitButton from "../components/buttons/SubmitButton";
 import { dashboardPageLink } from "../urls";
 import { useMutation } from "@tanstack/react-query";
 import TextSkeleton from "../skeleton/TextSkeleton";
@@ -31,7 +31,7 @@ import axios, { AxiosError } from "axios";
 import { toast } from "react-toastify";
 import MultipleImageUploader from "../input/MultipleImageUploader";
 import { MAX_USER_PROFILE_IMGS_ALLOWED } from "../constants";
-import FormButton from "../components/FormButton";
+import FormButton from "../components/buttons/FormButton";
 import { useGetUserAccountDetails } from "../hooks/account";
 import { userDetailsKey } from "../reactQueryKeys";
 

@@ -5,7 +5,7 @@ import CardGridSkeleton from "../skeleton/CardGridSkeleton";
 import SearchBar from "../input/SearchBar";
 import PageOfProperties from "./PageOfProperties";
 import { useSearchParams } from "react-router-dom";
-import SubmitButton from "./SubmitButton";
+import SubmitButton from "./buttons/SubmitButton";
 import "../styles/contentBody.css";
 import "../styles/form.css";
 import FetchErrorText from "./FetchErrorText";

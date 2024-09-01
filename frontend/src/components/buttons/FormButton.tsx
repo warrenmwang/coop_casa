@@ -2,6 +2,8 @@ import React from "react";
 
 type FormButtonProps = {
   onClick: () => void;
+  disabled?: boolean;
+  disabledText?: string;
   displayText?: string;
   color?: string;
   className?: string; // if present, overrides other options for styling.
@@ -14,7 +16,9 @@ const colors: { gray: string; red: string } = {
 
 const FormButton: React.FC<FormButtonProps> = ({
   onClick,
-  displayText = "Reset",
+  disabled = false,
+  disabledText = "Button Disabled",
+  displayText = "Button",
   color = "gray",
   className = "",
 }) => {
@@ -26,10 +30,11 @@ const FormButton: React.FC<FormButtonProps> = ({
   return (
     <button
       type="button"
+      disabled={disabled}
       onClick={onClick}
       className={className ? className : colorClassName}
     >
-      {displayText}
+      {disabled ? disabledText : displayText}
     </button>
   );
 };

@@ -10,7 +10,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import FetchErrorText from "./FetchErrorText";
 import CardGridSkeleton from "../skeleton/CardGridSkeleton";
 import SearchBar from "../input/SearchBar";
-import SubmitButton from "./SubmitButton";
+import SubmitButton from "./buttons/SubmitButton";
 import PageOfUserProfiles from "./PageOfUserProfiles";
 import { useGetPageOfUserProfiles } from "../hooks/users";
 

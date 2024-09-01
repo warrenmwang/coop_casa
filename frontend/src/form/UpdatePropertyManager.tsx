@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import SubmitButton from "../components/SubmitButton";
+import SubmitButton from "../components/buttons/SubmitButton";
 import { validate as uuidValidate } from "uuid";
 import { apiDeleteProperty, apiGetProperty } from "../api/property";
 import { Property } from "../types/Types";

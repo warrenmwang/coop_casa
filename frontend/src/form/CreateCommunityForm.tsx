@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { apiCreateCommunity } from "../api/community";
 import TextInput from "../input/TextInput";
-import SubmitButton from "../components/SubmitButton";
+import SubmitButton from "../components/buttons/SubmitButton";
 import MultipleImageUploader from "../input/MultipleImageUploader";
 import { MAX_COMMUNITY_IMGS_ALLOWED } from "../constants";
 import {

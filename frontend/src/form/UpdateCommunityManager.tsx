@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import SubmitButton from "../components/SubmitButton";
+import SubmitButton from "../components/buttons/SubmitButton";
 import { validate as uuidValidate } from "uuid";
 import { apiDeleteCommunity, apiGetCommunity } from "../api/community";
 import { Community } from "../types/Types";
