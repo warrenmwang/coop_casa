@@ -23,95 +23,6 @@ import (
 	_ "github.com/joho/godotenv/autoload"
 )
 
-type FileInternal struct {
-	Filename string
-	Mimetype string
-	Size     int64
-	Data     []byte
-}
-
-type FileExternal struct {
-	Filename string `json:"fileName"`
-	Mimetype string `json:"mimeType"`
-	Size     int64  `json:"size"`
-	Data     string `json:"data"`
-}
-
-type OrderedFileInternal struct {
-	OrderNum int16        `json:"orderNum"`
-	File     FileInternal `json:"file"`
-}
-
-type OrderedFileExternal struct {
-	OrderNum int16        `json:"orderNum"`
-	File     FileExternal `json:"file"`
-}
-
-type UserDetails struct {
-	UserID    string   `json:"userId"`
-	Email     string   `json:"email"`
-	FirstName string   `json:"firstName"`
-	LastName  string   `json:"lastName"`
-	BirthDate string   `json:"birthDate"`
-	Gender    string   `json:"gender"`
-	Location  string   `json:"location"`
-	Interests []string `json:"interests"`
-}
-
-type PropertyDetails struct {
-	PropertyID        string `json:"propertyId"`
-	ListerUserID      string `json:"listerUserId"`
-	Name              string `json:"name"`
-	Description       string `json:"description"`
-	Address_1         string `json:"address1"`
-	Address_2         string `json:"address2"`
-	City              string `json:"city"`
-	State             string `json:"state"`
-	Zipcode           string `json:"zipcode"`
-	Country           string `json:"country"`
-	Square_feet       int32  `json:"squareFeet"`
-	Num_bedrooms      int16  `json:"numBedrooms"`
-	Num_toilets       int16  `json:"numToilets"`
-	Num_showers_baths int16  `json:"numShowersBaths"`
-	Cost_dollars      int64  `json:"costDollars"`
-	Cost_cents        int16  `json:"costCents"`
-	Misc_note         string `json:"miscNote"`
-}
-
-type PropertyFull struct {
-	PropertyDetails PropertyDetails       `json:"details"`
-	PropertyImages  []OrderedFileExternal `json:"images"`
-}
-
-type CommunityDetails struct {
-	CommunityID string `json:"communityId"`
-	AdminUserID string `json:"adminUserId"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
-}
-
-type CommunityFull struct {
-	CommunityDetails    CommunityDetails `json:"details"`
-	CommunityImages     []FileExternal   `json:"images"`
-	CommunityUsers      []string         `json:"users"`      // user ids
-	CommunityProperties []string         `json:"properties"` // property ids
-}
-
-type PublicUserProfileDetails struct {
-	UserID     string   `json:"userId"`
-	FirstName  string   `json:"firstName"`
-	LastName   string   `json:"lastName"`
-	AgeInYears int16    `json:"ageInYears"`
-	Gender     string   `json:"gender"`
-	Location   string   `json:"location"`
-	Interests  []string `json:"interests"`
-}
-
-type PublicUserProfile struct {
-	Details PublicUserProfileDetails `json:"details"`
-	Images  []FileExternal           `json:"images"`
-}
-
 type service struct {
 	db             *sql.DB
 	db_queries     *sqlc.Queries
@@ -195,86 +106,6 @@ func (s *service) Health() map[string]string {
 	}
 }
 
-func (s *service) encryptBytes(plainBytes []byte) ([]byte, error) {
-	if plainBytes == nil {
-		return nil, nil
-	}
-
-	encryptedBytes, err := utils.EncryptBytes(plainBytes, s.db_encrypt_key)
-	if err != nil {
-		return nil, err
-	}
-
-	return encryptedBytes, nil
-}
-
-func (s *service) decryptBytes(encryptedBytes []byte) ([]byte, error) {
-	if encryptedBytes == nil {
-		return nil, nil
-	}
-
-	plainBytes, err := utils.DecryptBytes(encryptedBytes, s.db_encrypt_key)
-	if err != nil {
-		return nil, err
-	}
-
-	return plainBytes, nil
-}
-
-func (s *service) decryptNullString(encrypted sql.NullString) (sql.NullString, error) {
-	if encrypted.Valid {
-		decrypted, err := utils.DecryptString(encrypted.String, s.db_encrypt_key)
-		if err != nil {
-			return sql.NullString{}, err
-		}
-		return sql.NullString{
-			String: decrypted,
-			Valid:  encrypted.Valid,
-		}, nil
-	}
-	return encrypted, nil
-}
-
-func (s *service) decryptString(encrypted string) (string, error) {
-	if encrypted == "" {
-		return "", nil
-	}
-
-	decrypted, err := utils.DecryptString(encrypted, s.db_encrypt_key)
-	if err != nil {
-		return "", err
-	}
-
-	return decrypted, nil
-}
-
-func (s *service) encryptNullString(plainText sql.NullString) (sql.NullString, error) {
-	if !plainText.Valid {
-		return sql.NullString{
-			String: "",
-			Valid:  false,
-		}, nil
-	}
-
-	encrypted, err := utils.EncryptString(plainText.String, s.db_encrypt_key)
-	if err != nil {
-		return sql.NullString{}, err
-	}
-
-	return sql.NullString{
-		String: encrypted,
-		Valid:  true,
-	}, nil
-}
-
-func (s *service) encryptString(plainText string) (string, error) {
-	encrypted, err := utils.EncryptString(plainText, s.db_encrypt_key)
-	if err != nil {
-		return "", err
-	}
-	return encrypted, nil
-}
-
 // Admin functions
 func (s *service) AdminGetUsers(limit, offset int32) ([]UserDetails, error) {
 	ctx := context.Background()
@@ -291,37 +122,37 @@ func (s *service) AdminGetUsers(limit, offset int32) ([]UserDetails, error) {
 	// Decrypt user data
 	var decryptedUsers []UserDetails
 	for _, userEncrypted := range usersEncrypted {
-		userId, err := s.decryptString(userEncrypted.UserID)
+		userId, err := utils.DecryptString(userEncrypted.UserID, s.db_encrypt_key)
 		if err != nil {
 			return nil, err
 		}
 
-		email, err := s.decryptString(userEncrypted.Email)
+		email, err := utils.DecryptString(userEncrypted.Email, s.db_encrypt_key)
 		if err != nil {
 			return nil, err
 		}
 
-		firstName, err := s.decryptString(userEncrypted.FirstName.String)
+		firstName, err := utils.DecryptString(userEncrypted.FirstName.String, s.db_encrypt_key)
 		if err != nil {
 			return nil, err
 		}
 
-		lastName, err := s.decryptString(userEncrypted.LastName.String)
+		lastName, err := utils.DecryptString(userEncrypted.LastName.String, s.db_encrypt_key)
 		if err != nil {
 			return nil, err
 		}
 
-		birthDate, err := s.decryptString(userEncrypted.BirthDate.String)
+		birthDate, err := utils.DecryptString(userEncrypted.BirthDate.String, s.db_encrypt_key)
 		if err != nil {
 			return nil, err
 		}
 
-		gender, err := s.decryptString(userEncrypted.Gender.String)
+		gender, err := utils.DecryptString(userEncrypted.Gender.String, s.db_encrypt_key)
 		if err != nil {
 			return nil, err
 		}
 
-		location, err := s.decryptString(userEncrypted.Location.String)
+		location, err := utils.DecryptString(userEncrypted.Location.String, s.db_encrypt_key)
 		if err != nil {
 			return nil, err
 		}
@@ -356,11 +187,11 @@ func (s *service) CreateUser(userId, email string) error {
 	ctx := context.Background()
 
 	// Encrypt user data
-	userIDEncrypted, err := s.encryptString(userId)
+	userIDEncrypted, err := utils.EncryptString(userId, s.db_encrypt_key)
 	if err != nil {
 		return err
 	}
-	email_encrypted, err := s.encryptString(email)
+	email_encrypted, err := utils.EncryptString(email, s.db_encrypt_key)
 	if err != nil {
 		return err
 	}
@@ -387,7 +218,7 @@ func (s *service) GetUserDetails(userId string) (UserDetails, error) {
 	ctx := context.Background()
 
 	// Need to use the encrypted userId to search
-	userIDEncrypted, err := s.encryptString(userId)
+	userIDEncrypted, err := utils.EncryptString(userId, s.db_encrypt_key)
 	if err != nil {
 		return UserDetails{}, err
 	}
@@ -398,32 +229,32 @@ func (s *service) GetUserDetails(userId string) (UserDetails, error) {
 	}
 
 	// Decrypt user data
-	emailDecrypted, err := s.decryptString(userEncrypted.Email)
+	emailDecrypted, err := utils.DecryptString(userEncrypted.Email, s.db_encrypt_key)
 	if err != nil {
 		return UserDetails{}, err
 	}
 
-	firstNameDecrypted, err := s.decryptString(userEncrypted.FirstName.String)
+	firstNameDecrypted, err := utils.DecryptString(userEncrypted.FirstName.String, s.db_encrypt_key)
 	if err != nil {
 		return UserDetails{}, err
 	}
 
-	lastNameDecrypted, err := s.decryptString(userEncrypted.LastName.String)
+	lastNameDecrypted, err := utils.DecryptString(userEncrypted.LastName.String, s.db_encrypt_key)
 	if err != nil {
 		return UserDetails{}, err
 	}
 
-	birthDateDecrypted, err := s.decryptString(userEncrypted.BirthDate.String)
+	birthDateDecrypted, err := utils.DecryptString(userEncrypted.BirthDate.String, s.db_encrypt_key)
 	if err != nil {
 		return UserDetails{}, err
 	}
 
-	genderDecrypted, err := s.decryptString(userEncrypted.Gender.String)
+	genderDecrypted, err := utils.DecryptString(userEncrypted.Gender.String, s.db_encrypt_key)
 	if err != nil {
 		return UserDetails{}, err
 	}
 
-	locationDecrypted, err := s.decryptString(userEncrypted.Location.String)
+	locationDecrypted, err := utils.DecryptString(userEncrypted.Location.String, s.db_encrypt_key)
 	if err != nil {
 		return UserDetails{}, err
 	}
@@ -453,7 +284,7 @@ func (s *service) GetUserAvatar(userId string) (FileInternal, error) {
 	ctx := context.Background()
 
 	// Encrypt userId
-	userIdEncrypted, err := s.encryptString(userId)
+	userIdEncrypted, err := utils.EncryptString(userId, s.db_encrypt_key)
 	if err != nil {
 		return FileInternal{}, err
 	}
@@ -465,11 +296,11 @@ func (s *service) GetUserAvatar(userId string) (FileInternal, error) {
 	}
 
 	// Decrypt filename and data
-	avatarFileNameDecrypted, err := s.decryptString(avatarEncrypted.FileName.String)
+	avatarFileNameDecrypted, err := utils.DecryptString(avatarEncrypted.FileName.String, s.db_encrypt_key)
 	if err != nil {
 		return FileInternal{}, err
 	}
-	avatarDataDecrypted, err := s.decryptBytes(avatarEncrypted.Data)
+	avatarDataDecrypted, err := utils.DecryptBytes(avatarEncrypted.Data, s.db_encrypt_key)
 	if err != nil {
 		return FileInternal{}, err
 	}
@@ -486,47 +317,39 @@ func (s *service) GetUserAvatar(userId string) (FileInternal, error) {
 func (s *service) UpdateUser(updatedUserData UserDetails, avatarImage FileInternal) error {
 	ctx := context.Background()
 
-	userId := updatedUserData.UserID
-	first_name := updatedUserData.FirstName
-	last_name := updatedUserData.LastName
-	birth_date := updatedUserData.BirthDate
-	gender := updatedUserData.Gender
-	location := updatedUserData.Location
-	interests := updatedUserData.Interests
-
 	// Encrypt all user information
-	userIDEncrypted, err := s.encryptString(userId)
+	userIDEncrypted, err := utils.EncryptString(updatedUserData.UserID, s.db_encrypt_key)
 	if err != nil {
 		return err
 	}
 
-	first_name_encrypted, err := s.encryptNullString(sql.NullString{String: first_name, Valid: true})
+	first_name_encrypted, err := utils.EncryptString(updatedUserData.FirstName, s.db_encrypt_key)
 	if err != nil {
 		return err
 	}
 
-	last_name_encrypted, err := s.encryptNullString(sql.NullString{String: last_name, Valid: true})
+	last_name_encrypted, err := utils.EncryptString(updatedUserData.LastName, s.db_encrypt_key)
 	if err != nil {
 		return err
 	}
 
-	birth_date_encrypted, err := s.encryptNullString(sql.NullString{String: birth_date, Valid: true})
+	birth_date_encrypted, err := utils.EncryptString(updatedUserData.BirthDate, s.db_encrypt_key)
 	if err != nil {
 		return err
 	}
 
-	gender_encrypted, err := s.encryptNullString(sql.NullString{String: gender, Valid: true})
+	gender_encrypted, err := utils.EncryptString(updatedUserData.Gender, s.db_encrypt_key)
 	if err != nil {
 		return err
 	}
 
-	location_encrypted, err := s.encryptNullString(sql.NullString{String: location, Valid: true})
+	location_encrypted, err := utils.EncryptString(updatedUserData.Location, s.db_encrypt_key)
 	if err != nil {
 		return err
 	}
 
 	var interestsEncrypted []string
-	for _, interest := range interests {
+	for _, interest := range updatedUserData.Interests {
 		encryptedInterest, err := utils.EncryptString(interest, s.db_encrypt_key)
 		if err != nil {
 			return err
@@ -535,12 +358,12 @@ func (s *service) UpdateUser(updatedUserData UserDetails, avatarImage FileIntern
 	}
 
 	// Encrypt filename and data
-	avatarFilenameEncrypted, err := s.encryptString(avatarImage.Filename)
+	avatarFilenameEncrypted, err := utils.EncryptString(avatarImage.Filename, s.db_encrypt_key)
 	if err != nil {
 		return err
 	}
 
-	avatarDataEncrypted, err := s.encryptBytes(avatarImage.Data)
+	avatarDataEncrypted, err := utils.EncryptBytes(avatarImage.Data, s.db_encrypt_key)
 	if err != nil {
 		return err
 	}
@@ -549,18 +372,18 @@ func (s *service) UpdateUser(updatedUserData UserDetails, avatarImage FileIntern
 	// Small information
 	err = s.db_queries.UpdateUserDetails(ctx, sqlc.UpdateUserDetailsParams{
 		UserID:    userIDEncrypted, // Need the encrypted userId to search for the right row to update in db.
-		FirstName: first_name_encrypted,
-		LastName:  last_name_encrypted,
-		BirthDate: birth_date_encrypted,
-		Gender:    gender_encrypted,
-		Location:  location_encrypted,
+		FirstName: sql.NullString{String: first_name_encrypted, Valid: true},
+		LastName:  sql.NullString{String: last_name_encrypted, Valid: true},
+		BirthDate: sql.NullString{String: birth_date_encrypted, Valid: true},
+		Gender:    sql.NullString{String: gender_encrypted, Valid: true},
+		Location:  sql.NullString{String: location_encrypted, Valid: true},
 		Interests: interestsEncrypted,
 	})
 	if err != nil {
 		return err
 	}
 
-	// Larger information
+	// User avatar (user's first image)
 	err = s.db_queries.UpdateUserAvatar(ctx, sqlc.UpdateUserAvatarParams{
 		UserID: userIDEncrypted,
 		FileName: sql.NullString{
@@ -589,7 +412,7 @@ func (s *service) DeleteUser(userId string) error {
 	ctx := context.Background()
 
 	// Encrypt user id
-	userIDEncrypted, err := s.encryptString(userId)
+	userIDEncrypted, err := utils.EncryptString(userId, s.db_encrypt_key)
 	if err != nil {
 		return err
 	}
@@ -697,13 +520,13 @@ func (s *service) CreateNewUserRole(userId, role string) error {
 	ctx := context.Background()
 
 	// Encrypt user id
-	userIdEncrypted, err := s.encryptString(userId)
+	userIdEncrypted, err := utils.EncryptString(userId, s.db_encrypt_key)
 	if err != nil {
 		return err
 	}
 
 	// Encrypt the role
-	roleEncrypted, err := s.encryptString(role)
+	roleEncrypted, err := utils.EncryptString(role, s.db_encrypt_key)
 	if err != nil {
 		return err
 	}
@@ -721,7 +544,7 @@ func (s *service) GetUserRole(userId string) (string, error) {
 	ctx := context.Background()
 
 	// Encrypt the user id
-	userIdEncrypted, err := s.encryptString(userId)
+	userIdEncrypted, err := utils.EncryptString(userId, s.db_encrypt_key)
 	if err != nil {
 		return "", err
 	}
@@ -733,7 +556,7 @@ func (s *service) GetUserRole(userId string) (string, error) {
 	}
 
 	// Decrypt the role
-	roleDecrypted, err := s.decryptString(userRole.Role)
+	roleDecrypted, err := utils.DecryptString(userRole.Role, s.db_encrypt_key)
 	if err != nil {
 		return "", err
 	}
@@ -746,13 +569,13 @@ func (s *service) UpdateUserRole(userId, role string) error {
 	ctx := context.Background()
 
 	// Encrypt the user id
-	userIdEncrypted, err := s.encryptString(userId)
+	userIdEncrypted, err := utils.EncryptString(userId, s.db_encrypt_key)
 	if err != nil {
 		return err
 	}
 
 	// Encrypt the role
-	roleEncrypted, err := s.encryptString(role)
+	roleEncrypted, err := utils.EncryptString(role, s.db_encrypt_key)
 	if err != nil {
 		return err
 	}
@@ -771,7 +594,7 @@ func (s *service) DeleteUserRole(userId string) error {
 	ctx := context.Background()
 
 	// Encrypt the user id
-	userIdEncrypted, err := s.encryptString(userId)
+	userIdEncrypted, err := utils.EncryptString(userId, s.db_encrypt_key)
 	if err != nil {
 		return err
 	}
@@ -786,7 +609,7 @@ func (s *service) CreateProperty(propertyDetails PropertyDetails, images []Order
 	ctx := context.Background()
 
 	// Encrypt user id
-	encryptedListerUserID, err := s.encryptString(propertyDetails.ListerUserID)
+	encryptedListerUserID, err := utils.EncryptString(propertyDetails.ListerUserID, s.db_encrypt_key)
 	if err != nil {
 		return err
 	}
@@ -844,7 +667,7 @@ func (s *service) GetPropertyDetails(propertyId string) (PropertyDetails, error)
 	}
 
 	// Decrypt user id
-	decryptedListerUserID, err := s.decryptString(property.ListerUserID)
+	decryptedListerUserID, err := utils.DecryptString(property.ListerUserID, s.db_encrypt_key)
 	if err != nil {
 		return PropertyDetails{}, err
 	}
@@ -930,7 +753,7 @@ func (s *service) UpdatePropertyDetails(details PropertyDetails) error {
 	ctx := context.Background()
 
 	// Encrypt user id
-	encryptedListerUserID, err := s.encryptString(details.ListerUserID)
+	encryptedListerUserID, err := utils.EncryptString(details.ListerUserID, s.db_encrypt_key)
 	if err != nil {
 		return err
 	}
@@ -1068,7 +891,7 @@ func (s *service) AdminGetUsersRoles(userIds []string) ([]string, error) {
 	// Encrypt the user ids
 	var userIdsEncrypted []string
 	for _, userId := range userIds {
-		userIdEncrypted, err := s.encryptString(userId)
+		userIdEncrypted, err := utils.EncryptString(userId, s.db_encrypt_key)
 		if err != nil {
 			return nil, err
 		}
@@ -1089,7 +912,7 @@ func (s *service) AdminGetUsersRoles(userIds []string) ([]string, error) {
 	// Decrypt the roles
 	var userRoles []string
 	for _, role := range userRolesEncrypted {
-		roleDecrypted, err := s.decryptString(role.Role)
+		roleDecrypted, err := utils.DecryptString(role.Role, s.db_encrypt_key)
 		if err != nil {
 			return nil, err
 		}
@@ -1104,7 +927,7 @@ func (s *service) CreateCommunity(details CommunityDetails, images []FileInterna
 	ctx := context.Background()
 
 	// Encrypt the community's admin user id
-	encryptedAdminUserID, err := s.encryptString(details.AdminUserID)
+	encryptedAdminUserID, err := utils.EncryptString(details.AdminUserID, s.db_encrypt_key)
 	if err != nil {
 		return err
 	}
@@ -1150,7 +973,7 @@ func (s *service) CreateCommunityUser(communityId, userId string) error {
 	ctx := context.Background()
 
 	// Encrypt user id
-	encryptedUserID, err := s.encryptString(userId)
+	encryptedUserID, err := utils.EncryptString(userId, s.db_encrypt_key)
 	if err != nil {
 		return err
 	}
@@ -1179,7 +1002,7 @@ func (s *service) GetCommunityDetails(communityId string) (CommunityDetails, err
 	}
 
 	// Decrypt user id
-	decryptedUserID, err := s.decryptString(details.AdminUserID)
+	decryptedUserID, err := utils.DecryptString(details.AdminUserID, s.db_encrypt_key)
 	if err != nil {
 		return CommunityDetails{}, err
 	}
@@ -1219,7 +1042,7 @@ func (s *service) GetCommunityUsers(communityId string) ([]string, error) {
 	var returnUserIds []string
 	for _, id := range userIds {
 		// Decrypt each user id of the community
-		decryptedUserID, err := s.decryptString(id.UserID)
+		decryptedUserID, err := utils.DecryptString(id.UserID, s.db_encrypt_key)
 		if err != nil {
 			return nil, err
 		}
@@ -1290,7 +1113,7 @@ func (s *service) GetNextPageCommunities(limit, offset int32, filterName, filter
 func (s *service) UpdateCommunityDetails(details CommunityDetails) error {
 	ctx := context.Background()
 	// Encrypt user id
-	encryptedAdminUserID, err := s.encryptString(details.AdminUserID)
+	encryptedAdminUserID, err := utils.EncryptString(details.AdminUserID, s.db_encrypt_key)
 	if err != nil {
 		return err
 	}
@@ -1334,7 +1157,7 @@ func (s *service) DeleteCommunityUser(communityId, userId string) error {
 	ctx := context.Background()
 
 	// Encrypt user id
-	encryptedUserID, err := s.encryptString(userId)
+	encryptedUserID, err := utils.EncryptString(userId, s.db_encrypt_key)
 	if err != nil {
 		return err
 	}
@@ -1358,7 +1181,7 @@ func (s *service) GetUserOwnedCommunities(userId string) ([]string, error) {
 	ctx := context.Background()
 
 	// Encrypt user id
-	encryptedUserID, err := s.encryptString(userId)
+	encryptedUserID, err := utils.EncryptString(userId, s.db_encrypt_key)
 	if err != nil {
 		return nil, err
 	}

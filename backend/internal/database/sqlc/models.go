@@ -115,3 +115,24 @@ type UsersAvatar struct {
 	Data      []byte
 	UpdatedAt time.Time
 }
+
+type UsersSavedCommunity struct {
+	ID          int32
+	UserID      string
+	CommunityID string
+	CreatedAt   time.Time
+}
+
+type UsersSavedProperty struct {
+	ID         int32
+	UserID     string
+	PropertyID string
+	CreatedAt  time.Time
+}
+
+type UsersSavedUser struct {
+	ID          int32
+	UserID      string
+	SavedUserID string
+	CreatedAt   time.Time
+}
