@@ -30,3 +30,20 @@ export const filterAddressQPKey = "filterAddress";
 
 export const filterFirstNameQPKey = "filterFirstName";
 export const filterLastNameQPKey = "filterLastName";
+
+export const interestsOptions = [
+  "Reading",
+  "Traveling",
+  "Cooking",
+  "Swimming",
+  "Gaming",
+  "Sports",
+  "Music",
+  "Art",
+  "Technology",
+  "Politics",
+  "Writing",
+  "Social Justice",
+  "History",
+  "Dance",
+];

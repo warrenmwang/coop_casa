@@ -12,8 +12,6 @@ interface GenderInputArgs {
 }
 
 const GenderInput: React.FC<GenderInputArgs> = ({
-  // formData,
-  // setFormData,
   value,
   setValue,
   setError,
@@ -45,7 +43,6 @@ const GenderInput: React.FC<GenderInputArgs> = ({
         id="gender"
         className={`input__text_gray_box ${classNameCustom}`}
         onChange={handleChange}
-        defaultValue={value}
         value={value}
         required={required}
       >

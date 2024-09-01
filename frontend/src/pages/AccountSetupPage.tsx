@@ -246,8 +246,13 @@ const AccountSetupPage: React.FC = () => {
 
           {/* Interests Multiple Choice Check Boxes */}
           <InterestsInput
-            formData={formData}
-            setFormData={setFormData}
+            values={formData.interests}
+            setValues={(newVals: string[]) =>
+              setFormData((prevState) => ({
+                ...prevState,
+                interests: newVals,
+              }))
+            }
             setError={setError}
             required={true}
           />

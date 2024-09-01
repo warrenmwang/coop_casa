@@ -66,3 +66,7 @@ export const fileArray2OrderedFileArray = (arr: File[]): OrderedFile[] => {
   }
   return newArr;
 };
+
+export const deepCopyObjectJSONSerialize = <T>(obj: T): T => {
+  return JSON.parse(JSON.stringify(obj));
+};

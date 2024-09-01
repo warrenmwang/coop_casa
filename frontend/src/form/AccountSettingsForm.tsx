@@ -5,7 +5,10 @@ import LocationInput from "../input/LocationInput";
 import GenderInput from "../input/GenderInput";
 import TextInput from "../input/TextInput";
 import ImageInput from "../input/ImageInput";
-import { apiFile2ClientFile } from "../utils/utils";
+import {
+  apiFile2ClientFile,
+  deepCopyObjectJSONSerialize,
+} from "../utils/utils";
 import {
   APIUserReceived,
   OrderedFile,
@@ -53,7 +56,7 @@ const AccountSettingsForm: React.FC = () => {
       queryClient.invalidateQueries({
         queryKey: userAccountKey,
       });
-      setUser(formData);
+      setUser({ ...formData, interests: [...formData.interests] });
       setUserProfileImages(formProfileImages);
       setIsChanged(false);
       setIsSubmitting(false);
@@ -80,7 +83,7 @@ const AccountSettingsForm: React.FC = () => {
   };
 
   const handleDiscardChanges = () => {
-    setFormData(user);
+    setFormData({ ...user, interests: [...user.interests] });
     setFormProfileImages(userProfileImages);
     setIsChanged(false);
   };
@@ -111,6 +114,7 @@ const AccountSettingsForm: React.FC = () => {
       });
       setFormData({
         ...userDetails,
+        interests: [...userDetails.interests],
         avatar: userAvatar,
       });
     }
@@ -203,8 +207,13 @@ const AccountSettingsForm: React.FC = () => {
 
           {/* Interests */}
           <InterestsInput
-            formData={formData}
-            setFormData={setFormData}
+            values={formData.interests}
+            setValues={(newVals: string[]) =>
+              setFormData((prevState) => ({
+                ...prevState,
+                interests: newVals,
+              }))
+            }
             setIsChanged={setIsChanged}
             required={true}
           />
