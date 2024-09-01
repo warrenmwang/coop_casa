@@ -1,8 +1,10 @@
 package handlers
 
 import (
+	"backend/internal/database"
 	"backend/internal/interfaces"
 	"backend/internal/utils"
+	"encoding/base64"
 	"errors"
 	"net/http"
 	"strconv"
@@ -83,4 +85,35 @@ func (h *UserProfileHandler) GetUserHandler(w http.ResponseWriter, r *http.Reque
 	}
 
 	utils.RespondWithJSON(w, http.StatusOK, userPublicProfile)
+}
+
+// GET .../users/{id}/images
+// NO AUTH
+func (h *UserProfileHandler) GetUserImagesHandler(w http.ResponseWriter, r *http.Request) {
+	userID := chi.URLParam(r, "id")
+
+	// Get images from db and send as json
+	imagesInternal, err := h.server.DB().GetUserProfileImages(userID)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusNotFound, err)
+		return
+	}
+
+	// Convert images format from internal to external
+	var imagesExternal []database.FileExternal
+	for _, image := range imagesInternal {
+		imagesExternal = append(imagesExternal, database.FileExternal{
+			Filename: image.Filename,
+			Mimetype: image.Mimetype,
+			Size:     image.Size,
+			Data:     base64.StdEncoding.EncodeToString(image.Data),
+		})
+	}
+
+	// Respond with images in text format
+	utils.RespondWithJSON(w, http.StatusOK, struct {
+		Images []database.FileExternal `json:"images"`
+	}{
+		Images: imagesExternal,
+	})
 }

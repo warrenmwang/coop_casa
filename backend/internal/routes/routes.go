@@ -35,6 +35,8 @@ func NewAccountRouter(s interfaces.Server) http.Handler {
 	r.Delete("/", accountHandlers.DeleteAccountHandler)
 	r.Get("/role", accountHandlers.GetUserRoleHandler)
 	r.Get("/communities", accountHandlers.GetUserOwnedCommunities)
+	r.Get("/images", accountHandlers.GetUserProfileImages)
+	r.Post("/images", accountHandlers.UpdateUserProfileImages)
 
 	return r
 }
@@ -96,6 +98,7 @@ func NewUserProfileHandler(s interfaces.Server) http.Handler {
 	userProfileHandlers := handlers.NewUserProfileHandlers(s)
 	r.Get("/", userProfileHandlers.GetUsersHandler)
 	r.Get("/{id}", userProfileHandlers.GetUserHandler)
+	r.Get("/{id}/images", userProfileHandlers.GetUserImagesHandler)
 
 	return r
 }
@@ -124,10 +127,6 @@ func RegisterRoutes(s interfaces.Server) http.Handler {
 	accountRouter := NewAccountRouter(s)
 	apiRouter.Mount("/account", accountRouter)
 
-	// TODO: User (profile) images
-	// r.Post("/api/account/images", s.apiCreateUserProfileImagesHandler)
-	// r.Delete("/api/account/images", s.apiDeleteUserProfileImagesHandler)
-
 	// Admin
 	adminRouter := NewAdminRouter(s)
 	apiRouter.Mount("/admin", adminRouter)
@@ -143,8 +142,6 @@ func RegisterRoutes(s interfaces.Server) http.Handler {
 	// Public Users Profile
 	userProfileRouter := NewUserProfileHandler(s)
 	apiRouter.Mount("/users", userProfileRouter)
-
-	// // r.Get("/api/users/{id}/images", s.apiGetUserProfileImagesHandler)
 
 	r.Mount("/api/v1", apiRouter)
 
