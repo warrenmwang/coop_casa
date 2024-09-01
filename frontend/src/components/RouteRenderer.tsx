@@ -29,8 +29,8 @@ import {
   usersPageLink,
 } from "../urls";
 import CommunityDetailPage from "../pages/CommunityDetailPage";
-import TopNavbar from "./TopNavbar";
-import Footer from "./Footer";
+import TopNavbar from "./page_sections/TopNavbar";
+import Footer from "./page_sections/Footer";
 import UsersPage from "../pages/UsersPage";
 import UserProfilePage from "../pages/UserProfilePage";
 

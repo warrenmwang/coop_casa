@@ -1,6 +1,6 @@
 import React from "react";
-import Title from "../components/Title";
-import peopleCircleImage from "../assets/people_circle.webp";
+import Title from "../Title";
+import peopleCircleImage from "../../assets/people_circle.webp";
 
 const UsersHeroSection: React.FC = () => {
   return (

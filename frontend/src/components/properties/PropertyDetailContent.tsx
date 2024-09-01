@@ -1,12 +1,12 @@
 import React from "react";
-import { propertiesPageLink } from "../urls";
+import { propertiesPageLink } from "../../urls";
 import { Box } from "@mui/material";
 import CustomImageGallery, {
   ImageGalleryItemsInput,
-} from "../components/CustomImageGallery";
-import ShareLinkButton from "./buttons/ShareLinkButton";
-import ListerInfo from "../components/ListerInfo";
-import { Property } from "../types/Types";
+} from "../CustomImageGallery";
+import ShareLinkButton from "../buttons/ShareLinkButton";
+import ListerInfo from "./ListerInfo";
+import { Property } from "../../types/Types";
 import { useNavigate } from "react-router-dom";
 
 type PropertyDetailContentProps = {

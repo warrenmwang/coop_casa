@@ -1,31 +1,32 @@
-import React, { useState, useEffect } from "react";
-import { useQueryClient } from "@tanstack/react-query";
-import { MAX_NUMBER_PROPERTIES_PER_PAGE } from "../constants";
-import CardGridSkeleton from "../skeleton/CardGridSkeleton";
-import SearchBar from "../input/SearchBar";
-import PageOfProperties from "./PageOfProperties";
+import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import SubmitButton from "./buttons/SubmitButton";
-import "../styles/contentBody.css";
-import "../styles/form.css";
-import FetchErrorText from "./FetchErrorText";
-import { pageQPKey, filterAddressQPKey } from "../constants";
-import { useGetPageOfPropertyIDs } from "../hooks/properties";
+import {
+  filterFirstNameQPKey,
+  filterLastNameQPKey,
+  MAX_NUMBER_USER_PROFILES_PER_PAGE,
+  pageQPKey,
+} from "../../constants";
+import { useQueryClient } from "@tanstack/react-query";
+import FetchErrorText from "../FetchErrorText";
+import CardGridSkeleton from "../../skeleton/CardGridSkeleton";
+import SearchBar from "../../input/SearchBar";
+import SubmitButton from "../buttons/SubmitButton";
+import PageOfUserProfiles from "./PageOfUserProfiles";
+import { useGetPageOfUserProfiles } from "../../hooks/users";
 
-const PropertiesMainBody: React.FC = () => {
-  const [searchIsSubmitting, setSearchIsSubmitting] = useState(false);
+const UserProfilesMainBody: React.FC = () => {
+  const [searchIsSubmitting, setSearchIsSubmitting] = useState<boolean>(false);
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [pages, setPages] = useState<Map<number, string[]>>(new Map()); // <page num, property ids>
 
-  // Sync query params with state
-  // page num
-  let pageQP: string | null = searchParams.get(pageQPKey);
+  // Grab the search params, to init our state.
+  let startPage: string | null = searchParams.get(pageQPKey);
   let startPageNum: number;
-  if (pageQP !== null && pageQP.length > 0) {
+  if (startPage !== null && startPage.length > 0) {
     // use the given page num, or use 0 if not a valid number
-    pageQP = pageQP as string;
-    startPageNum = Number(pageQP);
+    startPage = startPage as string;
+    startPageNum = Number(startPage);
     if (Number.isNaN(startPageNum)) {
       startPageNum = 0;
     }
@@ -39,32 +40,42 @@ const PropertiesMainBody: React.FC = () => {
     setSearchParams(searchParams);
   }
 
-  const filterAddressQP: string | null = searchParams.get(filterAddressQPKey);
-  let filterAddressStr: string;
-  if (filterAddressQP !== null) {
-    filterAddressStr = filterAddressQP as string;
+  const filterFirstNameQP: string | null =
+    searchParams.get(filterFirstNameQPKey);
+  let filterFirstNameStr: string;
+  if (filterFirstNameQP !== null) {
+    filterFirstNameStr = filterFirstNameQP as string;
   } else {
-    filterAddressStr = "";
+    filterFirstNameStr = "";
   }
 
-  // Init our states from the query params
-  // Current page number
+  const filterLastNameQP: string | null = searchParams.get(filterLastNameQPKey);
+  let filterLastNameStr: string;
+  if (filterLastNameQP !== null) {
+    filterLastNameStr = filterLastNameQP as string;
+  } else {
+    filterLastNameStr = "";
+  }
+
+  // Init our state from the query params
+  const [firstName, setFirstName] = useState<string>(filterFirstNameStr);
+  const [lastName, setLastName] = useState<string>(filterLastNameStr);
   const [currentPage, _setCurrentPage] = useState<number>(startPageNum);
   const setCurrentPage = (page: number) => {
+    // Want to update the query param for page number whenever the page
+    // state is updated. This is fired by the pagination navigation buttons.
+    // The other filters handled by the input forms are automatically handled by
+    // the binding between the input elements and the query params.
     _setCurrentPage(page);
     searchParams.set(pageQPKey, `${page}`);
     setSearchParams(searchParams);
   };
-  // Filter - address
-  const [filterAddress, setFilterAddress] = useState<string>(filterAddressStr);
 
-  // Use react query hook to handle our data fetching and async state w/ caching of query results.
-  const query = useGetPageOfPropertyIDs(currentPage, filterAddress);
-  // Use query client hook to get the query client for access to the cache
+  const query = useGetPageOfUserProfiles(currentPage, firstName, lastName);
   const queryClient = useQueryClient();
 
   // Define search form submission handler
-  const searchPropertiesWithFilter = (e: React.FormEvent) => {
+  const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setSearchIsSubmitting(true);
   };
@@ -92,20 +103,26 @@ const PropertiesMainBody: React.FC = () => {
     }
   }, [query.status, query.isRefetching]); // add isRefetching to dependency to allow us to use pages that were cached from previous queries
 
-  // When new search is fired off, get the latest address filter
+  // When new search is fired off, get the latest filters
   useEffect(() => {
     if (searchIsSubmitting) {
-      let filterAddressTmp: string | null =
-        searchParams.get(filterAddressQPKey);
-      if (filterAddressTmp === null) {
-        filterAddressTmp = "";
+      let filterFirstNameTmp: string | null =
+        searchParams.get(filterFirstNameQPKey);
+      if (filterFirstNameTmp === null) {
+        filterFirstNameTmp = "";
+      }
+      let filterLastNameTmp: string | null =
+        searchParams.get(filterLastNameQPKey);
+      if (filterLastNameTmp === null) {
+        filterLastNameTmp = "";
       }
 
       // See if first page of the search is already cached.
       const pageCached: string[] | undefined = queryClient.getQueryData([
-        "propertiesPage",
+        "userProfilesPage",
         0,
-        filterAddressTmp,
+        filterFirstNameTmp,
+        filterLastNameTmp,
       ]);
 
       // If page exists, then just use that page and don't
@@ -118,54 +135,59 @@ const PropertiesMainBody: React.FC = () => {
 
       // Update filter variables to trigger fetch.
       setCurrentPage(0);
-      setFilterAddress(filterAddressTmp);
+      setFirstName(filterFirstNameTmp);
+      setLastName(filterLastNameTmp);
     }
   }, [searchIsSubmitting]);
 
-  const noPropertiesOnPlatform: boolean =
+  const noUserProfilesOnPlatform: boolean =
     query.status === "success" && pages.get(0)?.length === 0;
 
   return (
     <>
       {/* Input form for applying filters to search */}
-      <form
-        className="form__searchProperties"
-        onSubmit={searchPropertiesWithFilter}
-      >
-        <div className="flex-col flex-grow">
-          <label className="label__text_input_gray">Address</label>
+      <form className="form__searchUserProfiles" onSubmit={handleFormSubmit}>
+        <div className="flex-col flex-grow items-center">
+          <label className="label__text_input_gray">First Name</label>
           <SearchBar
-            searchQueryParamKey={filterAddressQPKey}
-            placeholder="Search by address."
+            searchQueryParamKey={filterFirstNameQPKey}
+            placeholder="First Name"
+          ></SearchBar>
+        </div>
+        <div className="flex-col flex-grow">
+          <label className="label__text_input_gray">Last Name</label>
+          <SearchBar
+            searchQueryParamKey={filterLastNameQPKey}
+            placeholder="Last Name"
           ></SearchBar>
         </div>
         <SubmitButton isSubmitting={searchIsSubmitting} />
       </form>
 
-      {/* Display of Page of Properties */}
+      {/* Display of Page of User Profiles */}
       {/* If query is pending, display a skeleton. */}
       {query.status === "pending" && <CardGridSkeleton />}
 
-      {/* If query is successful and there are properties, then show the current page of them! */}
+      {/* If query is successful and there are user profiles, then show the current page of them! */}
       {pages.has(currentPage) && (
-        <PageOfProperties
+        <PageOfUserProfiles
           key={currentPage}
-          propertyIDs={pages.get(currentPage) as string[]}
+          userIDs={pages.get(currentPage) as string[]}
         />
       )}
 
-      {/* If no properties exist on platform, display a message. */}
-      {noPropertiesOnPlatform && (
+      {/* If no user profiles exist on platform, display a message. */}
+      {noUserProfilesOnPlatform && (
         <FetchErrorText>
-          Sorry, there are no properties on Coop right now! There will be
-          listings soon, we promise.
+          Sorry, there are no user profiles on Coop right now! Create your own
+          account to be the first one!
         </FetchErrorText>
       )}
 
       {/* Flex box for the pagination navigation buttons. */}
-      {!noPropertiesOnPlatform && (
+      {!noUserProfilesOnPlatform && (
         <div
-          id="DisplayProperties__navigationBtnsContainer"
+          id="UserProfilesMainBody__navigationBtnsContainer"
           className="flex gap-1"
         >
           {Array(currentPage + 1)
@@ -183,7 +205,7 @@ const PropertiesMainBody: React.FC = () => {
             ))}
           {pages.has(currentPage) &&
             (pages.get(currentPage) as string[]).length ===
-              MAX_NUMBER_PROPERTIES_PER_PAGE && (
+              MAX_NUMBER_USER_PROFILES_PER_PAGE && (
               <button
                 key="next"
                 className="bg-gray-500 hover:bg-gray-600 text-white p-3 rounded"
@@ -198,4 +220,4 @@ const PropertiesMainBody: React.FC = () => {
   );
 };
 
-export default PropertiesMainBody;
+export default UserProfilesMainBody;

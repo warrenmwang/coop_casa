@@ -1,10 +1,10 @@
 import React from "react";
-import CreatePropertyForm from "../form/CreatePropertyForm";
-import AdminManageUserRoles from "../form/AdminManageUserRoles";
+import CreatePropertyForm from "../../form/CreatePropertyForm";
+import AdminManageUserRoles from "../../form/AdminManageUserRoles";
 import { Grid } from "@mui/material";
-import UpdatePropertyManager from "../form/UpdatePropertyManager";
-import CreateCommunityForm from "../form/CreateCommunityForm";
-import UpdateCommunityManager from "../form/UpdateCommunityManager";
+import UpdatePropertyManager from "../../form/UpdatePropertyManager";
+import CreateCommunityForm from "../../form/CreateCommunityForm";
+import UpdateCommunityManager from "../../form/UpdateCommunityManager";
 import AdminDisplayUsers from "./AdminDisplayUsers";
 
 const AdminDashboard: React.FC = () => {

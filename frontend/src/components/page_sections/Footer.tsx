@@ -7,7 +7,7 @@ import {
   termsOfServicePageLink,
   attributionsPageLink,
   contactPageLink,
-} from "../urls";
+} from "../../urls";
 
 const Footer: React.FC = () => {
   return (

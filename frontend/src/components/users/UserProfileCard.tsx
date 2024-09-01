@@ -1,9 +1,9 @@
 import React, { useMemo } from "react";
-import { UserProfile } from "../types/Types";
-import { usersPageLink } from "../urls";
+import { UserProfile } from "../../types/Types";
+import { usersPageLink } from "../../urls";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardMedia } from "@mui/material";
-import DefaultUserProfileIcon from "../icons/DefaultUserProfile/DefaultUserProfileIcon";
+import DefaultUserProfileIcon from "../../icons/DefaultUserProfile/DefaultUserProfileIcon";
 
 const UserProfileCard: React.FC<{ userProfile: UserProfile }> = ({
   userProfile,

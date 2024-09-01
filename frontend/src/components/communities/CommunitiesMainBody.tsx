@@ -1,20 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import CardGridSkeleton from "../skeleton/CardGridSkeleton";
+import CardGridSkeleton from "../../skeleton/CardGridSkeleton";
 import PageOfCommunities from "./PageOfCommunities";
 
-import SearchBar from "../input/SearchBar";
-import "../styles/colors.css";
-import SubmitButton from "./buttons/SubmitButton";
+import SearchBar from "../../input/SearchBar";
+import "../../styles/colors.css";
+import SubmitButton from "../buttons/SubmitButton";
 import { useSearchParams } from "react-router-dom";
 import {
   pageQPKey,
   filterNameQPKey,
   filterDescriptionQPKey,
   MAX_NUMBER_COMMUNITIES_PER_PAGE,
-} from "../constants";
-import FetchErrorText from "./FetchErrorText";
-import { useGetPageOfCommunityIDs } from "../hooks/communities";
+} from "../../constants";
+import FetchErrorText from "../FetchErrorText";
+import { useGetPageOfCommunityIDs } from "../../hooks/communities";
 
 const CommunitiesMainBody: React.FC = () => {
   const [searchIsSubmitting, setSearchIsSubmitting] = useState<boolean>(false);

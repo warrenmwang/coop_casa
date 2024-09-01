@@ -1,8 +1,8 @@
 import React, { useMemo } from "react";
 import { Link } from "react-router-dom";
-import { Property } from "../types/Types";
+import { Property } from "../../types/Types";
 import { Card, CardContent, CardMedia } from "@mui/material";
-import { propertiesPageLink } from "../urls";
+import { propertiesPageLink } from "../../urls";
 
 interface PropertyCardProps {
   property: Property;

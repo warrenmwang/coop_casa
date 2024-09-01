@@ -1,12 +1,14 @@
 import React from "react";
 import { Box } from "@mui/material";
-import { communitiesPageLink } from "../urls";
-import ShareLinkButton from "./buttons/ShareLinkButton";
+import { communitiesPageLink } from "../../urls";
+import ShareLinkButton from "../buttons/ShareLinkButton";
 import CustomImageGallery, {
   ImageGalleryItemsInput,
-} from "../components/CustomImageGallery";
+} from "../CustomImageGallery";
 import { useNavigate } from "react-router-dom";
-import { Community } from "../types/Types";
+import { Community } from "../../types/Types";
+import CommunityUsersProfilesSection from "./CommunityUsersProfilesSection";
+import CommunityPropertiesSection from "./CommunityPropertiesSection";
 
 const CommunityDetailContent: React.FC<{ community: Community }> = ({
   community,
@@ -45,9 +47,11 @@ const CommunityDetailContent: React.FC<{ community: Community }> = ({
         <div className="text-3xl font-bold">{community.details.name}</div>
         <div className="text-2xl">{community.details.description}</div>
       </div>
-      {/* TODO: How do we show the community's users and properties? */}
-      {/* how much information do we want to show for the users? just their name? */}
-      {/* how about some point of contact? a public email addr they setup in their account? */}
+      {/* Community Users' Profiles */}
+      <CommunityUsersProfilesSection userIDs={community.users} />
+
+      {/* Community Properties' Listings */}
+      <CommunityPropertiesSection propertyIDs={community.properties} />
     </Box>
   );
 };

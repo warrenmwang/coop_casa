@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { Property } from "../types/Types";
 import CardSkeleton from "../skeleton/CardSkeleton";
 import FetchErrorText from "../components/FetchErrorText";
-import PropertyDetailContent from "../components/PropertyDetailContent";
+import PropertyDetailContent from "../components/properties/PropertyDetailContent";
 import { useGetProperty } from "../hooks/properties";
 
 const PropertyDetailPage: React.FC = () => {

@@ -4,7 +4,7 @@ import Title from "../components/Title";
 
 import TextSkeleton from "../skeleton/TextSkeleton";
 import RegularDashboard from "../components/RegularDashboard";
-import AdminDashboard from "../components/AdminDashboard";
+import AdminDashboard from "../components/admin/AdminDashboard";
 import { accountSetupPageLink, homePageLink } from "../urls";
 import { APIUserReceived, UserDetails } from "../types/Types";
 

@@ -2,7 +2,7 @@ import React, { Fragment } from "react";
 import { Link } from "react-router-dom";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
-import coopImg from "../assets/coopAlt1.svg";
+import coopImg from "../../assets/coopAlt1.svg";
 import {
   apiAuthGoogleOAuthLink,
   accountSettingsPageLink,
@@ -10,20 +10,20 @@ import {
   usersPageLink,
   communitiesPageLink,
   propertiesPageLink,
-} from "../urls";
+} from "../../urls";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiLogoutUser } from "../api/account";
-import { APIUserReceived } from "../types/Types";
-import { apiFile2ClientFile } from "../utils/utils";
+import { apiLogoutUser } from "../../api/account";
+import { APIUserReceived } from "../../types/Types";
+import { apiFile2ClientFile } from "../../utils/utils";
 import { toast } from "react-toastify";
 import axios, { AxiosError } from "axios";
-import UserProfileIcon from "../icons/UserProfileIcon/UserProfileIcon";
-import DefaultUserProfileIcon from "../icons/DefaultUserProfile/DefaultUserProfileIcon";
+import UserProfileIcon from "../../icons/UserProfileIcon/UserProfileIcon";
+import DefaultUserProfileIcon from "../../icons/DefaultUserProfile/DefaultUserProfileIcon";
 import {
   useGetUserAccountAuth,
   useGetUserAccountDetails,
-} from "../hooks/account";
-import { userAccountKey } from "../reactQueryKeys";
+} from "../../hooks/account";
+import { userAccountKey } from "../../reactQueryKeys";
 
 function classNames(...classes: (string | undefined | null | false)[]) {
   return classes.filter(Boolean).join(" ");

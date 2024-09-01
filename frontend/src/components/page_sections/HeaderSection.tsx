@@ -1,5 +1,5 @@
 import React from "react";
-import cartoonNeighborhood from "../assets/cartoonNeighborhood.jpg";
+import cartoonNeighborhood from "../../assets/cartoonNeighborhood.jpg";
 
 const stats = [
   { name: "Individual Ownership", value: "100%" },
@@ -8,7 +8,7 @@ const stats = [
   // { name: "Active Members", value: "4" },
 ];
 
-export default function HeaderSection() {
+const HeaderSection: React.FC = () => {
   const textColor1 = "black";
   const block1ClassName = `text-4xl font-bold tracking-tight text-${textColor1} sm:text-6xl`;
   const textColor2 = "black";
@@ -57,4 +57,6 @@ export default function HeaderSection() {
       </div>
     </div>
   );
-}
+};
+
+export default HeaderSection;

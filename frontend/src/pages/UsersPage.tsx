@@ -1,5 +1,5 @@
 import React from "react";
-import UserProfilesMainBody from "../components/UserProfilesMainBody";
+import UserProfilesMainBody from "../components/users/UserProfilesMainBody";
 import Title from "../components/Title";
 
 const UsersPage: React.FC = () => {

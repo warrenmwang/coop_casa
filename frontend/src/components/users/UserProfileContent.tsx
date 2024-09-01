@@ -1,13 +1,13 @@
 import React from "react";
-import { UserProfile } from "../types/Types";
+import { UserProfile } from "../../types/Types";
 import { Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { usersPageLink } from "../urls";
-import ShareLinkButton from "./buttons/ShareLinkButton";
+import { usersPageLink } from "../../urls";
+import ShareLinkButton from "../buttons/ShareLinkButton";
 import CustomImageGallery, {
   ImageGalleryItemsInput,
-} from "./CustomImageGallery";
-import defaultProfileImage from "../assets/profile.jpg";
+} from "../CustomImageGallery";
+import defaultProfileImage from "../../assets/profile.jpg";
 
 const UserProfileContent: React.FC<{ userProfile: UserProfile }> = ({
   userProfile,

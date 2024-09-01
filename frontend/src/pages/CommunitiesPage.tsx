@@ -1,6 +1,6 @@
 import React from "react";
 import "../styles/contentBody.css";
-import CommunitiesMainBody from "../components/CommunitiesMainBody";
+import CommunitiesMainBody from "../components/communities/CommunitiesMainBody";
 import Title from "../components/Title";
 
 const CommunitiesPage: React.FC = () => {
