@@ -30,6 +30,7 @@ export const apiAccountLink = `${API_HOST}:${API_PORT}/api/v1/account`;
 export const apiAccountUpdateLink = `${API_HOST}:${API_PORT}/api/v1/account`;
 export const apiUserRoleLink = `${API_HOST}:${API_PORT}/api/v1/account/role`;
 export const apiUserCommunities = `${API_HOST}:${API_PORT}/api/v1/account/communities`;
+export const apiAccountUserProfileImagesLink = `${API_HOST}:${API_PORT}/api/v1/account/images`;
 
 export const apiAdminUsersLink = `${API_HOST}:${API_PORT}/api/v1/admin/users`;
 export const apiAdminUsersRolesLink = `${API_HOST}:${API_PORT}/api/v1/admin/users/roles`;

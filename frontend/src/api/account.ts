@@ -4,10 +4,12 @@ import {
   apiAuthLogoutLink,
   apiAuthCheckLink,
   apiUserRoleLink,
+  apiAccountUserProfileImagesLink,
 } from "../urls";
-import { User, APIUserReceived } from "../types/Types";
+import { User, APIUserReceived, APIFileReceived } from "../types/Types";
 import axios, { AxiosResponse } from "axios";
 import { DeleteUserResponse, LogoutUserResponse } from "../types/Responses";
+import { apiFile2ClientFile } from "../utils/utils";
 
 // Delete Account Function
 export const apiAccountDelete = async (): Promise<
@@ -19,9 +21,7 @@ export const apiAccountDelete = async (): Promise<
 };
 
 // Update Account Details
-export const apiUpdateUserAccountDetails = async (
-  newUserData: User,
-): Promise<Response> => {
+export const apiUpdateUserAccountDetails = async (newUserData: User) => {
   const formData = new FormData();
 
   // User details (string values)
@@ -49,6 +49,63 @@ export const apiUpdateUserAccountDetails = async (
   });
 };
 
+export const apiUpdateUserProfileImages = async (images: File[]) => {
+  const formData = new FormData();
+
+  const numImages: number = images.length;
+
+  // Skip request if no images
+  if (numImages === 0) {
+    return Promise.resolve();
+  }
+
+  formData.append("numImages", `${numImages}`);
+  for (let i = 0; i < numImages; i++) {
+    formData.append(`image${i}`, images[i]);
+  }
+
+  return axios.post(apiAccountUserProfileImagesLink, formData, {
+    withCredentials: true,
+  });
+};
+
+export const apiUpdateUserAccountDetailsAndProfileImages = async (
+  newUserData: User,
+  images: File[],
+) => {
+  const updateDetailsPromise = apiUpdateUserAccountDetails(newUserData);
+  const updateImagesPromise = apiUpdateUserProfileImages(images);
+  return Promise.all([updateDetailsPromise, updateImagesPromise]);
+};
+
+export const apiAccountGetUserProfileImages = async (): Promise<File[]> => {
+  return axios
+    .get(apiAccountUserProfileImagesLink, {
+      headers: {
+        Accept: "application/json",
+      },
+      withCredentials: true,
+    })
+    .then((res) => res.data)
+    .then((data) => data.images as APIFileReceived[])
+    .then((images) => {
+      // convert images to binary
+      let imagesTmp: File[] = [];
+      if (images !== null) {
+        imagesTmp = images.map((image) => apiFile2ClientFile(image)) as File[];
+      }
+      return imagesTmp;
+    });
+};
+
+// export const apiAccountGetUserDetailsAndProfileImages = async (): Promise<
+//   [APIUserReceived, File[]]
+// > => {
+//   const userDetailsPromise = apiGetUser();
+//   const userImagesPromise = apiAccountGetUserProfileImages();
+//   return Promise.all([userDetailsPromise, userImagesPromise]);
+// };
+
 // Log out user from system, end session by invalidating the client side token
 export const apiLogoutUser = async (): Promise<
   AxiosResponse<LogoutUserResponse>
@@ -72,9 +129,11 @@ export const apiGetUserAuth = async (): Promise<boolean> => {
     })
     .then((res) => res.data)
     .then((data) => data.authed as boolean)
-    .catch((_) => false);
+    .catch(() => false);
 };
 
+// Function from before user profile images
+// Returns user details and avatar image
 export const apiGetUser = async (): Promise<APIUserReceived> => {
   return axios
     .get(apiAccountLink, {

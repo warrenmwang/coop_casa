@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { apiUpdateUserAccountDetails, apiGetUser } from "../api/account";
+import {
+  apiUpdateUserAccountDetails,
+  apiGetUser,
+  apiUpdateUserAccountDetailsAndProfileImages,
+} from "../api/account";
 import InterestsInput from "../input/InterestsInput";
 import LocationInput from "../input/LocationInput";
 import GenderInput from "../input/GenderInput";
@@ -21,25 +25,36 @@ import FetchErrorText from "../components/FetchErrorText";
 import axios, { AxiosError } from "axios";
 import FormButton from "../components/FormButton";
 import MultipleImageUploader from "../input/MultipleImageUploader";
-import { useGetUserAccountDetails } from "../hooks/account";
+import {
+  useGetAccountUserProfileImages,
+  useGetUserAccountDetails,
+} from "../hooks/account";
+import { userAccountKey, userDetailsKey } from "../reactQueryKeys";
 
 const AccountSettingsForm: React.FC = () => {
   const [user, setUser] = useState<User>(EmptyUser);
   const [formData, setFormData] = useState<User>(EmptyUser);
   const [isChanged, setIsChanged] = useState(false);
 
-  // TODO:
-  // const [userProfileImages, setUserProfileImages] = useState<OrderedFile[]>([]);
+  const [userProfileImages, setUserProfileImages] = useState<OrderedFile[]>([]);
+  const [formProfileImages, setFormProfileImages] = useState<OrderedFile[]>([]);
 
+  // Get user account information
   const userQuery = useGetUserAccountDetails();
-
+  const userProfileImagesQuery = useGetAccountUserProfileImages();
   const queryClient = useQueryClient();
+
+  // Prepare mutation for changing user account information
   const mutation = useMutation({
-    mutationKey: ["user", "details"],
-    mutationFn: () => apiUpdateUserAccountDetails(formData),
+    mutationFn: () =>
+      apiUpdateUserAccountDetailsAndProfileImages(
+        formData,
+        formProfileImages.map((image) => image.file),
+      ),
     onSuccess: () => {
+      // Invalidate queries for current user account
       queryClient.invalidateQueries({
-        queryKey: ["user", "details"],
+        queryKey: userAccountKey,
       });
       setUser(formData);
       setIsChanged(false);
@@ -66,6 +81,7 @@ const AccountSettingsForm: React.FC = () => {
 
   const handleDiscardChanges = () => {
     setFormData(user);
+    setFormProfileImages(userProfileImages);
     setIsChanged(false);
   };
 
@@ -77,11 +93,12 @@ const AccountSettingsForm: React.FC = () => {
     }));
   };
 
-  // const handleImagesUploaded = (files: OrderedFile[]) => {
-  //   // TODO: update our form data
-  // };
+  const handleImagesUploaded = (files: OrderedFile[]) => {
+    setFormProfileImages(files);
+  };
 
   useEffect(() => {
+    // Populate user details and avatar
     if (userQuery.status === "success") {
       const userReceived: APIUserReceived = userQuery.data;
       const userDetails: UserDetails = userReceived.userDetails;
@@ -97,9 +114,24 @@ const AccountSettingsForm: React.FC = () => {
         avatar: userAvatar,
       });
     }
-  }, [userQuery.status]);
+    // Populate user profile images
+    if (userProfileImagesQuery.status === "success") {
+      const images: File[] = userProfileImagesQuery.data;
+      setUserProfileImages(
+        images.map(
+          (image, idx) => ({ orderNum: idx, file: image }) as OrderedFile,
+        ),
+      );
+      setFormProfileImages(
+        images.map(
+          (image, idx) => ({ orderNum: idx, file: image }) as OrderedFile,
+        ),
+      );
+    }
+  }, [userQuery.status, userProfileImagesQuery.status]);
 
-  const ready: boolean = userQuery.isFetched;
+  const ready: boolean =
+    userQuery.isFetched && userProfileImagesQuery.isFetched;
 
   return (
     <>
@@ -190,18 +222,18 @@ const AccountSettingsForm: React.FC = () => {
             </div>
           )}
 
-          {/* TODO: */}
           {/* User Profile Images */}
-          {/* <div className="input__container">
+          <div className="input__container">
             <label className="label__text_input_gray">
               Additional User Profile Images, displayed after avatar image.
               (opt.)
             </label>
             <MultipleImageUploader
-              images={userProfileImages}
+              images={formProfileImages}
               onImagesUploaded={handleImagesUploaded}
+              setIsChanged={setIsChanged}
             />
-          </div> */}
+          </div>
 
           {/* Save / discard buttons */}
           {isChanged && (

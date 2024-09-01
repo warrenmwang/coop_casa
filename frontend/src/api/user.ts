@@ -6,7 +6,11 @@ import {
   limitQPKey,
   pageQPKey,
 } from "../constants";
-import { APIUserProfileReceived, UserProfile } from "../types/Types";
+import {
+  APIFileReceived,
+  APIUserProfileReceived,
+  UserProfile,
+} from "../types/Types";
 import { apiFile2ClientFile } from "../utils/utils";
 
 export const apiGetUserProfiles = async (
@@ -53,5 +57,26 @@ export const apiGetUserProfile = async (
         details: data.details,
         images: imagesTmp,
       } as UserProfile;
+    });
+};
+
+export const apiGetUserProfileImages = async (
+  userID: string,
+): Promise<File[]> => {
+  return axios
+    .get(`${apiUsersLink}/${userID}/images`, {
+      headers: {
+        Accept: "application/json",
+      },
+    })
+    .then((res) => res.data)
+    .then((data) => data.images as APIFileReceived[])
+    .then((images) => {
+      // convert images to binary
+      let imagesTmp: File[] = [];
+      if (images !== null) {
+        imagesTmp = images.map((image) => apiFile2ClientFile(image)) as File[];
+      }
+      return imagesTmp;
     });
 };

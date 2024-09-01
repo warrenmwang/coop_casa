@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { apiCreateCommunity } from "../api/community";
-import { apiGetUser } from "../api/account";
 import TextInput from "../input/TextInput";
 import SubmitButton from "../components/SubmitButton";
 import MultipleImageUploader from "../input/MultipleImageUploader";
@@ -13,7 +12,7 @@ import {
   UserDetails,
   Community,
 } from "../types/Types";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import TextSkeleton from "../skeleton/TextSkeleton";
 import "../styles/font.css";
 import "../styles/input.css";

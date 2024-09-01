@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { apiCreateNewProperty } from "../api/property";
-import { apiGetUser } from "../api/account";
 import { validateNumber } from "../utils/inputValidation";
 import TextInput from "../input/TextInput";
 import SubmitButton from "../components/SubmitButton";
@@ -14,7 +13,7 @@ import {
   PropertyDetails,
   UserDetails,
 } from "../types/Types";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import TextSkeleton from "../skeleton/TextSkeleton";
 import "../styles/font.css";
 import "../styles/input.css";

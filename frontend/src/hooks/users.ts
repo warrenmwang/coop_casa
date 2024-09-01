@@ -1,7 +1,16 @@
 import { useQueries, useQuery, UseQueryResult } from "@tanstack/react-query";
 import { MAX_NUMBER_USER_PROFILES_PER_PAGE } from "../constants";
-import { apiGetUserProfile, apiGetUserProfiles } from "../api/user";
+import {
+  apiGetUserProfile,
+  apiGetUserProfileImages,
+  apiGetUserProfiles,
+} from "../api/user";
 import { UserProfile } from "../types/Types";
+import {
+  publicUserProfileImagesKey,
+  publicUserProfileKey,
+  publicUserProfilesPageKey,
+} from "../reactQueryKeys";
 
 export const useGetPageOfUserProfiles = (
   currentPage: number,
@@ -9,7 +18,7 @@ export const useGetPageOfUserProfiles = (
   lastName: string,
 ): UseQueryResult<string[], Error> => {
   return useQuery({
-    queryKey: ["userProfilesPage", currentPage, firstName, lastName],
+    queryKey: [...publicUserProfilesPageKey, currentPage, firstName, lastName],
     queryFn: () =>
       apiGetUserProfiles(
         currentPage,
@@ -26,7 +35,7 @@ export const useGetUserProfiles = (
   return useQueries({
     queries: userIDs.map((userID) => {
       return {
-        queryKey: ["userProfile", userID],
+        queryKey: [...publicUserProfileKey, userID],
         queryFn: () => apiGetUserProfile(userID),
       };
     }),
@@ -37,7 +46,16 @@ export const useGetUserProfile = (
   userID: string,
 ): UseQueryResult<UserProfile, Error> => {
   return useQuery({
-    queryKey: ["userProfile", userID],
+    queryKey: [...publicUserProfileKey, userID],
     queryFn: () => apiGetUserProfile(userID),
+  });
+};
+
+export const useGetUserProfileImages = (
+  userID: string,
+): UseQueryResult<File[], Error> => {
+  return useQuery({
+    queryKey: [...publicUserProfileImagesKey, userID],
+    queryFn: () => apiGetUserProfileImages(userID),
   });
 };

@@ -1,6 +1,7 @@
 import { useQueries, useQuery, UseQueryResult } from "@tanstack/react-query";
 import { apiGetCommunities, apiGetCommunity } from "../api/community";
 import { Community } from "../types/Types";
+import { communitiesKey, communitiesPageKey } from "../reactQueryKeys";
 
 export const useGetPageOfCommunityIDs = (
   currentPage: number,
@@ -8,7 +9,7 @@ export const useGetPageOfCommunityIDs = (
   description: string,
 ): UseQueryResult<string[], Error> => {
   return useQuery({
-    queryKey: ["communitiesPage", currentPage, name, description],
+    queryKey: [...communitiesPageKey, currentPage, name, description],
     queryFn: () => apiGetCommunities(currentPage, name, description),
   });
 };
@@ -19,7 +20,7 @@ export const useGetCommunities = (
   return useQueries({
     queries: communityIDs.map((communityID) => {
       return {
-        queryKey: ["communities", communityID],
+        queryKey: [...communitiesKey, communityID],
         queryFn: () => apiGetCommunity(communityID),
       };
     }),
@@ -30,7 +31,7 @@ export const useGetCommunity = (
   communityID: string,
 ): UseQueryResult<Community, Error> => {
   return useQuery({
-    queryKey: ["communities", communityID],
+    queryKey: [...communitiesKey, communityID],
     queryFn: () => apiGetCommunity(communityID),
   });
 };

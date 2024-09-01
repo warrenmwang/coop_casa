@@ -1443,7 +1443,7 @@ func (s *service) GetPublicUserProfile(userID string) (PublicUserProfile, error)
 		return PublicUserProfile{}, err
 	}
 
-	// TODO: for now users only have one image, but in the future they will have multiple.
+	// First get user avatar
 	userAvatar, err := s.GetUserAvatar(plainTextUserID)
 	if err != nil {
 		return PublicUserProfile{}, err
@@ -1456,13 +1456,26 @@ func (s *service) GetPublicUserProfile(userID string) (PublicUserProfile, error)
 	}
 
 	var userImages []FileExternal
-	// TODO: for now users only have one image, but in the future they will have multiple.
+	// First append user avatar
 	userImages = append(userImages, FileExternal{
 		Filename: userAvatar.Filename,
 		Mimetype: userAvatar.Mimetype,
 		Size:     userAvatar.Size,
 		Data:     base64.StdEncoding.EncodeToString(userAvatar.Data),
 	})
+	// Then get and append the rest of the user images
+	userProfileImages, err := s.GetUserProfileImages(plainTextUserID)
+	if err != nil {
+		return PublicUserProfile{}, err
+	}
+	for _, image := range userProfileImages {
+		userImages = append(userImages, FileExternal{
+			Filename: image.Filename,
+			Mimetype: image.Mimetype,
+			Size:     image.Size,
+			Data:     base64.StdEncoding.EncodeToString(image.Data),
+		})
+	}
 
 	userProfile := PublicUserProfile{
 		Details: PublicUserProfileDetails{

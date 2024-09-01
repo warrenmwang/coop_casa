@@ -10,7 +10,11 @@ import {
   User,
   UserDetails,
 } from "../types/Types";
-import { apiUpdateUserAccountDetails } from "../api/account";
+import {
+  apiUpdateUserAccountDetails,
+  apiUpdateUserAccountDetailsAndProfileImages,
+  apiUpdateUserProfileImages,
+} from "../api/account";
 import LocationInput from "../input/LocationInput";
 import InterestsInput from "../input/InterestsInput";
 import GenderInput from "../input/GenderInput";
@@ -33,6 +37,7 @@ import MultipleImageUploader from "../input/MultipleImageUploader";
 import { MAX_USER_PROFILE_IMGS_ALLOWED } from "../constants";
 import FormButton from "../components/FormButton";
 import { useGetUserAccountDetails } from "../hooks/account";
+import { userDetailsKey } from "../reactQueryKeys";
 
 const AccountSetupPage: React.FC = () => {
   const navigate = useNavigate();
@@ -50,8 +55,12 @@ const AccountSetupPage: React.FC = () => {
   const userQuery = useGetUserAccountDetails();
 
   const mutation = useMutation({
-    mutationKey: ["user", "details"],
-    mutationFn: () => apiUpdateUserAccountDetails(formData),
+    mutationKey: userDetailsKey,
+    mutationFn: () =>
+      apiUpdateUserAccountDetailsAndProfileImages(
+        formData,
+        userProfileImages.map((image) => image.file),
+      ),
     onSuccess: () => {
       navigate(dashboardPageLink);
     },
@@ -62,7 +71,6 @@ const AccountSetupPage: React.FC = () => {
         errMsg = `${(error as AxiosError).response?.data}`;
       }
       toast.error(`Unable to setup account due to reason: ${errMsg}.`);
-      setIsSubmitting(false);
     },
   });
 
@@ -113,9 +121,6 @@ const AccountSetupPage: React.FC = () => {
     // Send update
     setIsSubmitting(true);
     mutation.mutate();
-
-    // TODO: handle user profile images
-    console.log(userProfileImages);
   };
 
   // Set interests error to true at first render

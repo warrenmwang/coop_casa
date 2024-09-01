@@ -23,6 +23,7 @@ import {
   useGetUserAccountAuth,
   useGetUserAccountDetails,
 } from "../hooks/account";
+import { userAccountKey } from "../reactQueryKeys";
 
 function classNames(...classes: (string | undefined | null | false)[]) {
   return classes.filter(Boolean).join(" ");
@@ -35,9 +36,9 @@ const TopNavbar: React.FC = () => {
   const mutation = useMutation({
     mutationFn: apiLogoutUser,
     onSuccess: () => {
-      // Invalidate the queries for user auth and data.
+      // Invalidate the queries for current user's account
       queryClient.invalidateQueries({
-        queryKey: ["user"], // invalidate all queries whose keys start with user
+        queryKey: userAccountKey,
       });
     },
     onError: (error: Error | AxiosError) => {

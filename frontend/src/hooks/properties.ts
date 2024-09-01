@@ -1,13 +1,14 @@
 import { useQueries, useQuery, UseQueryResult } from "@tanstack/react-query";
 import { apiGetProperties, apiGetProperty } from "../api/property";
 import { Property } from "../types/Types";
+import { propertiesKey, propertiesPageKey } from "../reactQueryKeys";
 
 export const useGetPageOfPropertyIDs = (
   currentPage: number,
   filterAddress: string,
 ): UseQueryResult<string[], Error> => {
   return useQuery({
-    queryKey: ["propertiesPage", currentPage, filterAddress],
+    queryKey: [...propertiesPageKey, currentPage, filterAddress],
     queryFn: () => apiGetProperties(currentPage, filterAddress),
   });
 };
@@ -18,7 +19,7 @@ export const useGetProperties = (
   return useQueries({
     queries: propertyIDs.map((propertyID) => {
       return {
-        queryKey: ["properties", propertyID],
+        queryKey: [...propertiesKey, propertyID],
         queryFn: () => apiGetProperty(propertyID),
       };
     }),
@@ -27,7 +28,7 @@ export const useGetProperties = (
 
 export const useGetProperty = (propertyID: string) => {
   return useQuery({
-    queryKey: ["properties", propertyID],
+    queryKey: [...propertiesKey, propertyID],
     queryFn: () => apiGetProperty(propertyID),
   });
 };

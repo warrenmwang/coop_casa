@@ -2,13 +2,9 @@ import React, { useState } from "react";
 import Title from "../components/Title";
 import Modal from "../components/Modal";
 import AccountSettingsForm from "../form/AccountSettingsForm";
-import {
-  apiAccountDelete,
-  apiGetUserAuth,
-  apiGetUserRole,
-} from "../api/account";
+import { apiAccountDelete } from "../api/account";
 import { useNavigate } from "react-router-dom";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { homePageLink } from "../urls";
 import TextSkeleton from "../skeleton/TextSkeleton";
 import axios, { AxiosError } from "axios";
