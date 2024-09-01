@@ -54,11 +54,6 @@ export const apiUpdateUserProfileImages = async (images: File[]) => {
 
   const numImages: number = images.length;
 
-  // Skip request if no images
-  if (numImages === 0) {
-    return Promise.resolve();
-  }
-
   formData.append("numImages", `${numImages}`);
   for (let i = 0; i < numImages; i++) {
     formData.append(`image${i}`, images[i]);

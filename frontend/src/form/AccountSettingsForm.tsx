@@ -57,6 +57,7 @@ const AccountSettingsForm: React.FC = () => {
         queryKey: userAccountKey,
       });
       setUser(formData);
+      setUserProfileImages(formProfileImages);
       setIsChanged(false);
     },
     onError: (error: Error | AxiosError) => {

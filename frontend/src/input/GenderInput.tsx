@@ -54,11 +54,7 @@ const GenderInput: React.FC<GenderInputArgs> = ({
           Select an Option
         </option>
         {GENDER_OPTIONS.map((gender) => (
-          <option
-            key={gender}
-            value={gender}
-            selected={gender === formData.gender}
-          >
+          <option key={gender} value={gender}>
             {gender}
           </option>
         ))}
