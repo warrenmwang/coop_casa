@@ -181,8 +181,13 @@ const AccountSettingsForm: React.FC = () => {
 
           {/* Gender */}
           <GenderInput
-            formData={formData}
-            setFormData={setFormData}
+            value={formData.gender}
+            setValue={(newVal: string) =>
+              setFormData((prevState) => ({
+                ...prevState,
+                gender: newVal,
+              }))
+            }
             setIsChanged={setIsChanged}
             classNameCustom="w-full"
             required={true}

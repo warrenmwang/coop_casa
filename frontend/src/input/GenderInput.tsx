@@ -1,11 +1,10 @@
 import React from "react";
-import { User } from "../types/Types";
 import { GENDER_OPTIONS } from "../constants";
 import "../styles/input.css";
 
 interface GenderInputArgs {
-  formData: User;
-  setFormData: React.Dispatch<React.SetStateAction<User>>;
+  value: string;
+  setValue: (newVal: string) => void;
   setIsChanged?: (value: React.SetStateAction<boolean>) => void;
   setError?: (key: string, value: boolean) => void;
   required?: boolean;
@@ -13,8 +12,10 @@ interface GenderInputArgs {
 }
 
 const GenderInput: React.FC<GenderInputArgs> = ({
-  formData,
-  setFormData,
+  // formData,
+  // setFormData,
+  value,
+  setValue,
   setError,
   setIsChanged,
   required = false,
@@ -24,12 +25,9 @@ const GenderInput: React.FC<GenderInputArgs> = ({
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
-    const { id, value } = e.target;
+    const { id, value: val } = e.target;
 
-    setFormData((prevState) => ({
-      ...prevState,
-      [id]: value,
-    }));
+    setValue(val);
     if (setError) {
       setError(id, false);
     }
@@ -47,7 +45,8 @@ const GenderInput: React.FC<GenderInputArgs> = ({
         id="gender"
         className={`input__text_gray_box ${classNameCustom}`}
         onChange={handleChange}
-        defaultValue={formData.gender}
+        defaultValue={value}
+        value={value}
         required={required}
       >
         <option value="" disabled>

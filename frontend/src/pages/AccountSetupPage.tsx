@@ -193,8 +193,13 @@ const AccountSetupPage: React.FC = () => {
 
           {/* Gender */}
           <GenderInput
-            formData={formData}
-            setFormData={setFormData}
+            value={formData.gender}
+            setValue={(newVal: string) =>
+              setFormData((prevState) => ({
+                ...prevState,
+                gender: newVal,
+              }))
+            }
             setError={setError}
             required={true}
             classNameCustom="w-full"

@@ -29,14 +29,15 @@ export const apiAuthCheckLink = `${API_HOST}:${API_PORT}/auth/google/check`;
 export const apiAccountLink = `${API_HOST}:${API_PORT}/api/v1/account`;
 export const apiAccountUpdateLink = `${API_HOST}:${API_PORT}/api/v1/account`;
 export const apiUserRoleLink = `${API_HOST}:${API_PORT}/api/v1/account/role`;
-export const apiUserCommunities = `${API_HOST}:${API_PORT}/api/v1/account/communities`;
 export const apiAccountUserProfileImagesLink = `${API_HOST}:${API_PORT}/api/v1/account/images`;
+export const apiAccountUserSavedCommunties = `${API_HOST}:${API_PORT}/api/v1/account/saved/communities`;
+export const apiAccountUserSavedProperties = `${API_HOST}:${API_PORT}/api/v1/account/saved/properties`;
+export const apiAccountUserSavedUsers = `${API_HOST}:${API_PORT}/api/v1/account/saved/users`;
 
 export const apiAdminUsersLink = `${API_HOST}:${API_PORT}/api/v1/admin/users`;
 export const apiAdminUsersRolesLink = `${API_HOST}:${API_PORT}/api/v1/admin/users/roles`;
 
 export const apiPropertiesLink = `${API_HOST}:${API_PORT}/api/v1/properties`;
-
 export const apiListerLink = `${API_HOST}:${API_PORT}/api/v1/properties/lister`;
 
 export const apiCommunitiesLink = `${API_HOST}:${API_PORT}/api/v1/communities`;
