@@ -1,23 +1,13 @@
 package tests
 
 import (
+	"backend/internal/config"
 	"backend/internal/database"
-	"log"
-	"path/filepath"
 	"testing"
-
-	"github.com/joho/godotenv"
 )
 
 func TestDatabase(t *testing.T) {
 	// Assumes docker postgresql db to be up.
-
-	rootDir := filepath.Join("..", ".env")
-	err := godotenv.Load(rootDir)
-	if err != nil {
-		log.Fatalf("Error loading .env file: %s\n", err.Error())
-	}
-
 	db := database.New()
 	expected := map[string]string{
 		"message": "It's healthy",
@@ -30,4 +20,9 @@ func TestDatabase(t *testing.T) {
 	if expected["message"] != returned["message"] {
 		t.Fatal("got unexpected database Health() message")
 	}
+}
+
+func TestMain(m *testing.M) {
+	config.InitConfig()
+	m.Run()
 }

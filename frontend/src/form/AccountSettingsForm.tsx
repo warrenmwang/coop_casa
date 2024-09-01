@@ -1,9 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  apiUpdateUserAccountDetails,
-  apiGetUser,
-  apiUpdateUserAccountDetailsAndProfileImages,
-} from "../api/account";
+import { apiUpdateUserAccountDetailsAndProfileImages } from "../api/account";
 import InterestsInput from "../input/InterestsInput";
 import LocationInput from "../input/LocationInput";
 import GenderInput from "../input/GenderInput";
@@ -29,7 +25,7 @@ import {
   useGetAccountUserProfileImages,
   useGetUserAccountDetails,
 } from "../hooks/account";
-import { userAccountKey, userDetailsKey } from "../reactQueryKeys";
+import { userAccountKey } from "../reactQueryKeys";
 
 const AccountSettingsForm: React.FC = () => {
   const [user, setUser] = useState<User>(EmptyUser);

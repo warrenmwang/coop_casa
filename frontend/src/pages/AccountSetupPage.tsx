@@ -10,11 +10,7 @@ import {
   User,
   UserDetails,
 } from "../types/Types";
-import {
-  apiUpdateUserAccountDetails,
-  apiUpdateUserAccountDetailsAndProfileImages,
-  apiUpdateUserProfileImages,
-} from "../api/account";
+import { apiUpdateUserAccountDetailsAndProfileImages } from "../api/account";
 import LocationInput from "../input/LocationInput";
 import InterestsInput from "../input/InterestsInput";
 import GenderInput from "../input/GenderInput";
