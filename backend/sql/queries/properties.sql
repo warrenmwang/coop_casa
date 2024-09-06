@@ -29,6 +29,16 @@ SELECT
 FROM
     properties;
 
+-- name: GetUserOwnedProperties :many
+SELECT
+    property_id
+FROM
+    properties
+WHERE
+    lister_user_id = $1
+ORDER BY
+    id;
+
 -- name: GetPropertyImages :many
 SELECT
     *

@@ -335,6 +335,40 @@ func (q *Queries) GetTotalCountProperties(ctx context.Context) (int64, error) {
 	return count, err
 }
 
+const getUserOwnedProperties = `-- name: GetUserOwnedProperties :many
+SELECT
+    property_id
+FROM
+    properties
+WHERE
+    lister_user_id = $1
+ORDER BY
+    id
+`
+
+func (q *Queries) GetUserOwnedProperties(ctx context.Context, listerUserID string) ([]string, error) {
+	rows, err := q.db.QueryContext(ctx, getUserOwnedProperties, listerUserID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []string
+	for rows.Next() {
+		var property_id string
+		if err := rows.Scan(&property_id); err != nil {
+			return nil, err
+		}
+		items = append(items, property_id)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const updatePropertyDetails = `-- name: UpdatePropertyDetails :exec
 UPDATE
     properties

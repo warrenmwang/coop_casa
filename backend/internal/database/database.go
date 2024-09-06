@@ -73,14 +73,15 @@ type Service interface {
 	CreateProperty(propertyDetails PropertyDetails, images []OrderedFileInternal) error
 	GetPropertyDetails(propertyId string) (PropertyDetails, error)
 	GetPropertyImages(propertyId string) ([]OrderedFileInternal, error)
+	GetNextPageProperties(limit, offset int32, addressFilter string) ([]string, error)
+	GetTotalCountProperties() (int64, error)
+	GetListerOwnedProperties(userID string) ([]string, error)
+	CheckDuplicateProperty(propertyDetails PropertyDetails) error
 	UpdatePropertyDetails(details PropertyDetails) error
 	UpdatePropertyImages(propertyID string, images []OrderedFileInternal) error
 	DeleteProperty(propertyId string) error
 	DeletePropertyImage(propertyId string, imageOrderNum int16) error
-	GetNextPageProperties(limit, offset int32, addressFilter string) ([]string, error)
-	GetTotalCountProperties() (int64, error)
 	DeleteUserOwnedProperties(userID string) error
-	CheckDuplicateProperty(propertyDetails PropertyDetails) error
 
 	// Communities
 	CreateCommunity(details CommunityDetails, images []FileInternal) error
@@ -133,7 +134,7 @@ func (s *service) AdminGetUsers(limit, offset int32) ([]UserDetails, error) {
 		Offset: offset,
 	})
 	if err != nil {
-		return nil, err
+		return []UserDetails{}, err
 	}
 
 	// Decrypt user data
@@ -141,44 +142,44 @@ func (s *service) AdminGetUsers(limit, offset int32) ([]UserDetails, error) {
 	for _, userEncrypted := range usersEncrypted {
 		userId, err := utils.DecryptString(userEncrypted.UserID, s.db_encrypt_key)
 		if err != nil {
-			return nil, err
+			return []UserDetails{}, err
 		}
 
 		email, err := utils.DecryptString(userEncrypted.Email, s.db_encrypt_key)
 		if err != nil {
-			return nil, err
+			return []UserDetails{}, err
 		}
 
 		firstName, err := utils.DecryptString(userEncrypted.FirstName.String, s.db_encrypt_key)
 		if err != nil {
-			return nil, err
+			return []UserDetails{}, err
 		}
 
 		lastName, err := utils.DecryptString(userEncrypted.LastName.String, s.db_encrypt_key)
 		if err != nil {
-			return nil, err
+			return []UserDetails{}, err
 		}
 
 		birthDate, err := utils.DecryptString(userEncrypted.BirthDate.String, s.db_encrypt_key)
 		if err != nil {
-			return nil, err
+			return []UserDetails{}, err
 		}
 
 		gender, err := utils.DecryptString(userEncrypted.Gender.String, s.db_encrypt_key)
 		if err != nil {
-			return nil, err
+			return []UserDetails{}, err
 		}
 
 		location, err := utils.DecryptString(userEncrypted.Location.String, s.db_encrypt_key)
 		if err != nil {
-			return nil, err
+			return []UserDetails{}, err
 		}
 
 		var interestsDecrypted []string
 		for _, encryptedInterest := range userEncrypted.Interests {
 			decryptedInterest, err := utils.DecryptString(encryptedInterest, s.db_encrypt_key)
 			if err != nil {
-				return nil, err
+				return []UserDetails{}, err
 			}
 			interestsDecrypted = append(interestsDecrypted, decryptedInterest)
 		}
@@ -485,13 +486,13 @@ func (s *service) GetUserProfileImages(userID string) ([]FileInternal, error) {
 	// Encrypt all of the user information and their images
 	userID_E, err := utils.EncryptString(userID, s.db_encrypt_key)
 	if err != nil {
-		return nil, errors.New("couldn't encrypt userID for image")
+		return []FileInternal{}, errors.New("couldn't encrypt userID for image")
 	}
 
 	// Find images by encrypted user id
 	images_E, err := s.db_queries.GetUserImages(ctx, userID_E)
 	if err != nil {
-		return nil, err
+		return []FileInternal{}, err
 	}
 
 	var images_D []FileInternal
@@ -540,13 +541,13 @@ func (s *service) GetUserSavedProperties(userID string) ([]string, error) {
 	// Encrypt user id
 	encryptedUserID, err := utils.EncryptString(userID, s.db_encrypt_key)
 	if err != nil {
-		return nil, err
+		return []string{}, err
 	}
 
 	// Get the encrypted property ids
 	propertyIDs, err := s.db_queries.GetUserSavedProperties(ctx, encryptedUserID)
 	if err != nil {
-		return nil, err
+		return []string{}, err
 	}
 
 	// Decrypt the property ids
@@ -554,7 +555,7 @@ func (s *service) GetUserSavedProperties(userID string) ([]string, error) {
 	for _, propertyID_E := range propertyIDs {
 		propertyID_D, err := utils.DecryptString(propertyID_E.PropertyID, s.db_encrypt_key)
 		if err != nil {
-			return nil, err
+			return []string{}, err
 		}
 		decryptedPropertyIDs = append(decryptedPropertyIDs, propertyID_D)
 	}
@@ -569,13 +570,13 @@ func (s *service) GetUserSavedCommunities(userID string) ([]string, error) {
 	// Encrypt user id
 	encryptedUserID, err := utils.EncryptString(userID, s.db_encrypt_key)
 	if err != nil {
-		return nil, err
+		return []string{}, err
 	}
 
 	// Get the encrypted community ids
 	communityIDs, err := s.db_queries.GetUserSavedCommunities(ctx, encryptedUserID)
 	if err != nil {
-		return nil, err
+		return []string{}, err
 	}
 
 	// Decrypt the community ids
@@ -583,7 +584,7 @@ func (s *service) GetUserSavedCommunities(userID string) ([]string, error) {
 	for _, communityID_E := range communityIDs {
 		communityID_D, err := utils.DecryptString(communityID_E.CommunityID, s.db_encrypt_key)
 		if err != nil {
-			return nil, err
+			return []string{}, err
 		}
 		decryptedCommunityIDs = append(decryptedCommunityIDs, communityID_D)
 	}
@@ -597,13 +598,13 @@ func (s *service) GetUserSavedUsers(userID string) ([]string, error) {
 	// Encrypt user id
 	encryptedUserID, err := utils.EncryptString(userID, s.db_encrypt_key)
 	if err != nil {
-		return nil, err
+		return []string{}, err
 	}
 
 	// Get the encrypted user ids
 	userIDs, err := s.db_queries.GetUserSavedUsers(ctx, encryptedUserID)
 	if err != nil {
-		return nil, err
+		return []string{}, err
 	}
 
 	// Decrypt the user ids
@@ -611,7 +612,7 @@ func (s *service) GetUserSavedUsers(userID string) ([]string, error) {
 	for _, userID_E := range userIDs {
 		userID_D, err := utils.DecryptString(userID_E.SavedUserID, s.db_encrypt_key)
 		if err != nil {
-			return nil, err
+			return []string{}, err
 		}
 		decryptedUserIDs = append(decryptedUserIDs, userID_D)
 	}
@@ -975,7 +976,7 @@ func (s *service) GetNextPageProperties(limit, offset int32, addressFilter strin
 			Offset: offset,
 		})
 		if err != nil {
-			return nil, err
+			return []string{}, err
 		}
 		return propertyIDs, nil
 	}
@@ -987,7 +988,7 @@ func (s *service) GetNextPageProperties(limit, offset int32, addressFilter strin
 		Similarity: addressFilter,
 	})
 	if err != nil {
-		return nil, err
+		return []string{}, err
 	}
 
 	return propertyIDs, nil
@@ -1079,6 +1080,15 @@ func (s *service) GetTotalCountProperties() (int64, error) {
 	return num, nil
 }
 
+func (s *service) GetListerOwnedProperties(userID string) ([]string, error) {
+	ctx := context.Background()
+	propertyIDs, err := s.db_queries.GetUserOwnedProperties(ctx, userID)
+	if err != nil {
+		return []string{}, err
+	}
+	return propertyIDs, nil
+}
+
 // Delete a single property's image identified by its order number
 func (s *service) DeletePropertyImage(propertyId string, imageOrderNum int16) error {
 	ctx := context.Background()
@@ -1138,7 +1148,7 @@ func (s *service) AdminGetUsersRoles(userIds []string) ([]string, error) {
 	for _, userId := range userIds {
 		userIdEncrypted, err := utils.EncryptString(userId, s.db_encrypt_key)
 		if err != nil {
-			return nil, err
+			return []string{}, err
 		}
 		userIdsEncrypted = append(userIdsEncrypted, userIdEncrypted)
 	}
@@ -1148,7 +1158,7 @@ func (s *service) AdminGetUsersRoles(userIds []string) ([]string, error) {
 	for _, userId := range userIdsEncrypted {
 		role, err := s.db_queries.GetUserRole(ctx, userId)
 		if err != nil {
-			return nil, err
+			return []string{}, err
 		}
 
 		userRolesEncrypted = append(userRolesEncrypted, role)
@@ -1159,7 +1169,7 @@ func (s *service) AdminGetUsersRoles(userIds []string) ([]string, error) {
 	for _, role := range userRolesEncrypted {
 		roleDecrypted, err := utils.DecryptString(role.Role, s.db_encrypt_key)
 		if err != nil {
-			return nil, err
+			return []string{}, err
 		}
 		userRoles = append(userRoles, roleDecrypted)
 	}
@@ -1264,7 +1274,7 @@ func (s *service) GetCommunityImages(communityId string) ([]FileInternal, error)
 	ctx := context.Background()
 	images, err := s.db_queries.GetCommunityImages(ctx, communityId)
 	if err != nil {
-		return nil, err
+		return []FileInternal{}, err
 	}
 	var returnImages []FileInternal
 	for _, image := range images {
@@ -1282,14 +1292,14 @@ func (s *service) GetCommunityUsers(communityId string) ([]string, error) {
 	ctx := context.Background()
 	userIds, err := s.db_queries.GetCommunityUsers(ctx, communityId)
 	if err != nil {
-		return nil, err
+		return []string{}, err
 	}
 	var returnUserIds []string
 	for _, id := range userIds {
 		// Decrypt each user id of the community
 		decryptedUserID, err := utils.DecryptString(id.UserID, s.db_encrypt_key)
 		if err != nil {
-			return nil, err
+			return []string{}, err
 		}
 		returnUserIds = append(returnUserIds, decryptedUserID)
 	}
@@ -1300,7 +1310,7 @@ func (s *service) GetCommunityProperties(communityId string) ([]string, error) {
 	ctx := context.Background()
 	propertyIds, err := s.db_queries.GetCommunityProperties(ctx, communityId)
 	if err != nil {
-		return nil, err
+		return []string{}, err
 	}
 	var returnPropertyIds []string
 	for _, id := range propertyIds {
@@ -1320,7 +1330,7 @@ func (s *service) GetNextPageCommunities(limit, offset int32, filterName, filter
 			Similarity_2: filterDescription,
 		})
 		if err != nil {
-			return nil, err
+			return []string{}, err
 		}
 		return communityIds, nil
 	} else if len(filterName) > 0 {
@@ -1330,7 +1340,7 @@ func (s *service) GetNextPageCommunities(limit, offset int32, filterName, filter
 			Similarity: filterName,
 		})
 		if err != nil {
-			return nil, err
+			return []string{}, err
 		}
 		return communityIds, nil
 	} else if len(filterDescription) > 0 {
@@ -1340,7 +1350,7 @@ func (s *service) GetNextPageCommunities(limit, offset int32, filterName, filter
 			Similarity: filterDescription,
 		})
 		if err != nil {
-			return nil, err
+			return []string{}, err
 		}
 		return communityIds, nil
 	} else {
@@ -1349,7 +1359,7 @@ func (s *service) GetNextPageCommunities(limit, offset int32, filterName, filter
 			Offset: offset,
 		})
 		if err != nil {
-			return nil, err
+			return []string{}, err
 		}
 		return communityIds, nil
 	}
@@ -1464,12 +1474,12 @@ func (s *service) GetUserOwnedCommunities(userId string) ([]string, error) {
 	// Encrypt user id
 	encryptedUserID, err := utils.EncryptString(userId, s.db_encrypt_key)
 	if err != nil {
-		return nil, err
+		return []string{}, err
 	}
 
 	communities, err := s.db_queries.GetUserOwnedCommunities(ctx, encryptedUserID)
 	if err != nil {
-		return nil, err
+		return []string{}, err
 	}
 	return communities, nil
 }
@@ -1488,7 +1498,7 @@ func (s *service) GetNextPagePublicUserIDs(limit, offset int32) ([]string, error
 		Offset: offset,
 	})
 	if err != nil {
-		return nil, err
+		return []string{}, err
 	}
 
 	// Decrypt userIDs
@@ -1496,7 +1506,7 @@ func (s *service) GetNextPagePublicUserIDs(limit, offset int32) ([]string, error
 	for _, userID := range userIdsEncrypted {
 		decryptedUserID, err := utils.DecryptString(userID, s.db_encrypt_key)
 		if err != nil {
-			return nil, err
+			return []string{}, err
 		}
 		userIDs = append(userIDs, decryptedUserID)
 	}
@@ -1509,11 +1519,11 @@ func (s *service) GetNextPagePublicUserIDsFilterByName(limit, offset int32, firs
 
 	encryptedFirstName, err := utils.EncryptString(firstName, s.db_encrypt_key)
 	if err != nil {
-		return nil, err
+		return []string{}, err
 	}
 	encryptedLastName, err := utils.EncryptString(lastName, s.db_encrypt_key)
 	if err != nil {
-		return nil, err
+		return []string{}, err
 	}
 
 	userIdsEncrypted, err := s.db_queries.GetNextPageOfPublicUsersFilterByName(ctx, sqlc.GetNextPageOfPublicUsersFilterByNameParams{
@@ -1523,7 +1533,7 @@ func (s *service) GetNextPagePublicUserIDsFilterByName(limit, offset int32, firs
 		Similarity_2: encryptedLastName,
 	})
 	if err != nil {
-		return nil, err
+		return []string{}, err
 	}
 
 	// Decrypt userIDs
@@ -1531,7 +1541,7 @@ func (s *service) GetNextPagePublicUserIDsFilterByName(limit, offset int32, firs
 	for _, userID := range userIdsEncrypted {
 		decryptedUserID, err := utils.DecryptString(userID, s.db_encrypt_key)
 		if err != nil {
-			return nil, err
+			return []string{}, err
 		}
 		userIDs = append(userIDs, decryptedUserID)
 	}

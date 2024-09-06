@@ -4,6 +4,8 @@ import UpdatePropertyManager from "../form/UpdatePropertyManager";
 import { Grid } from "@mui/material";
 import CreateCommunityForm from "../form/CreateCommunityForm";
 import UpdateCommunityManager from "../form/UpdateCommunityManager";
+import UserOwnedPropertiesTable from "./properties/UserOwnedPropertiesTable";
+import UserOwnedCommunitiesTable from "./communities/UserOwnedCommunitiesTable";
 
 const ListerDashboard: React.FC = () => {
   return (
@@ -14,14 +16,14 @@ const ListerDashboard: React.FC = () => {
             <CreatePropertyForm />
           </Grid>
           <Grid item xs={12} sm={12} md={12} lg={6} style={{ gap: "0 24px" }}>
+            <UserOwnedPropertiesTable />
             <UpdatePropertyManager />
           </Grid>
           <Grid item xs={12} sm={12} md={12} lg={6} style={{ gap: "0 24px" }}>
-            {/* Create Community Form */}
             <CreateCommunityForm />
           </Grid>
           <Grid item xs={12} sm={12} md={12} lg={6} style={{ gap: "0 24px" }}>
-            {/* Update Community Form*/}
+            <UserOwnedCommunitiesTable />
             <UpdateCommunityManager />
           </Grid>
         </Grid>

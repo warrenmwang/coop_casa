@@ -149,7 +149,6 @@ func (h *PropertyHandler) GetListerInfoHandler(w http.ResponseWriter, r *http.Re
 // GET .../properties/total
 // AUTHED
 func (h *PropertyHandler) GetPropertiesTotalCountHandler(w http.ResponseWriter, r *http.Request) {
-	// Validate properties
 	count, err := h.server.DB().GetTotalCountProperties()
 	if err != nil {
 		utils.RespondWithError(w, 500, err)

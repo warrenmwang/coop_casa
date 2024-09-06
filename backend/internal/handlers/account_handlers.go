@@ -258,9 +258,34 @@ func (h *AccountHandler) GetUserOwnedCommunities(w http.ResponseWriter, r *http.
 	}
 
 	utils.RespondWithJSON(w, 200, struct {
-		CommunityIDs []string `json:"communityIds"`
+		CommunityIDs []string `json:"communityIDs"`
 	}{
 		CommunityIDs: communityIds,
+	})
+}
+
+// GET .../account/properties
+// AUTHED
+// Lister is able to retrieve the properties that they are put on the site
+func (h *AccountHandler) GetUserOwnedProperties(w http.ResponseWriter, r *http.Request) {
+	// Get user id
+	userID, ok := r.Context().Value(auth.UserIDKey).(string)
+	if !ok {
+		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("user id blank"))
+		return
+	}
+	// Fetch properties owned by user
+	propertyIDs, err := h.server.DB().GetListerOwnedProperties(userID)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	// Return the propertyIDs
+	utils.RespondWithJSON(w, http.StatusOK, struct {
+		PropertyIDs []string `json:"propertyIDs"`
+	}{
+		PropertyIDs: propertyIDs,
 	})
 }
 

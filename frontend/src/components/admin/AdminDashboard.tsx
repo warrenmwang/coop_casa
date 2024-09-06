@@ -6,6 +6,8 @@ import UpdatePropertyManager from "../../form/UpdatePropertyManager";
 import CreateCommunityForm from "../../form/CreateCommunityForm";
 import UpdateCommunityManager from "../../form/UpdateCommunityManager";
 import AdminDisplayUsers from "./AdminDisplayUsers";
+import UserOwnedPropertiesTable from "../properties/UserOwnedPropertiesTable";
+import UserOwnedCommunitiesTable from "../communities/UserOwnedCommunitiesTable";
 
 const AdminDashboard: React.FC = () => {
   return (
@@ -23,7 +25,7 @@ const AdminDashboard: React.FC = () => {
             <CreatePropertyForm />
           </Grid>
           <Grid item xs={12} sm={12} md={12} lg={6} style={{ gap: "0 24px" }}>
-            {/* Update Properties / Delete Properties Form */}
+            <UserOwnedPropertiesTable />
             <UpdatePropertyManager />
           </Grid>
           <Grid item xs={12} sm={12} md={12} lg={6} style={{ gap: "0 24px" }}>
@@ -31,7 +33,7 @@ const AdminDashboard: React.FC = () => {
             <CreateCommunityForm />
           </Grid>
           <Grid item xs={12} sm={12} md={12} lg={6} style={{ gap: "0 24px" }}>
-            {/* Update Community Form*/}
+            <UserOwnedCommunitiesTable />
             <UpdateCommunityManager />
           </Grid>
         </Grid>

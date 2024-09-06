@@ -149,3 +149,27 @@ export const apiGetUserRole = async (): Promise<string> => {
     .then((res) => res.data)
     .then((data) => data.role as string);
 };
+
+export const apiGetUserOwnedProperties = async (): Promise<string[]> => {
+  return axios
+    .get(`${apiAccountLink}/properties`, {
+      headers: {
+        Accept: "application/json,",
+      },
+      withCredentials: true,
+    })
+    .then((res) => res.data)
+    .then((data) => data.propertyIDs as string[]);
+};
+
+export const apiGetUserOwnedCommunities = async (): Promise<string[]> => {
+  return axios
+    .get(`${apiAccountLink}/communities`, {
+      headers: {
+        Accept: "application/json,",
+      },
+      withCredentials: true,
+    })
+    .then((res) => res.data)
+    .then((data) => data.communityIDs as string[]);
+};

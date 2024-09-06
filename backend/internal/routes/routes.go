@@ -35,6 +35,7 @@ func NewAccountRouter(s interfaces.Server) http.Handler {
 	r.Delete("/", accountHandlers.DeleteAccountHandler)
 	r.Get("/role", accountHandlers.GetUserRoleHandler)
 	r.Get("/communities", accountHandlers.GetUserOwnedCommunities)
+	r.Get("/properties", accountHandlers.GetUserOwnedProperties)
 	r.Get("/images", accountHandlers.GetUserProfileImages)
 	r.Post("/images", accountHandlers.UpdateUserProfileImages)
 
