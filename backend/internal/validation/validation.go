@@ -9,6 +9,21 @@ import (
 	"github.com/google/uuid"
 )
 
+func ValidateCommunity(community database.CommunityFullInternal) error {
+	// Ensure that admin user id is a userid of the community
+	var flag bool = false
+	for _, userID := range community.CommunityUsers {
+		if userID == community.CommunityDetails.AdminUserID {
+			flag = true
+		}
+	}
+	if !flag {
+		return errors.New("expected admin user id in community users list but is not")
+	}
+
+	return nil
+}
+
 func ValidateCommnityDetails(details database.CommunityDetails) error {
 	if _, err := uuid.Parse(details.CommunityID); err != nil {
 		return errors.New("communityId is not a valid uuid")

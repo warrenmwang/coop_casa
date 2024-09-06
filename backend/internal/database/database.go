@@ -94,6 +94,8 @@ type Service interface {
 	GetUserOwnedCommunities(userId string) ([]string, error)
 	UpdateCommunityDetails(details CommunityDetails) error
 	UpdateCommunityImages(communityId string, images []FileInternal) error
+	UpdateCommunityUsers(communityID string, userIDs []string) error
+	UpdateCommunityProperties(communityID string, propertyIDs []string) error
 	DeleteCommunity(communityId string) error
 	DeleteCommunityUser(communityId, userId string) error
 	DeleteCommunityProperty(communityId, propertyId string) error
@@ -1382,6 +1384,42 @@ func (s *service) UpdateCommunityImages(communityId string, images []FileInterna
 			MimeType:    image.Mimetype,
 			Size:        image.Size,
 			Data:        image.Data,
+		})
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (s *service) UpdateCommunityUsers(communityID string, userIDs []string) error {
+	ctx := context.Background()
+	err := s.db_queries.DeleteCommunityUsers(ctx, communityID)
+	if err != nil {
+		return err
+	}
+	for _, userID := range userIDs {
+		err = s.db_queries.CreateCommunityUser(ctx, sqlc.CreateCommunityUserParams{
+			CommunityID: communityID,
+			UserID:      userID,
+		})
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (s *service) UpdateCommunityProperties(communityID string, propertyIDs []string) error {
+	ctx := context.Background()
+	err := s.db_queries.DeleteCommunityProperties(ctx, communityID)
+	if err != nil {
+		return err
+	}
+	for _, propertyID := range propertyIDs {
+		err = s.db_queries.CreateCommunityProperty(ctx, sqlc.CreateCommunityPropertyParams{
+			CommunityID: communityID,
+			PropertyID:  propertyID,
 		})
 		if err != nil {
 			return err

@@ -43,4 +43,4 @@ const UserProfileCard: React.FC<{ userProfile: UserProfile }> = ({
   );
 };
 
-export default UserProfileCard;
+export default React.memo(UserProfileCard);

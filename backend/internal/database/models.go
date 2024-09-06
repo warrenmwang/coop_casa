@@ -82,6 +82,13 @@ type CommunityFull struct {
 	CommunityProperties []string         `json:"properties"` // property ids
 }
 
+type CommunityFullInternal struct {
+	CommunityDetails    CommunityDetails `json:"details"`
+	CommunityImages     []FileInternal   `json:"images"`
+	CommunityUsers      []string         `json:"users"`      // user ids
+	CommunityProperties []string         `json:"properties"` // property ids
+}
+
 type PublicUserProfileDetails struct {
 	UserID     string   `json:"userId"`
 	FirstName  string   `json:"firstName"`

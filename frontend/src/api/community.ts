@@ -128,9 +128,6 @@ export const apiCreateCommunityProperty = async (
 export const apiUpdateCommunity = async (
   community: Community,
 ): Promise<Response | null> => {
-  // TODO: at creation time, allow adding users and properties
-  // for now they are ignored here.
-
   const details: CommunityDetails = community.details;
   const images: File[] = community.images;
 
@@ -142,6 +139,8 @@ export const apiUpdateCommunity = async (
       formData.append(`image${i}`, images[i]);
     }
   }
+  formData.append("userIDs", JSON.stringify(community.users));
+  formData.append("propertyIDs", JSON.stringify(community.properties));
 
   return axios.put(`${apiCommunitiesLink}/${details.communityId}`, formData, {
     withCredentials: true,

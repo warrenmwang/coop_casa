@@ -58,6 +58,18 @@ func (h *CommunityHandler) GetCommunityHandler(w http.ResponseWriter, r *http.Re
 		utils.RespondWithError(w, 500, err)
 		return
 	}
+	// Do not return nulls!
+	if communityImagesExternal == nil {
+		communityImagesExternal = []database.FileExternal{}
+	}
+	if communityUsers == nil {
+		communityUsers = []string{}
+	}
+	if communityProperties == nil {
+		communityProperties = []string{}
+	}
+
+	// Return completed community
 	communityFull := database.CommunityFull{
 		CommunityDetails:    communityDetails,
 		CommunityImages:     communityImagesExternal,
@@ -398,6 +410,38 @@ func (h *CommunityHandler) UpdateCommunitiesHandler(w http.ResponseWriter, r *ht
 		})
 	}
 
+	// Get user ids
+	userIDsRaw := r.FormValue("userIDs")
+	var userIDs []string
+	err = json.Unmarshal([]byte(userIDsRaw), &userIDs)
+	if err != nil {
+		utils.RespondWithError(w, 500, err)
+		return
+	}
+
+	// Get property ids
+	propertyIDsRaw := r.FormValue("propertyIDs")
+	var propertyIDs []string
+	err = json.Unmarshal([]byte(propertyIDsRaw), &propertyIDs)
+	if err != nil {
+		utils.RespondWithError(w, 500, err)
+		return
+	}
+
+	// Validate community as a whole before committing changes to db
+	community := database.CommunityFullInternal{
+		CommunityDetails:    communityDetails,
+		CommunityImages:     images,
+		CommunityUsers:      userIDs,
+		CommunityProperties: propertyIDs,
+	}
+	err = validation.ValidateCommunity(community)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	// Commit changes to community to DB
 	// Update community details and images
 	err = h.server.DB().UpdateCommunityDetails(communityDetails)
 	if err != nil {
@@ -407,6 +451,18 @@ func (h *CommunityHandler) UpdateCommunitiesHandler(w http.ResponseWriter, r *ht
 	err = h.server.DB().UpdateCommunityImages(communityDetails.CommunityID, images)
 	if err != nil {
 		utils.RespondWithError(w, 500, err)
+		return
+	}
+
+	// Update community's list of users and properties
+	err = h.server.DB().UpdateCommunityUsers(communityDetails.CommunityID, userIDs)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
+		return
+	}
+	err = h.server.DB().UpdateCommunityProperties(communityDetails.CommunityID, propertyIDs)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 

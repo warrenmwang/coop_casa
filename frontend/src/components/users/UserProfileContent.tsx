@@ -47,6 +47,7 @@ const UserProfileContent: React.FC<{ userProfile: UserProfile }> = ({
         {/* Cost, Address, core property details */}
         <div id="transition-modal-title">
           <div className="text-3xl font-bold">{`${userProfile.details.firstName} ${userProfile.details.lastName}, ${userProfile.details.ageInYears}`}</div>
+          <div className="text-2xl">Gender: {userProfile.details.gender}</div>
           <div className="text-2xl">
             Location: {userProfile.details.location}
           </div>

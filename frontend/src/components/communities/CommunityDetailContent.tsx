@@ -52,6 +52,11 @@ const CommunityDetailContent: React.FC<{ community: Community }> = ({
 
       {/* Community Properties' Listings */}
       <CommunityPropertiesSection propertyIDs={community.properties} />
+
+      {/* community id */}
+      <p className="text-sm pt-5">
+        Community ID: {community.details.communityId}{" "}
+      </p>
     </Box>
   );
 };

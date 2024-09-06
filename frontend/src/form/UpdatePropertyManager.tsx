@@ -114,18 +114,10 @@ const UpdatePropertyManager: React.FC = () => {
             {property === null && (
               <SubmitButton isSubmitting={getPropertyDetailsIsSubmitting} />
             )}
-            <button
-              id="clear"
-              className="bg-gray-500 hover:bg-gray-600 text-white rounded p-3"
-              onClick={clearForm}
-            >
+            <button id="clear" className="button__gray" onClick={clearForm}>
               Clear Form
             </button>
-            <button
-              id="delete"
-              className="bg-red-500 hover:bg-red-600 rounded p-3"
-              onClick={handleDelete}
-            >
+            <button id="delete" className="button__red" onClick={handleDelete}>
               Delete Property
             </button>
           </div>

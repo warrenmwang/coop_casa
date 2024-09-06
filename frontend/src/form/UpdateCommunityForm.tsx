@@ -10,6 +10,16 @@ import { apiUpdateCommunity } from "../api/community";
 import { OrderedFile, Community, CommunityDetails } from "../types/Types";
 import { toast } from "react-toastify";
 import { useMutation } from "@tanstack/react-query";
+import { useGetUserProfiles } from "../hooks/users";
+import { useGetProperties } from "../hooks/properties";
+import UserProfileCard from "../components/users/UserProfileCard";
+import PropertyCard from "../components/properties/PropertyCard";
+import {
+  constructAddressString,
+  costNumsToPresentableString,
+} from "../utils/property";
+import FormButton from "../components/buttons/FormButton";
+import "../styles/button.css";
 
 const UpdateCommunityForm: React.FC<{
   community: Community;
@@ -18,17 +28,29 @@ const UpdateCommunityForm: React.FC<{
   // Initialize the update form with the current community object's values
   // that can be updated here.
 
+  // local states of community object
+  // yes decoupling server state and local state of same thing is kind of
+  // awkward, but this allows us to temporary discard changes
+  // that a user could be making to the community object
   const [formDetails, setFormDetails] = useState<CommunityDetails>(
     community.details,
   );
   const [formImages, setFormImages] = useState<OrderedFile[]>(
     fileArray2OrderedFileArray(community.images),
   );
+  const [users, setUsers] = useState<string[]>(community.users);
+  const [properties, setProperties] = useState<string[]>(community.properties);
+
   const [isChanged, setIsChanged] = useState(false);
   const [errors, setMyMap] = useState<Map<string, boolean>>(
     new Map<string, boolean>(),
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [userIDInput, setUserIDInput] = useState<string>("");
+  const [propertyIDInput, setPropertyIDInput] = useState<string>("");
+
+  const userPublicProfileQueries = useGetUserProfiles(community.users);
+  const propertiesQueries = useGetProperties(community.properties);
 
   const {
     mutate: mutateUpdate,
@@ -48,9 +70,79 @@ const UpdateCommunityForm: React.FC<{
     });
   };
 
+  const handleUserIDInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const value = e.target.value;
+    if (value.trim()) {
+      setUserIDInput(value);
+    }
+  };
+
+  const handleAddUser = () => {
+    if (users.findIndex((x) => x === userIDInput) !== -1) {
+      toast.info(
+        "User is either already in the community or has been staged to be added.",
+      );
+      return;
+    }
+    setUsers([...users, userIDInput]);
+    setIsChanged(true);
+  };
+
+  const handleRemoveUser = () => {
+    if (users.findIndex((x) => x === userIDInput) === -1) {
+      toast.error(
+        "User is already not a member of the community or has been staged to be removed.",
+      );
+      return;
+    }
+    setUsers([...users.filter((x) => x !== userIDInput)]);
+    setIsChanged(true);
+  };
+
+  const handleResetUserIDInput = () => {
+    setUserIDInput("");
+  };
+
+  const handleAddProperty = () => {
+    if (properties.findIndex((x) => x === propertyIDInput) !== -1) {
+      toast.info(
+        "Property is either already in the community or has been staged to be added.",
+      );
+      return;
+    }
+    setProperties([...properties, propertyIDInput]);
+    setIsChanged(true);
+  };
+
+  const handleRemoveProperty = () => {
+    if (properties.findIndex((x) => x === propertyIDInput) === -1) {
+      toast.error(
+        "Property is already not a member of the community or has been staged to be removed.",
+      );
+      return;
+    }
+    setProperties([...properties.filter((x) => x !== propertyIDInput)]);
+    setIsChanged(true);
+  };
+
+  const handlePropertyIDInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const value = e.target.value;
+    if (value.trim()) {
+      setPropertyIDInput(value);
+    }
+  };
+
+  const handleResetPropertyIDInput = () => {
+    setPropertyIDInput("");
+  };
+
   const handleDiscardChanges = () => {
     setFormDetails(community.details);
-    setFormImages(fileArray2OrderedFileArray(community.images)); // This is cursed.
+    setFormImages(fileArray2OrderedFileArray(community.images)); // This is cursed. unfort, priority goes to getting features, not quality code rn...when will i actually come to fix this spaghetti? when i make money.
+    setUsers(community.users);
+    setProperties(community.properties);
     setIsChanged(false);
   };
 
@@ -87,6 +179,8 @@ const UpdateCommunityForm: React.FC<{
           ...prevState,
           details: formDetails,
           images: orderedFileArray2FileArray(formImages),
+          users: users,
+          properties: properties,
         }) as Community,
     );
     setIsSubmitting(true);
@@ -134,6 +228,174 @@ const UpdateCommunityForm: React.FC<{
           classNameCustom="w-full"
         />
       </form>
+      {/* show the users */}
+      <h1>Users</h1>
+      {/* <div className="flex">
+        {userPublicProfileQueries.map((userQuery) => {
+          if (userQuery.data != undefined) {
+            return <UserProfileCard userProfile={userQuery.data} />;
+          }
+          return null;
+        })}
+      </div> */}
+      <table>
+        <thead>
+          <tr>
+            <th className="px-4 py-2 border border-gray-300 text-gray-700 font-semibold">
+              UserID
+            </th>
+            <th className="px-4 py-2 border border-gray-300 text-gray-700 font-semibold">
+              First Name
+            </th>
+            <th className="px-4 py-2 border border-gray-300 text-gray-700 font-semibold">
+              Last Name
+            </th>
+            <th className="px-4 py-2 border border-gray-300 text-gray-700 font-semibold">
+              Age
+            </th>
+            <th className="px-4 py-2 border border-gray-300 text-gray-700 font-semibold">
+              Gender
+            </th>
+            <th className="px-4 py-2 border border-gray-300 text-gray-700 font-semibold">
+              Location
+            </th>
+            <th className="px-4 py-2 border border-gray-300 text-gray-700 font-semibold">
+              Interests
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {userPublicProfileQueries.map((query) => {
+            if (query.data) {
+              return (
+                <tr>
+                  <th>{query.data.details.userId}</th>
+                  <th>{query.data.details.firstName}</th>
+                  <th>{query.data.details.lastName}</th>
+                  <th>{query.data.details.ageInYears}</th>
+                  <th>{query.data.details.gender}</th>
+                  <th>{query.data.details.location}</th>
+                  <th>{query.data.details.interests.join(", ")}</th>
+                </tr>
+              );
+            }
+          })}
+        </tbody>
+      </table>
+      <form className="form__vertical_inputs">
+        <label className="label__text_input_gray">User ID</label>
+        <input
+          type="text"
+          id="community_user_update"
+          placeholder="User ID"
+          value={userIDInput}
+          onChange={handleUserIDInput}
+          className="input__text_gray_box w-full"
+        />
+        <div className="flex gap-3">
+          <button
+            type="button"
+            className="button__green"
+            onClick={handleAddUser}
+          >
+            Add User
+          </button>
+          <button
+            type="button"
+            className="button__red"
+            onClick={handleRemoveUser}
+          >
+            Remove User
+          </button>
+          <FormButton
+            onClick={handleResetUserIDInput}
+            displayText="Clear"
+            className="button__gray"
+          />
+        </div>
+      </form>
+      {/* show the properties */}
+      <h1>Properties</h1>
+      {/* <div className="flex">
+        {propertiesQueries.map((propertyQuery) => {
+          if (propertyQuery.data !== undefined) {
+            return <PropertyCard property={propertyQuery.data} />;
+          }
+          return null;
+        })}
+      </div> */}
+      <table>
+        <thead>
+          <tr>
+            <th className="px-4 py-2 border border-gray-300 text-gray-700 font-semibold">
+              PropertyID
+            </th>
+            <th className="px-4 py-2 border border-gray-300 text-gray-700 font-semibold">
+              Address
+            </th>
+            <th className="px-4 py-2 border border-gray-300 text-gray-700 font-semibold">
+              Cost
+            </th>
+            <th className="px-4 py-2 border border-gray-300 text-gray-700 font-semibold">
+              ListerUserID
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {propertiesQueries.map((query) => {
+            if (query.data) {
+              const addressString = constructAddressString(query.data.details);
+
+              const costString = costNumsToPresentableString(
+                query.data.details.costDollars,
+                query.data.details.costCents,
+              );
+
+              return (
+                <tr>
+                  <th>{query.data.details.propertyId}</th>
+                  <th>{addressString}</th>
+                  <th>{costString}</th>
+                  <th>{query.data.details.listerUserId}</th>
+                </tr>
+              );
+            }
+          })}
+        </tbody>
+      </table>
+      <form className="form__vertical_inputs">
+        <label className="label__text_input_gray">Property ID</label>
+        <input
+          type="text"
+          id="community_user_update"
+          placeholder="Property ID"
+          value={propertyIDInput}
+          onChange={handlePropertyIDInput}
+          className="input__text_gray_box w-full"
+        />
+        <div className="flex gap-3">
+          <button
+            type="button"
+            className="button__green"
+            onClick={handleAddProperty}
+          >
+            Add Property
+          </button>
+          <button
+            type="button"
+            className="button__red"
+            onClick={handleRemoveProperty}
+          >
+            Remove Property
+          </button>
+          <FormButton
+            onClick={handleResetPropertyIDInput}
+            displayText="Clear"
+            className="button__gray"
+          />
+        </div>
+      </form>
+
       <div className="px-3">
         <label className="label__text_input_gray">
           Upload some images of the community. At least 1 image is required.

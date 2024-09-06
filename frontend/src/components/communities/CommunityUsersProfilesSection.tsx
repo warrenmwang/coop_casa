@@ -12,7 +12,10 @@ const CommunityUsersProfilesSection: React.FC<
   return (
     <>
       <div className="text-3xl font-bold">Community Members</div>
-      <div className="flex">{}</div>
+      <div>TODO:</div>
+      <div className="flex">
+        should be some user cards here that let you open a modal
+      </div>
     </>
   );
 };

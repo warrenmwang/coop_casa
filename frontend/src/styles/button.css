@@ -1,0 +1,15 @@
+.button__green {
+  @apply bg-green-500 hover:bg-green-600 text-white p-3 rounded;
+}
+
+.button__red {
+  @apply bg-red-500 hover:bg-red-600 rounded p-3 text-white;
+}
+
+.button__red_1 {
+  @apply mt-4 bg-red-500 text-white p-2 rounded-lg w-3/5 hover:bg-red-600;
+}
+
+.button__gray {
+  @apply bg-gray-500 hover:bg-gray-600 text-white rounded p-3;
+}

@@ -8,6 +8,10 @@ import ShareLinkButton from "../buttons/ShareLinkButton";
 import ListerInfo from "./ListerInfo";
 import { Property } from "../../types/Types";
 import { useNavigate } from "react-router-dom";
+import {
+  constructAddressString,
+  costNumsToPresentableString,
+} from "../../utils/property";
 
 type PropertyDetailContentProps = {
   property: Property;
@@ -26,25 +30,6 @@ const PropertyDetailContent: React.FC<PropertyDetailContentProps> = ({
     rows: 2,
     cols: 4,
   }));
-
-  const costNumsToPresentableString = (
-    costDollars: number,
-    costCents: number,
-  ) => {
-    const start = `${costDollars}`;
-    let res = "";
-    let count = 0;
-    for (let i = start.length - 1; i >= 0; i--) {
-      count++;
-      if (count === 4) {
-        res = `${start[i]},${res}`;
-        count = 1;
-      } else {
-        res = `${start[i]}${res}`;
-      }
-    }
-    return "$" + res + "." + String(costCents).padStart(2, "0");
-  };
 
   const basicInfoConstructor = (property: Property) => {
     return (
@@ -65,10 +50,7 @@ const PropertyDetailContent: React.FC<PropertyDetailContentProps> = ({
     property.details.costDollars,
     property.details.costCents,
   );
-  const addressString =
-    property.details.address2 === ""
-      ? `${property.details.address1}, ${property.details.city}, ${property.details.state} ${property.details.zipcode}, ${property.details.country}`
-      : `${property.details.address1}, ${property.details.address2}, ${property.details.city}, ${property.details.state} ${property.details.zipcode}, ${property.details.country}`;
+  const addressString = constructAddressString(property.details);
 
   const basicInfoElement: JSX.Element = basicInfoConstructor(property);
 
