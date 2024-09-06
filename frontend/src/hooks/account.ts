@@ -3,6 +3,7 @@ import {
   apiAccountGetUserProfileImages,
   apiGetUser,
   apiGetUserAuth,
+  apiGetUserOwnedCommunities,
   apiGetUserRole,
 } from "../api/account";
 import { APIUserReceived } from "../types/Types";
@@ -11,7 +12,10 @@ import {
   userAuthKey,
   userRoleKey,
   userDetailsKey,
+  userPropertiesKey,
+  userCommunitiesKey,
 } from "../reactQueryKeys";
+import { apiGetUserOwnedProperties } from "../api/account";
 
 export const useGetUserAccountDetails = (): UseQueryResult<
   APIUserReceived,
@@ -44,5 +48,19 @@ export const useGetAccountUserProfileImages = (): UseQueryResult<
   return useQuery({
     queryKey: userImagesKey,
     queryFn: apiAccountGetUserProfileImages,
+  });
+};
+
+export const useGetUserOwnedPropertiesIDs = () => {
+  return useQuery({
+    queryKey: userPropertiesKey,
+    queryFn: apiGetUserOwnedProperties,
+  });
+};
+
+export const useGetUserOwnedCommunitiesIDs = () => {
+  return useQuery({
+    queryKey: userCommunitiesKey,
+    queryFn: apiGetUserOwnedCommunities,
   });
 };

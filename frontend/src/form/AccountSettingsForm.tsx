@@ -27,6 +27,7 @@ import MultipleImageUploader from "../input/MultipleImageUploader";
 import {
   useGetAccountUserProfileImages,
   useGetUserAccountDetails,
+  useGetUserAccountRole,
 } from "../hooks/account";
 import { userAccountKey } from "../reactQueryKeys";
 
@@ -40,6 +41,7 @@ const AccountSettingsForm: React.FC = () => {
   const [formProfileImages, setFormProfileImages] = useState<OrderedFile[]>([]);
 
   // Get user account information
+  const roleQuery = useGetUserAccountRole();
   const userQuery = useGetUserAccountDetails();
   const userProfileImagesQuery = useGetAccountUserProfileImages();
   const queryClient = useQueryClient();
@@ -135,18 +137,31 @@ const AccountSettingsForm: React.FC = () => {
   }, [userQuery.status, userProfileImagesQuery.status]);
 
   const ready: boolean =
-    userQuery.isFetched && userProfileImagesQuery.isFetched;
+    roleQuery.isFetched &&
+    userQuery.isFetched &&
+    userProfileImagesQuery.isFetched;
 
   return (
     <>
-      {ready && userQuery.isError && (
-        <FetchErrorText>
-          Sorry, we couldn{"'"}t fetch your data at this moment. Please try
-          again later.
-        </FetchErrorText>
-      )}
+      {ready &&
+        (userQuery.isError ||
+          userProfileImagesQuery.isError ||
+          roleQuery.isError) && (
+          <FetchErrorText>
+            Sorry, we couldn{"'"}t fetch your data at this moment. Please try
+            again later.
+          </FetchErrorText>
+        )}
       {ready && userQuery.isSuccess && (
         <form className="form__vertical_inputs">
+          {/* User Role and ID -- obviously not allowed to change, just displaying it! */}
+          <div className="input__container ">
+            <h1 className="label__text_input_gray">
+              User Role:{roleQuery.data as string}
+            </h1>
+            <h1 className="label__text_input_gray">User ID: {user.userId}</h1>
+          </div>
+
           {/* First Name */}
           <TextInput
             setFormData={textInputSetFormData}

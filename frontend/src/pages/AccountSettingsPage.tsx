@@ -10,7 +10,7 @@ import TextSkeleton from "../skeleton/TextSkeleton";
 import axios, { AxiosError } from "axios";
 import { toast } from "react-toastify";
 import "../styles/contentBody.css";
-import { useGetUserAccountAuth, useGetUserAccountRole } from "../hooks/account";
+import { useGetUserAccountAuth } from "../hooks/account";
 
 // Authenticated Endpoint
 const AccountSettingsPage: React.FC = () => {
@@ -18,7 +18,6 @@ const AccountSettingsPage: React.FC = () => {
   const navigate = useNavigate();
 
   const authQuery = useGetUserAccountAuth();
-  const roleQuery = useGetUserAccountRole();
 
   const queryClient = useQueryClient();
   const mutation = useMutation({
@@ -40,11 +39,6 @@ const AccountSettingsPage: React.FC = () => {
     },
   });
 
-  let userRole: string = "";
-  if (roleQuery.status === "success") {
-    userRole = roleQuery.data;
-  }
-
   let authenticated: boolean = false;
   if (authQuery.status === "success") {
     authenticated = authQuery.data as boolean;
@@ -54,7 +48,7 @@ const AccountSettingsPage: React.FC = () => {
     navigate(homePageLink);
   }
 
-  const ready: boolean = authQuery.isFetched && roleQuery.isFetched;
+  const ready: boolean = authQuery.isFetched;
   if (!ready) {
     return <TextSkeleton />;
   }
@@ -63,7 +57,7 @@ const AccountSettingsPage: React.FC = () => {
     <div className="content-body">
       <Title
         title="Account Settings"
-        description={`All your account information in one place. Your account role is "${userRole}"`}
+        description="All your account information in one place."
       ></Title>
 
       <div className="justify-center items-center mx-auto">

@@ -1082,7 +1082,13 @@ func (s *service) GetTotalCountProperties() (int64, error) {
 
 func (s *service) GetListerOwnedProperties(userID string) ([]string, error) {
 	ctx := context.Background()
-	propertyIDs, err := s.db_queries.GetUserOwnedProperties(ctx, userID)
+	// Encrypt user id to search
+	encryptedUserID, err := utils.EncryptString(userID, s.db_encrypt_key)
+	if err != nil {
+		return []string{}, err
+	}
+
+	propertyIDs, err := s.db_queries.GetUserOwnedProperties(ctx, encryptedUserID)
 	if err != nil {
 		return []string{}, err
 	}

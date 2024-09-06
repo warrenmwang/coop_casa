@@ -280,6 +280,10 @@ func (h *AccountHandler) GetUserOwnedProperties(w http.ResponseWriter, r *http.R
 		utils.RespondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
+	// Do not return null!
+	if propertyIDs == nil {
+		propertyIDs = []string{}
+	}
 
 	// Return the propertyIDs
 	utils.RespondWithJSON(w, http.StatusOK, struct {

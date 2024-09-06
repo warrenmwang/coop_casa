@@ -2,6 +2,8 @@
 export const userAccountKey = ["user", "account"];
 export const userDetailsKey = ["user", "account", "details"];
 export const userImagesKey = ["user", "account", "details", "images"];
+export const userPropertiesKey = ["user", "properties"];
+export const userCommunitiesKey = ["user", "communities"];
 
 export const userAuthKey = ["user", "account", "auth"];
 export const userRoleKey = ["user", "account", "role"];
