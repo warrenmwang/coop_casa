@@ -20,6 +20,7 @@ import {
 } from "../utils/property";
 import FormButton from "../components/buttons/FormButton";
 import "../styles/button.css";
+import axios, { AxiosError } from "axios";
 
 const UpdateCommunityForm: React.FC<{
   community: Community;
@@ -32,14 +33,16 @@ const UpdateCommunityForm: React.FC<{
   // yes decoupling server state and local state of same thing is kind of
   // awkward, but this allows us to temporary discard changes
   // that a user could be making to the community object
-  const [formDetails, setFormDetails] = useState<CommunityDetails>(
-    community.details,
-  );
-  const [formImages, setFormImages] = useState<OrderedFile[]>(
-    fileArray2OrderedFileArray(community.images),
-  );
-  const [users, setUsers] = useState<string[]>(community.users);
-  const [properties, setProperties] = useState<string[]>(community.properties);
+  const [formDetails, setFormDetails] = useState<CommunityDetails>({
+    ...community.details,
+  });
+  const [formImages, setFormImages] = useState<OrderedFile[]>([
+    ...fileArray2OrderedFileArray(community.images),
+  ]);
+  const [users, setUsers] = useState<string[]>([...community.users]);
+  const [properties, setProperties] = useState<string[]>([
+    ...community.properties,
+  ]);
 
   const [isChanged, setIsChanged] = useState(false);
   const [errors, setMyMap] = useState<Map<string, boolean>>(
@@ -52,14 +55,25 @@ const UpdateCommunityForm: React.FC<{
   const userPublicProfileQueries = useGetUserProfiles(community.users);
   const propertiesQueries = useGetProperties(community.properties);
 
-  const {
-    mutate: mutateUpdate,
-    isPending: isPendingUpdate,
-    isSuccess: isSuccessUpdate,
-    isError: isErrorUpdate,
-    error: errorUpdate,
-  } = useMutation({
+  const { mutate: mutateUpdate } = useMutation({
     mutationFn: (community: Community) => apiUpdateCommunity(community),
+    onSuccess: () => {
+      setFormDetails({ ...community.details });
+      setFormImages([...fileArray2OrderedFileArray(community.images)]);
+      setUsers([...community.users]);
+      setProperties([...community.properties]);
+      setIsChanged(false);
+      setIsSubmitting(false);
+      toast.success("Community updated.");
+    },
+    onError: (error: Error | AxiosError) => {
+      let errMsg: string = error.message;
+      if (axios.isAxiosError(error)) {
+        errMsg = `${(error as AxiosError).response?.data}`;
+      }
+      toast.error(`Failed to update because: ${errMsg}`);
+      setIsSubmitting(false);
+    },
   });
 
   const setErrors = (key: string, value: boolean) => {
@@ -72,13 +86,19 @@ const UpdateCommunityForm: React.FC<{
 
   const handleUserIDInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
-    const value = e.target.value;
-    if (value.trim()) {
-      setUserIDInput(value);
-    }
+    setUserIDInput(e.target.value.trim());
+  };
+
+  const handlePropertyIDInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    setPropertyIDInput(e.target.value.trim());
   };
 
   const handleAddUser = () => {
+    if (userIDInput.length === 0) {
+      toast.info("Input contains no substance (empty or just whitespace).");
+      return;
+    }
     if (users.findIndex((x) => x === userIDInput) !== -1) {
       toast.info(
         "User is either already in the community or has been staged to be added.",
@@ -87,9 +107,14 @@ const UpdateCommunityForm: React.FC<{
     }
     setUsers([...users, userIDInput]);
     setIsChanged(true);
+    toast.info(`Staged adding user ${userIDInput}`);
   };
 
   const handleRemoveUser = () => {
+    if (userIDInput.length === 0) {
+      toast.info("Input contains no substance (empty or just whitespace).");
+      return;
+    }
     if (users.findIndex((x) => x === userIDInput) === -1) {
       toast.error(
         "User is already not a member of the community or has been staged to be removed.",
@@ -98,6 +123,7 @@ const UpdateCommunityForm: React.FC<{
     }
     setUsers([...users.filter((x) => x !== userIDInput)]);
     setIsChanged(true);
+    toast.info(`Staged removing user ${userIDInput}`);
   };
 
   const handleResetUserIDInput = () => {
@@ -105,6 +131,10 @@ const UpdateCommunityForm: React.FC<{
   };
 
   const handleAddProperty = () => {
+    if (propertyIDInput.length === 0) {
+      toast.info("Input contains no substance (empty or just whitespace).");
+      return;
+    }
     if (properties.findIndex((x) => x === propertyIDInput) !== -1) {
       toast.info(
         "Property is either already in the community or has been staged to be added.",
@@ -113,9 +143,14 @@ const UpdateCommunityForm: React.FC<{
     }
     setProperties([...properties, propertyIDInput]);
     setIsChanged(true);
+    toast.info(`Staged adding property ${propertyIDInput}`);
   };
 
   const handleRemoveProperty = () => {
+    if (propertyIDInput.length === 0) {
+      toast.info("Input contains no substance (empty or just whitespace).");
+      return;
+    }
     if (properties.findIndex((x) => x === propertyIDInput) === -1) {
       toast.error(
         "Property is already not a member of the community or has been staged to be removed.",
@@ -124,14 +159,7 @@ const UpdateCommunityForm: React.FC<{
     }
     setProperties([...properties.filter((x) => x !== propertyIDInput)]);
     setIsChanged(true);
-  };
-
-  const handlePropertyIDInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    e.preventDefault();
-    const value = e.target.value;
-    if (value.trim()) {
-      setPropertyIDInput(value);
-    }
+    toast.info(`Staged removing property ${propertyIDInput}`);
   };
 
   const handleResetPropertyIDInput = () => {
@@ -139,10 +167,10 @@ const UpdateCommunityForm: React.FC<{
   };
 
   const handleDiscardChanges = () => {
-    setFormDetails(community.details);
-    setFormImages(fileArray2OrderedFileArray(community.images)); // This is cursed. unfort, priority goes to getting features, not quality code rn...when will i actually come to fix this spaghetti? when i make money.
-    setUsers(community.users);
-    setProperties(community.properties);
+    setFormDetails({ ...community.details });
+    setFormImages([...fileArray2OrderedFileArray(community.images)]); // This is cursed. unfort, priority goes to getting features, not quality code rn...when will i actually come to fix this spaghetti? when i make money.
+    setUsers([...community.users]);
+    setProperties([...community.properties]);
     setIsChanged(false);
   };
 
@@ -172,6 +200,14 @@ const UpdateCommunityForm: React.FC<{
   };
 
   const handleSaveChanges = async () => {
+    // ensure no errors in the "main" textinput fields
+    for (const key of errors.keys()) {
+      if (errors.get(key)) {
+        toast.error(`Resolve error in field "${key}" first before submitting.`);
+        return;
+      }
+    }
+
     // save community details and images and start submission request.
     setCommunity(
       (prevState) =>
@@ -188,19 +224,7 @@ const UpdateCommunityForm: React.FC<{
 
   useEffect(() => {
     if (isSubmitting) {
-      // ensure no errors
-      for (const key of errors.keys()) {
-        if (errors.get(key)) {
-          setIsSubmitting(false);
-          toast.error(
-            `Resolve error in field "${key}" first before submitting.`,
-          );
-          return;
-        }
-      }
-
       mutateUpdate(community);
-      setIsSubmitting(false);
     }
   }, [isSubmitting]);
 
@@ -429,12 +453,6 @@ const UpdateCommunityForm: React.FC<{
       </div>
 
       <div className="pt-3">
-        {isPendingUpdate && <p>Updating community...</p>}
-        {isSuccessUpdate && <p>Community updated.</p>}
-        {isErrorUpdate && (
-          <p>Failed to update community. Error: {errorUpdate.message}</p>
-        )}
-
         {/* Save / discard buttons */}
         {isChanged && (
           <div className="flex justify-end space-x-4">

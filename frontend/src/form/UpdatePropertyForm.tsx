@@ -8,30 +8,42 @@ import { MAX_PROPERTY_IMGS_ALLOWED } from "../constants";
 import { validateNumber } from "../utils/inputValidation";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
+import axios, { AxiosError } from "axios";
 
 const UpdatePropertyForm: React.FC<{
   property: Property;
   setProperty: React.Dispatch<React.SetStateAction<Property | null>>;
 }> = ({ property, setProperty }) => {
   // ------------- For Updating the property details
-  const [formDetails, setFormDetails] = useState<PropertyDetails>(
-    property.details,
-  );
-  const [formImages, setFormImages] = useState<OrderedFile[]>(property.images);
+  const [formDetails, setFormDetails] = useState<PropertyDetails>({
+    ...property.details,
+  });
+  const [formImages, setFormImages] = useState<OrderedFile[]>([
+    ...property.images,
+  ]);
   const [isChanged, setIsChanged] = useState(false);
   const [errors, setMyMap] = useState<Map<string, boolean>>(
     new Map<string, boolean>(),
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const {
-    mutate: mutateUpdate,
-    isPending: isPendingUpdate,
-    isSuccess: isSuccessUpdate,
-    isError: isErrorUpdate,
-    error: errorUpdate,
-  } = useMutation({
+  const { mutate: mutateUpdate } = useMutation({
     mutationFn: (property: Property) => apiUpdateProperty(property),
+    onSuccess: () => {
+      setFormDetails({ ...property.details });
+      setFormImages([...property.images]);
+      setIsChanged(false);
+      setIsSubmitting(false);
+      toast.success("Property updated.");
+    },
+    onError: (error: Error | AxiosError) => {
+      let errMsg: string = error.message;
+      if (axios.isAxiosError(error)) {
+        errMsg = `${(error as AxiosError).response?.data}`;
+      }
+      toast.error(`Failed to update because: ${errMsg}`);
+      setIsSubmitting(false);
+    },
   });
 
   const setErrors = (key: string, value: boolean) => {
@@ -43,8 +55,8 @@ const UpdatePropertyForm: React.FC<{
   };
 
   const handleDiscardChanges = () => {
-    setFormDetails(property.details);
-    setFormImages(property.images);
+    setFormDetails({ ...property.details });
+    setFormImages([...property.images]);
     setIsChanged(false);
   };
 
@@ -120,9 +132,7 @@ const UpdatePropertyForm: React.FC<{
           return;
         }
       }
-
       mutateUpdate(property);
-      setIsSubmitting(false);
     }
   }, [isSubmitting]);
 
@@ -291,12 +301,6 @@ const UpdatePropertyForm: React.FC<{
       </div>
 
       <div className="pt-3">
-        {isPendingUpdate && <p>Updating property...</p>}
-        {isSuccessUpdate && <p>Property updated.</p>}
-        {isErrorUpdate && (
-          <p>Failed to update property. Error: {errorUpdate.message}</p>
-        )}
-
         {/* Save / discard buttons */}
         {isChanged && (
           <div className="flex justify-end space-x-4">

@@ -1414,10 +1414,16 @@ func (s *service) UpdateCommunityUsers(communityID string, userIDs []string) err
 	if err != nil {
 		return err
 	}
+
 	for _, userID := range userIDs {
+		// Encrypt user id
+		encryptedUserID, err := utils.EncryptString(userID, s.db_encrypt_key)
+		if err != nil {
+			return err
+		}
 		err = s.db_queries.CreateCommunityUser(ctx, sqlc.CreateCommunityUserParams{
 			CommunityID: communityID,
-			UserID:      userID,
+			UserID:      encryptedUserID,
 		})
 		if err != nil {
 			return err
