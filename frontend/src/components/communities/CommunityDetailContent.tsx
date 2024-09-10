@@ -7,8 +7,8 @@ import CustomImageGallery, {
 } from "../CustomImageGallery";
 import { useNavigate } from "react-router-dom";
 import { Community } from "../../types/Types";
-import CommunityUsersProfilesSection from "./CommunityUsersProfilesSection";
-import CommunityPropertiesSection from "./CommunityPropertiesSection";
+import LayoutSectionUsersProfilesWithModal from "../LayoutSectionUsersProfilesWithModal";
+import LayoutSectionPropertiesWithModal from "../LayoutSectionProperiesWithModal";
 
 const CommunityDetailContent: React.FC<{ community: Community }> = ({
   community,
@@ -50,10 +50,10 @@ const CommunityDetailContent: React.FC<{ community: Community }> = ({
           <div className="text-2xl">{community.details.description}</div>
         </div>
         {/* Community Users' Profiles */}
-        <CommunityUsersProfilesSection userIDs={community.users} />
+        <LayoutSectionUsersProfilesWithModal userIDs={community.users} />
 
         {/* Community Properties' Listings */}
-        <CommunityPropertiesSection propertyIDs={community.properties} />
+        <LayoutSectionPropertiesWithModal propertyIDs={community.properties} />
 
         {/* community id */}
         <p className="text-sm pt-5">

@@ -1,15 +1,15 @@
 import * as React from "react";
-import { useGetProperties } from "../../hooks/properties";
-import { Property } from "../../types/Types";
-import PropertyCard from "../properties/PropertyCard";
-import Modal from "../Modal";
+import { useGetProperties } from "../hooks/properties";
+import { Property } from "../types/Types";
+import PropertyCard from "./properties/PropertyCard";
+import Modal from "./Modal";
 
-type CommunityPropertiesSectionProps = {
+type LayoutSectionPropertiesWithModalProps = {
   propertyIDs: string[];
 };
-const CommunityPropertiesSection: React.FC<CommunityPropertiesSectionProps> = ({
-  propertyIDs,
-}) => {
+const LayoutSectionPropertiesWithModal: React.FC<
+  LayoutSectionPropertiesWithModalProps
+> = ({ propertyIDs }) => {
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
   const propertyQueries = useGetProperties(propertyIDs);
 
@@ -49,4 +49,4 @@ const CommunityPropertiesSection: React.FC<CommunityPropertiesSectionProps> = ({
   );
 };
 
-export default CommunityPropertiesSection;
+export default LayoutSectionPropertiesWithModal;

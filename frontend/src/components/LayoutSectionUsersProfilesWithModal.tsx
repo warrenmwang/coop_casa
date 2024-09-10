@@ -1,14 +1,15 @@
 import * as React from "react";
-import { useGetUserProfiles } from "../../hooks/users";
-import UserProfileCard from "../users/UserProfileCard";
-import { UserProfile } from "../../types/Types";
-import Modal from "../Modal";
+import { useGetUserProfiles } from "../hooks/users";
+import UserProfileCard from "./users/UserProfileCard";
+import { UserProfile } from "../types/Types";
+import Modal from "./Modal";
 
-type CommunityUsersProfilesSectionProps = {
+type LayoutSectionUsersProfilesWithModalProps = {
   userIDs: string[];
 };
-const CommunityUsersProfilesSection: React.FC<
-  CommunityUsersProfilesSectionProps
+
+const LayoutSectionUsersProfilesWithModal: React.FC<
+  LayoutSectionUsersProfilesWithModalProps
 > = ({ userIDs }) => {
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
   const userProfileQueries = useGetUserProfiles(userIDs);
@@ -22,7 +23,7 @@ const CommunityUsersProfilesSection: React.FC<
   return (
     <>
       <div className="text-3xl font-bold">Community Members</div>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 flex-wrap">
         {userProfiles.slice(0, 3).map((value) => {
           return (
             <UserProfileCard key={value.details.userId} userProfile={value} />
@@ -49,4 +50,4 @@ const CommunityUsersProfilesSection: React.FC<
   );
 };
 
-export default CommunityUsersProfilesSection;
+export default LayoutSectionUsersProfilesWithModal;
