@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Property } from "../../types/Types";
 import { Card, CardContent, CardMedia } from "@mui/material";
 import { propertiesPageLink } from "../../urls";
+import "../../styles/mui.css";
 
 interface PropertyCardProps {
   property: Property;
@@ -63,11 +64,11 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
   return (
     <>
       <Link to={propertyDetailPage}>
-        <Card sx={{ maxWidth: 400, maxHeight: 600 }}>
+        <Card className="mui__card">
           <CardMedia
-            sx={{ width: 400, height: 300 }}
             image={cardImage}
             title="default first image"
+            className="mui__card_media"
           />
           <CardContent>
             <div className="text-3xl font-bold">{costString}</div>

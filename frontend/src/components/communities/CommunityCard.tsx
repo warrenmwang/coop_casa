@@ -3,6 +3,7 @@ import { Community } from "../../types/Types";
 import { communitiesPageLink } from "../../urls";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardMedia } from "@mui/material";
+import "../../styles/mui.css";
 
 type CommunityCardProps = {
   community: Community;
@@ -19,12 +20,8 @@ const CommunityCard: React.FC<CommunityCardProps> = ({ community }) => {
   return (
     <>
       <Link to={communityDetailPage}>
-        <Card sx={{ maxWidth: 400, maxHeight: 600 }}>
-          <CardMedia
-            sx={{ width: 400, height: 300 }}
-            image={cardImage}
-            title=""
-          />
+        <Card className="mui__card">
+          <CardMedia image={cardImage} title="" className="mui__card_media" />
           <CardContent>
             <div className="text-3xl font-bold">{community.details.name}</div>
             <div className="text-2xl">{community.details.description}</div>

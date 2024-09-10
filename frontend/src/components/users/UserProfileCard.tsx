@@ -4,6 +4,7 @@ import { usersPageLink } from "../../urls";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardMedia } from "@mui/material";
 import DefaultUserProfileIcon from "../../icons/DefaultUserProfile/DefaultUserProfileIcon";
+import "../../styles/mui.css";
 
 const UserProfileCard: React.FC<{ userProfile: UserProfile }> = ({
   userProfile,
@@ -26,8 +27,8 @@ const UserProfileCard: React.FC<{ userProfile: UserProfile }> = ({
   return (
     <>
       <Link to={userProfileDetailPage}>
-        <Card sx={{ maxWidth: 400, maxHeight: 600 }}>
-          <CardMedia sx={{ width: 400, height: 300 }} title="">
+        <Card className="mui__card">
+          <CardMedia title="" className="mui__card_media">
             {cardImage}
           </CardMedia>
           <CardContent className="bg-white bg-opacity-40 backdrop-blur-xl">

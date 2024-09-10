@@ -1,0 +1,13 @@
+.mui__card {
+  max-width: 400px;
+  max-height: 600px;
+}
+
+.mui__card:hover {
+  @apply shadow-2xl bg-slate-300;
+}
+
+.mui__card_media {
+  width: 400px;
+  height: 300px;
+}
