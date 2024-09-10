@@ -8,6 +8,8 @@ import CustomImageGallery, {
   ImageGalleryItemsInput,
 } from "../CustomImageGallery";
 import defaultProfileImage from "../../assets/profile.jpg";
+import LayoutSectionCommunitiesWithModal from "../LayoutSectionCommunitiesWithModal";
+import LayoutSectionPropertiesWithModal from "../LayoutSectionProperiesWithModal";
 
 const UserProfileContent: React.FC<{ userProfile: UserProfile }> = ({
   userProfile,
@@ -42,6 +44,7 @@ const UserProfileContent: React.FC<{ userProfile: UserProfile }> = ({
           </button>
           <ShareLinkButton />
         </div>
+
         {/* Images */}
         <CustomImageGallery imageData={imageData} />
         {/* Cost, Address, core property details */}
@@ -58,6 +61,20 @@ const UserProfileContent: React.FC<{ userProfile: UserProfile }> = ({
             User ID: {userProfile.details.userId}
           </div>
         </div>
+
+        {/* User's communities */}
+        {userProfile.communityIDs.length > 0 && (
+          <LayoutSectionCommunitiesWithModal
+            communityIDs={userProfile.communityIDs}
+          />
+        )}
+
+        {/* User's properties */}
+        {userProfile.propertyIDs.length > 0 && (
+          <LayoutSectionPropertiesWithModal
+            propertyIDs={userProfile.propertyIDs}
+          />
+        )}
       </Box>
     </>
   );

@@ -43,6 +43,14 @@ type UsersSavedProperty struct {
 	CreatedAt  time.Time `json:"createdAt"`
 }
 
+type User struct {
+	UserDetails       UserDetails  `json:"userDetails"`
+	UserAvatar        FileExternal `json:"avatarImageB64"`
+	LikedCommunityIDs []string     `json:"likedCommunityIDs"`
+	LikedPropertyIDs  []string     `json:"likedPropertyIDs"`
+	LikedUserIDs      []string     `json:"likedUserIDs"`
+}
+
 type PropertyDetails struct {
 	PropertyID        string `json:"propertyId"`
 	ListerUserID      string `json:"listerUserId"`
@@ -100,6 +108,8 @@ type PublicUserProfileDetails struct {
 }
 
 type PublicUserProfile struct {
-	Details PublicUserProfileDetails `json:"details"`
-	Images  []FileExternal           `json:"images"`
+	Details      PublicUserProfileDetails `json:"details"`
+	Images       []FileExternal           `json:"images"`
+	CommunityIDs []string                 `json:"communityIDs"`
+	PropertyIDs  []string                 `json:"propertyIDs"`
 }

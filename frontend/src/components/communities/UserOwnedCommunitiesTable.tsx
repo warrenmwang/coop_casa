@@ -5,6 +5,9 @@ import FetchErrorText from "../FetchErrorText";
 import { useGetCommunities } from "../../hooks/communities";
 
 const Table: React.FC<{ communityIDs: string[] }> = ({ communityIDs }) => {
+  if (communityIDs === null) {
+    communityIDs = [];
+  }
   const queries = useGetCommunities(communityIDs);
 
   return (

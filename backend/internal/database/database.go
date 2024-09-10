@@ -560,6 +560,11 @@ func (s *service) GetUserSavedProperties(userID string) ([]string, error) {
 		decryptedPropertyIDs = append(decryptedPropertyIDs, propertyID_D)
 	}
 
+	// return an actual empty list, instead of nil
+	if decryptedPropertyIDs == nil {
+		decryptedPropertyIDs = []string{}
+	}
+
 	// Return the decrypted property ids
 	return decryptedPropertyIDs, nil
 }
@@ -589,6 +594,11 @@ func (s *service) GetUserSavedCommunities(userID string) ([]string, error) {
 		decryptedCommunityIDs = append(decryptedCommunityIDs, communityID_D)
 	}
 
+	// return an actual empty list, instead of nil
+	if decryptedCommunityIDs == nil {
+		decryptedCommunityIDs = []string{}
+	}
+
 	return decryptedCommunityIDs, nil
 }
 
@@ -615,6 +625,11 @@ func (s *service) GetUserSavedUsers(userID string) ([]string, error) {
 			return []string{}, err
 		}
 		decryptedUserIDs = append(decryptedUserIDs, userID_D)
+	}
+
+	// return an actual empty list, instead of nil
+	if decryptedUserIDs == nil {
+		decryptedUserIDs = []string{}
 	}
 
 	return decryptedUserIDs, nil
@@ -1603,6 +1618,25 @@ func (s *service) GetPublicUserProfile(userID string) (PublicUserProfile, error)
 		})
 	}
 
+	// User's liked communities and properties
+	communityIDs, err := s.GetUserSavedCommunities(plainTextUserID)
+	if err != nil {
+		return PublicUserProfile{}, err
+	}
+
+	if communityIDs == nil {
+		communityIDs = []string{}
+	}
+
+	propertyIDs, err := s.GetUserSavedProperties(plainTextUserID)
+	if err != nil {
+		return PublicUserProfile{}, err
+	}
+
+	if propertyIDs == nil {
+		propertyIDs = []string{}
+	}
+
 	userProfile := PublicUserProfile{
 		Details: PublicUserProfileDetails{
 			UserID:     userDetails.UserID,
@@ -1613,7 +1647,9 @@ func (s *service) GetPublicUserProfile(userID string) (PublicUserProfile, error)
 			Location:   userDetails.Location,
 			Interests:  userDetails.Interests,
 		},
-		Images: userImages,
+		Images:       userImages,
+		CommunityIDs: communityIDs,
+		PropertyIDs:  propertyIDs,
 	}
 
 	return userProfile, nil

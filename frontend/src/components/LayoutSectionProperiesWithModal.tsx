@@ -7,6 +7,7 @@ import Modal from "./Modal";
 type LayoutSectionPropertiesWithModalProps = {
   propertyIDs: string[];
 };
+
 const LayoutSectionPropertiesWithModal: React.FC<
   LayoutSectionPropertiesWithModalProps
 > = ({ propertyIDs }) => {

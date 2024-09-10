@@ -9,6 +9,9 @@ import {
 } from "../../utils/property";
 
 const Table: React.FC<{ propertyIDs: string[] }> = ({ propertyIDs }) => {
+  if (propertyIDs === null) {
+    propertyIDs = [];
+  }
   const queries = useGetProperties(propertyIDs);
 
   return (

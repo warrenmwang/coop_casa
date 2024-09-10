@@ -56,6 +56,8 @@ export const apiGetUserProfile = async (
       return {
         details: data.details,
         images: imagesTmp,
+        communityIDs: data.communityIDs,
+        propertyIDs: data.propertyIDs,
       } as UserProfile;
     });
 };
