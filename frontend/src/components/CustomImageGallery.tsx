@@ -51,7 +51,13 @@ const CustomImageGallery: React.FC<{ imageData: ImageGalleryItemsInput[] }> = ({
     foo();
   }, []);
 
-  return <ImageGallery items={imagesReadyForGallery} showNav={true} />;
+  return (
+    <ImageGallery
+      items={imagesReadyForGallery}
+      showNav={true}
+      additionalClass="z-10"
+    />
+  );
 };
 
 export default CustomImageGallery;
