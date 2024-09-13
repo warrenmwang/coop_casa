@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from "react";
 import { UserProfile } from "../../types/Types";
 import { Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
@@ -10,6 +10,9 @@ import CustomImageGallery, {
 import defaultProfileImage from "../../assets/profile.jpg";
 import LayoutSectionCommunitiesWithModal from "../LayoutSectionCommunitiesWithModal";
 import LayoutSectionPropertiesWithModal from "../LayoutSectionProperiesWithModal";
+import LikeButton from "../buttons/LikeButton";
+import { useGetUserAccountDetails } from "../../hooks/account";
+import TextSkeleton from "../../skeleton/TextSkeleton";
 
 const UserProfileContent: React.FC<{ userProfile: UserProfile }> = ({
   userProfile,
@@ -24,6 +27,20 @@ const UserProfileContent: React.FC<{ userProfile: UserProfile }> = ({
     rows: 2,
     cols: 4,
   }));
+
+  const userQuery = useGetUserAccountDetails();
+  if (userQuery.status === "pending") {
+    return <TextSkeleton />;
+  }
+
+  // initialize whether or not the user has liked this user...
+  const isLiked: boolean =
+    userQuery.data?.likedUserIDs.includes(userProfile.details.userId) ?? false;
+
+  // TODO: need a mutation as well for updating that the logged in user has liked someone
+  // needs to update 2 state -- local and server side
+
+  // probably should refactor the useMutations first ?
 
   return (
     <>
@@ -43,6 +60,7 @@ const UserProfileContent: React.FC<{ userProfile: UserProfile }> = ({
             Browse User Profiles
           </button>
           <ShareLinkButton />
+          {userQuery.status !== "error" && <LikeButton initState={isLiked} />}
         </div>
 
         {/* Images */}
