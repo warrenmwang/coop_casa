@@ -1,4 +1,5 @@
 // Account
+export const userKey = ["user"];
 export const userAccountKey = ["user", "account"];
 export const userDetailsKey = ["user", "account", "details"];
 export const userImagesKey = ["user", "account", "details", "images"];

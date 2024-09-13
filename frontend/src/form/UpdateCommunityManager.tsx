@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import SubmitButton from "../components/buttons/SubmitButton";
 import { validate as uuidValidate } from "uuid";
-import { apiDeleteCommunity, apiGetCommunity } from "../api/community";
 import { Community } from "../types/Types";
-import { useMutation } from "@tanstack/react-query";
 import "../styles/input.css";
 import { toast } from "react-toastify";
 import UpdateCommunityForm from "./UpdateCommunityForm";
+import { useDeleteCommunity } from "../hooks/communities";
+import axios, { AxiosError } from "axios";
+import { apiGetCommunity } from "../api/community";
 
 const UpdateCommunityManager: React.FC = () => {
   // ------------ For Getting the community details
@@ -15,7 +16,6 @@ const UpdateCommunityManager: React.FC = () => {
   const [communityID, setCommunityID] = useState<string>("");
   const [community, setCommunity] = useState<Community | null>(null);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
-  const [inputChanged, setInputChanged] = useState<boolean>(false);
 
   const getCommunityDetails = (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,15 +28,7 @@ const UpdateCommunityManager: React.FC = () => {
     setGetCommunityDetailsIsSubmitting(true);
   };
 
-  const {
-    mutate: mutateDelete,
-    isPending: isPendingDelete,
-    isSuccess: isSuccessDelete,
-    isError: isErrorDelete,
-    error: errorDelete,
-  } = useMutation({
-    mutationFn: (communityID: string) => apiDeleteCommunity(communityID),
-  });
+  const deleteCommunity = useDeleteCommunity();
 
   const handleDelete = (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,7 +43,6 @@ const UpdateCommunityManager: React.FC = () => {
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
-    setInputChanged(true);
     setCommunityID(e.target.value.trim());
   };
 
@@ -61,6 +52,7 @@ const UpdateCommunityManager: React.FC = () => {
     setCommunity(null);
   };
 
+  // TODO: refactor me to use react query !
   useEffect(() => {
     const foo = async () => {
       // get the community data using the propertID
@@ -79,11 +71,26 @@ const UpdateCommunityManager: React.FC = () => {
 
   useEffect(() => {
     if (isDeleting) {
-      setInputChanged(false);
-      mutateDelete(communityID);
-      setCommunityID("");
-      setCommunity(null);
-      setIsDeleting(false);
+      deleteCommunity.mutate(
+        { communityID },
+        {
+          onSuccess: () => {
+            setCommunityID("");
+            setCommunity(null);
+            toast.success("Deleted community.");
+          },
+          onError: (error: Error | AxiosError) => {
+            let errMsg: string = error.message;
+            if (axios.isAxiosError(error)) {
+              errMsg = `${(error as AxiosError).response?.data}`;
+            }
+            toast.error(`Failed to delete because: ${errMsg}`);
+          },
+          onSettled: () => {
+            setIsDeleting(false);
+          },
+        },
+      );
     }
   }, [isDeleting]);
 
@@ -117,20 +124,17 @@ const UpdateCommunityManager: React.FC = () => {
             <button id="clear" className="button__gray" onClick={clearForm}>
               Clear Form
             </button>
-            <button id="delete" className="button__red" onClick={handleDelete}>
-              Delete Community
+            <button
+              id="delete"
+              className="button__red"
+              onClick={handleDelete}
+              disabled={isDeleting}
+            >
+              {isDeleting ? "Deleting..." : "Delete Community"}
             </button>
           </div>
         </form>
       </div>
-
-      {!inputChanged && isPendingDelete && <p>Deleting community...</p>}
-      {!inputChanged && isSuccessDelete && <p>Community deleted.</p>}
-      {!inputChanged && isErrorDelete && (
-        <p>
-          Couldn{"'"}t delete community. Try again. {errorDelete.message}
-        </p>
-      )}
 
       {community !== null && (
         <UpdateCommunityForm

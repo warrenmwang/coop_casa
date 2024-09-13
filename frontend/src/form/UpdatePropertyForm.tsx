@@ -1,20 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { apiUpdateProperty } from "../api/property";
 import { OrderedFile, Property, PropertyDetails } from "../types/Types";
 import TextInput from "../input/TextInput";
 import MultipleImageUploader from "../input/MultipleImageUploader";
 import { MAX_PROPERTY_IMGS_ALLOWED } from "../constants";
 
 import { validateNumber } from "../utils/inputValidation";
-import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import axios, { AxiosError } from "axios";
+import { useUpdateProperty } from "../hooks/properties";
 
 const UpdatePropertyForm: React.FC<{
   property: Property;
   setProperty: React.Dispatch<React.SetStateAction<Property | null>>;
 }> = ({ property, setProperty }) => {
-  // ------------- For Updating the property details
   const [formDetails, setFormDetails] = useState<PropertyDetails>({
     ...property.details,
   });
@@ -27,24 +25,7 @@ const UpdatePropertyForm: React.FC<{
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { mutate: mutateUpdate } = useMutation({
-    mutationFn: (property: Property) => apiUpdateProperty(property),
-    onSuccess: () => {
-      setFormDetails({ ...property.details });
-      setFormImages([...property.images]);
-      setIsChanged(false);
-      setIsSubmitting(false);
-      toast.success("Property updated.");
-    },
-    onError: (error: Error | AxiosError) => {
-      let errMsg: string = error.message;
-      if (axios.isAxiosError(error)) {
-        errMsg = `${(error as AxiosError).response?.data}`;
-      }
-      toast.error(`Failed to update because: ${errMsg}`);
-      setIsSubmitting(false);
-    },
-  });
+  const updateProperty = useUpdateProperty();
 
   const setErrors = (key: string, value: boolean) => {
     setMyMap((prevMap) => {
@@ -132,7 +113,26 @@ const UpdatePropertyForm: React.FC<{
           return;
         }
       }
-      mutateUpdate(property);
+      updateProperty.mutate(
+        { property },
+        {
+          onSuccess: () => {
+            setFormDetails({ ...property.details });
+            setFormImages([...property.images]);
+            setIsChanged(false);
+            setIsSubmitting(false);
+            toast.success("Property updated.");
+          },
+          onError: (error: Error | AxiosError) => {
+            let errMsg: string = error.message;
+            if (axios.isAxiosError(error)) {
+              errMsg = `${(error as AxiosError).response?.data}`;
+            }
+            toast.error(`Failed to update because: ${errMsg}`);
+            setIsSubmitting(false);
+          },
+        },
+      );
     }
   }, [isSubmitting]);
 

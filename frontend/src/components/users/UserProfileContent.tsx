@@ -40,8 +40,6 @@ const UserProfileContent: React.FC<{ userProfile: UserProfile }> = ({
   // TODO: need a mutation as well for updating that the logged in user has liked someone
   // needs to update 2 state -- local and server side
 
-  // probably should refactor the useMutations first ?
-
   return (
     <>
       <Box className="bg-white p-4 shadow-lg rounded-lg mx-auto w-11/12 md:w-3/5 lg:w-1/2 z-50">

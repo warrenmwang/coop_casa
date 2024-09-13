@@ -2,9 +2,8 @@ import React, { useState } from "react";
 import SubmitButton from "../components/buttons/SubmitButton";
 import "../styles/input.css";
 import { toast } from "react-toastify";
-import { useMutation } from "@tanstack/react-query";
-import { apiAdminUpdateUserRole } from "../api/admin";
 import axios, { AxiosError } from "axios";
+import { useAdminUpdateUserRole } from "../hooks/admin";
 
 const AdminManageUserRoles: React.FC = () => {
   const roleTypes = ["lister", "regular"];
@@ -12,24 +11,7 @@ const AdminManageUserRoles: React.FC = () => {
   const [userID, setUserID] = useState<string>("");
   const [role, setRole] = useState<string>("");
 
-  const mutation = useMutation({
-    mutationKey: ["admin", "userRole", userID],
-    mutationFn: () => apiAdminUpdateUserRole(userID, role),
-    onSuccess: () => {
-      toast.success("User role updated.");
-      setUserID("");
-      setRole("");
-      setIsSubmitting(false);
-    },
-    onError: (error: Error | AxiosError) => {
-      let errMsg: string = error.message;
-      if (axios.isAxiosError(error)) {
-        errMsg = `${(error as AxiosError).response?.data}`;
-      }
-      toast.error(`Failed to update because: ${errMsg}`);
-      setIsSubmitting(false);
-    },
-  });
+  const mutation = useAdminUpdateUserRole();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,7 +29,25 @@ const AdminManageUserRoles: React.FC = () => {
       return;
     }
 
-    mutation.mutate();
+    mutation.mutate(
+      { userID, role },
+      {
+        onSuccess: () => {
+          toast.success("User role updated.");
+          setUserID("");
+          setRole("");
+          setIsSubmitting(false);
+        },
+        onError: (error: Error | AxiosError) => {
+          let errMsg: string = error.message;
+          if (axios.isAxiosError(error)) {
+            errMsg = `${(error as AxiosError).response?.data}`;
+          }
+          toast.error(`Failed to update because: ${errMsg}`);
+          setIsSubmitting(false);
+        },
+      },
+    );
   };
 
   const handleChange = (

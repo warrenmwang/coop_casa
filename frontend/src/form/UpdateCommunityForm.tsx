@@ -6,14 +6,10 @@ import {
   fileArray2OrderedFileArray,
   orderedFileArray2FileArray,
 } from "../utils/utils";
-import { apiUpdateCommunity } from "../api/community";
 import { OrderedFile, Community, CommunityDetails } from "../types/Types";
 import { toast } from "react-toastify";
-import { useMutation } from "@tanstack/react-query";
 import { useGetUserProfiles } from "../hooks/users";
 import { useGetProperties } from "../hooks/properties";
-import UserProfileCard from "../components/users/UserProfileCard";
-import PropertyCard from "../components/properties/PropertyCard";
 import {
   constructAddressString,
   costNumsToPresentableString,
@@ -21,6 +17,7 @@ import {
 import FormButton from "../components/buttons/FormButton";
 import "../styles/button.css";
 import axios, { AxiosError } from "axios";
+import { useUpdateCommunity } from "../hooks/communities";
 
 const UpdateCommunityForm: React.FC<{
   community: Community;
@@ -55,26 +52,7 @@ const UpdateCommunityForm: React.FC<{
   const userPublicProfileQueries = useGetUserProfiles(community.users);
   const propertiesQueries = useGetProperties(community.properties);
 
-  const { mutate: mutateUpdate } = useMutation({
-    mutationFn: (community: Community) => apiUpdateCommunity(community),
-    onSuccess: () => {
-      setFormDetails({ ...community.details });
-      setFormImages([...fileArray2OrderedFileArray(community.images)]);
-      setUsers([...community.users]);
-      setProperties([...community.properties]);
-      setIsChanged(false);
-      setIsSubmitting(false);
-      toast.success("Community updated.");
-    },
-    onError: (error: Error | AxiosError) => {
-      let errMsg: string = error.message;
-      if (axios.isAxiosError(error)) {
-        errMsg = `${(error as AxiosError).response?.data}`;
-      }
-      toast.error(`Failed to update because: ${errMsg}`);
-      setIsSubmitting(false);
-    },
-  });
+  const updateCommunity = useUpdateCommunity();
 
   const setErrors = (key: string, value: boolean) => {
     setMyMap((prevMap) => {
@@ -224,7 +202,28 @@ const UpdateCommunityForm: React.FC<{
 
   useEffect(() => {
     if (isSubmitting) {
-      mutateUpdate(community);
+      updateCommunity.mutate(
+        { community },
+        {
+          onSuccess: () => {
+            setFormDetails({ ...community.details });
+            setFormImages([...fileArray2OrderedFileArray(community.images)]);
+            setUsers([...community.users]);
+            setProperties([...community.properties]);
+            setIsChanged(false);
+            setIsSubmitting(false);
+            toast.success("Community updated.");
+          },
+          onError: (error: Error | AxiosError) => {
+            let errMsg: string = error.message;
+            if (axios.isAxiosError(error)) {
+              errMsg = `${(error as AxiosError).response?.data}`;
+            }
+            toast.error(`Failed to update because: ${errMsg}`);
+            setIsSubmitting(false);
+          },
+        },
+      );
     }
   }, [isSubmitting]);
 

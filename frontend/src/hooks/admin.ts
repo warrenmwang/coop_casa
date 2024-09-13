@@ -1,5 +1,14 @@
-import { useQuery, UseQueryResult } from "@tanstack/react-query";
-import { apiAdminGetUsersDetails, apiAdminGetUsersRoles } from "../api/admin";
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  UseQueryResult,
+} from "@tanstack/react-query";
+import {
+  apiAdminGetUsersDetails,
+  apiAdminGetUsersRoles,
+  apiAdminUpdateUserRole,
+} from "../api/admin";
 import { UserDetails } from "../types/Types";
 import { adminUserDetailsKey, adminUserRolesKey } from "../reactQueryKeys";
 
@@ -15,8 +24,21 @@ export const useAdminGetUserDetails = (
 
 export const useAdminGetUserRoles = (userIDs: string[]) => {
   return useQuery({
-    queryKey: [...adminUserRolesKey, userIDs],
+    queryKey: [...adminUserRolesKey, ...userIDs],
     queryFn: () => apiAdminGetUsersRoles(userIDs),
     enabled: userIDs.length > 0,
+  });
+};
+
+export const useAdminUpdateUserRole = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ userID, role }: { userID: string; role: string }) =>
+      apiAdminUpdateUserRole(userID, role),
+    onSuccess: () => {
+      return queryClient.invalidateQueries({
+        queryKey: [...adminUserRolesKey],
+      });
+    },
   });
 };

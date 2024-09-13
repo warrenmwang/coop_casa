@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { apiCreateNewProperty } from "../api/property";
 import { validateNumber } from "../utils/inputValidation";
 import TextInput from "../input/TextInput";
 import SubmitButton from "../components/buttons/SubmitButton";
@@ -13,7 +12,6 @@ import {
   PropertyDetails,
   UserDetails,
 } from "../types/Types";
-import { useMutation } from "@tanstack/react-query";
 import TextSkeleton from "../skeleton/TextSkeleton";
 import "../styles/font.css";
 import "../styles/input.css";
@@ -21,6 +19,7 @@ import "../styles/form.css";
 import { toast } from "react-toastify";
 import axios, { AxiosError } from "axios";
 import { useGetUserAccountDetails } from "../hooks/account";
+import { useCreateProperty } from "../hooks/properties";
 
 type TextFieldsConstruct = {
   id: string;
@@ -66,9 +65,7 @@ const CreatePropertyForm: React.FC = () => {
   const [images, setImages] = useState<OrderedFile[]>([]);
 
   const userQuery = useGetUserAccountDetails();
-  const { mutate: mutateCreate } = useMutation({
-    mutationFn: (property: Property) => apiCreateNewProperty(property),
-  });
+  const createProperty = useCreateProperty();
 
   // for user inputs
   const propertyRequiredFields: string[] = [
@@ -333,21 +330,24 @@ const CreatePropertyForm: React.FC = () => {
       };
 
       // Send data to backend
-      mutateCreate(property, {
-        onSuccess: () => {
-          setPropertyDetails(EmptyPropertyDetails);
-          setImages([]);
-          setIsSubmitting(false);
-          toast.success("Property created.");
+      createProperty.mutate(
+        { property },
+        {
+          onSuccess: () => {
+            setPropertyDetails(EmptyPropertyDetails);
+            setImages([]);
+            setIsSubmitting(false);
+            toast.success("Property created.");
+          },
+          onError: (error: Error | AxiosError) => {
+            let errMsg: string = error.message;
+            if (axios.isAxiosError(error)) {
+              errMsg = `${(error as AxiosError).response?.data}`;
+            }
+            toast.error("Could not create property because: " + errMsg);
+          },
         },
-        onError: (error: Error | AxiosError) => {
-          let errMsg: string = error.message;
-          if (axios.isAxiosError(error)) {
-            errMsg = `${(error as AxiosError).response?.data}`;
-          }
-          toast.error("Could not create property because: " + errMsg);
-        },
-      });
+      );
     }
   }, [isSubmitting, propertyDetails]);
 

@@ -1,5 +1,17 @@
-import { useQueries, useQuery, UseQueryResult } from "@tanstack/react-query";
-import { apiGetCommunities, apiGetCommunity } from "../api/community";
+import {
+  useMutation,
+  useQueries,
+  useQuery,
+  useQueryClient,
+  UseQueryResult,
+} from "@tanstack/react-query";
+import {
+  apiCreateCommunity,
+  apiDeleteCommunity,
+  apiGetCommunities,
+  apiGetCommunity,
+  apiUpdateCommunity,
+} from "../api/community";
 import { Community } from "../types/Types";
 import { communitiesKey, communitiesPageKey } from "../reactQueryKeys";
 
@@ -33,5 +45,38 @@ export const useGetCommunity = (
   return useQuery({
     queryKey: [...communitiesKey, communityID],
     queryFn: () => apiGetCommunity(communityID),
+  });
+};
+
+export const useCreateCommunity = () => {
+  return useMutation({
+    mutationFn: ({ community }: { community: Community }) =>
+      apiCreateCommunity(community),
+  });
+};
+
+export const useUpdateCommunity = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ community }: { community: Community }) =>
+      apiUpdateCommunity(community).then(() => community.details.communityId),
+    onSuccess: (communityID: string) => {
+      return queryClient.invalidateQueries({
+        queryKey: [...communitiesKey, communityID],
+      });
+    },
+  });
+};
+
+export const useDeleteCommunity = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ communityID }: { communityID: string }) =>
+      apiDeleteCommunity(communityID).then(() => communityID),
+    onSuccess: (communityID: string) => {
+      return queryClient.invalidateQueries({
+        queryKey: [...communitiesKey, communityID],
+      });
+    },
   });
 };

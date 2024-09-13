@@ -2,15 +2,13 @@ import React, { useState } from "react";
 import Title from "../components/Title";
 import Modal from "../components/Modal";
 import AccountSettingsForm from "../form/AccountSettingsForm";
-import { apiAccountDelete } from "../api/account";
 import { useNavigate } from "react-router-dom";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { homePageLink } from "../urls";
 import TextSkeleton from "../skeleton/TextSkeleton";
 import axios, { AxiosError } from "axios";
 import { toast } from "react-toastify";
 import "../styles/contentBody.css";
-import { useGetUserAccountAuth } from "../hooks/account";
+import { useDeleteUserAccount, useGetUserAccountAuth } from "../hooks/account";
 
 // Authenticated Endpoint
 const AccountSettingsPage: React.FC = () => {
@@ -19,25 +17,23 @@ const AccountSettingsPage: React.FC = () => {
 
   const authQuery = useGetUserAccountAuth();
 
-  const queryClient = useQueryClient();
-  const mutation = useMutation({
-    mutationFn: apiAccountDelete,
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["user"],
-      });
-      navigate("/");
-    },
-    onError: (error: Error | AxiosError) => {
-      let errMsg: string = error.message;
-      if (axios.isAxiosError(error)) {
-        errMsg = `${(error as AxiosError).response?.data}`;
-      }
-      toast.error(
-        `Something went wrong in deleting the account: ${errMsg}. Try again.`,
-      );
-    },
-  });
+  const mutation = useDeleteUserAccount();
+  const handleDelete = () => {
+    mutation.mutate(undefined, {
+      onSuccess: () => {
+        navigate("/");
+      },
+      onError: (error: Error | AxiosError) => {
+        let errMsg: string = error.message;
+        if (axios.isAxiosError(error)) {
+          errMsg = `${(error as AxiosError).response?.data}`;
+        }
+        toast.error(
+          `Something went wrong in deleting the account: ${errMsg}. Try again.`,
+        );
+      },
+    });
+  };
 
   let authenticated: boolean = false;
   if (authQuery.status === "success") {
@@ -96,7 +92,7 @@ const AccountSettingsPage: React.FC = () => {
           </p>
           <div className="mt-4">
             <button
-              onClick={() => mutation.mutate()}
+              onClick={handleDelete}
               className="mr-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
             >
               {mutation.isIdle && "Confirm"}

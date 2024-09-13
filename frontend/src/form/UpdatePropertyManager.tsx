@@ -1,21 +1,20 @@
 import React, { useState, useEffect } from "react";
 import SubmitButton from "../components/buttons/SubmitButton";
 import { validate as uuidValidate } from "uuid";
-import { apiDeleteProperty, apiGetProperty } from "../api/property";
+import { apiGetProperty } from "../api/property";
 import { Property } from "../types/Types";
-import { useMutation } from "@tanstack/react-query";
 import "../styles/input.css";
 import { toast } from "react-toastify";
 import UpdatePropertyForm from "./UpdatePropertyForm";
+import { useDeleteProperty } from "../hooks/properties";
+import axios, { AxiosError } from "axios";
 
 const UpdatePropertyManager: React.FC = () => {
-  // ------------ For Getting the property details
   const [getPropertyDetailsIsSubmitting, setGetPropertyDetailsIsSubmitting] =
     useState(false);
   const [propertyID, setPropertyID] = useState<string>("");
   const [property, setProperty] = useState<Property | null>(null);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
-  const [inputChanged, setInputChanged] = useState<boolean>(false);
 
   const getPropertyDetails = (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,15 +27,7 @@ const UpdatePropertyManager: React.FC = () => {
     setGetPropertyDetailsIsSubmitting(true);
   };
 
-  const {
-    mutate: mutateDelete,
-    isPending: isPendingDelete,
-    isSuccess: isSuccessDelete,
-    isError: isErrorDelete,
-    error: errorDelete,
-  } = useMutation({
-    mutationFn: (propertyID: string) => apiDeleteProperty(propertyID),
-  });
+  const deleteProperty = useDeleteProperty();
 
   const handleDelete = (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,7 +42,6 @@ const UpdatePropertyManager: React.FC = () => {
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
-    setInputChanged(true);
     setPropertyID(e.target.value);
   };
 
@@ -61,6 +51,7 @@ const UpdatePropertyManager: React.FC = () => {
     setProperty(null);
   };
 
+  // TODO: refactor to use react query !
   useEffect(() => {
     const foo = async () => {
       // get the property data using the propertID
@@ -79,11 +70,26 @@ const UpdatePropertyManager: React.FC = () => {
 
   useEffect(() => {
     if (isDeleting) {
-      setInputChanged(false);
-      mutateDelete(propertyID);
-      setPropertyID("");
-      setProperty(null);
-      setIsDeleting(false);
+      deleteProperty.mutate(
+        { propertyID },
+        {
+          onSuccess: () => {
+            setPropertyID("");
+            setProperty(null);
+            toast.success("Deleted property.");
+          },
+          onError: (error: Error | AxiosError) => {
+            let errMsg: string = error.message;
+            if (axios.isAxiosError(error)) {
+              errMsg = `${(error as AxiosError).response?.data}`;
+            }
+            toast.error(`Failed to update because: ${errMsg}`);
+          },
+          onSettled() {
+            setIsDeleting(false);
+          },
+        },
+      );
     }
   }, [isDeleting]);
 
@@ -117,20 +123,17 @@ const UpdatePropertyManager: React.FC = () => {
             <button id="clear" className="button__gray" onClick={clearForm}>
               Clear Form
             </button>
-            <button id="delete" className="button__red" onClick={handleDelete}>
-              Delete Property
+            <button
+              id="delete"
+              className="button__red"
+              onClick={handleDelete}
+              disabled={isDeleting}
+            >
+              {isDeleting ? "Deleting..." : "Delete Property"}
             </button>
           </div>
         </form>
       </div>
-
-      {!inputChanged && isPendingDelete && <p>Deleting property...</p>}
-      {!inputChanged && isSuccessDelete && <p>Property deleted.</p>}
-      {!inputChanged && isErrorDelete && (
-        <p>
-          Couldn{"'"}t delete property. Try again. {errorDelete.message}
-        </p>
-      )}
 
       {property !== null && (
         <UpdatePropertyForm property={property} setProperty={setProperty} />

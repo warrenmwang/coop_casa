@@ -1,14 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { apiUpdateUserAccountDetailsAndProfileImages } from "../api/account";
 import InterestsInput from "../input/InterestsInput";
 import LocationInput from "../input/LocationInput";
 import GenderInput from "../input/GenderInput";
 import TextInput from "../input/TextInput";
 import ImageInput from "../input/ImageInput";
-import {
-  apiFile2ClientFile,
-  deepCopyObjectJSONSerialize,
-} from "../utils/utils";
+import { apiFile2ClientFile } from "../utils/utils";
 import {
   APIUserReceived,
   OrderedFile,
@@ -16,7 +12,6 @@ import {
   UserDetails,
 } from "../types/Types";
 import "../styles/form.css";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import TextSkeleton from "../skeleton/TextSkeleton";
 import { toast } from "react-toastify";
 import { EmptyUser } from "../types/Objects";
@@ -28,8 +23,8 @@ import {
   useGetAccountUserProfileImages,
   useGetUserAccountDetails,
   useGetUserAccountRole,
+  useUpdateAccountSettings,
 } from "../hooks/account";
-import { userAccountKey } from "../reactQueryKeys";
 
 const AccountSettingsForm: React.FC = () => {
   const [user, setUser] = useState<User>(EmptyUser);
@@ -44,33 +39,8 @@ const AccountSettingsForm: React.FC = () => {
   const roleQuery = useGetUserAccountRole();
   const userQuery = useGetUserAccountDetails();
   const userProfileImagesQuery = useGetAccountUserProfileImages();
-  const queryClient = useQueryClient();
 
-  // Prepare mutation for changing user account information
-  const mutation = useMutation({
-    mutationFn: () =>
-      apiUpdateUserAccountDetailsAndProfileImages(
-        formData,
-        formProfileImages.map((image) => image.file),
-      ),
-    onSuccess: () => {
-      // Invalidate queries for current user account
-      queryClient.invalidateQueries({
-        queryKey: userAccountKey,
-      });
-      setUser({ ...formData, interests: [...formData.interests] });
-      setUserProfileImages(formProfileImages);
-      setIsChanged(false);
-      setIsSubmitting(false);
-    },
-    onError: (error: Error | AxiosError) => {
-      let errMsg: string = error.message;
-      if (axios.isAxiosError(error)) {
-        errMsg = `${(error as AxiosError).response?.data}`;
-      }
-      toast.error(`Failed to update because: ${errMsg}`);
-    },
-  });
+  const updateAccount = useUpdateAccountSettings();
 
   const textInputSetFormData = (id: string, value: string) => {
     setFormData((prevState) => ({
@@ -81,7 +51,24 @@ const AccountSettingsForm: React.FC = () => {
 
   const handleSaveChanges = () => {
     setIsSubmitting(true);
-    mutation.mutate();
+    updateAccount.mutate(
+      { formData, images: formProfileImages.map((image) => image.file) },
+      {
+        onSuccess: () => {
+          setUser({ ...formData, interests: [...formData.interests] });
+          setUserProfileImages(formProfileImages);
+          setIsChanged(false);
+          setIsSubmitting(false);
+        },
+        onError: (error: Error | AxiosError) => {
+          let errMsg: string = error.message;
+          if (axios.isAxiosError(error)) {
+            errMsg = `${(error as AxiosError).response?.data}`;
+          }
+          toast.error(`Failed to update because: ${errMsg}`);
+        },
+      },
+    );
   };
 
   const handleDiscardChanges = () => {

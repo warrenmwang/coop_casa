@@ -10,7 +10,6 @@ import {
   User,
   UserDetails,
 } from "../types/Types";
-import { apiUpdateUserAccountDetailsAndProfileImages } from "../api/account";
 import LocationInput from "../input/LocationInput";
 import InterestsInput from "../input/InterestsInput";
 import GenderInput from "../input/GenderInput";
@@ -23,7 +22,6 @@ import "../styles/form.css";
 import "../styles/contentBody.css";
 import SubmitButton from "../components/buttons/SubmitButton";
 import { dashboardPageLink } from "../urls";
-import { useMutation } from "@tanstack/react-query";
 import TextSkeleton from "../skeleton/TextSkeleton";
 import { apiFile2ClientFile } from "../utils/utils";
 
@@ -32,8 +30,10 @@ import { toast } from "react-toastify";
 import MultipleImageUploader from "../input/MultipleImageUploader";
 import { MAX_USER_PROFILE_IMGS_ALLOWED } from "../constants";
 import FormButton from "../components/buttons/FormButton";
-import { useGetUserAccountDetails } from "../hooks/account";
-import { userDetailsKey } from "../reactQueryKeys";
+import {
+  useGetUserAccountDetails,
+  useUpdateAccountSettings,
+} from "../hooks/account";
 
 const AccountSetupPage: React.FC = () => {
   const navigate = useNavigate();
@@ -47,28 +47,8 @@ const AccountSetupPage: React.FC = () => {
   // User Profile Images (opt)
   const [userProfileImages, setUserProfileImages] = useState<OrderedFile[]>([]);
 
-  // need to get user's to get the id and email
   const userQuery = useGetUserAccountDetails();
-
-  const mutation = useMutation({
-    mutationKey: userDetailsKey,
-    mutationFn: () =>
-      apiUpdateUserAccountDetailsAndProfileImages(
-        formData,
-        userProfileImages.map((image) => image.file),
-      ),
-    onSuccess: () => {
-      navigate(dashboardPageLink);
-    },
-    onError: (error: Error | AxiosError) => {
-      // try to use help text about error if provided by backend
-      let errMsg: string = error.message;
-      if (axios.isAxiosError(error)) {
-        errMsg = `${(error as AxiosError).response?.data}`;
-      }
-      toast.error(`Unable to setup account due to reason: ${errMsg}.`);
-    },
-  });
+  const updateUserAccount = useUpdateAccountSettings();
 
   const setError = (key: string, value: boolean) => {
     setMyMap((prevMap) => {
@@ -116,7 +96,25 @@ const AccountSetupPage: React.FC = () => {
     }
     // Send update
     setIsSubmitting(true);
-    mutation.mutate();
+    updateUserAccount.mutate(
+      { formData, images: userProfileImages.map((image) => image.file) },
+      {
+        onSuccess: () => {
+          navigate(dashboardPageLink);
+        },
+        onError: (error: Error | AxiosError) => {
+          // try to use help text about error if provided by backend
+          let errMsg: string = error.message;
+          if (axios.isAxiosError(error)) {
+            errMsg = `${(error as AxiosError).response?.data}`;
+          }
+          toast.error(`Unable to setup account due to reason: ${errMsg}.`);
+        },
+        onSettled: () => {
+          setIsSubmitting(false);
+        },
+      },
+    );
   };
 
   // Set interests error to true at first render

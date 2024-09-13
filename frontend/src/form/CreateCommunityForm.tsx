@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { apiCreateCommunity } from "../api/community";
 import TextInput from "../input/TextInput";
 import SubmitButton from "../components/buttons/SubmitButton";
 import MultipleImageUploader from "../input/MultipleImageUploader";
@@ -12,7 +11,6 @@ import {
   UserDetails,
   Community,
 } from "../types/Types";
-import { useMutation } from "@tanstack/react-query";
 import TextSkeleton from "../skeleton/TextSkeleton";
 import "../styles/font.css";
 import "../styles/input.css";
@@ -20,6 +18,7 @@ import "../styles/form.css";
 import { toast } from "react-toastify";
 import axios, { AxiosError } from "axios";
 import { useGetUserAccountDetails } from "../hooks/account";
+import { useCreateCommunity } from "../hooks/communities";
 
 type TextFieldsConstruct = {
   id: string;
@@ -55,9 +54,7 @@ const CreateCommunityForm: React.FC = () => {
   // Need to grab the user id from backend to use as adminUserId
   // for marking who the community belongs to.
   const userQuery = useGetUserAccountDetails();
-  const { mutate: mutateCreate } = useMutation({
-    mutationFn: (community: Community) => apiCreateCommunity(community),
-  });
+  const createCommunity = useCreateCommunity();
 
   // Required fields we want from the user.
   const communityRequiredFields: string[] = ["name", "description", "images"];
@@ -169,23 +166,26 @@ const CreateCommunityForm: React.FC = () => {
       };
 
       // Send data to backend
-      mutateCreate(community, {
-        onSuccess: () => {
-          // Reset form on creation success
-          setCommunityDetails(EmptyCommunityDetails);
-          setImages([]);
-          setIsSubmitting(false);
-          toast.success("Community created.");
+      createCommunity.mutate(
+        { community },
+        {
+          onSuccess: () => {
+            // Reset form on creation success
+            setCommunityDetails(EmptyCommunityDetails);
+            setImages([]);
+            setIsSubmitting(false);
+            toast.success("Community created.");
+          },
+          onError: (error: Error | AxiosError) => {
+            // Notify user of creation error
+            let errMsg: string = error.message;
+            if (axios.isAxiosError(error)) {
+              errMsg = `${(error as AxiosError).response?.data}`;
+            }
+            toast.error("Could not create community because: " + errMsg);
+          },
         },
-        onError: (error: Error | AxiosError) => {
-          // Notify user of creation error
-          let errMsg: string = error.message;
-          if (axios.isAxiosError(error)) {
-            errMsg = `${(error as AxiosError).response?.data}`;
-          }
-          toast.error("Could not create community because: " + errMsg);
-        },
-      });
+      );
     }
   }, [isSubmitting, communityDetails]);
 

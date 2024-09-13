@@ -1,12 +1,20 @@
-import { useQuery, UseQueryResult } from "@tanstack/react-query";
 import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  UseQueryResult,
+} from "@tanstack/react-query";
+import {
+  apiAccountDelete,
   apiAccountGetUserProfileImages,
   apiGetUser,
   apiGetUserAuth,
   apiGetUserOwnedCommunities,
   apiGetUserRole,
+  apiLogoutUser,
+  apiUpdateUserAccountDetailsAndProfileImages,
 } from "../api/account";
-import { APIUserReceived } from "../types/Types";
+import { APIUserReceived, User } from "../types/Types";
 import {
   userImagesKey,
   userAuthKey,
@@ -14,6 +22,8 @@ import {
   userDetailsKey,
   userPropertiesKey,
   userCommunitiesKey,
+  userAccountKey,
+  userKey,
 } from "../reactQueryKeys";
 import { apiGetUserOwnedProperties } from "../api/account";
 
@@ -62,5 +72,42 @@ export const useGetUserOwnedCommunitiesIDs = () => {
   return useQuery({
     queryKey: userCommunitiesKey,
     queryFn: apiGetUserOwnedCommunities,
+  });
+};
+
+export const useLogoutUser = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: apiLogoutUser,
+    onSuccess: () => {
+      return queryClient.invalidateQueries({
+        queryKey: userAccountKey,
+      });
+    },
+  });
+};
+
+export const useUpdateAccountSettings = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ formData, images }: { formData: User; images: File[] }) =>
+      apiUpdateUserAccountDetailsAndProfileImages(formData, images),
+    onSuccess: () => {
+      return queryClient.invalidateQueries({
+        queryKey: userAccountKey,
+      });
+    },
+  });
+};
+
+export const useDeleteUserAccount = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: apiAccountDelete,
+    onSuccess: () => {
+      return queryClient.invalidateQueries({
+        queryKey: userKey,
+      });
+    },
   });
 };

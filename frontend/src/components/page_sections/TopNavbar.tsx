@@ -11,8 +11,6 @@ import {
   communitiesPageLink,
   propertiesPageLink,
 } from "../../urls";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiLogoutUser } from "../../api/account";
 import { APIUserReceived } from "../../types/Types";
 import { apiFile2ClientFile } from "../../utils/utils";
 import { toast } from "react-toastify";
@@ -22,8 +20,8 @@ import DefaultUserProfileIcon from "../../icons/DefaultUserProfile/DefaultUserPr
 import {
   useGetUserAccountAuth,
   useGetUserAccountDetails,
+  useLogoutUser,
 } from "../../hooks/account";
-import { userAccountKey } from "../../reactQueryKeys";
 
 function classNames(...classes: (string | undefined | null | false)[]) {
   return classes.filter(Boolean).join(" ");
@@ -33,23 +31,17 @@ const TopNavbar: React.FC = () => {
   const userQuery = useGetUserAccountDetails();
   const authQuery = useGetUserAccountAuth();
 
-  const mutation = useMutation({
-    mutationFn: apiLogoutUser,
-    onSuccess: () => {
-      // Invalidate the queries for current user's account
-      queryClient.invalidateQueries({
-        queryKey: userAccountKey,
-      });
-    },
-    onError: (error: Error | AxiosError) => {
-      let errMsg: string = error.message;
-      if (axios.isAxiosError(error)) {
-        errMsg = `${(error as AxiosError).response?.data}`;
-      }
-      toast.error(`Failed to logout: ${errMsg}`);
-    },
-  });
-  const queryClient = useQueryClient();
+  const mutation = useLogoutUser();
+  const handleLogout = () =>
+    mutation.mutate(undefined, {
+      onError: (error: Error | AxiosError) => {
+        let errMsg: string = error.message;
+        if (axios.isAxiosError(error)) {
+          errMsg = `${(error as AxiosError).response?.data}`;
+        }
+        toast.error(`Failed to logout: ${errMsg}`);
+      },
+    });
 
   let authenticated: boolean = false;
   if (authQuery.status === "success") {
@@ -172,7 +164,7 @@ const TopNavbar: React.FC = () => {
                         <Menu.Item>
                           {({ active }) => (
                             <button
-                              onClick={() => mutation.mutate()}
+                              onClick={handleLogout}
                               className={classNames(
                                 active ? "bg-gray-100" : "",
                                 "block w-full text-left px-4 py-2 text-sm text-gray-700",
