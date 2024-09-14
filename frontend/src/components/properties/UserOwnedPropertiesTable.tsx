@@ -52,16 +52,6 @@ const Table: React.FC<{ propertyIDs: string[] }> = ({ propertyIDs }) => {
                 </th>
               </tr>
             );
-          } else if (query.isFetching) {
-            <tr>
-              <th>Loading...</th>
-            </tr>;
-          } else if (query.isError) {
-            <tr>
-              <th>Error.</th>
-            </tr>;
-          } else {
-            return <tr></tr>;
           }
         })}
       </tbody>
@@ -88,7 +78,9 @@ const UserOwnedPropertiesTable: React.FC = () => {
   return (
     <div className="flex flex-col items-center">
       <h1 className="h1_custom">Your Properties</h1>
-      <h4 className="h4_custom">If you don't see any, try creating one!</h4>
+      <h4 className="h4_custom">
+        If you don&apos;t see any, try creating one!
+      </h4>
       <Table propertyIDs={propertyIDs} />
     </div>
   );

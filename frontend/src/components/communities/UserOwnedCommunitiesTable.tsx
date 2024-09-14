@@ -53,16 +53,6 @@ const Table: React.FC<{ communityIDs: string[] }> = ({ communityIDs }) => {
                 </th>
               </tr>
             );
-          } else if (query.isFetching) {
-            <tr>
-              <th>Loading...</th>
-            </tr>;
-          } else if (query.isError) {
-            <tr>
-              <th>Error.</th>
-            </tr>;
-          } else {
-            return <tr></tr>;
           }
         })}
       </tbody>
@@ -89,7 +79,9 @@ const UserOwnedCommunitiesTable: React.FC = () => {
   return (
     <div className="flex flex-col items-center">
       <h1 className="h1_custom">Your Communities</h1>
-      <h4 className="h4_custom">If you don't see any, try creating one!</h4>
+      <h4 className="h4_custom">
+        If you don&apos;t see any, try creating one!
+      </h4>
       <Table communityIDs={communityIDs} />
     </div>
   );

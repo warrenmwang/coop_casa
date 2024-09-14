@@ -291,7 +291,7 @@ const UpdateCommunityForm: React.FC<{
           {userPublicProfileQueries.map((query) => {
             if (query.data) {
               return (
-                <tr>
+                <tr key={query.data.details.userId}>
                   <th>{query.data.details.userId}</th>
                   <th>{query.data.details.firstName}</th>
                   <th>{query.data.details.lastName}</th>
@@ -301,16 +301,6 @@ const UpdateCommunityForm: React.FC<{
                   <th>{query.data.details.interests.join(", ")}</th>
                 </tr>
               );
-            } else if (query.isFetching) {
-              <tr>
-                <th>Loading...</th>
-              </tr>;
-            } else if (query.isError) {
-              <tr>
-                <th>Error.</th>
-              </tr>;
-            } else {
-              return <tr></tr>;
             }
           })}
         </tbody>
@@ -385,23 +375,13 @@ const UpdateCommunityForm: React.FC<{
               );
 
               return (
-                <tr>
+                <tr key={query.data.details.propertyId}>
                   <th>{query.data.details.propertyId}</th>
                   <th>{addressString}</th>
                   <th>{costString}</th>
                   <th>{query.data.details.listerUserId}</th>
                 </tr>
               );
-            } else if (query.isFetching) {
-              <tr>
-                <th>Loading...</th>
-              </tr>;
-            } else if (query.isError) {
-              <tr>
-                <th>Error.</th>
-              </tr>;
-            } else {
-              return <tr></tr>;
             }
           })}
         </tbody>

@@ -5,7 +5,6 @@ import ShareLinkButton from "../buttons/ShareLinkButton";
 import CustomImageGallery, {
   ImageGalleryItemsInput,
 } from "../CustomImageGallery";
-import { useNavigate } from "react-router-dom";
 import { Community } from "../../types/Types";
 import LayoutSectionUsersProfilesWithModal from "../LayoutSectionUsersProfilesWithModal";
 import LayoutSectionPropertiesWithModal from "../LayoutSectionProperiesWithModal";
@@ -20,7 +19,6 @@ import {
 import debounce from "lodash.debounce";
 import axios, { AxiosError } from "axios";
 import { toast } from "react-toastify";
-import TextSkeleton from "../../skeleton/TextSkeleton";
 
 const CommunityDetailContent: React.FC<{ community: Community }> = ({
   community,

@@ -11,7 +11,6 @@ import {
   constructAddressString,
   costNumsToPresentableString,
 } from "../../utils/property";
-import TextSkeleton from "../../skeleton/TextSkeleton";
 import {
   useGetLikedProperties,
   useLikeProperty,
