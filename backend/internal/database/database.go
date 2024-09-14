@@ -544,29 +544,25 @@ func (s *service) GetUserSavedProperties(userID string) ([]string, error) {
 		return []string{}, err
 	}
 
-	// Get the encrypted property ids
-	propertyIDs, err := s.db_queries.GetUserSavedProperties(ctx, encryptedUserID)
+	// Get the sqlc property ids
+	rawPropertyIDs, err := s.db_queries.GetUserSavedProperties(ctx, encryptedUserID)
 	if err != nil {
 		return []string{}, err
 	}
 
-	// Decrypt the property ids
-	var decryptedPropertyIDs []string
-	for _, propertyID_E := range propertyIDs {
-		propertyID_D, err := utils.DecryptString(propertyID_E.PropertyID, s.db_encrypt_key)
-		if err != nil {
-			return []string{}, err
-		}
-		decryptedPropertyIDs = append(decryptedPropertyIDs, propertyID_D)
+	// Restructure the property ids
+	var restructuredPropertyIDs []string
+	for _, propertyID := range rawPropertyIDs {
+		restructuredPropertyIDs = append(restructuredPropertyIDs, propertyID.PropertyID)
 	}
 
 	// return an actual empty list, instead of nil
-	if decryptedPropertyIDs == nil {
-		decryptedPropertyIDs = []string{}
+	if restructuredPropertyIDs == nil {
+		restructuredPropertyIDs = []string{}
 	}
 
 	// Return the decrypted property ids
-	return decryptedPropertyIDs, nil
+	return restructuredPropertyIDs, nil
 }
 
 func (s *service) GetUserSavedCommunities(userID string) ([]string, error) {
@@ -578,28 +574,24 @@ func (s *service) GetUserSavedCommunities(userID string) ([]string, error) {
 		return []string{}, err
 	}
 
-	// Get the encrypted community ids
-	communityIDs, err := s.db_queries.GetUserSavedCommunities(ctx, encryptedUserID)
+	// Get the community ids
+	rawCommunityIDs, err := s.db_queries.GetUserSavedCommunities(ctx, encryptedUserID)
 	if err != nil {
 		return []string{}, err
 	}
 
-	// Decrypt the community ids
-	var decryptedCommunityIDs []string
-	for _, communityID_E := range communityIDs {
-		communityID_D, err := utils.DecryptString(communityID_E.CommunityID, s.db_encrypt_key)
-		if err != nil {
-			return []string{}, err
-		}
-		decryptedCommunityIDs = append(decryptedCommunityIDs, communityID_D)
+	// Restructure the community ids
+	var restructuredCommunityIDs []string
+	for _, communityID := range rawCommunityIDs {
+		restructuredCommunityIDs = append(restructuredCommunityIDs, communityID.CommunityID)
 	}
 
 	// return an actual empty list, instead of nil
-	if decryptedCommunityIDs == nil {
-		decryptedCommunityIDs = []string{}
+	if restructuredCommunityIDs == nil {
+		restructuredCommunityIDs = []string{}
 	}
 
-	return decryptedCommunityIDs, nil
+	return restructuredCommunityIDs, nil
 }
 
 func (s *service) GetUserSavedUsers(userID string) ([]string, error) {
@@ -643,14 +635,9 @@ func (s *service) CreateUserSavedProperty(userID, propertyID string) error {
 		return err
 	}
 
-	encryptedPropertyID, err := utils.EncryptString(propertyID, s.db_encrypt_key)
-	if err != nil {
-		return err
-	}
-
 	err = s.db_queries.CreateUserSavedProperty(ctx, sqlc.CreateUserSavedPropertyParams{
 		UserID:     encryptedUserID,
-		PropertyID: encryptedPropertyID,
+		PropertyID: propertyID,
 	})
 	return err
 }
@@ -663,17 +650,11 @@ func (s *service) CreateUserSavedCommunity(userID, communityID string) error {
 		return err
 	}
 
-	encryptedCommunityID, err := utils.EncryptString(communityID, s.db_encrypt_key)
-	if err != nil {
-		return err
-	}
-
 	err = s.db_queries.CreateUserSavedCommunity(ctx, sqlc.CreateUserSavedCommunityParams{
 		UserID:      encryptedUserID,
-		CommunityID: encryptedCommunityID,
+		CommunityID: communityID,
 	})
 	return err
-
 }
 
 func (s *service) CreateUserSavedUser(userID, savedUserID string) error {
@@ -704,14 +685,9 @@ func (s *service) DeleteUserSavedProperty(userID, propertyID string) error {
 		return err
 	}
 
-	encryptedPropertyID, err := utils.EncryptString(propertyID, s.db_encrypt_key)
-	if err != nil {
-		return err
-	}
-
 	err = s.db_queries.DeleteUserSavedProperty(ctx, sqlc.DeleteUserSavedPropertyParams{
 		UserID:     encryptedUserID,
-		PropertyID: encryptedPropertyID,
+		PropertyID: propertyID,
 	})
 	return err
 }
@@ -724,14 +700,9 @@ func (s *service) DeleteUserSavedCommunity(userID, communityID string) error {
 		return err
 	}
 
-	encryptedCommunityID, err := utils.EncryptString(communityID, s.db_encrypt_key)
-	if err != nil {
-		return err
-	}
-
 	err = s.db_queries.DeleteUserSavedCommunity(ctx, sqlc.DeleteUserSavedCommunityParams{
 		UserID:      encryptedUserID,
-		CommunityID: encryptedCommunityID,
+		CommunityID: communityID,
 	})
 	return err
 }

@@ -44,8 +44,8 @@ const AdminDashboard: React.FC = () => {
   );
 
   const likedUserIDs: string[] = likedEntitiesData[0];
-  const likedCommunityIDs: string[] = likedEntitiesData[1];
-  const likedPropertyIDs: string[] = likedEntitiesData[2];
+  const likedPropertyIDs: string[] = likedEntitiesData[1];
+  const likedCommunityIDs: string[] = likedEntitiesData[2];
 
   return (
     <>

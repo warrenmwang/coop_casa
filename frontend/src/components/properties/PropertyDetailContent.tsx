@@ -12,6 +12,18 @@ import {
   constructAddressString,
   costNumsToPresentableString,
 } from "../../utils/property";
+import TextSkeleton from "../../skeleton/TextSkeleton";
+import {
+  useGetLikedProperties,
+  useLikeProperty,
+  useUnlikeProperty,
+} from "../../hooks/account";
+import debounce from "lodash.debounce";
+import axios, { AxiosError } from "axios";
+import { toast } from "react-toastify";
+import LikeButton from "../buttons/LikeButton";
+import BackButton from "../buttons/BackButton";
+import BrowsePageButton from "../users/BrowsePageButton";
 
 type PropertyDetailContentProps = {
   property: Property;
@@ -54,23 +66,71 @@ const PropertyDetailContent: React.FC<PropertyDetailContentProps> = ({
 
   const basicInfoElement: JSX.Element = basicInfoConstructor(property);
 
+  // For like button
+  // ------ LIKE BUTTON ------
+  const likeProperty = useLikeProperty();
+  const unlikeProperty = useUnlikeProperty();
+
+  const debounceToggleLikeProperty = debounce((isLiked: boolean) => {
+    if (isLiked) {
+      unlikeProperty.mutate(
+        { propertyID: property.details.propertyId },
+        {
+          onError: (error: Error | AxiosError) => {
+            let errMsg: string = error.message;
+            if (axios.isAxiosError(error)) {
+              errMsg = `${(error as AxiosError).response?.data}`;
+            }
+            toast.error(`Unabled to unlike community: ${errMsg}`);
+          },
+        },
+      );
+    } else {
+      likeProperty.mutate(
+        { propertyID: property.details.propertyId },
+        {
+          onError: (error: Error | AxiosError) => {
+            let errMsg: string = error.message;
+            if (axios.isAxiosError(error)) {
+              errMsg = `${(error as AxiosError).response?.data}`;
+            }
+            toast.error(`Unabled to like community: ${errMsg}`);
+          },
+        },
+      );
+    }
+  }, 250);
+
+  let showLikedButton = false;
+  let isLiked = false;
+
+  const likedQuery = useGetLikedProperties();
+  if (likedQuery.status === "success") {
+    showLikedButton = true;
+    isLiked = likedQuery.data.includes(property.details.propertyId);
+  }
+
+  if (likedQuery.status === "pending") {
+    return <TextSkeleton />;
+  }
+  // ------ LIKE BUTTON ------
+
   return (
     <Box className="bg-white p-4 shadow-lg rounded-lg mx-auto w-11/12 md:w-3/5 lg:w-1/2 z-50">
       {/* Top row of buttons */}
       <div className="flex">
-        <button
-          className="block m-3 p-3 bg-gray-500 hover:bg-gray-400 text-white rounded"
-          onClick={() => navigate(-1)}
-        >
-          Back
-        </button>
-        <button
-          className="block m-3 p-3 bg-gray-500 hover:bg-gray-400 text-white rounded"
-          onClick={() => navigate(propertiesPageLink)}
-        >
-          Browse Properties
-        </button>
+        <BackButton />
+        <BrowsePageButton
+          pageLink={propertiesPageLink}
+          displayText="Browse Properties"
+        />
         <ShareLinkButton />
+        {showLikedButton && (
+          <LikeButton
+            initState={isLiked}
+            onClick={() => debounceToggleLikeProperty(isLiked)}
+          />
+        )}
       </div>
       {/* Images */}
       <CustomImageGallery imageData={imageData} />

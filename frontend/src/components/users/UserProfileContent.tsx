@@ -1,7 +1,6 @@
 import * as React from "react";
 import { UserProfile } from "../../types/Types";
 import { Box } from "@mui/material";
-import { useNavigate } from "react-router-dom";
 import { usersPageLink } from "../../urls";
 import ShareLinkButton from "../buttons/ShareLinkButton";
 import CustomImageGallery, {
@@ -13,8 +12,8 @@ import LayoutSectionPropertiesWithModal from "../LayoutSectionProperiesWithModal
 import LikeButton from "../buttons/LikeButton";
 import {
   useGetLikedUsers,
-  useGetUserAccountDetails,
   useLikeUser,
+  useUnlikeUser,
 } from "../../hooks/account";
 import TextSkeleton from "../../skeleton/TextSkeleton";
 import BackButton from "../buttons/BackButton";
@@ -38,30 +37,49 @@ const UserProfileContent: React.FC<{ userProfile: UserProfile }> = ({
 
   // Setup for user to like/unlike the user
   const likeUser = useLikeUser();
-  const debounceToggleLikeUser = debounce(() => {
-    likeUser.mutate(
-      { userID: userProfile.details.userId },
-      {
-        onError: (error: Error | AxiosError) => {
-          let errMsg: string = error.message;
-          if (axios.isAxiosError(error)) {
-            errMsg = `${(error as AxiosError).response?.data}`;
-          }
-          toast.error(`Unabled to like/unlike user: ${errMsg}`);
+  const unlikeUser = useUnlikeUser();
+
+  const debounceToggleLikeUser = debounce((isLiked: boolean) => {
+    if (isLiked) {
+      unlikeUser.mutate(
+        { userID: userProfile.details.userId },
+        {
+          onError: (error: Error | AxiosError) => {
+            let errMsg: string = error.message;
+            if (axios.isAxiosError(error)) {
+              errMsg = `${(error as AxiosError).response?.data}`;
+            }
+            toast.error(`Error: unabled to unlike user because: ${errMsg}`);
+          },
         },
-      },
-    );
+      );
+    } else {
+      likeUser.mutate(
+        { userID: userProfile.details.userId },
+        {
+          onError: (error: Error | AxiosError) => {
+            let errMsg: string = error.message;
+            if (axios.isAxiosError(error)) {
+              errMsg = `${(error as AxiosError).response?.data}`;
+            }
+            toast.error(`Error: unabled to like user because: ${errMsg}`);
+          },
+        },
+      );
+    }
   }, 250);
 
   let showLikedButton = false;
-  const likedQuery = useGetLikedUsers();
-  if (likedQuery.status === "pending") {
-    return <TextSkeleton />;
-  }
   let isLiked = false;
+
+  const likedQuery = useGetLikedUsers();
   if (likedQuery.status === "success") {
     showLikedButton = true;
     isLiked = likedQuery.data.includes(userProfile.details.userId);
+  }
+
+  if (likedQuery.status === "pending") {
+    return <TextSkeleton />;
   }
 
   return (
@@ -76,7 +94,10 @@ const UserProfileContent: React.FC<{ userProfile: UserProfile }> = ({
           />
           <ShareLinkButton />
           {showLikedButton && (
-            <LikeButton initState={isLiked} onClick={debounceToggleLikeUser} />
+            <LikeButton
+              initState={isLiked}
+              onClick={() => debounceToggleLikeUser(isLiked)}
+            />
           )}
         </div>
 

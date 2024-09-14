@@ -9,11 +9,22 @@ import { useNavigate } from "react-router-dom";
 import { Community } from "../../types/Types";
 import LayoutSectionUsersProfilesWithModal from "../LayoutSectionUsersProfilesWithModal";
 import LayoutSectionPropertiesWithModal from "../LayoutSectionProperiesWithModal";
+import BackButton from "../buttons/BackButton";
+import BrowsePageButton from "../users/BrowsePageButton";
+import LikeButton from "../buttons/LikeButton";
+import {
+  useGetLikedCommunities,
+  useLikeCommunity,
+  useUnlikeCommunity,
+} from "../../hooks/account";
+import debounce from "lodash.debounce";
+import axios, { AxiosError } from "axios";
+import { toast } from "react-toastify";
+import TextSkeleton from "../../skeleton/TextSkeleton";
 
 const CommunityDetailContent: React.FC<{ community: Community }> = ({
   community,
 }) => {
-  const navigate = useNavigate();
   const images = community.images.map((image) => URL.createObjectURL(image));
   const imageData: ImageGalleryItemsInput[] = images.map((image) => ({
     img: image,
@@ -22,23 +33,68 @@ const CommunityDetailContent: React.FC<{ community: Community }> = ({
     cols: 4,
   }));
 
+  const likeCommunity = useLikeCommunity();
+  const unlikeCommunity = useUnlikeCommunity();
+
+  const debounceToggleLikeCommunity = debounce((isLiked: boolean) => {
+    if (isLiked) {
+      unlikeCommunity.mutate(
+        { communityID: community.details.communityId },
+        {
+          onError: (error: Error | AxiosError) => {
+            let errMsg: string = error.message;
+            if (axios.isAxiosError(error)) {
+              errMsg = `${(error as AxiosError).response?.data}`;
+            }
+            toast.error(`Unabled to unlike community: ${errMsg}`);
+          },
+        },
+      );
+    } else {
+      likeCommunity.mutate(
+        { communityID: community.details.communityId },
+        {
+          onError: (error: Error | AxiosError) => {
+            let errMsg: string = error.message;
+            if (axios.isAxiosError(error)) {
+              errMsg = `${(error as AxiosError).response?.data}`;
+            }
+            toast.error(`Unabled to like community: ${errMsg}`);
+          },
+        },
+      );
+    }
+  }, 250);
+
+  let showLikedButton = false;
+  let isLiked = false;
+
+  const likedQuery = useGetLikedCommunities();
+  if (likedQuery.status === "success") {
+    showLikedButton = true;
+    isLiked = likedQuery.data.includes(community.details.communityId);
+  }
+
+  if (likedQuery.status === "pending") {
+    return <TextSkeleton />;
+  }
+
   return (
     <Box className="bg-white p-4 shadow-lg rounded-lg mx-auto w-11/12 md:w-3/5 lg:w-4/5">
       {/* Top row of buttons */}
       <div className="flex">
-        <button
-          className="block m-3 p-3 bg-gray-500 hover:bg-gray-400 text-white rounded"
-          onClick={() => navigate(-1)}
-        >
-          Back
-        </button>
-        <button
-          className="block m-3 p-3 bg-gray-500 hover:bg-gray-400 text-white rounded"
-          onClick={() => navigate(communitiesPageLink)}
-        >
-          Browse Communities
-        </button>
+        <BackButton />
+        <BrowsePageButton
+          pageLink={communitiesPageLink}
+          displayText="Browse Communities"
+        />
         <ShareLinkButton />
+        {showLikedButton && (
+          <LikeButton
+            initState={isLiked}
+            onClick={() => debounceToggleLikeCommunity(isLiked)}
+          />
+        )}
       </div>
 
       <div className="flex flex-col gap-2">

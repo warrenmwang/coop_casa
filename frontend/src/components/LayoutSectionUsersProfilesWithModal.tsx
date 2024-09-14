@@ -22,7 +22,6 @@ const LayoutSectionUsersProfilesWithModal: React.FC<
 
   return (
     <>
-      <div className="text-3xl font-bold">Community Members</div>
       <div className="flex items-center gap-2 flex-wrap">
         {userProfiles.slice(0, 3).map((value) => {
           return (

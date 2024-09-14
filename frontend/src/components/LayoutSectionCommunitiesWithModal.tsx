@@ -22,7 +22,6 @@ const LayoutSectionCommunitiesWithModal: React.FC<
 
   return (
     <>
-      <div className="text-3xl font-bold">Community Communities</div>
       <div className="flex items-center gap-2">
         {Communities.slice(0, 3).map((value) => {
           return (
