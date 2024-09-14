@@ -173,3 +173,77 @@ export const apiGetUserOwnedCommunities = async (): Promise<string[]> => {
     .then((res) => res.data)
     .then((data) => data.communityIDs as string[]);
 };
+
+// saved/liked entities
+
+// users
+export const apiAccountGetUserLikedUsers = async () => {
+  return axios
+    .get(`${apiAccountLink}/saved/users`, {
+      withCredentials: true,
+    })
+    .then((res) => res.data)
+    .then((data) => data.userIDs as string[]);
+};
+
+export const apiAccountLikeUser = async (userID: string) => {
+  const formData = new FormData();
+  formData.set("userID", userID);
+  return axios.post(`${apiAccountLink}/saved/users`, formData, {
+    withCredentials: true,
+  });
+};
+
+export const apiAccountUnlikeUser = async (userID: string) => {
+  return axios.delete(`${apiAccountLink}/saved/users/${userID}`, {
+    withCredentials: true,
+  });
+};
+
+// properties
+export const apiAccountGetUserLikedProperties = async () => {
+  return axios
+    .get(`${apiAccountLink}/saved/properties`, {
+      withCredentials: true,
+    })
+    .then((res) => res.data)
+    .then((data) => data.propertyIDs as string[]);
+};
+
+export const apiAccountLikeProperty = async (propertyID: string) => {
+  const formData = new FormData();
+  formData.set("propertyID", propertyID);
+  return axios.post(`${apiAccountLink}/saved/properties`, formData, {
+    withCredentials: true,
+  });
+};
+
+export const apiAccountUnlikeProperty = async (propertyID: string) => {
+  return axios.delete(`${apiAccountLink}/saved/properties/${propertyID}`, {
+    withCredentials: true,
+  });
+};
+
+// communities
+export const apiAccountGetUserLikedCommunities = async () => {
+  return axios
+    .get(`${apiAccountLink}/saved/communities`, {
+      withCredentials: true,
+    })
+    .then((res) => res.data)
+    .then((data) => data.communityIDs as string[]);
+};
+
+export const apiAccountLikeCommunity = async (communityID: string) => {
+  const formData = new FormData();
+  formData.set("communityID", communityID);
+  return axios.post(`${apiAccountLink}/saved/communities`, formData, {
+    withCredentials: true,
+  });
+};
+
+export const apiAccountUnlikeCommunity = async (communityID: string) => {
+  return axios.delete(`${apiAccountLink}/saved/communities/${communityID}`, {
+    withCredentials: true,
+  });
+};

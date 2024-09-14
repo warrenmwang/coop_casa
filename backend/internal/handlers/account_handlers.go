@@ -58,24 +58,24 @@ func (h *AccountHandler) GetAccountDetailsHandler(w http.ResponseWriter, r *http
 		userDetails.Interests = []string{}
 	}
 
-	// Get user liked communities, properties, and users
-	likedCommunityIDs, err := h.server.DB().GetUserSavedCommunities(userId)
-	if err != nil {
-		utils.RespondWithError(w, http.StatusInternalServerError, err)
-		return
-	}
+	// // Get user liked communities, properties, and users
+	// likedCommunityIDs, err := h.server.DB().GetUserSavedCommunities(userId)
+	// if err != nil {
+	// 	utils.RespondWithError(w, http.StatusInternalServerError, err)
+	// 	return
+	// }
 
-	likedPropertyIDs, err := h.server.DB().GetUserSavedCommunities(userId)
-	if err != nil {
-		utils.RespondWithError(w, http.StatusInternalServerError, err)
-		return
-	}
+	// likedPropertyIDs, err := h.server.DB().GetUserSavedCommunities(userId)
+	// if err != nil {
+	// 	utils.RespondWithError(w, http.StatusInternalServerError, err)
+	// 	return
+	// }
 
-	likedUserIDs, err := h.server.DB().GetUserSavedUsers(userId)
-	if err != nil {
-		utils.RespondWithError(w, http.StatusInternalServerError, err)
-		return
-	}
+	// likedUserIDs, err := h.server.DB().GetUserSavedUsers(userId)
+	// if err != nil {
+	// 	utils.RespondWithError(w, http.StatusInternalServerError, err)
+	// 	return
+	// }
 
 	// Return as JSON data, need to convert userAvatar to base64 str
 	userAvatarDataB64 := base64.StdEncoding.EncodeToString(userAvatar.Data)
@@ -88,11 +88,8 @@ func (h *AccountHandler) GetAccountDetailsHandler(w http.ResponseWriter, r *http
 	}
 
 	utils.RespondWithJSON(w, 200, database.User{
-		UserDetails:       userDetails,
-		UserAvatar:        userAvatarFileExternal,
-		LikedCommunityIDs: likedCommunityIDs,
-		LikedPropertyIDs:  likedPropertyIDs,
-		LikedUserIDs:      likedUserIDs,
+		UserDetails: userDetails,
+		UserAvatar:  userAvatarFileExternal,
 	})
 }
 

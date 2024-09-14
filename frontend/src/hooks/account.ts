@@ -1,12 +1,22 @@
 import {
   useMutation,
+  useQueries,
   useQuery,
   useQueryClient,
   UseQueryResult,
 } from "@tanstack/react-query";
 import {
   apiAccountDelete,
+  apiAccountGetUserLikedCommunities,
+  apiAccountGetUserLikedProperties,
+  apiAccountGetUserLikedUsers,
   apiAccountGetUserProfileImages,
+  apiAccountLikeCommunity,
+  apiAccountLikeProperty,
+  apiAccountLikeUser,
+  apiAccountUnlikeCommunity,
+  apiAccountUnlikeProperty,
+  apiAccountUnlikeUser,
   apiGetUser,
   apiGetUserAuth,
   apiGetUserOwnedCommunities,
@@ -24,6 +34,9 @@ import {
   userCommunitiesKey,
   userAccountKey,
   userKey,
+  userLikedUsersKey,
+  userLikedPropertiesKey,
+  userLikedCommunitiesKey,
 } from "../reactQueryKeys";
 import { apiGetUserOwnedProperties } from "../api/account";
 
@@ -109,5 +122,122 @@ export const useDeleteUserAccount = () => {
         queryKey: userKey,
       });
     },
+  });
+};
+
+export const useGetLikedUsers = () => {
+  return useQuery({
+    queryKey: userLikedUsersKey,
+    queryFn: apiAccountGetUserLikedUsers,
+  });
+};
+
+export const useLikeUser = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ userID }: { userID: string }) => apiAccountLikeUser(userID),
+    onSuccess: () => {
+      return queryClient.invalidateQueries({
+        queryKey: userLikedUsersKey,
+      });
+    },
+  });
+};
+
+export const useUnlikeUser = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ userID }: { userID: string }) =>
+      apiAccountUnlikeUser(userID),
+    onSuccess: () => {
+      return queryClient.invalidateQueries({
+        queryKey: userLikedUsersKey,
+      });
+    },
+  });
+};
+
+export const useGetLikedProperties = () => {
+  return useQuery({
+    queryKey: userLikedPropertiesKey,
+    queryFn: apiAccountGetUserLikedProperties,
+  });
+};
+
+export const useLikeProperty = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ propertyID }: { propertyID: string }) =>
+      apiAccountLikeProperty(propertyID),
+    onSuccess: () => {
+      return queryClient.invalidateQueries({
+        queryKey: userLikedPropertiesKey,
+      });
+    },
+  });
+};
+
+export const useUnlikeProperty = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ propertyID }: { propertyID: string }) =>
+      apiAccountUnlikeProperty(propertyID),
+    onSuccess: () => {
+      return queryClient.invalidateQueries({
+        queryKey: userLikedPropertiesKey,
+      });
+    },
+  });
+};
+
+export const useGetLikedCommunities = () => {
+  return useQuery({
+    queryKey: userLikedCommunitiesKey,
+    queryFn: apiAccountGetUserLikedCommunities,
+  });
+};
+
+export const useLikeCommunity = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ communityID }: { communityID: string }) =>
+      apiAccountLikeCommunity(communityID),
+    onSuccess: () => {
+      return queryClient.invalidateQueries({
+        queryKey: userLikedCommunitiesKey,
+      });
+    },
+  });
+};
+
+export const useUnlikeCommunity = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ communityID }: { communityID: string }) =>
+      apiAccountUnlikeCommunity(communityID),
+    onSuccess: () => {
+      return queryClient.invalidateQueries({
+        queryKey: userLikedCommunitiesKey,
+      });
+    },
+  });
+};
+
+export const useGetLikedEntities = () => {
+  return useQueries({
+    queries: [
+      {
+        queryKey: userLikedUsersKey,
+        queryFn: apiAccountGetUserLikedUsers,
+      },
+      {
+        queryKey: userLikedPropertiesKey,
+        queryFn: apiAccountGetUserLikedProperties,
+      },
+      {
+        queryKey: userLikedCommunitiesKey,
+        queryFn: apiAccountGetUserLikedCommunities,
+      },
+    ],
   });
 };

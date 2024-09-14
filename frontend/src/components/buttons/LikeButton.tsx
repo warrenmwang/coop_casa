@@ -14,25 +14,19 @@ const LikeButton: React.FC<LikeButtonProps> = ({
 
   return (
     <>
-      {isClicked ? (
-        <button
-          onClick={() => {
-            setIsClicked(!isClicked);
-            onClick();
-          }}
-        >
-          <HeartIcon height="50px" fill="pink" stroke="red" />
-        </button>
-      ) : (
-        <button
-          onClick={() => {
-            setIsClicked(!isClicked);
-            onClick();
-          }}
-        >
-          <HeartIcon height="50px" fill="none" stroke="gray" />
-        </button>
-      )}
+      <button
+        onClick={() => {
+          setIsClicked(!isClicked);
+          onClick();
+        }}
+      >
+        <HeartIcon
+          height="50px"
+          width="50px"
+          fill={isClicked ? "pink" : "none"}
+          stroke={isClicked ? "red" : "gray"}
+        />
+      </button>
     </>
   );
 };

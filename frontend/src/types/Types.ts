@@ -7,9 +7,6 @@ export type User = UserDetails & {
 export type APIUserReceived = {
   userDetails: UserDetails;
   avatarImageB64: APIFileReceived;
-  likedCommunityIDs: string[];
-  likedPropertyIDs: string[];
-  likedUserIDs: string[];
 };
 
 export type APIFileReceived = {

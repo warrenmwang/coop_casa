@@ -41,10 +41,12 @@ export const useGetCommunities = (
 
 export const useGetCommunity = (
   communityID: string,
+  enabled?: boolean,
 ): UseQueryResult<Community, Error> => {
   return useQuery({
     queryKey: [...communitiesKey, communityID],
     queryFn: () => apiGetCommunity(communityID),
+    enabled: typeof enabled === "undefined" ? true : enabled,
   });
 };
 

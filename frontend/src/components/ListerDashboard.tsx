@@ -6,7 +6,10 @@ import CreateCommunityForm from "../form/CreateCommunityForm";
 import UpdateCommunityManager from "../form/UpdateCommunityManager";
 import UserOwnedPropertiesTable from "./properties/UserOwnedPropertiesTable";
 import UserOwnedCommunitiesTable from "./communities/UserOwnedCommunitiesTable";
-import { useGetUserAccountDetails } from "../hooks/account";
+import {
+  useGetLikedEntities,
+  useGetUserAccountDetails,
+} from "../hooks/account";
 import TextSkeleton from "../skeleton/TextSkeleton";
 import FetchErrorText from "./FetchErrorText";
 import LayoutSectionUsersProfilesWithModal from "./LayoutSectionUsersProfilesWithModal";
@@ -14,22 +17,33 @@ import LayoutSectionCommunitiesWithModal from "./LayoutSectionCommunitiesWithMod
 import LayoutSectionPropertiesWithModal from "./LayoutSectionProperiesWithModal";
 
 const ListerDashboard: React.FC = () => {
-  const userQuery = useGetUserAccountDetails();
+  const likedEntities = useGetLikedEntities();
+  const pending = likedEntities.reduce(
+    (accum, curr) => accum || curr.isFetching,
+    false,
+  );
+  const error = likedEntities.reduce(
+    (accum, curr) => accum || curr.isError,
+    false,
+  );
 
-  if (userQuery.status === "pending") {
+  if (pending) {
     return <TextSkeleton />;
   }
-  if (userQuery.status === "error") {
+  if (error || likedEntities.length !== 3) {
     return (
       <FetchErrorText>
         Unable to fetch your data at this time. Please try again later.
       </FetchErrorText>
     );
   }
+  const likedEntitiesData: string[][] = likedEntities.map(
+    (query) => query.data as string[],
+  );
 
-  const likedUserIDs: string[] = userQuery.data.likedUserIDs;
-  const likedCommunityIDs: string[] = userQuery.data.likedCommunityIDs;
-  const likedPropertyIDs: string[] = userQuery.data.likedPropertyIDs;
+  const likedUserIDs: string[] = likedEntitiesData[0];
+  const likedCommunityIDs: string[] = likedEntitiesData[1];
+  const likedPropertyIDs: string[] = likedEntitiesData[2];
 
   return (
     <>

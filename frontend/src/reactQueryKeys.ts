@@ -9,6 +9,10 @@ export const userCommunitiesKey = ["user", "communities"];
 export const userAuthKey = ["user", "account", "auth"];
 export const userRoleKey = ["user", "account", "role"];
 
+export const userLikedUsersKey = ["user", "liked", "users"];
+export const userLikedPropertiesKey = ["user", "liked", "properties"];
+export const userLikedCommunitiesKey = ["user", "liked", "communities"];
+
 // User Profiles
 export const publicUserProfileKey = ["user", "profile"];
 export const publicUserProfilesPageKey = ["user", "profile", "page"];

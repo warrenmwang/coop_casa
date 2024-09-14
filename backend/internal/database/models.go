@@ -44,11 +44,8 @@ type UsersSavedProperty struct {
 }
 
 type User struct {
-	UserDetails       UserDetails  `json:"userDetails"`
-	UserAvatar        FileExternal `json:"avatarImageB64"`
-	LikedCommunityIDs []string     `json:"likedCommunityIDs"`
-	LikedPropertyIDs  []string     `json:"likedPropertyIDs"`
-	LikedUserIDs      []string     `json:"likedUserIDs"`
+	UserDetails UserDetails  `json:"userDetails"`
+	UserAvatar  FileExternal `json:"avatarImageB64"`
 }
 
 type PropertyDetails struct {

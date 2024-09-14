@@ -16,7 +16,7 @@ const ShareLinkButton: React.FC = () => {
     <>
       <button
         type="button"
-        className="block m-3 p-3 bg-gray-500 hover:bg-gray-400 text-white rounded"
+        className="m-3 p-3 bg-gray-500 hover:bg-gray-400 text-white rounded"
         onClick={handleShare}
       >
         <svg
