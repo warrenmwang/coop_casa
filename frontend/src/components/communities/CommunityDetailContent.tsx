@@ -75,10 +75,6 @@ const CommunityDetailContent: React.FC<{ community: Community }> = ({
     isLiked = likedQuery.data.includes(community.details.communityId);
   }
 
-  if (likedQuery.status === "pending") {
-    return <TextSkeleton />;
-  }
-
   return (
     <Box className="bg-white p-4 shadow-lg rounded-lg mx-auto w-11/12 md:w-3/5 lg:w-4/5">
       {/* Top row of buttons */}
@@ -106,9 +102,11 @@ const CommunityDetailContent: React.FC<{ community: Community }> = ({
           <div className="text-2xl">{community.details.description}</div>
         </div>
         {/* Community Users' Profiles */}
+        <h1 className="text-3xl font-bold">Community Members</h1>
         <LayoutSectionUsersProfilesWithModal userIDs={community.users} />
 
         {/* Community Properties' Listings */}
+        <h1 className="text-3xl font-bold">Community Properties</h1>
         <LayoutSectionPropertiesWithModal propertyIDs={community.properties} />
 
         {/* community id */}

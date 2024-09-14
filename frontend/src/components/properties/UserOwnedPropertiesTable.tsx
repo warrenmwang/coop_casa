@@ -86,11 +86,11 @@ const UserOwnedPropertiesTable: React.FC = () => {
   const propertyIDs = query.data as string[];
 
   return (
-    <>
+    <div className="flex flex-col items-center">
       <h1 className="h1_custom">Your Properties</h1>
       <h4 className="h4_custom">If you don't see any, try creating one!</h4>
       <Table propertyIDs={propertyIDs} />
-    </>
+    </div>
   );
 };
 export default UserOwnedPropertiesTable;

@@ -7,7 +7,6 @@ import CustomImageGallery, {
 import ShareLinkButton from "../buttons/ShareLinkButton";
 import ListerInfo from "./ListerInfo";
 import { Property } from "../../types/Types";
-import { useNavigate } from "react-router-dom";
 import {
   constructAddressString,
   costNumsToPresentableString,
@@ -32,7 +31,6 @@ type PropertyDetailContentProps = {
 const PropertyDetailContent: React.FC<PropertyDetailContentProps> = ({
   property,
 }) => {
-  const navigate = useNavigate();
   const images = property.images.map((image) =>
     URL.createObjectURL(image.file),
   );
@@ -110,9 +108,6 @@ const PropertyDetailContent: React.FC<PropertyDetailContentProps> = ({
     isLiked = likedQuery.data.includes(property.details.propertyId);
   }
 
-  if (likedQuery.status === "pending") {
-    return <TextSkeleton />;
-  }
   // ------ LIKE BUTTON ------
 
   return (

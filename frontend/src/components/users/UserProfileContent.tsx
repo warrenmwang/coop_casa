@@ -15,7 +15,6 @@ import {
   useLikeUser,
   useUnlikeUser,
 } from "../../hooks/account";
-import TextSkeleton from "../../skeleton/TextSkeleton";
 import BackButton from "../buttons/BackButton";
 import BrowsePageButton from "./BrowsePageButton";
 import debounce from "lodash.debounce";
@@ -76,10 +75,6 @@ const UserProfileContent: React.FC<{ userProfile: UserProfile }> = ({
   if (likedQuery.status === "success") {
     showLikedButton = true;
     isLiked = likedQuery.data.includes(userProfile.details.userId);
-  }
-
-  if (likedQuery.status === "pending") {
-    return <TextSkeleton />;
   }
 
   return (

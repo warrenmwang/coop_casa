@@ -8,45 +8,10 @@ import UpdateCommunityManager from "../../form/UpdateCommunityManager";
 import AdminDisplayUsers from "./AdminDisplayUsers";
 import UserOwnedPropertiesTable from "../properties/UserOwnedPropertiesTable";
 import UserOwnedCommunitiesTable from "../communities/UserOwnedCommunitiesTable";
-import {
-  useGetLikedEntities,
-  useGetUserAccountDetails,
-} from "../../hooks/account";
-import TextSkeleton from "../../skeleton/TextSkeleton";
-import FetchErrorText from "../FetchErrorText";
-import LayoutSectionUsersProfilesWithModal from "../LayoutSectionUsersProfilesWithModal";
-import LayoutSectionCommunitiesWithModal from "../LayoutSectionCommunitiesWithModal";
-import LayoutSectionPropertiesWithModal from "../LayoutSectionProperiesWithModal";
+import AllLikedEntitiesSection from "../AllLikedEntitiesSection";
+import Title from "../Title";
 
 const AdminDashboard: React.FC = () => {
-  const likedEntities = useGetLikedEntities();
-  const pending = likedEntities.reduce(
-    (accum, curr) => accum || curr.isFetching,
-    false,
-  );
-  const error = likedEntities.reduce(
-    (accum, curr) => accum || curr.isError,
-    false,
-  );
-
-  if (pending) {
-    return <TextSkeleton />;
-  }
-  if (error || likedEntities.length !== 3) {
-    return (
-      <FetchErrorText>
-        Unable to fetch your data at this time. Please try again later.
-      </FetchErrorText>
-    );
-  }
-  const likedEntitiesData: string[][] = likedEntities.map(
-    (query) => query.data as string[],
-  );
-
-  const likedUserIDs: string[] = likedEntitiesData[0];
-  const likedPropertyIDs: string[] = likedEntitiesData[1];
-  const likedCommunityIDs: string[] = likedEntitiesData[2];
-
   return (
     <>
       <div className="min-w-full mx-auto">
@@ -58,11 +23,16 @@ const AdminDashboard: React.FC = () => {
             {/* Component to be able to update the role of a user */}
             <AdminManageUserRoles />
           </Grid>
+          <Grid item lg={6}>
+            <UserOwnedPropertiesTable />
+          </Grid>
+          <Grid item lg={6}>
+            <UserOwnedCommunitiesTable />
+          </Grid>
           <Grid item xs={12} sm={12} md={12} lg={6} style={{ gap: "0 24px" }}>
             <CreatePropertyForm />
           </Grid>
           <Grid item xs={12} sm={12} md={12} lg={6} style={{ gap: "0 24px" }}>
-            <UserOwnedPropertiesTable />
             <UpdatePropertyManager />
           </Grid>
           <Grid item xs={12} sm={12} md={12} lg={6} style={{ gap: "0 24px" }}>
@@ -70,26 +40,14 @@ const AdminDashboard: React.FC = () => {
             <CreateCommunityForm />
           </Grid>
           <Grid item xs={12} sm={12} md={12} lg={6} style={{ gap: "0 24px" }}>
-            <UserOwnedCommunitiesTable />
             <UpdateCommunityManager />
           </Grid>
         </Grid>
-
-        {likedUserIDs.length === 0 ? (
-          <p>Go like some users!</p>
-        ) : (
-          <LayoutSectionUsersProfilesWithModal userIDs={likedUserIDs} />
-        )}
-        {likedCommunityIDs.length === 0 ? (
-          <p>Go liked some commmunities!</p>
-        ) : (
-          <LayoutSectionCommunitiesWithModal communityIDs={likedCommunityIDs} />
-        )}
-        {likedPropertyIDs.length === 0 ? (
-          <p>Go like some properties!</p>
-        ) : (
-          <LayoutSectionPropertiesWithModal propertyIDs={likedPropertyIDs} />
-        )}
+        <Title
+          title="Your Liked Collections"
+          description="If you're not seeing anything, go browse the users, properties, and communities that exist on Coop now!"
+        />
+        <AllLikedEntitiesSection />
       </div>
     </>
   );
