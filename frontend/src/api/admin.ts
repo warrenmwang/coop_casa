@@ -2,6 +2,10 @@ import { apiAdminUsersLink, apiAdminUsersRolesLink } from "../urls";
 import { UserDetails } from "../types/Types";
 import axios, { AxiosResponse } from "axios";
 import { AdminUpdateUserRoleResponse } from "../types/Responses";
+import {
+  APIReceivedUserDetailsSchema,
+  APIReceivedUserRolesSchema,
+} from "../types/Schema";
 
 export const apiAdminGetUsersDetails = async (
   limit: number,
@@ -15,7 +19,14 @@ export const apiAdminGetUsersDetails = async (
 
       withCredentials: true,
     })
-    .then((res) => res.data);
+    .then((res) => res.data)
+    .then((data) => {
+      const res = APIReceivedUserDetailsSchema.safeParse(data);
+      if (res.success) return res.data.userDetails;
+      throw new Error(
+        "Validation failed: received users details does not match expected schema",
+      );
+    });
 };
 
 export const apiAdminGetUsersRoles = async (
@@ -36,8 +47,14 @@ export const apiAdminGetUsersRoles = async (
       },
       withCredentials: true,
     })
-    .then((resp) => resp.data)
-    .catch((err) => console.error(err));
+    .then((res) => res.data)
+    .then((data) => {
+      const res = APIReceivedUserRolesSchema.safeParse(data);
+      if (res.success) return res.data.userRoles.map((v) => v.role);
+      throw new Error(
+        "Validation failed: received users roles does not match expected schema",
+      );
+    });
 };
 
 export const apiAdminUpdateUserRole = async (

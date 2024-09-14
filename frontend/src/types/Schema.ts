@@ -134,6 +134,10 @@ export const APIReceivedUserProfileImagesSchema = z.object({
   images: z.array(APIFileReceivedSchema),
 });
 
+export const APIReceivedUserDetailsSchema = z.object({
+  userDetails: z.array(UserDetailsSchema),
+});
+
 export const APIReceivedPropertyIDsSchema = z.object({
   propertyIDs: z.array(z.string().uuid()),
 });
@@ -144,4 +148,13 @@ export const APIReceivedCommunityIDsSchema = z.object({
 
 export const APIReceivedUserIDsSchema = z.object({
   userIDs: z.array(z.string().min(1)),
+});
+
+export const APIReceivedUserRolesSchema = z.object({
+  userRoles: z.array(
+    z.object({
+      userID: z.string().min(1),
+      role: z.string().min(1),
+    }),
+  ),
 });
