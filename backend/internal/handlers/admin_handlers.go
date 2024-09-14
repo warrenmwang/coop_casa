@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"backend/internal/config"
+	"backend/internal/database"
 	"backend/internal/interfaces"
 	"backend/internal/utils"
 	"errors"
@@ -61,7 +62,11 @@ func (h *AdminHandler) AdminGetUsers(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Return the users
-	utils.RespondWithJSON(w, 200, users)
+	utils.RespondWithJSON(w, 200, struct {
+		UserDetails []database.UserDetails `json:"userDetails"`
+	}{
+		UserDetails: users,
+	})
 }
 
 // GET .../admin/users/roles
@@ -86,8 +91,27 @@ func (h *AdminHandler) AdminGetUsersRoles(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	// construct the return result
+	type tmp struct {
+		UserID string `json:"userID"`
+		Role   string `json:"role"`
+	}
+
+	var results []tmp
+
+	for i := range len(userIds) {
+		results = append(results, tmp{
+			UserID: userIds[i],
+			Role:   roles[i],
+		})
+	}
+
 	// Return the roles
-	utils.RespondWithJSON(w, 200, roles)
+	utils.RespondWithJSON(w, 200, struct {
+		UserRoles []tmp `json:"userRoles"`
+	}{
+		UserRoles: results,
+	})
 }
 
 // POST .../admin/users/roles
