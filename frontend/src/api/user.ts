@@ -12,6 +12,12 @@ import {
   UserProfile,
 } from "../types/Types";
 import { apiFile2ClientFile } from "../utils/utils";
+import {
+  APIFileReceivedSchema,
+  APIReceivedUserIDsSchema,
+  APIReceivedUserProfileImagesSchema,
+  APIUserProfileReceivedSchema,
+} from "../types/Schema";
 
 export const apiGetUserProfiles = async (
   page: number,
@@ -30,7 +36,11 @@ export const apiGetUserProfiles = async (
     )
     .then((res) => res.data)
     .then((data) => {
-      return data.userIDs !== null ? (data.userIDs as string[]) : [];
+      const res = APIReceivedUserIDsSchema.safeParse(data);
+      if (res.success) return res.data.userIDs;
+      throw new Error(
+        "Validation failed: received user ids does not match expected schema",
+      );
     });
 };
 
@@ -44,18 +54,28 @@ export const apiGetUserProfile = async (
       },
     })
     .then((res) => res.data)
-    .then((data) => data as APIUserProfileReceived)
     .then((data) => {
-      // convert images to binary
-      let imagesTmp: File[] = [];
-      if (data.images !== null) {
-        imagesTmp = data.images.map((image) =>
-          apiFile2ClientFile(image),
-        ) as File[];
-      }
+      // NOTE: not parsing the images array because it can contain
+      // very large b64 strings (encoded binary image data of up to 5Mib)
+      // which translated to b64 string can be up to ~6.5 MiB, which apparently
+      // is too much for zod, because it will hang!
+      // This is a "good enough" check. We are expecting
+      // correct data from the backend service anyway, parsing and runtime type
+      // checking is an extra step of being careful.
+      const APIUserProfileWithoutImageSchema =
+        APIUserProfileReceivedSchema.omit({ images: true });
+      const res = APIUserProfileWithoutImageSchema.safeParse(data);
+      if (res.success)
+        return { ...res.data, images: data.images as APIFileReceived[] };
+      throw new Error(
+        "Validation failed: received user profile does not match expected schema",
+      );
+    })
+    .then((data) => {
+      // Transform apifiles to File
       return {
         details: data.details,
-        images: imagesTmp,
+        images: data.images.map((image) => apiFile2ClientFile(image)) as File[],
         communityIDs: data.communityIDs,
         propertyIDs: data.propertyIDs,
       } as UserProfile;
@@ -72,13 +92,15 @@ export const apiGetUserProfileImages = async (
       },
     })
     .then((res) => res.data)
-    .then((data) => data.images as APIFileReceived[])
+    .then((data) => {
+      const res = APIReceivedUserProfileImagesSchema.safeParse(data);
+      if (res.success) return res.data.images;
+      throw new Error(
+        "Validation failed: received account's liked users does not match expected schema",
+      );
+    })
     .then((images) => {
       // convert images to binary
-      let imagesTmp: File[] = [];
-      if (images !== null) {
-        imagesTmp = images.map((image) => apiFile2ClientFile(image)) as File[];
-      }
-      return imagesTmp;
+      return images.map((image) => apiFile2ClientFile(image)) as File[];
     });
 };

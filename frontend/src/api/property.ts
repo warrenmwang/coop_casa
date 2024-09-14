@@ -13,6 +13,12 @@ import {
 import { apiFile2ClientFile } from "../utils/utils";
 
 import axios from "axios";
+import {
+  APIPropertyReceivedSchema,
+  APIReceivedPropertyIDsSchema,
+  ListerBasicInfoSchema,
+} from "../types/Schema";
+import { z } from "zod";
 
 export const apiCreateNewProperty = async (
   property: Property,
@@ -63,7 +69,13 @@ export const apiGetProperty = async (propertyID: string): Promise<Property> => {
       },
     })
     .then((res) => res.data)
-    .then((data) => data as APIPropertyReceived)
+    .then((data) => {
+      const res = APIPropertyReceivedSchema.safeParse(data);
+      if (res.success) return res.data;
+      throw new Error(
+        "Validation failed: received property does not match expected schema",
+      );
+    })
     .then((data) => {
       return {
         details: data.details,
@@ -94,7 +106,11 @@ export const apiGetProperties = async (
     )
     .then((res) => res.data)
     .then((data) => {
-      return data.propertyIDs !== null ? (data.propertyIDs as string[]) : [];
+      const res = APIReceivedPropertyIDsSchema.safeParse(data);
+      if (res.success) return res.data.propertyIDs;
+      throw new Error(
+        "Validation failed: received property ids does not match expected schema",
+      );
     });
 };
 
@@ -110,14 +126,23 @@ export const apiDeleteProperty = async (
 export const apiGetListerInfo = async (
   listerID: string,
 ): Promise<ListerBasicInfo> => {
-  return axios
-    .get(`${apiListerLink}?listerID=${listerID}`, {
-      headers: {
-        Accept: "application/json",
-      },
-    })
-    .then((res) => res.data)
-    .then((data) => data as ListerBasicInfo);
+  return (
+    axios
+      .get(`${apiListerLink}?listerID=${listerID}`, {
+        headers: {
+          Accept: "application/json",
+        },
+      })
+      .then((res) => res.data)
+      // .then((data) => data as ListerBasicInfo);
+      .then((data) => {
+        const res = ListerBasicInfoSchema.safeParse(data);
+        if (res.success) return res.data;
+        throw new Error(
+          "Validation failed: received lister basic info does not match expected schema",
+        );
+      })
+  );
 };
 
 // Get total count of properties in db
@@ -127,8 +152,11 @@ export const apiGetTotalCountProperties = async (): Promise<number> => {
       withCredentials: true,
     })
     .then((response) => response.data)
-    .then((data) => data as number)
-    .catch((error) => {
-      throw error;
+    .then((data) => {
+      const res = z.number().safeParse(data);
+      if (res.success) return res.data;
+      throw new Error(
+        "Validation failed: received total count properties does not match expected schema",
+      );
     });
 };

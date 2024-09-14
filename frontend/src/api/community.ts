@@ -16,6 +16,10 @@ import {
   MAX_NUMBER_COMMUNITIES_PER_PAGE,
 } from "../constants";
 import axios from "axios";
+import {
+  APICommunityReceivedSchema,
+  APIReceivedCommunityIDsSchema,
+} from "../types/Schema";
 
 export const apiGetCommunity = async (
   communityID: string,
@@ -27,24 +31,21 @@ export const apiGetCommunity = async (
       },
     })
     .then((res) => res.data)
-    .then((data) => data as APICommunityReceived)
     .then((data) => {
-      // For potentially nullable fields, check and if null replace with empty array
-      const usersTmp: string[] = data.users !== null ? data.users : [];
-      const propertiesTmp: string[] =
-        data.properties !== null ? data.properties : [];
-      let imagesTmp: File[] = [];
-      if (data.images !== null) {
-        imagesTmp = data.images.map((image) =>
-          apiFile2ClientFile(image),
-        ) as File[];
-      }
-      // Return full Community obj
+      console.log(data);
+      const res = APICommunityReceivedSchema.safeParse(data);
+      if (res.success) return res.data;
+      throw new Error(
+        "Validation failed: received community does not match expected schema",
+      );
+    })
+    .then((data) => {
+      // Transform apifiles to File
       return {
         details: data.details,
-        images: imagesTmp,
-        users: usersTmp,
-        properties: propertiesTmp,
+        images: data.images.map((image) => apiFile2ClientFile(image)) as File[],
+        users: data.users,
+        properties: data.properties,
       } as Community;
     });
 };
@@ -65,7 +66,11 @@ export const apiGetCommunities = async (
     )
     .then((res) => res.data)
     .then((data) => {
-      return data.communityIDs !== null ? (data.communityIDs as string[]) : [];
+      const res = APIReceivedCommunityIDsSchema.safeParse(data);
+      if (res.success) return res.data.communityIDs;
+      throw new Error(
+        "Validation failed: received communities does not match expected schema",
+      );
     });
 };
 

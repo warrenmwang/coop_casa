@@ -271,6 +271,10 @@ func (h *AccountHandler) GetUserOwnedCommunities(w http.ResponseWriter, r *http.
 		return
 	}
 
+	if communityIds == nil {
+		communityIds = []string{}
+	}
+
 	utils.RespondWithJSON(w, 200, struct {
 		CommunityIDs []string `json:"communityIDs"`
 	}{
