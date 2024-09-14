@@ -6,11 +6,12 @@ import Modal from "./Modal";
 
 type LayoutSectionUsersProfilesWithModalProps = {
   userIDs: string[];
+  modalTitle: string;
 };
 
 const LayoutSectionUsersProfilesWithModal: React.FC<
   LayoutSectionUsersProfilesWithModalProps
-> = ({ userIDs }) => {
+> = ({ userIDs, modalTitle }) => {
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
   const userProfileQueries = useGetUserProfiles(userIDs);
 
@@ -35,7 +36,7 @@ const LayoutSectionUsersProfilesWithModal: React.FC<
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title="Browse More Community Members"
+        title={modalTitle}
       >
         <div className="flex items-center gap-2 flex-wrap">
           {userProfiles.slice(0, 3).map((value) => {

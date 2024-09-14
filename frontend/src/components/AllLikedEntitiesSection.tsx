@@ -51,7 +51,10 @@ const AllLikedEntitiesSection: React.FC = () => {
       ) : (
         <>
           <h1 className="h1_custom">Liked Users</h1>
-          <LayoutSectionUsersProfilesWithModal userIDs={likedUserIDs} />
+          <LayoutSectionUsersProfilesWithModal
+            userIDs={likedUserIDs}
+            modalTitle="Your Liked Users"
+          />
         </>
       )}
       {likedCommunityIDs.length === 0 ? (
@@ -62,7 +65,10 @@ const AllLikedEntitiesSection: React.FC = () => {
       ) : (
         <>
           <h1 className="h1_custom">Liked Communities</h1>
-          <LayoutSectionCommunitiesWithModal communityIDs={likedCommunityIDs} />
+          <LayoutSectionCommunitiesWithModal
+            communityIDs={likedCommunityIDs}
+            modalTitle="Your Liked Communities"
+          />
         </>
       )}
       {likedPropertyIDs.length === 0 ? (
@@ -73,7 +79,10 @@ const AllLikedEntitiesSection: React.FC = () => {
       ) : (
         <>
           <h1 className="h1_custom">Liked Properties</h1>
-          <LayoutSectionPropertiesWithModal propertyIDs={likedPropertyIDs} />
+          <LayoutSectionPropertiesWithModal
+            propertyIDs={likedPropertyIDs}
+            modalTitle="Your Liked Properties"
+          />
         </>
       )}
     </div>

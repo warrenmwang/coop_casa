@@ -6,11 +6,12 @@ import Modal from "./Modal";
 
 type LayoutSectionPropertiesWithModalProps = {
   propertyIDs: string[];
+  modalTitle: string;
 };
 
 const LayoutSectionPropertiesWithModal: React.FC<
   LayoutSectionPropertiesWithModalProps
-> = ({ propertyIDs }) => {
+> = ({ propertyIDs, modalTitle }) => {
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
   const propertyQueries = useGetProperties(propertyIDs);
 
@@ -35,7 +36,7 @@ const LayoutSectionPropertiesWithModal: React.FC<
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title="Browse More Properties"
+        title={modalTitle}
       >
         <div className="flex items-center gap-2 flex-wrap">
           {properties.slice(0, 3).map((value) => {

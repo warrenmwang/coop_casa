@@ -101,11 +101,17 @@ const CommunityDetailContent: React.FC<{ community: Community }> = ({
         </div>
         {/* Community Users' Profiles */}
         <h1 className="text-3xl font-bold">Community Members</h1>
-        <LayoutSectionUsersProfilesWithModal userIDs={community.users} />
+        <LayoutSectionUsersProfilesWithModal
+          userIDs={community.users}
+          modalTitle="Community Members"
+        />
 
         {/* Community Properties' Listings */}
         <h1 className="text-3xl font-bold">Community Properties</h1>
-        <LayoutSectionPropertiesWithModal propertyIDs={community.properties} />
+        <LayoutSectionPropertiesWithModal
+          propertyIDs={community.properties}
+          modalTitle="Community Properties"
+        />
 
         {/* community id */}
         <p className="text-sm pt-5">

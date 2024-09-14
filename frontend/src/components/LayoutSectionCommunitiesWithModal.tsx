@@ -6,11 +6,12 @@ import Modal from "./Modal";
 
 type LayoutSectionCommunitiesWithModalProps = {
   communityIDs: string[];
+  modalTitle: string;
 };
 
 const LayoutSectionCommunitiesWithModal: React.FC<
   LayoutSectionCommunitiesWithModalProps
-> = ({ communityIDs }) => {
+> = ({ communityIDs, modalTitle }) => {
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
   const CommunityQueries = useGetCommunities(communityIDs);
 
@@ -35,7 +36,7 @@ const LayoutSectionCommunitiesWithModal: React.FC<
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title="Browse More Communities"
+        title={modalTitle}
       >
         <div className="flex items-center gap-2 flex-wrap">
           {Communities.slice(0, 3).map((value) => {
