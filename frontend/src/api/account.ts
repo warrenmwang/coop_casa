@@ -6,10 +6,18 @@ import {
   apiUserRoleLink,
   apiAccountUserProfileImagesLink,
 } from "../urls";
-import { User, APIUserReceived, APIFileReceived } from "../types/Types";
+import { User, APIUserReceived } from "../types/Types";
 import axios, { AxiosResponse } from "axios";
 import { DeleteUserResponse, LogoutUserResponse } from "../types/Responses";
 import { apiFile2ClientFile } from "../utils/utils";
+import {
+  APIReceivedCommunityIDsSchema,
+  APIReceivedPropertyIDsSchema,
+  APIReceivedUserIDsSchema,
+  APIReceivedUserProfileImagesSchema,
+  APIUserReceivedSchema,
+} from "../types/Schema";
+import { z } from "zod";
 
 // Delete Account Function
 export const apiAccountDelete = async (): Promise<
@@ -24,7 +32,7 @@ export const apiAccountDelete = async (): Promise<
 export const apiUpdateUserAccountDetails = async (newUserData: User) => {
   const formData = new FormData();
 
-  // User details (string values)
+  // User details
   formData.append(
     "user",
     JSON.stringify({
@@ -82,7 +90,15 @@ export const apiAccountGetUserProfileImages = async (): Promise<File[]> => {
       withCredentials: true,
     })
     .then((res) => res.data)
-    .then((data) => data.images as APIFileReceived[])
+    .then((data) => {
+      const res = APIReceivedUserProfileImagesSchema.safeParse(data);
+      if (res.success) {
+        return res.data.images;
+      }
+      throw new Error(
+        "Validation failed: received user profile images not matching expected schema",
+      );
+    })
     .then((images) => {
       // convert images to binary
       let imagesTmp: File[] = [];
@@ -135,7 +151,13 @@ export const apiGetUser = async (): Promise<APIUserReceived> => {
       withCredentials: true,
     })
     .then((res) => res.data)
-    .then((data) => data as APIUserReceived);
+    .then((data) => {
+      const res = APIUserReceivedSchema.safeParse(data);
+      if (res.success) return res.data;
+      throw new Error(
+        "Validation failed: received user does not match expected schema",
+      );
+    });
 };
 
 export const apiGetUserRole = async (): Promise<string> => {
@@ -147,7 +169,13 @@ export const apiGetUserRole = async (): Promise<string> => {
       withCredentials: true,
     })
     .then((res) => res.data)
-    .then((data) => data.role as string);
+    .then((data) => {
+      const res = z.object({ role: z.string().min(1) }).safeParse(data);
+      if (res.success) return res.data.role;
+      throw new Error(
+        "Validation failed: received user role does not match expected schema",
+      );
+    });
 };
 
 export const apiGetUserOwnedProperties = async (): Promise<string[]> => {
@@ -159,7 +187,13 @@ export const apiGetUserOwnedProperties = async (): Promise<string[]> => {
       withCredentials: true,
     })
     .then((res) => res.data)
-    .then((data) => data.propertyIDs as string[]);
+    .then((data) => {
+      const res = APIReceivedPropertyIDsSchema.safeParse(data);
+      if (res.success) return res.data.propertyIDs;
+      throw new Error(
+        "Validation failed: received user owned properties does not match expected schema",
+      );
+    });
 };
 
 export const apiGetUserOwnedCommunities = async (): Promise<string[]> => {
@@ -171,7 +205,13 @@ export const apiGetUserOwnedCommunities = async (): Promise<string[]> => {
       withCredentials: true,
     })
     .then((res) => res.data)
-    .then((data) => data.communityIDs as string[]);
+    .then((data) => {
+      const res = APIReceivedCommunityIDsSchema.safeParse(data);
+      if (res.success) return res.data.communityIDs;
+      throw new Error(
+        "Validation failed: received user owned communities does not match expected schema",
+      );
+    });
 };
 
 // saved/liked entities
@@ -183,7 +223,13 @@ export const apiAccountGetUserLikedUsers = async () => {
       withCredentials: true,
     })
     .then((res) => res.data)
-    .then((data) => data.userIDs as string[]);
+    .then((data) => {
+      const res = APIReceivedUserIDsSchema.safeParse(data);
+      if (res.success) return res.data.userIDs;
+      throw new Error(
+        "Validation failed: received account's liked users does not match expected schema",
+      );
+    });
 };
 
 export const apiAccountLikeUser = async (userID: string) => {
@@ -207,7 +253,13 @@ export const apiAccountGetUserLikedProperties = async () => {
       withCredentials: true,
     })
     .then((res) => res.data)
-    .then((data) => data.propertyIDs as string[]);
+    .then((data) => {
+      const res = APIReceivedPropertyIDsSchema.safeParse(data);
+      if (res.success) return res.data.propertyIDs;
+      throw new Error(
+        "Validation failed: received property ids does not match expected schema",
+      );
+    });
 };
 
 export const apiAccountLikeProperty = async (propertyID: string) => {
@@ -231,7 +283,13 @@ export const apiAccountGetUserLikedCommunities = async () => {
       withCredentials: true,
     })
     .then((res) => res.data)
-    .then((data) => data.communityIDs as string[]);
+    .then((data) => {
+      const res = APIReceivedCommunityIDsSchema.safeParse(data);
+      if (res.success) return res.data.communityIDs;
+      throw new Error(
+        "Validation failed: received user owned communities does not match expected schema",
+      );
+    });
 };
 
 export const apiAccountLikeCommunity = async (communityID: string) => {
