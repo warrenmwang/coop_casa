@@ -1,9 +1,4 @@
-import {
-  Property,
-  APIPropertyReceived,
-  OrderedFile,
-  ListerBasicInfo,
-} from "../types/Types";
+import { Property, OrderedFile, ListerBasicInfo } from "../types/Types";
 import { apiPropertiesLink, apiListerLink } from "../urls";
 import {
   pageQPKey,

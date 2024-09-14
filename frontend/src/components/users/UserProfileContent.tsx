@@ -116,7 +116,7 @@ const UserProfileContent: React.FC<{ userProfile: UserProfile }> = ({
         {/* User's communities */}
         {userProfile.communityIDs.length > 0 && (
           <>
-            <h1 className="h1_custom mt-3">User's Liked Communities</h1>
+            <h1 className="h1_custom mt-3">User&apos;s Liked Communities</h1>
             <LayoutSectionCommunitiesWithModal
               communityIDs={userProfile.communityIDs}
               modalTitle="User's Liked Communities"
@@ -127,7 +127,7 @@ const UserProfileContent: React.FC<{ userProfile: UserProfile }> = ({
         {/* User's properties */}
         {userProfile.propertyIDs.length > 0 && (
           <>
-            <h1 className="h1_custom mt-3">User's Liked Properties</h1>
+            <h1 className="h1_custom mt-3">User&apos;s Liked Properties</h1>
             <LayoutSectionPropertiesWithModal
               propertyIDs={userProfile.propertyIDs}
               modalTitle="User's Liked Properties"

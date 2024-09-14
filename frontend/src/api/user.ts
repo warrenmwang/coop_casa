@@ -6,14 +6,9 @@ import {
   limitQPKey,
   pageQPKey,
 } from "../constants";
-import {
-  APIFileReceived,
-  APIUserProfileReceived,
-  UserProfile,
-} from "../types/Types";
+import { APIFileReceived, UserProfile } from "../types/Types";
 import { apiFile2ClientFile } from "../utils/utils";
 import {
-  APIFileReceivedSchema,
   APIReceivedUserIDsSchema,
   APIReceivedUserProfileImagesSchema,
   APIUserProfileReceivedSchema,

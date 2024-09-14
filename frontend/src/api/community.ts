@@ -1,8 +1,4 @@
-import {
-  APICommunityReceived,
-  Community,
-  CommunityDetails,
-} from "../types/Types";
+import { Community, CommunityDetails } from "../types/Types";
 import {
   apiCommunitiesLink,
   apiCommunitiesPropertiesLink,
