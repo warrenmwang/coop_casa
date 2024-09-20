@@ -1,6 +1,7 @@
 services:
   coop_casa_proxy:
     build: ./proxy
+    restart: always
     networks:
       - frontend
       - backend
