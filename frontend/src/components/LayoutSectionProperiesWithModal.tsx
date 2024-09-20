@@ -3,6 +3,7 @@ import { useGetProperties } from "../hooks/properties";
 import { Property } from "../types/Types";
 import PropertyCard from "./properties/PropertyCard";
 import Modal from "./Modal";
+import "../styles/container.css";
 
 type LayoutSectionPropertiesWithModalProps = {
   propertyIDs: string[];
@@ -23,7 +24,7 @@ const LayoutSectionPropertiesWithModal: React.FC<
 
   return (
     <>
-      <div className="flex items-center gap-2">
+      <div className="container__horizontal_card_layout">
         {properties.slice(0, 3).map((value) => {
           return (
             <PropertyCard key={value.details.propertyId} property={value} />
@@ -38,7 +39,7 @@ const LayoutSectionPropertiesWithModal: React.FC<
         onClose={() => setIsModalOpen(false)}
         title={modalTitle}
       >
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="container__horizontal_card_layout">
           {properties.slice(0, 3).map((value) => {
             return (
               <PropertyCard key={value.details.propertyId} property={value} />

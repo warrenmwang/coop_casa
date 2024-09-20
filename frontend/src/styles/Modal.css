@@ -1,0 +1,23 @@
+.modal__background {
+  @apply fixed inset-0 bg-black bg-opacity-50 z-50 p-4;
+}
+
+.modal__body {
+  @apply bg-white p-6 rounded shadow-lg w-full max-h-[90vh] flex flex-col;
+}
+
+.modal__header {
+  @apply flex justify-between items-center;
+}
+
+.modal__header_title {
+  @apply text-xl font-bold;
+}
+
+.modal__header_close_button {
+  @apply text-gray-500 hover:text-gray-700;
+}
+
+.modal__content {
+  @apply mt-4 overflow-y-auto flex-grow;
+}

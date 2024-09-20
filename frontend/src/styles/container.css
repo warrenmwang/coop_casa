@@ -1,0 +1,3 @@
+.container__horizontal_card_layout {
+  @apply w-full grid gap-3 grid-cols-1 lg:grid-cols-4;
+}

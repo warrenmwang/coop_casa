@@ -2,5 +2,5 @@
   Styles for general content holders.
 */
 .content-body {
-  @apply sm:w-4/5 md:w-10/12 lg:w-9/12 xl:w-8/12 mx-auto;
+  @apply px-2 w-full sm:w-4/5 md:w-10/12 lg:w-9/12 xl:w-8/12 mx-auto;
 }

@@ -3,6 +3,7 @@ import { useGetUserProfiles } from "../hooks/users";
 import UserProfileCard from "./users/UserProfileCard";
 import { UserProfile } from "../types/Types";
 import Modal from "./Modal";
+import "../styles/container.css";
 
 type LayoutSectionUsersProfilesWithModalProps = {
   userIDs: string[];
@@ -23,7 +24,7 @@ const LayoutSectionUsersProfilesWithModal: React.FC<
 
   return (
     <>
-      <div className="flex items-center gap-2 flex-wrap">
+      <div className="container__horizontal_card_layout">
         {userProfiles.slice(0, 3).map((value) => {
           return (
             <UserProfileCard key={value.details.userId} userProfile={value} />
@@ -38,7 +39,7 @@ const LayoutSectionUsersProfilesWithModal: React.FC<
         onClose={() => setIsModalOpen(false)}
         title={modalTitle}
       >
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="container__horizontal_card_layout">
           {userProfiles.slice(0, 3).map((value) => {
             return (
               <UserProfileCard key={value.details.userId} userProfile={value} />
