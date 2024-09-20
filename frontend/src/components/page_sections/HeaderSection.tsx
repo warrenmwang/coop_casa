@@ -4,10 +4,11 @@ import cartoonNeighborhood from "../../assets/cartoonNeighborhood.jpg";
 const stats = [
   { name: "Individual Ownership", value: "100%" },
   { name: "Dark Patterns and Hidden Fees", value: "0" },
-  { name: "Office Worldwide", value: "1" },
+  { name: "Offices Worldwide", value: "1" },
   // { name: "Active Members", value: "4" },
 ];
 
+// TODO: refactor out the CSS styles.
 const HeaderSection: React.FC = () => {
   const textColor1 = "black";
   const block1ClassName = `text-4xl font-bold tracking-tight text-${textColor1} sm:text-6xl`;
@@ -19,7 +20,7 @@ const HeaderSection: React.FC = () => {
       {/* background image */}
       <img
         src={cartoonNeighborhood}
-        alt=""
+        alt="Image of a friendly cartoon neighborhood"
         className="absolute inset-0 -z-10 h-full w-full object-cover object-right md:object-center"
       />
 

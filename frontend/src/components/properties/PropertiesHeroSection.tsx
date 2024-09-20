@@ -10,7 +10,7 @@ const PropertiesHeroSection: React.FC = () => {
         description="Browse to find your desired property to co-own with your buddies."
       />
       <img
-        alt="cartoon neighborhood decoration"
+        alt="Cartoon image of a street of different colored homes lined up next to one another on a blue sky day"
         src={cartoonNeighborhood}
         className="mx-auto rounded-lg"
       />

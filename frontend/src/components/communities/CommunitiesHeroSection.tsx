@@ -9,7 +9,11 @@ const CommunitiesHeroSection: React.FC = () => {
         title="Join or Create Your Own Group Today"
         description="Together we are stronger than we could ever be alone."
       />
-      <img alt="community image" src={communityClipArt} className="mx-auto" />
+      <img
+        alt="Cartoon image of a diverse group of people smiling and enjoying each others' company"
+        src={communityClipArt}
+        className="mx-auto"
+      />
       <p className="justify-normal mx-auto font__paragraph_1 w-3/5">
         Going through any and all stages of life alone can be noble and
         fulfulling in its own right, but going through life with others, friends

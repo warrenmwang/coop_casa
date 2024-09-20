@@ -10,7 +10,7 @@ const UsersHeroSection: React.FC = () => {
         description="Find your fellow coopers and create your own communities!"
       />
       <img
-        alt="users in a circle image"
+        alt="Cartoon image of a circle of round stick men of red, blue, green, and yellow colors holding hands"
         src={peopleCircleImage}
         className="mx-auto"
       />
