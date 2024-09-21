@@ -5,6 +5,7 @@ import {
   APIFileReceivedSchema,
   APIOrderedFileSchema,
   APIPropertyReceivedSchema,
+  APIReceivedUserProfileImagesSchema,
   APIUserProfileReceivedSchema,
   APIUserReceivedSchema,
   CommunityDetailsSchema,
@@ -60,3 +61,7 @@ export type APIUserProfileReceived = z.infer<
 >;
 
 export type UserProfile = z.infer<typeof UserProfileSchema>;
+
+export type APIReceivedUserProfileImages = z.infer<
+  typeof APIReceivedUserProfileImagesSchema
+>;

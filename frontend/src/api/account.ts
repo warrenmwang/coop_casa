@@ -14,10 +14,11 @@ import {
   APIReceivedCommunityIDsSchema,
   APIReceivedPropertyIDsSchema,
   APIReceivedUserIDsSchema,
-  APIReceivedUserProfileImagesSchema,
-  APIUserReceivedSchema,
+  UserDetailsSchema,
 } from "../types/Schema";
-import { z } from "zod";
+
+import { APIReceivedUserProfileImages } from "../types/Types";
+import { z, ZodError } from "zod";
 
 // Delete Account Function
 export const apiAccountDelete = async (): Promise<
@@ -82,40 +83,31 @@ export const apiUpdateUserAccountDetailsAndProfileImages = async (
 };
 
 export const apiAccountGetUserProfileImages = async (): Promise<File[]> => {
-  return axios
-    .get(apiAccountUserProfileImagesLink, {
-      headers: {
-        Accept: "application/json",
-      },
-      withCredentials: true,
-    })
-    .then((res) => res.data)
-    .then((data) => {
-      const res = APIReceivedUserProfileImagesSchema.safeParse(data);
-      if (res.success) {
-        return res.data.images;
-      }
-      throw new Error(
-        "Validation failed: received user profile images not matching expected schema",
-      );
-    })
-    .then((images) => {
-      // convert images to binary
-      let imagesTmp: File[] = [];
-      if (images !== null) {
-        imagesTmp = images.map((image) => apiFile2ClientFile(image)) as File[];
-      }
-      return imagesTmp;
-    });
+  return (
+    axios
+      .get(apiAccountUserProfileImagesLink, {
+        headers: {
+          Accept: "application/json",
+        },
+        withCredentials: true,
+      })
+      .then((res) => res.data)
+      // no validation here bc images can be too large when encoded as strings and make zod hang
+      // need backend service to be correct.
+      .then((data) => data as APIReceivedUserProfileImages)
+      .then((data) => data.images)
+      .then((images) => {
+        // convert images to binary
+        let imagesTmp: File[] = [];
+        if (images !== null) {
+          imagesTmp = images.map((image) =>
+            apiFile2ClientFile(image),
+          ) as File[];
+        }
+        return imagesTmp;
+      })
+  );
 };
-
-// export const apiAccountGetUserDetailsAndProfileImages = async (): Promise<
-//   [APIUserReceived, File[]]
-// > => {
-//   const userDetailsPromise = apiGetUser();
-//   const userImagesPromise = apiAccountGetUserProfileImages();
-//   return Promise.all([userDetailsPromise, userImagesPromise]);
-// };
 
 // Log out user from system, end session by invalidating the client side token
 export const apiLogoutUser = async (): Promise<
@@ -151,12 +143,18 @@ export const apiGetUser = async (): Promise<APIUserReceived> => {
       withCredentials: true,
     })
     .then((res) => res.data)
-    .then((data) => {
-      const res = APIUserReceivedSchema.safeParse(data);
-      if (res.success) return res.data;
-      throw new Error(
-        "Validation failed: received user does not match expected schema",
-      );
+    .then((data) => ({
+      userDetails: UserDetailsSchema.parse(data.userDetails),
+      avatarImageB64: data.avatarImageB64, // zod cannot parse images encoded as b64 strings
+    }))
+    .then((data) => data as APIUserReceived)
+    .catch((err) => {
+      if (err instanceof ZodError) {
+        throw new Error(
+          "Validation error: user details not of expected schema.",
+        );
+      }
+      throw err;
     });
 };
 

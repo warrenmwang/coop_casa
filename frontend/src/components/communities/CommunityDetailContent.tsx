@@ -99,24 +99,33 @@ const CommunityDetailContent: React.FC<{ community: Community }> = ({
           <div className="text-3xl font-bold">{community.details.name}</div>
           <div className="text-2xl">{community.details.description}</div>
         </div>
-        {/* Community Users' Profiles */}
-        <h1 className="text-3xl font-bold">Community Members</h1>
-        <LayoutSectionUsersProfilesWithModal
-          userIDs={community.users}
-          modalTitle="Community Members"
-        />
-
-        {/* Community Properties' Listings */}
-        <h1 className="text-3xl font-bold">Community Properties</h1>
-        <LayoutSectionPropertiesWithModal
-          propertyIDs={community.properties}
-          modalTitle="Community Properties"
-        />
 
         {/* community id */}
         <p className="text-sm pt-5">
           Community ID: {community.details.communityId}{" "}
         </p>
+
+        {/* Community Users' Profiles */}
+        {community.users.length > 0 && (
+          <>
+            <h1 className="text-3xl font-bold">Community Members</h1>
+            <LayoutSectionUsersProfilesWithModal
+              userIDs={community.users}
+              modalTitle="Community Members"
+            />
+          </>
+        )}
+
+        {/* Community Properties' Listings */}
+        {community.properties.length > 0 && (
+          <>
+            <h1 className="text-3xl font-bold">Community Properties</h1>
+            <LayoutSectionPropertiesWithModal
+              propertyIDs={community.properties}
+              modalTitle="Community Properties"
+            />
+          </>
+        )}
       </div>
     </Box>
   );

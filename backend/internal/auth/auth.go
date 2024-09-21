@@ -129,20 +129,3 @@ func AuthCheckAndGetClaims(r *http.Request, signingKeySecret string) (jwt.MapCla
 	}
 	return claims, nil
 }
-
-// Returns the userId from the http cookie in the request, if present (if the user is authed)
-// If something goes wrong in here, we should assume a response http code 401 for unauthorized.
-// func GetAuthedUserId(r *http.Request, signingKeySecret string) (string, error) {
-// 	claims, err := AuthCheckAndGetClaims(r, signingKeySecret)
-// 	if err != nil {
-// 		return "", err
-// 	}
-
-// 	// Get User ID to insert into the right place in the DB
-// 	userId, ok := claims["user_id"].(string)
-// 	if !ok {
-// 		return "", fmt.Errorf("cannot login with given token, sign in again")
-// 	}
-
-// 	return userId, nil
-// }
