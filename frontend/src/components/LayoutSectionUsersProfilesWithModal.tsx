@@ -4,6 +4,7 @@ import UserProfileCard from "./users/UserProfileCard";
 import { UserProfile } from "../types/Types";
 import Modal from "./Modal";
 import "../styles/container.css";
+import { LIKED_ENTITIES_DISPLAY_NUM_PREVIEW } from "../constants";
 
 type LayoutSectionUsersProfilesWithModalProps = {
   userIDs: string[];
@@ -25,11 +26,13 @@ const LayoutSectionUsersProfilesWithModal: React.FC<
   return (
     <>
       <div className="container__horizontal_card_layout">
-        {userProfiles.slice(0, 3).map((value) => {
-          return (
-            <UserProfileCard key={value.details.userId} userProfile={value} />
-          );
-        })}
+        {userProfiles
+          .slice(0, LIKED_ENTITIES_DISPLAY_NUM_PREVIEW)
+          .map((value) => {
+            return (
+              <UserProfileCard key={value.details.userId} userProfile={value} />
+            );
+          })}
         <button className="text-9xl" onClick={() => setIsModalOpen(true)}>
           ...
         </button>
@@ -40,7 +43,7 @@ const LayoutSectionUsersProfilesWithModal: React.FC<
         title={modalTitle}
       >
         <div className="container__horizontal_card_layout">
-          {userProfiles.slice(0, 3).map((value) => {
+          {userProfiles.map((value) => {
             return (
               <UserProfileCard key={value.details.userId} userProfile={value} />
             );

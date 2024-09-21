@@ -1,4 +1,3 @@
-// React
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -149,112 +148,109 @@ const AccountSetupPage: React.FC = () => {
         description="Please provide some information about yourself to be able to use this platform and connect with others!"
       />
       <form className="form__vertical_inputs" onSubmit={handleSubmit}>
-        <div>
-          {/* First Name */}
-          <TextInput
-            setFormData={textInputSetFormData}
-            setError={setError}
-            type="text"
-            label="First Name"
-            placeholder="Jane"
-            id="firstName"
-            value={formData.firstName}
-            required={true}
-            classNameCustom="w-full"
-          />
+        {/* First Name */}
+        <TextInput
+          setFormData={textInputSetFormData}
+          setError={setError}
+          type="text"
+          label="First Name"
+          placeholder="Jane"
+          id="firstName"
+          value={formData.firstName}
+          required={true}
+          classNameCustom="w-full"
+        />
 
-          {/* Last Name */}
-          <TextInput
-            setFormData={textInputSetFormData}
-            setError={setError}
-            type="text"
-            label="Last Name"
-            placeholder="Doe"
-            id="lastName"
-            value={formData.lastName}
-            required={true}
-            classNameCustom="w-full"
-          />
+        {/* Last Name */}
+        <TextInput
+          setFormData={textInputSetFormData}
+          setError={setError}
+          type="text"
+          label="Last Name"
+          placeholder="Doe"
+          id="lastName"
+          value={formData.lastName}
+          required={true}
+          classNameCustom="w-full"
+        />
 
-          {/* Birthdate  */}
-          <TextInput
-            setFormData={textInputSetFormData}
-            setError={setError}
-            type="date"
-            label="Birthdate"
-            placeholder=""
-            id="birthDate"
-            value={formData.birthDate}
-            required={true}
-            classNameCustom="w-full"
-          />
+        {/* Birthdate  */}
+        <TextInput
+          setFormData={textInputSetFormData}
+          setError={setError}
+          type="date"
+          label="Birthdate"
+          placeholder=""
+          id="birthDate"
+          value={formData.birthDate}
+          required={true}
+          classNameCustom="w-full"
+        />
 
-          {/* Gender */}
-          <GenderInput
-            value={formData.gender}
-            setValue={(newVal: string) =>
-              setFormData((prevState) => ({
-                ...prevState,
-                gender: newVal,
-              }))
-            }
-            setError={setError}
-            required={true}
-            classNameCustom="w-full"
-          />
+        {/* Gender */}
+        <GenderInput
+          value={formData.gender}
+          setValue={(newVal: string) =>
+            setFormData((prevState) => ({
+              ...prevState,
+              gender: newVal,
+            }))
+          }
+          setError={setError}
+          required={true}
+          classNameCustom="w-full"
+        />
 
-          {/* Location */}
-          <LocationInput
-            formData={formData}
-            setFormData={setFormData}
-            setError={setError}
-            required={true}
-          />
+        {/* Location */}
+        <LocationInput
+          formData={formData}
+          setFormData={setFormData}
+          setError={setError}
+          required={true}
+        />
 
-          {/* Avatar Image */}
-          <ImageInput
-            setFormData={setFormData}
-            setError={setError}
-            label="Avatar Image (Max size 5 MiB)"
-            id="avatar"
-            value={formData.avatar}
-            classNameCustom="w-full"
-          />
-          {/* Clear Image Button */}
-          {formData.avatar && (
-            <div className="input__container">
-              <FormButton
-                onClick={handleClearAvatarImage}
-                displayText="Clear Avatar Image"
-              />
-            </div>
-          )}
-
-          {/* User Profile Images */}
+        {/* Avatar Image */}
+        <ImageInput
+          setFormData={setFormData}
+          setError={setError}
+          label="Avatar Image (Max size 5 MiB)"
+          id="avatar"
+          value={formData.avatar}
+          classNameCustom="w-full"
+        />
+        {/* Clear Image Button */}
+        {formData.avatar && (
           <div className="input__container">
-            <label className="label__text_input_gray">
-              Additional User Profile Images, displayed after avatar image.
-              (opt.)
-            </label>
-            <MultipleImageUploader
-              images={userProfileImages}
-              onImagesUploaded={handleImagesUploaded}
+            <FormButton
+              onClick={handleClearAvatarImage}
+              displayText="Clear Avatar Image"
             />
           </div>
+        )}
 
-          {/* Interests Multiple Choice Check Boxes */}
-          <InterestsInput
-            values={formData.interests}
-            setValues={(newVals: string[]) =>
-              setFormData((prevState) => ({
-                ...prevState,
-                interests: newVals,
-              }))
-            }
-            setError={setError}
-            required={true}
+        {/* User Profile Images */}
+        <div className="input__container">
+          <label className="label__text_input_gray">
+            Additional User Profile Images, displayed after avatar image. (opt.)
+          </label>
+          <MultipleImageUploader
+            images={userProfileImages}
+            onImagesUploaded={handleImagesUploaded}
           />
         </div>
+
+        {/* Interests Multiple Choice Check Boxes */}
+        <InterestsInput
+          values={formData.interests}
+          setValues={(newVals: string[]) =>
+            setFormData((prevState) => ({
+              ...prevState,
+              interests: newVals,
+            }))
+          }
+          setError={setError}
+          required={true}
+        />
 
         {/* Submit Button */}
         <SubmitButton isSubmitting={isSubmitting} />

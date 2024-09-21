@@ -4,6 +4,7 @@ import { Community } from "../types/Types";
 import CommunityCard from "./communities/CommunityCard";
 import Modal from "./Modal";
 import "../styles/container.css";
+import { LIKED_ENTITIES_DISPLAY_NUM_PREVIEW } from "../constants";
 
 type LayoutSectionCommunitiesWithModalProps = {
   communityIDs: string[];
@@ -25,11 +26,16 @@ const LayoutSectionCommunitiesWithModal: React.FC<
   return (
     <>
       <div className="container__horizontal_card_layout">
-        {Communities.slice(0, 3).map((value) => {
-          return (
-            <CommunityCard key={value.details.communityId} community={value} />
-          );
-        })}
+        {Communities.slice(0, LIKED_ENTITIES_DISPLAY_NUM_PREVIEW).map(
+          (value) => {
+            return (
+              <CommunityCard
+                key={value.details.communityId}
+                community={value}
+              />
+            );
+          },
+        )}
         <button className="text-9xl" onClick={() => setIsModalOpen(true)}>
           ...
         </button>
@@ -40,7 +46,7 @@ const LayoutSectionCommunitiesWithModal: React.FC<
         title={modalTitle}
       >
         <div className="container__horizontal_card_layout">
-          {Communities.slice(0, 3).map((value) => {
+          {Communities.map((value) => {
             return (
               <CommunityCard
                 key={value.details.communityId}

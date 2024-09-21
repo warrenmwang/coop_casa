@@ -28,7 +28,6 @@ export const apiGetCommunity = async (
     })
     .then((res) => res.data)
     .then((data) => {
-      console.log(data);
       const res = APICommunityReceivedSchema.safeParse(data);
       if (res.success) return res.data;
       throw new Error(

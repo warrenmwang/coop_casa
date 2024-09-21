@@ -1,9 +1,10 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import { Property } from "../../types/Types";
 import { Card, CardContent, CardMedia } from "@mui/material";
 import { propertiesPageLink } from "../../urls";
 import "../../styles/mui.css";
+import MemoizedImageElement from "../MemoizedImageElement";
 
 interface PropertyCardProps {
   property: Property;
@@ -11,10 +12,6 @@ interface PropertyCardProps {
 
 const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
   const propertyDetailPage = `${propertiesPageLink}/${property.details.propertyId}`;
-  const cardImage: string = useMemo(
-    () => URL.createObjectURL(property.images[0].file),
-    [property.images],
-  );
 
   const costNumsToPresentableString = (
     costDollars: number,
@@ -65,11 +62,9 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
     <>
       <Link to={propertyDetailPage}>
         <Card className="mui__card">
-          <CardMedia
-            image={cardImage}
-            title="default first image"
-            className="mui__card_media"
-          />
+          <CardMedia title="Property first image" className="mui__card_media">
+            <MemoizedImageElement image={property.images[0].file} />
+          </CardMedia>
           <CardContent>
             <div className="text-3xl font-bold">{costString}</div>
             <div className="text-2xl">{addressString}</div>
@@ -81,5 +76,4 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
   );
 };
 
-// Export memoized version, since PropertyCard is pure.
 export default React.memo(PropertyCard);

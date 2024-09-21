@@ -4,6 +4,7 @@ import { Property } from "../types/Types";
 import PropertyCard from "./properties/PropertyCard";
 import Modal from "./Modal";
 import "../styles/container.css";
+import { LIKED_ENTITIES_DISPLAY_NUM_PREVIEW } from "../constants";
 
 type LayoutSectionPropertiesWithModalProps = {
   propertyIDs: string[];
@@ -25,11 +26,13 @@ const LayoutSectionPropertiesWithModal: React.FC<
   return (
     <>
       <div className="container__horizontal_card_layout">
-        {properties.slice(0, 3).map((value) => {
-          return (
-            <PropertyCard key={value.details.propertyId} property={value} />
-          );
-        })}
+        {properties
+          .slice(0, LIKED_ENTITIES_DISPLAY_NUM_PREVIEW)
+          .map((value) => {
+            return (
+              <PropertyCard key={value.details.propertyId} property={value} />
+            );
+          })}
         <button className="text-9xl" onClick={() => setIsModalOpen(true)}>
           ...
         </button>
@@ -40,7 +43,7 @@ const LayoutSectionPropertiesWithModal: React.FC<
         title={modalTitle}
       >
         <div className="container__horizontal_card_layout">
-          {properties.slice(0, 3).map((value) => {
+          {properties.map((value) => {
             return (
               <PropertyCard key={value.details.propertyId} property={value} />
             );

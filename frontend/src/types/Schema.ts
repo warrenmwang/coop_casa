@@ -12,7 +12,14 @@ export const UserDetailsSchema = z.object({
   email: z.string().email(),
   firstName: z.string(),
   lastName: z.string(),
-  birthDate: z.string().date(),
+  birthDate: z.union([
+    z
+      .string()
+      .refine((val) => val === "", {
+        message: "String must be empty if not date string",
+      }),
+    z.string().date(),
+  ]),
   gender: z.string(),
   location: z.string(),
   interests: z.array(z.string()),

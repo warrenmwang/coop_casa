@@ -47,3 +47,5 @@ export const interestsOptions = [
   "History",
   "Dance",
 ];
+
+export const LIKED_ENTITIES_DISPLAY_NUM_PREVIEW = 3;

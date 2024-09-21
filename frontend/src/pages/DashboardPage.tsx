@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Title from "../components/Title";
 
 import TextSkeleton from "../skeleton/TextSkeleton";
@@ -40,10 +40,6 @@ const DashboardPage: React.FC = () => {
     authenticated = authQuery.data as boolean;
   }
 
-  if (!authenticated) {
-    navigate(homePageLink);
-  }
-
   let userRole: string = "";
   if (roleQuery.status === "success") {
     userRole = roleQuery.data as string;
@@ -52,36 +48,40 @@ const DashboardPage: React.FC = () => {
   const ready: boolean =
     userQuery.isFetched && authQuery.isFetched && roleQuery.isFetched;
 
-  if (!ready) {
-    return <TextSkeleton />;
-  }
+  React.useEffect(() => {
+    if (authQuery.status === "success" && authenticated === false) {
+      navigate(homePageLink);
+    }
+  }, [authQuery.status, authenticated]);
 
   const welcomeText =
     userDetails.firstName !== "" && userDetails.lastName !== ""
       ? `Welcome ${userDetails.firstName} ${userDetails.lastName}`
       : `Welcome ${userDetails.email}`;
 
-  const isAccountNotSetup =
-    userDetails.firstName === "" && userDetails.lastName === "";
+  React.useEffect(() => {
+    if (userQuery.status === "success") {
+      if (userDetails.firstName === "" || userDetails.lastName === "") {
+        navigate(accountSetupPageLink);
+      }
+    }
+  }, [userQuery.status, userDetails]);
 
   return (
     <div className="content-body">
-      <Title title="Dashboard" description={welcomeText}></Title>
-      {isAccountNotSetup ? (
-        <div className="my-4 text-center">
-          <Link
-            to={accountSetupPageLink}
-            className="mx-auto block bg-white border-2 p-4 shadow-lg rounded-lg w-full sm:w-2/3 lg:w-1/3 sm:p-6 lg:p-8"
-          >
-            Set up your account!
-          </Link>
-        </div>
-      ) : userRole === "admin" ? (
-        <AdminDashboard />
-      ) : userRole === "lister" ? (
-        <ListerDashboard />
-      ) : (
-        <RegularDashboard />
+      {!ready && <TextSkeleton />}
+
+      {ready && (
+        <>
+          <Title title="Dashboard" description={welcomeText}></Title>
+          {userRole === "admin" ? (
+            <AdminDashboard />
+          ) : userRole === "lister" ? (
+            <ListerDashboard />
+          ) : (
+            <RegularDashboard />
+          )}
+        </>
       )}
     </div>
   );

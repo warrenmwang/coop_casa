@@ -100,6 +100,11 @@ func (h *PropertyHandler) GetPropertiesHandler(w http.ResponseWriter, r *http.Re
 		return
 	}
 
+	// Ensure send empty array instead of nil if no more results.
+	if properties == nil {
+		properties = []string{}
+	}
+
 	utils.RespondWithJSON(w, 200, struct {
 		PropertyIDs []string `json:"propertyIDs"`
 	}{
