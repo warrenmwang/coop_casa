@@ -124,7 +124,13 @@ run_frontend_tests() {
         exit 1
     fi
 
-    echo "  TODO: react jest unit tests or something..."
+    echo "  Running Jest tests."
+    npm run test
+
+    if [ $? -ne 0 ]; then
+        echo "  Frontend Jest tests failed."
+        exit 1
+    fi
 }
 
 check_run_conditions() {
