@@ -15,6 +15,7 @@ import {
 } from "../../constants";
 import FetchErrorText from "../FetchErrorText";
 import { useGetPageOfCommunityIDs } from "../../hooks/communities";
+import PaginationButtons from "../PaginationButtons";
 
 const CommunitiesMainBody: React.FC = () => {
   const [searchIsSubmitting, setSearchIsSubmitting] = useState<boolean>(false);
@@ -194,35 +195,13 @@ const CommunitiesMainBody: React.FC = () => {
 
       {/* Flex box for the pagination navigation buttons. */}
       {!noCommunitiesOnPlatform && (
-        <div
-          id="CommunitiesMainBody__navigationBtnsContainer"
-          className="flex gap-1"
-        >
-          {Array(currentPage + 1)
-            .fill(0)
-            .map((_, i) => i * 1)
-            .map((pageNum) => (
-              <button
-                key={pageNum}
-                className="bg-gray-500 hover:bg-gray-600 text-white p-3 rounded"
-                disabled={currentPage === pageNum}
-                onClick={handleNavPage}
-              >
-                {pageNum + 1}
-              </button>
-            ))}
-          {pages.has(currentPage) &&
-            (pages.get(currentPage) as string[]).length ===
-              MAX_NUMBER_COMMUNITIES_PER_PAGE && (
-              <button
-                key="next"
-                className="bg-gray-500 hover:bg-gray-600 text-white p-3 rounded"
-                onClick={handleNextPage}
-              >
-                Next
-              </button>
-            )}
-        </div>
+        <PaginationButtons
+          currentPage={currentPage}
+          pages={pages}
+          setSize={MAX_NUMBER_COMMUNITIES_PER_PAGE}
+          handleNavPage={handleNavPage}
+          handleNextPage={handleNextPage}
+        />
       )}
     </>
   );

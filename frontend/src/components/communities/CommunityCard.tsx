@@ -18,9 +18,12 @@ const CommunityCard: React.FC<CommunityCardProps> = ({ community }) => {
       <Link to={communityDetailPage}>
         <Card className="mui__card">
           <CardMedia title="Community first image" className="mui__card_media">
-            <MemoizedImageElement image={community.images[0]} />
+            <MemoizedImageElement
+              image={community.images[0]}
+              className="mui__card_media"
+            />
           </CardMedia>
-          <CardContent>
+          <CardContent className="mui__card_content">
             <div className="text-3xl font-bold">{community.details.name}</div>
             <div className="text-2xl">{community.details.description}</div>
           </CardContent>

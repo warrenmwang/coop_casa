@@ -63,9 +63,12 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
       <Link to={propertyDetailPage}>
         <Card className="mui__card">
           <CardMedia title="Property first image" className="mui__card_media">
-            <MemoizedImageElement image={property.images[0].file} />
+            <MemoizedImageElement
+              image={property.images[0].file}
+              className="mui__card_media"
+            />
           </CardMedia>
-          <CardContent>
+          <CardContent className="mui__card_content">
             <div className="text-3xl font-bold">{costString}</div>
             <div className="text-2xl">{addressString}</div>
             {basicInfoElement}

@@ -11,6 +11,7 @@ import { pageQPKey, filterAddressQPKey } from "../../constants";
 import { useGetPageOfPropertyIDs } from "../../hooks/properties";
 import "../../styles/contentBody.css";
 import "../../styles/form.css";
+import PaginationButtons from "../PaginationButtons";
 
 const PropertiesMainBody: React.FC = () => {
   const [searchIsSubmitting, setSearchIsSubmitting] = useState(false);
@@ -162,37 +163,15 @@ const PropertiesMainBody: React.FC = () => {
         </FetchErrorText>
       )}
 
-      {/* Flex box for the pagination navigation buttons. */}
+      {/* Pagination navigation buttons. */}
       {!noPropertiesOnPlatform && (
-        <div
-          id="DisplayProperties__navigationBtnsContainer"
-          className="flex gap-1"
-        >
-          {Array(currentPage + 1)
-            .fill(0)
-            .map((_, i) => i * 1)
-            .map((pageNum) => (
-              <button
-                key={pageNum}
-                className="bg-gray-500 hover:bg-gray-600 text-white p-3 rounded"
-                disabled={currentPage === pageNum}
-                onClick={handleNavPage}
-              >
-                {pageNum + 1}
-              </button>
-            ))}
-          {pages.has(currentPage) &&
-            (pages.get(currentPage) as string[]).length ===
-              MAX_NUMBER_PROPERTIES_PER_PAGE && (
-              <button
-                key="next"
-                className="bg-gray-500 hover:bg-gray-600 text-white p-3 rounded"
-                onClick={handleNextPage}
-              >
-                Next
-              </button>
-            )}
-        </div>
+        <PaginationButtons
+          currentPage={currentPage}
+          pages={pages}
+          setSize={MAX_NUMBER_PROPERTIES_PER_PAGE}
+          handleNavPage={handleNavPage}
+          handleNextPage={handleNextPage}
+        />
       )}
     </>
   );

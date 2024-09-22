@@ -13,6 +13,7 @@ import SearchBar from "../../input/SearchBar";
 import SubmitButton from "../buttons/SubmitButton";
 import PageOfUserProfiles from "./PageOfUserProfiles";
 import { useGetPageOfUserProfiles } from "../../hooks/users";
+import PaginationButtons from "../PaginationButtons";
 
 const UserProfilesMainBody: React.FC = () => {
   const [searchIsSubmitting, setSearchIsSubmitting] = useState<boolean>(false);
@@ -186,35 +187,13 @@ const UserProfilesMainBody: React.FC = () => {
 
       {/* Flex box for the pagination navigation buttons. */}
       {!noUserProfilesOnPlatform && (
-        <div
-          id="UserProfilesMainBody__navigationBtnsContainer"
-          className="flex gap-1"
-        >
-          {Array(currentPage + 1)
-            .fill(0)
-            .map((_, i) => i * 1)
-            .map((pageNum) => (
-              <button
-                key={pageNum}
-                className="bg-gray-500 hover:bg-gray-600 text-white p-3 rounded"
-                disabled={currentPage === pageNum}
-                onClick={handleNavPage}
-              >
-                {pageNum + 1}
-              </button>
-            ))}
-          {pages.has(currentPage) &&
-            (pages.get(currentPage) as string[]).length ===
-              MAX_NUMBER_USER_PROFILES_PER_PAGE && (
-              <button
-                key="next"
-                className="bg-gray-500 hover:bg-gray-600 text-white p-3 rounded"
-                onClick={handleNextPage}
-              >
-                Next
-              </button>
-            )}
-        </div>
+        <PaginationButtons
+          currentPage={currentPage}
+          pages={pages}
+          setSize={MAX_NUMBER_USER_PROFILES_PER_PAGE}
+          handleNavPage={handleNavPage}
+          handleNextPage={handleNextPage}
+        />
       )}
     </>
   );

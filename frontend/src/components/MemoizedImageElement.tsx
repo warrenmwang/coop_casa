@@ -1,5 +1,4 @@
 import * as React from "react";
-import "../styles/card.css";
 
 type MemoizedImageElementProps = {
   image: File;
@@ -8,7 +7,7 @@ type MemoizedImageElementProps = {
 
 const MemoizedImageElement: React.FC<MemoizedImageElementProps> = ({
   image,
-  className,
+  className = "",
 }) => {
   const [imageURL, setImageURL] = React.useState<string>("");
 
@@ -21,9 +20,7 @@ const MemoizedImageElement: React.FC<MemoizedImageElementProps> = ({
     };
   }, [image]);
 
-  return (
-    <img src={imageURL} className={className ? className : "card__image"} />
-  );
+  return <img src={imageURL} className={className} />;
 };
 
 export default React.memo(MemoizedImageElement);

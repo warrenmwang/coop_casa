@@ -16,22 +16,20 @@ const UserProfileCard: React.FC<{ userProfile: UserProfile }> = ({
       return <DefaultUserProfileIcon color="black" className="w-72 ml-5" />;
     }
     // O.W. return their first image for card
-    return (
-      <img
-        src={URL.createObjectURL(userProfile.images[0])}
-        className="card__image"
-      />
-    );
+    return <img src={URL.createObjectURL(userProfile.images[0])} />;
   }, [userProfile.images]);
 
   return (
     <>
       <Link to={userProfileDetailPage}>
         <Card className="mui__card">
-          <CardMedia title="" className="mui__card_media">
+          <CardMedia
+            title="User Profile first image"
+            className="mui__card_media"
+          >
             {cardImage}
           </CardMedia>
-          <CardContent className="bg-white bg-opacity-40 backdrop-blur-xl">
+          <CardContent className="mui__card_content">
             <div className="text-3xl font-bold">{`${userProfile.details.firstName} ${userProfile.details.lastName}, ${userProfile.details.ageInYears}`}</div>
             <div className="text-2xl">{userProfile.details.location}</div>
             <div className="text-2xl">

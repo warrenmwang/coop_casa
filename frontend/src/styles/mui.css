@@ -11,3 +11,7 @@
   width: 400px;
   height: 300px;
 }
+
+.mui__card_content {
+  @apply bg-white bg-opacity-40 backdrop-blur-xl;
+}
