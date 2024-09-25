@@ -18,3 +18,15 @@ export function useGetPageNumSearchQueryParam(): number {
   if (Number(pageNumQP) < 0) return 0;
   return numberPageNumQP;
 }
+
+export function useUpdateURLSearchQueryParam(
+  searchParamName: string,
+  newValue: string,
+) {
+  const [_, setSearchParams] = useSearchParams();
+  setSearchParams((prev) => {
+    const newParams = new URLSearchParams(prev);
+    newParams.set(searchParamName, newValue);
+    return newParams;
+  });
+}

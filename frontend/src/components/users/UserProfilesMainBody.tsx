@@ -18,12 +18,14 @@ import {
   useGetPageNumSearchQueryParam,
   useGetURLSearchQueryParam,
 } from "../../hooks/react-router";
+import {
+  getURLSearchQueryParam,
+  updateURLSearchQueryParam,
+} from "../../react_router/react-router";
 
 const UserProfilesMainBody: React.FC = () => {
   const [searchIsSubmitting, setSearchIsSubmitting] = useState<boolean>(false);
   const [searchParams, setSearchParams] = useSearchParams();
-
-  const [pages, setPages] = useState<Map<number, string[]>>(new Map()); // <page num, property ids>
 
   // Init our state from the query params
   const [currentPage, _setCurrentPage] = useState<number>(
@@ -41,12 +43,10 @@ const UserProfilesMainBody: React.FC = () => {
     // The other filters handled by the input forms are automatically handled by
     // the binding between the input elements and the query params.
     _setCurrentPage(page);
-    searchParams.set(pageQPKey, `${page}`);
-    setSearchParams(searchParams);
+    updateURLSearchQueryParam(setSearchParams, pageQPKey, page.toString());
   };
 
   const query = useGetPageOfUserProfiles(currentPage, firstName, lastName);
-  const queryClient = useQueryClient();
 
   // Define search form submission handler
   const handleFormSubmit = (e: React.FormEvent) => {
@@ -68,54 +68,38 @@ const UserProfilesMainBody: React.FC = () => {
     setCurrentPage(pageToGoTo);
   };
 
-  // Watch changes to query for fetching of new pages if not in cache
   useEffect(() => {
     if (query.status === "success") {
-      const newPage = query.data as string[];
-      setPages((prevPages) => new Map(prevPages).set(currentPage, newPage));
       setSearchIsSubmitting(false);
     }
-  }, [query.status, query.isRefetching]); // add isRefetching to dependency to allow us to use pages that were cached from previous queries
+  }, [query.status, query.isRefetching]);
 
   // When new search is fired off, get the latest filters
   useEffect(() => {
     if (searchIsSubmitting) {
-      let filterFirstNameTmp: string | null =
-        searchParams.get(filterFirstNameQPKey);
-      if (filterFirstNameTmp === null) {
-        filterFirstNameTmp = "";
-      }
-      let filterLastNameTmp: string | null =
-        searchParams.get(filterLastNameQPKey);
-      if (filterLastNameTmp === null) {
-        filterLastNameTmp = "";
-      }
-
-      // See if first page of the search is already cached.
-      const pageCached: string[] | undefined = queryClient.getQueryData([
-        "userProfilesPage",
-        0,
-        filterFirstNameTmp,
-        filterLastNameTmp,
-      ]);
-
-      // If page exists, then just use that page and don't
-      // update states to trigger a new fetch.
-      if (pageCached !== undefined) {
-        setPages(() => new Map().set(0, pageCached));
-        setSearchIsSubmitting(false);
-        return;
-      }
+      const filterFirstNameTmp = getURLSearchQueryParam(
+        searchParams,
+        filterFirstNameQPKey,
+        "",
+      );
+      const filterLastNameTmp = getURLSearchQueryParam(
+        searchParams,
+        filterLastNameQPKey,
+        "",
+      );
 
       // Update filter variables to trigger fetch.
       setCurrentPage(0);
       setFirstName(filterFirstNameTmp);
       setLastName(filterLastNameTmp);
+      query.refetch();
     }
   }, [searchIsSubmitting]);
 
   const noUserProfilesOnPlatform: boolean =
-    query.status === "success" && pages.get(0)?.length === 0;
+    query.status === "success" && query.data.length === 0;
+
+  const currentPageUserIDs = query.data ? query.data : [];
 
   return (
     <>
@@ -143,8 +127,8 @@ const UserProfilesMainBody: React.FC = () => {
       {query.status === "pending" && <CardGridSkeleton />}
 
       {/* If query is successful and there are user profiles, then show the current page of them! */}
-      {pages.has(currentPage) && (
-        <PageOfUserProfiles userIDs={pages.get(currentPage) as string[]} />
+      {!noUserProfilesOnPlatform && (
+        <PageOfUserProfiles userIDs={currentPageUserIDs} />
       )}
 
       {/* If no user profiles exist on platform, display a message. */}
@@ -156,10 +140,10 @@ const UserProfilesMainBody: React.FC = () => {
       )}
 
       {/* Flex box for the pagination navigation buttons. */}
-      {!noUserProfilesOnPlatform && (
+      {(!noUserProfilesOnPlatform || currentPage > 0) && (
         <PaginationButtons
           currentPage={currentPage}
-          pages={pages}
+          currentPageSize={currentPageUserIDs.length}
           setSize={MAX_NUMBER_USER_PROFILES_PER_PAGE}
           handleNavPage={handleNavPage}
           handleNextPage={handleNextPage}

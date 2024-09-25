@@ -20,12 +20,14 @@ import {
   useGetPageNumSearchQueryParam,
   useGetURLSearchQueryParam,
 } from "../../hooks/react-router";
+import {
+  getURLSearchQueryParam,
+  updateURLSearchQueryParam,
+} from "../../react_router/react-router";
 
 const CommunitiesMainBody: React.FC = () => {
   const [searchIsSubmitting, setSearchIsSubmitting] = useState<boolean>(false);
   const [searchParams, setSearchParams] = useSearchParams();
-
-  const [pages, setPages] = useState<Map<number, string[]>>(new Map()); // <page num, property ids>
 
   // Init our state from the query params
   const [name, setName] = useState<string>(
@@ -43,14 +45,12 @@ const CommunitiesMainBody: React.FC = () => {
     // The other filters handled by the input forms are automatically handled by
     // the binding between the input elements and the query params.
     _setCurrentPage(page);
-    searchParams.set(pageQPKey, `${page}`);
-    setSearchParams(searchParams);
+    updateURLSearchQueryParam(setSearchParams, pageQPKey, page.toString());
   };
 
   // Use react query hook to handle our data fetching and async state w/ caching of query results.
   const query = useGetPageOfCommunityIDs(currentPage, name, description);
   // Use query client hook to get the query client for access to the cache
-  const queryClient = useQueryClient();
 
   // Define search form submission handler
   const searchCommunitiesWithFilters = (e: React.FormEvent) => {
@@ -72,54 +72,34 @@ const CommunitiesMainBody: React.FC = () => {
     setCurrentPage(pageToGoTo);
   };
 
-  // Watch changes to query for fetching of new pages if not in cache
   useEffect(() => {
     if (query.status === "success") {
-      const newPage = query.data as string[];
-      setPages((prevPages) => new Map(prevPages).set(currentPage, newPage));
       setSearchIsSubmitting(false);
     }
-  }, [query.status, query.isRefetching]); // add isRefetching to dependency to allow us to use pages that were cached from previous queries
+  }, [query.status, query.isRefetching]);
 
   // When new search is fired off, get the latest search filters
   useEffect(() => {
     if (searchIsSubmitting) {
-      let filterNameTmp: string | null = searchParams.get(filterNameQPKey);
-      if (filterNameTmp === null) {
-        filterNameTmp = "";
-      }
-      let filterDescriptionTmp: string | null = searchParams.get(
-        filterDescriptionQPKey,
+      const filterName = getURLSearchQueryParam(
+        searchParams,
+        filterNameQPKey,
+        "",
       );
-      if (filterDescriptionTmp === null) {
-        filterDescriptionTmp = "";
-      }
-
-      // See if first page of the search is already cached.
-      const pageCached: string[] | undefined = queryClient.getQueryData([
-        "communitiesPage",
-        0,
-        filterNameTmp,
-        filterDescriptionTmp,
-      ]);
-
-      // If page exists, then just use that page and don't
-      // update states to trigger a new fetch.
-      if (pageCached !== undefined) {
-        setPages(() => new Map().set(0, pageCached));
-        setSearchIsSubmitting(false);
-        return;
-      }
-
-      // Update filter variables to trigger fetch.
-      setCurrentPage(0);
-      setName(filterNameTmp);
-      setDescription(filterDescriptionTmp);
+      const filterDescription = getURLSearchQueryParam(
+        searchParams,
+        filterDescriptionQPKey,
+        "",
+      );
+      setName(filterName);
+      setDescription(filterDescription);
+      query.refetch();
     }
   }, [searchIsSubmitting]);
 
-  const noCommunitiesOnPlatform: boolean =
-    query.status === "success" && pages.get(0)?.length === 0;
+  const currentPageEmpty: boolean =
+    query.status === "success" && query.data.length === 0;
+  const currentPageCommunityIDs = query.data ? query.data : [];
 
   return (
     <>
@@ -150,23 +130,26 @@ const CommunitiesMainBody: React.FC = () => {
       {query.status === "pending" && <CardGridSkeleton />}
 
       {/* If query is successful and there are communities, then show the current page of them! */}
-      {pages.has(currentPage) && (
-        <PageOfCommunities communityIDs={pages.get(currentPage) as string[]} />
+      {!currentPageEmpty && (
+        <PageOfCommunities communityIDs={currentPageCommunityIDs} />
       )}
 
-      {/* If no communities exist on platform, display a message. */}
-      {noCommunitiesOnPlatform && (
+      {currentPageEmpty && currentPage === 0 && (
         <FetchErrorText>
           Sorry, there are no communities on Coop right now! Create your own or
           come back later.
         </FetchErrorText>
       )}
 
+      {currentPageEmpty && currentPage !== 0 && (
+        <p>No more communities to show!</p>
+      )}
+
       {/* Flex box for the pagination navigation buttons. */}
-      {!noCommunitiesOnPlatform && (
+      {(!currentPageEmpty || currentPage > 0) && (
         <PaginationButtons
           currentPage={currentPage}
-          pages={pages}
+          currentPageSize={currentPageCommunityIDs.length}
           setSize={MAX_NUMBER_COMMUNITIES_PER_PAGE}
           handleNavPage={handleNavPage}
           handleNextPage={handleNextPage}

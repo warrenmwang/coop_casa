@@ -2,7 +2,7 @@ import * as React from "react";
 
 type PaginationButtonsProps = {
   currentPage: number;
-  pages: Map<number, string[]>;
+  currentPageSize: number;
   setSize: number;
   handleNavPage: (e: React.MouseEvent<HTMLButtonElement>) => void;
   handleNextPage: (e: React.MouseEvent<HTMLButtonElement>) => void;
@@ -10,7 +10,7 @@ type PaginationButtonsProps = {
 
 const PaginationButtons: React.FC<PaginationButtonsProps> = ({
   currentPage,
-  pages,
+  currentPageSize,
   setSize,
   handleNavPage,
   handleNextPage,
@@ -30,16 +30,15 @@ const PaginationButtons: React.FC<PaginationButtonsProps> = ({
             {pageNum + 1}
           </button>
         ))}
-      {pages.has(currentPage) &&
-        (pages.get(currentPage) as string[]).length === setSize && (
-          <button
-            key="next"
-            className="bg-gray-500 hover:bg-gray-600 text-white p-3 rounded"
-            onClick={handleNextPage}
-          >
-            Next
-          </button>
-        )}
+      {currentPageSize === setSize && (
+        <button
+          key="next"
+          className="bg-gray-500 hover:bg-gray-600 text-white p-3 rounded"
+          onClick={handleNextPage}
+        >
+          Next
+        </button>
+      )}
     </div>
   );
 };

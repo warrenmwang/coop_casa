@@ -16,12 +16,14 @@ import {
   useGetPageNumSearchQueryParam,
   useGetURLSearchQueryParam,
 } from "../../hooks/react-router";
+import {
+  getURLSearchQueryParam,
+  updateURLSearchQueryParam,
+} from "../../react_router/react-router";
 
 const PropertiesMainBody: React.FC = () => {
   const [searchIsSubmitting, setSearchIsSubmitting] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
-
-  const [pages, setPages] = useState<Map<number, string[]>>(new Map()); // <page num, property ids>
 
   // Init our states from the query params
   // Current page number
@@ -30,8 +32,7 @@ const PropertiesMainBody: React.FC = () => {
   );
   const setCurrentPage = (page: number) => {
     _setCurrentPage(page);
-    searchParams.set(pageQPKey, `${page}`);
-    setSearchParams(searchParams);
+    updateURLSearchQueryParam(setSearchParams, pageQPKey, page.toString());
   };
   // Filter - address
   const [filterAddress, setFilterAddress] = useState<string>(
@@ -40,8 +41,6 @@ const PropertiesMainBody: React.FC = () => {
 
   // Use react query hook to handle our data fetching and async state w/ caching of query results.
   const query = useGetPageOfPropertyIDs(currentPage, filterAddress);
-  // Use query client hook to get the query client for access to the cache
-  const queryClient = useQueryClient();
 
   // Define search form submission handler
   const searchPropertiesWithFilter = (e: React.FormEvent) => {
@@ -63,47 +62,30 @@ const PropertiesMainBody: React.FC = () => {
     setCurrentPage(pageToGoTo);
   };
 
-  // Watch changes to query for fetching of new pages if not in cache
   useEffect(() => {
     if (query.status === "success") {
-      const newPage = query.data as string[];
-      setPages((prevPages) => new Map(prevPages).set(currentPage, newPage));
       setSearchIsSubmitting(false);
     }
-  }, [query.status, query.isRefetching]); // add isRefetching to dependency to allow us to use pages that were cached from previous queries
+  }, [query.status, query.isRefetching]);
 
   // When new search is fired off, get the latest address filter
   useEffect(() => {
     if (searchIsSubmitting) {
-      let filterAddressTmp: string | null =
-        searchParams.get(filterAddressQPKey);
-      if (filterAddressTmp === null) {
-        filterAddressTmp = "";
-      }
-
-      // See if first page of the search is already cached.
-      const pageCached: string[] | undefined = queryClient.getQueryData([
-        "propertiesPage",
-        0,
-        filterAddressTmp,
-      ]);
-
-      // If page exists, then just use that page and don't
-      // update states to trigger a new fetch.
-      if (pageCached !== undefined) {
-        setPages(() => new Map().set(0, pageCached));
-        setSearchIsSubmitting(false);
-        return;
-      }
-
-      // Update filter variables to trigger fetch.
+      const filterAddressTmp = getURLSearchQueryParam(
+        searchParams,
+        filterAddressQPKey,
+        "",
+      );
       setCurrentPage(0);
       setFilterAddress(filterAddressTmp);
+      query.refetch();
     }
   }, [searchIsSubmitting]);
 
-  const noPropertiesOnPlatform: boolean =
-    query.status === "success" && pages.get(0)?.length === 0;
+  const currentPageEmpty: boolean =
+    query.status === "success" && query.data.length === 0;
+
+  const currentPagePropertyIDs = query.data ? query.data : [];
 
   return (
     <>
@@ -127,23 +109,27 @@ const PropertiesMainBody: React.FC = () => {
       {query.status === "pending" && <CardGridSkeleton />}
 
       {/* If query is successful and there are properties, then show the current page of them! */}
-      {pages.has(currentPage) && (
-        <PageOfProperties propertyIDs={pages.get(currentPage) as string[]} />
+      {!currentPageEmpty && (
+        <PageOfProperties propertyIDs={currentPagePropertyIDs} />
       )}
 
       {/* If no properties exist on platform, display a message. */}
-      {noPropertiesOnPlatform && (
+      {currentPageEmpty && currentPage === 0 && (
         <FetchErrorText>
           Sorry, there are no properties on Coop right now! There will be
           listings soon, we promise.
         </FetchErrorText>
       )}
 
+      {currentPageEmpty && currentPage !== 0 && (
+        <p>No more properties to show!</p>
+      )}
+
       {/* Pagination navigation buttons. */}
-      {!noPropertiesOnPlatform && (
+      {(!currentPageEmpty || currentPage > 0) && (
         <PaginationButtons
           currentPage={currentPage}
-          pages={pages}
+          currentPageSize={currentPagePropertyIDs.length}
           setSize={MAX_NUMBER_PROPERTIES_PER_PAGE}
           handleNavPage={handleNavPage}
           handleNextPage={handleNextPage}
