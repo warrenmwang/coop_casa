@@ -6,7 +6,6 @@ import {
   MAX_NUMBER_USER_PROFILES_PER_PAGE,
   pageQPKey,
 } from "../../constants";
-import { useQueryClient } from "@tanstack/react-query";
 import FetchErrorText from "../FetchErrorText";
 import CardGridSkeleton from "../../skeleton/CardGridSkeleton";
 import SearchBar from "../../input/SearchBar";

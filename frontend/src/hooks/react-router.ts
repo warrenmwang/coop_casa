@@ -6,7 +6,7 @@ export function useGetURLSearchQueryParam(
   defaultValue: string,
 ): string {
   const [searchParams] = useSearchParams();
-  let searchParam = searchParams.get(searchParamName);
+  const searchParam = searchParams.get(searchParamName);
   if (searchParam !== null) return searchParam;
   return defaultValue;
 }
@@ -23,8 +23,8 @@ export function useUpdateURLSearchQueryParam(
   searchParamName: string,
   newValue: string,
 ) {
-  const [_, setSearchParams] = useSearchParams();
-  setSearchParams((prev) => {
+  const [...setSearchParams] = useSearchParams();
+  setSearchParams[1]((prev) => {
     const newParams = new URLSearchParams(prev);
     newParams.set(searchParamName, newValue);
     return newParams;

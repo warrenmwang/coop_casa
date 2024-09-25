@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { useQueryClient } from "@tanstack/react-query";
 import CardGridSkeleton from "../../skeleton/CardGridSkeleton";
 import PageOfCommunities from "./PageOfCommunities";
 

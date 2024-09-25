@@ -6,7 +6,7 @@ export function getURLSearchQueryParam(
   searchParam: string,
   defaultValue: string,
 ): string {
-  let value = searchParams.get(searchParam);
+  const value = searchParams.get(searchParam);
   if (value !== null) return value;
   return defaultValue;
 }

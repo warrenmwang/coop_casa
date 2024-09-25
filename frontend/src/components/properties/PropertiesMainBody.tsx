@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { useQueryClient } from "@tanstack/react-query";
 import { MAX_NUMBER_PROPERTIES_PER_PAGE } from "../../constants";
 import CardGridSkeleton from "../../skeleton/CardGridSkeleton";
 import SearchBar from "../../input/SearchBar";
