@@ -161,7 +161,7 @@ func (h *CommunityHandler) CreateCommunitiesHandler(w http.ResponseWriter, r *ht
 	}
 
 	// Validate community details
-	err = validation.ValidateCommnityDetails(communityDetails)
+	err = validation.ValidateCommunityDetails(communityDetails)
 	if err != nil {
 		utils.RespondWithError(w, 400, err)
 		return
@@ -370,7 +370,7 @@ func (h *CommunityHandler) UpdateCommunitiesHandler(w http.ResponseWriter, r *ht
 	}
 
 	// Validate community details
-	err = validation.ValidateCommnityDetails(communityDetails)
+	err = validation.ValidateCommunityDetails(communityDetails)
 	if err != nil {
 		utils.RespondWithError(w, 400, err)
 		return

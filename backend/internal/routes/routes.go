@@ -128,17 +128,16 @@ func RegisterRoutes(s interfaces.Server) http.Handler {
 	r.Use(middleware.NoCache)              // dont cache responses (especially important to get up to date api/auth responses)
 	r.Use(customMiddleware.CorsMiddleware) // set headers for CORS
 
-	// Heartbeat endpoints
-	heartBeatHandlers := handlers.NewHeartBeatHandlers(s)
-	r.Get("/health", heartBeatHandlers.HelloWorldHandler)
-	r.Get("/dbhealth", heartBeatHandlers.DatabaseHealthHandler)
-
 	// Auth
 	authRouter := NewAuthRouter(s)
-	r.Mount("/auth", authRouter)
+	r.Mount("/auth/v1", authRouter)
 
 	// API router
 	apiRouter := chi.NewRouter()
+	// Heartbeat endpoints
+	heartBeatHandlers := handlers.NewHeartBeatHandlers(s)
+	apiRouter.Get("/health", heartBeatHandlers.HelloWorldHandler)
+	apiRouter.Get("/dbhealth", heartBeatHandlers.DatabaseHealthHandler)
 
 	// Account - user accessing their own personal information
 	accountRouter := NewAccountRouter(s)

@@ -9,6 +9,33 @@ import (
 
 var GlobalConfig *Config
 
+var GENDER_OPTIONS = map[string]struct{}{
+	"Man":                 {},
+	"Woman":               {},
+	"Transgender Woman":   {},
+	"Transgender Man":     {},
+	"Non-binary":          {},
+	"Agender":             {},
+	"Prefer Not To State": {},
+}
+
+var INTERESTS_OPTIONS = map[string]struct{}{
+	"Reading":        {},
+	"Traveling":      {},
+	"Cooking":        {},
+	"Swimming":       {},
+	"Gaming":         {},
+	"Sports":         {},
+	"Music":          {},
+	"Art":            {},
+	"Technology":     {},
+	"Politics":       {},
+	"Writing":        {},
+	"Social Justice": {},
+	"History":        {},
+	"Dance":          {},
+}
+
 type Config struct {
 	HOST                  string
 	IS_PROD               bool

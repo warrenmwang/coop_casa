@@ -26,9 +26,9 @@ func NewAuth() {
 
 	var callbackURL string
 	if isProd {
-		callbackURL = fmt.Sprintf("%s:%d/auth/google/callback", host, config.GlobalConfig.FRONTEND_PORT) // rely on docker proxy
+		callbackURL = fmt.Sprintf("%s:%d/auth/v1/google/callback", host, config.GlobalConfig.FRONTEND_PORT) // rely on docker proxy
 	} else {
-		callbackURL = fmt.Sprintf("%s:%d/auth/google/callback", host, config.GlobalConfig.PORT) // access backend straight up for fast dev
+		callbackURL = fmt.Sprintf("%s:%d/auth/v1/google/callback", host, config.GlobalConfig.PORT) // access backend straight up for fast dev
 	}
 
 	store := sessions.NewCookieStore([]byte(key))

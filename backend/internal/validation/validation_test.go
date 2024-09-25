@@ -132,7 +132,7 @@ func TestValidateCommunityDetails(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		err := ValidateCommnityDetails(test.input)
+		err := ValidateCommunityDetails(test.input)
 		if test.expectError {
 			if err == nil {
 				t.Errorf("test #%d - expected error but didn't get one", i)
@@ -512,6 +512,132 @@ func TestValidatePropertyDetails(t *testing.T) {
 			},
 			true,
 		},
+		{
+			// bad words
+			database.PropertyDetails{
+				PropertyID:        uuid1,
+				ListerUserID:      listerUserID1,
+				Name:              "fuck",
+				Description:       "",
+				City:              "city",
+				State:             "state",
+				Zipcode:           "zipcode",
+				Country:           "country",
+				Square_feet:       123,
+				Num_bedrooms:      123,
+				Num_toilets:       123,
+				Num_showers_baths: 123,
+				Cost_dollars:      123,
+				Cost_cents:        100,
+				Misc_note:         "as",
+			},
+			true,
+		},
+		{
+			// bad words
+			database.PropertyDetails{
+				PropertyID:        uuid1,
+				ListerUserID:      listerUserID1,
+				Name:              "name",
+				Description:       "asshole",
+				City:              "city",
+				State:             "state",
+				Zipcode:           "zipcode",
+				Country:           "country",
+				Square_feet:       123,
+				Num_bedrooms:      123,
+				Num_toilets:       123,
+				Num_showers_baths: 123,
+				Cost_dollars:      123,
+				Cost_cents:        100,
+				Misc_note:         "as",
+			},
+			true,
+		},
+		{
+			// bad words
+			database.PropertyDetails{
+				PropertyID:        uuid1,
+				ListerUserID:      listerUserID1,
+				Name:              "name",
+				Description:       "",
+				City:              "bitch",
+				State:             "state",
+				Zipcode:           "zipcode",
+				Country:           "country",
+				Square_feet:       123,
+				Num_bedrooms:      123,
+				Num_toilets:       123,
+				Num_showers_baths: 123,
+				Cost_dollars:      123,
+				Cost_cents:        100,
+				Misc_note:         "as",
+			},
+			true,
+		},
+		{
+			// bad words
+			database.PropertyDetails{
+				PropertyID:        uuid1,
+				ListerUserID:      listerUserID1,
+				Name:              "name",
+				Description:       "",
+				City:              "city",
+				State:             "F   u   C  k",
+				Zipcode:           "zipcode",
+				Country:           "country",
+				Square_feet:       123,
+				Num_bedrooms:      123,
+				Num_toilets:       123,
+				Num_showers_baths: 123,
+				Cost_dollars:      123,
+				Cost_cents:        100,
+				Misc_note:         "as",
+			},
+			true,
+		},
+		{
+			// bad words
+			database.PropertyDetails{
+				PropertyID:        uuid1,
+				ListerUserID:      listerUserID1,
+				Name:              "name",
+				Description:       "",
+				City:              "city",
+				State:             "state",
+				Zipcode:           "$hiT",
+				Country:           "country",
+				Square_feet:       123,
+				Num_bedrooms:      123,
+				Num_toilets:       123,
+				Num_showers_baths: 123,
+				Cost_dollars:      123,
+				Cost_cents:        100,
+				Misc_note:         "as",
+			},
+			true,
+		},
+		{
+			// bad words
+			database.PropertyDetails{
+				PropertyID:        uuid1,
+				ListerUserID:      listerUserID1,
+				Name:              "name",
+				Description:       "",
+				City:              "city",
+				State:             "state",
+				Zipcode:           "zipcode",
+				Country:           "cunt",
+				Square_feet:       123,
+				Num_bedrooms:      123,
+				Num_toilets:       123,
+				Num_showers_baths: 123,
+				Cost_dollars:      123,
+				Cost_cents:        100,
+				Misc_note:         "as",
+			},
+			true,
+		},
 	}
 
 	for i, test := range tests {
@@ -545,7 +671,7 @@ func TestValidateUserDetails(t *testing.T) {
 				BirthDate: "0280-12-25",
 				Gender:    "Man",
 				Location:  "North Pole, Arctic",
-				Interests: []string{"giving gifts to good kids", "giving coal to naughty ones", "taking care of my reindeer and elves", "and making love to mrs.claus"},
+				Interests: []string{"Reading", "Traveling", "History"},
 			},
 			false,
 		},
@@ -558,7 +684,7 @@ func TestValidateUserDetails(t *testing.T) {
 				BirthDate: "1999-01-01",
 				Gender:    "Woman",
 				Location:  "Siberia",
-				Interests: []string{"giving gifts to good kids", "giving coal to naughty ones", "taking care of my reindeer and elves", "and making love to mrs.claus"},
+				Interests: []string{"Reading", "Traveling", "History"},
 			},
 			false,
 		},
@@ -571,7 +697,7 @@ func TestValidateUserDetails(t *testing.T) {
 				BirthDate: "0280-12-25",
 				Gender:    "Man",
 				Location:  "North Pole, Arctic",
-				Interests: []string{"giving gifts to good kids", "giving coal to naughty ones", "taking care of my reindeer and elves", "and making love to mrs.claus"},
+				Interests: []string{"Reading", "Traveling", "History"},
 			},
 			true,
 		},
@@ -584,7 +710,7 @@ func TestValidateUserDetails(t *testing.T) {
 				BirthDate: "0280-12-25",
 				Gender:    "Man",
 				Location:  "North Pole, Arctic",
-				Interests: []string{"giving gifts to good kids", "giving coal to naughty ones", "taking care of my reindeer and elves", "and making love to mrs.claus"},
+				Interests: []string{"Reading", "Traveling", "History"},
 			},
 			true,
 		},
@@ -597,7 +723,7 @@ func TestValidateUserDetails(t *testing.T) {
 				BirthDate: "0280-12-25",
 				Gender:    "Man",
 				Location:  "North Pole, Arctic",
-				Interests: []string{"giving gifts to good kids", "giving coal to naughty ones", "taking care of my reindeer and elves", "and making love to mrs.claus"},
+				Interests: []string{"Reading", "Traveling", "History"},
 			},
 			true,
 		},
@@ -610,7 +736,7 @@ func TestValidateUserDetails(t *testing.T) {
 				BirthDate: "0280-12-25",
 				Gender:    "Man",
 				Location:  "North Pole, Arctic",
-				Interests: []string{"giving gifts to good kids", "giving coal to naughty ones", "taking care of my reindeer and elves", "and making love to mrs.claus"},
+				Interests: []string{"Reading", "Traveling", "History"},
 			},
 			true,
 		},
@@ -623,7 +749,7 @@ func TestValidateUserDetails(t *testing.T) {
 				BirthDate: "", // empty birth date
 				Gender:    "Man",
 				Location:  "North Pole, Arctic",
-				Interests: []string{"giving gifts to good kids", "giving coal to naughty ones", "taking care of my reindeer and elves", "and making love to mrs.claus"},
+				Interests: []string{"Reading", "Traveling", "History"},
 			},
 			true,
 		},
@@ -636,7 +762,7 @@ func TestValidateUserDetails(t *testing.T) {
 				BirthDate: strings.Split(time.Now().String(), " ")[0], // invalid birth date (too young)
 				Gender:    "Man",
 				Location:  "North Pole, Arctic",
-				Interests: []string{"giving gifts to good kids", "giving coal to naughty ones", "taking care of my reindeer and elves", "and making love to mrs.claus"},
+				Interests: []string{"Reading", "Traveling", "History"},
 			},
 			true,
 		},
@@ -649,7 +775,7 @@ func TestValidateUserDetails(t *testing.T) {
 				BirthDate: "1999-12-25",
 				Gender:    "", // empty gender
 				Location:  "North Pole, Arctic",
-				Interests: []string{"giving gifts to good kids", "giving coal to naughty ones", "taking care of my reindeer and elves", "and making love to mrs.claus"},
+				Interests: []string{"Reading", "Traveling", "History"},
 			},
 			true,
 		},
@@ -662,7 +788,7 @@ func TestValidateUserDetails(t *testing.T) {
 				BirthDate: "1999-12-25",
 				Gender:    "Man",
 				Location:  "", // empty location
-				Interests: []string{"giving gifts to good kids", "giving coal to naughty ones", "taking care of my reindeer and elves", "and making love to mrs.claus"},
+				Interests: []string{"Reading", "Traveling", "History"},
 			},
 			true,
 		},
@@ -679,6 +805,58 @@ func TestValidateUserDetails(t *testing.T) {
 			},
 			true,
 		},
+		{
+			database.UserDetails{
+				UserID:    userID1,
+				Email:     "example@example.com",
+				FirstName: "santa",
+				LastName:  "claus",
+				BirthDate: "1999-12-25",
+				Gender:    "Man",
+				Location:  "North Pole, Arctic",
+				Interests: []string{"making love to santa claus"}, // invalid interest
+			},
+			true,
+		},
+		{
+			database.UserDetails{
+				UserID:    userID1,
+				Email:     "example@example.com",
+				FirstName: "fuck you", // profanity
+				LastName:  "lastname",
+				BirthDate: "1999-12-25",
+				Gender:    "Man",
+				Location:  "North Pole, Arctic",
+				Interests: []string{"Reading", "Traveling", "History"},
+			},
+			true,
+		},
+		{
+			database.UserDetails{
+				UserID:    userID1,
+				Email:     "example@example.com",
+				FirstName: "firstname",
+				LastName:  "bitch ass hoe", // profanity
+				BirthDate: "1999-12-25",
+				Gender:    "Man",
+				Location:  "North Pole, Arctic",
+				Interests: []string{"Reading", "Traveling", "History"},
+			},
+			true,
+		},
+		{
+			database.UserDetails{
+				UserID:    userID1,
+				Email:     "example@example.com",
+				FirstName: "fuck you",      // profanity
+				LastName:  "bitch ass hoe", // profanity
+				BirthDate: "1999-12-25",
+				Gender:    "Man",
+				Location:  "North Pole, Arctic",
+				Interests: []string{"Reading", "Traveling", "History"},
+			},
+			true,
+		},
 	}
 
 	for i, test := range tests {
@@ -689,7 +867,7 @@ func TestValidateUserDetails(t *testing.T) {
 			}
 		} else {
 			if err != nil {
-				t.Errorf("test #%d - didn't expect error but got one", i)
+				t.Errorf("test #%d - didn't expect error but got one: %s", i, err)
 			}
 		}
 	}
