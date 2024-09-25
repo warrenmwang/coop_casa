@@ -1,7 +1,4 @@
 import React from "react";
-import "../styles/font.css";
-
-import "../styles/contentBody.css";
 
 const PrivacyPolicyPage: React.FC = () => {
   return (

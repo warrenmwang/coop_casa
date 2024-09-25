@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Autosuggest from "react-autosuggest";
 import { User } from "../types/Types";
-import "../styles/font.css";
 
 interface LocationInputArgs {
   formData: User;

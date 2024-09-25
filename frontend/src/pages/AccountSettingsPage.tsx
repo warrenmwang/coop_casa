@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Title from "../components/Title";
 import Modal from "../components/Modal";
 import AccountSettingsForm from "../form/AccountSettingsForm";
@@ -7,12 +7,11 @@ import { homePageLink } from "../urls";
 import TextSkeleton from "../skeleton/TextSkeleton";
 import axios, { AxiosError } from "axios";
 import { toast } from "react-toastify";
-import "../styles/contentBody.css";
 import { useDeleteUserAccount, useGetUserAccountAuth } from "../hooks/account";
 
 // Authenticated Endpoint
 const AccountSettingsPage: React.FC = () => {
-  const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
   const authQuery = useGetUserAccountAuth();
@@ -41,7 +40,7 @@ const AccountSettingsPage: React.FC = () => {
   }
   const ready: boolean = authQuery.isFetched;
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (ready && !authenticated) {
       navigate(homePageLink);
     }

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 // Components
@@ -17,8 +17,7 @@ import ImageInput from "../input/ImageInput";
 import { EmptyUser } from "../types/Objects";
 
 // Styles
-import "../styles/form.css";
-import "../styles/contentBody.css";
+
 import SubmitButton from "../components/buttons/SubmitButton";
 import { dashboardPageLink, homePageLink } from "../urls";
 import TextSkeleton from "../skeleton/TextSkeleton";
@@ -36,16 +35,14 @@ import {
 } from "../hooks/account";
 
 const AccountSetupPage: React.FC = () => {
-  const [formData, setFormData] = React.useState<User>(EmptyUser);
-  const [isSubmitting, setIsSubmitting] = React.useState<boolean>(false);
-  const [errors, setMyMap] = React.useState<Map<string, boolean>>(
+  const [formData, setFormData] = useState<User>(EmptyUser);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [errors, setMyMap] = useState<Map<string, boolean>>(
     new Map<string, boolean>(),
   ); // if any key value in errors is true, then there is a problem.
 
   // User Profile Images (opt)
-  const [userProfileImages, setUserProfileImages] = React.useState<
-    OrderedFile[]
-  >([]);
+  const [userProfileImages, setUserProfileImages] = useState<OrderedFile[]>([]);
 
   const userQuery = useGetUserAccountDetails();
   const updateUserAccount = useUpdateAccountSettings();
@@ -127,14 +124,14 @@ const AccountSetupPage: React.FC = () => {
   const ready: boolean = authQuery.isFetched;
 
   // Set interests error to true at first render
-  React.useEffect(() => {
+  useEffect(() => {
     if (formData.interests.length === 0) {
       setError("interests", true);
     }
   }, []);
 
   // Retrieve the ID and email
-  React.useEffect(() => {
+  useEffect(() => {
     if (userQuery.status === "success") {
       const received: APIUserReceived = userQuery.data;
       const userDetails: UserDetails = received.userDetails;
@@ -151,7 +148,7 @@ const AccountSetupPage: React.FC = () => {
     }
   }, [userQuery.status]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (ready && !authenticated) {
       navigate(homePageLink);
     }

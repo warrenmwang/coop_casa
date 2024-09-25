@@ -3,7 +3,7 @@ import CardGridSkeleton from "../../skeleton/CardGridSkeleton";
 import PageOfCommunities from "./PageOfCommunities";
 
 import SearchBar from "../../input/SearchBar";
-import "../../styles/colors.css";
+
 import SubmitButton from "../buttons/SubmitButton";
 import { useSearchParams } from "react-router-dom";
 import {

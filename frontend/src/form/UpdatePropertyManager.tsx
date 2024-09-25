@@ -3,7 +3,7 @@ import SubmitButton from "../components/buttons/SubmitButton";
 import { validate as uuidValidate } from "uuid";
 import { apiGetProperty } from "../api/property";
 import { Property } from "../types/Types";
-import "../styles/input.css";
+
 import { toast } from "react-toastify";
 import UpdatePropertyForm from "./UpdatePropertyForm";
 import { useDeleteProperty } from "../hooks/properties";

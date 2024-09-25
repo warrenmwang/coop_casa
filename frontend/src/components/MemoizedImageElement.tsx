@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useState, useEffect } from "react";
 
 type MemoizedImageElementProps = {
   image: File;
@@ -9,9 +9,9 @@ const MemoizedImageElement: React.FC<MemoizedImageElementProps> = ({
   image,
   className = "",
 }) => {
-  const [imageURL, setImageURL] = React.useState<string>("");
+  const [imageURL, setImageURL] = useState<string>("");
 
-  React.useEffect(() => {
+  useEffect(() => {
     const url = URL.createObjectURL(image);
     setImageURL(url);
 

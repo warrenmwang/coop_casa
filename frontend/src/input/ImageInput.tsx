@@ -1,7 +1,7 @@
 import React from "react";
 import { User } from "../types/Types";
 import { validateUserAvatarInput } from "../utils/inputValidation";
-import "../styles/input.css";
+
 import { toast } from "react-toastify";
 
 interface ImageInputArgs {

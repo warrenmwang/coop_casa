@@ -1,9 +1,9 @@
-import * as React from "react";
+import React, { useState } from "react";
 import { useGetUserProfiles } from "../hooks/users";
 import UserProfileCard from "./users/UserProfileCard";
 import { UserProfile } from "../types/Types";
 import Modal from "./Modal";
-import "../styles/container.css";
+
 import { LIKED_ENTITIES_DISPLAY_NUM_PREVIEW } from "../constants";
 
 type LayoutSectionUsersProfilesWithModalProps = {
@@ -14,7 +14,7 @@ type LayoutSectionUsersProfilesWithModalProps = {
 const LayoutSectionUsersProfilesWithModal: React.FC<
   LayoutSectionUsersProfilesWithModalProps
 > = ({ userIDs, modalTitle }) => {
-  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const userProfileQueries = useGetUserProfiles(userIDs);
 
   const userProfiles: UserProfile[] = userProfileQueries

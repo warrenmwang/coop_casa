@@ -2,8 +2,6 @@ import React from "react";
 import Title from "../components/Title";
 import coopLogo from "../assets/coopAlt1.svg";
 
-import "../styles/contentBody.css";
-
 const AboutPage: React.FC = () => {
   return (
     <div className="content-body">

@@ -1,9 +1,9 @@
-import * as React from "react";
+import React, { useState } from "react";
 import { useGetCommunities } from "../hooks/communities";
 import { Community } from "../types/Types";
 import CommunityCard from "./communities/CommunityCard";
 import Modal from "./Modal";
-import "../styles/container.css";
+
 import { LIKED_ENTITIES_DISPLAY_NUM_PREVIEW } from "../constants";
 
 type LayoutSectionCommunitiesWithModalProps = {
@@ -14,7 +14,7 @@ type LayoutSectionCommunitiesWithModalProps = {
 const LayoutSectionCommunitiesWithModal: React.FC<
   LayoutSectionCommunitiesWithModalProps
 > = ({ communityIDs, modalTitle }) => {
-  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const CommunityQueries = useGetCommunities(communityIDs);
 
   const Communities: Community[] = CommunityQueries.map(

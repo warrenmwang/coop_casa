@@ -1,5 +1,4 @@
 import React from "react";
-import "../styles/contentBody.css";
 import CommunitiesMainBody from "../components/communities/CommunitiesMainBody";
 import Title from "../components/Title";
 

@@ -1,6 +1,5 @@
 import React from "react";
 import Title from "../components/Title";
-import "../styles/contentBody.css";
 import { Typography } from "@mui/material";
 
 const AttributionsPage: React.FC = () => {

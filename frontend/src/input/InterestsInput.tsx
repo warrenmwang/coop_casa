@@ -1,6 +1,5 @@
 import React from "react";
 import { interestsOptions } from "../constants";
-import "../styles/input.css";
 
 interface InterestsInputProps {
   values: string[];

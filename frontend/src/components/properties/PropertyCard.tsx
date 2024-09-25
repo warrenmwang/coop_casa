@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Property } from "../../types/Types";
 import { Card, CardContent, CardMedia } from "@mui/material";
 import { propertiesPageLink } from "../../urls";
-import "../../styles/mui.css";
+
 import MemoizedImageElement from "../MemoizedImageElement";
 
 interface PropertyCardProps {

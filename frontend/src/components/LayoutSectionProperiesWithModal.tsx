@@ -1,9 +1,9 @@
-import * as React from "react";
+import React, { useState } from "react";
 import { useGetProperties } from "../hooks/properties";
 import { Property } from "../types/Types";
 import PropertyCard from "./properties/PropertyCard";
 import Modal from "./Modal";
-import "../styles/container.css";
+
 import { LIKED_ENTITIES_DISPLAY_NUM_PREVIEW } from "../constants";
 
 type LayoutSectionPropertiesWithModalProps = {
@@ -14,7 +14,7 @@ type LayoutSectionPropertiesWithModalProps = {
 const LayoutSectionPropertiesWithModal: React.FC<
   LayoutSectionPropertiesWithModalProps
 > = ({ propertyIDs, modalTitle }) => {
-  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const propertyQueries = useGetProperties(propertyIDs);
 
   const properties: Property[] = propertyQueries

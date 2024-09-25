@@ -4,7 +4,6 @@ import { usersPageLink } from "../../urls";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardMedia } from "@mui/material";
 import DefaultUserProfileIcon from "../../icons/DefaultUserProfile/DefaultUserProfileIcon";
-import "../../styles/mui.css";
 
 const UserProfileCard: React.FC<{ userProfile: UserProfile }> = ({
   userProfile,

@@ -1,6 +1,4 @@
 import React from "react";
-import "../styles/contentBody.css";
-
 const TermsOfServicePage: React.FC = () => {
   return (
     <div className="content-body px-4 py-8">

@@ -1,5 +1,5 @@
 import * as React from "react";
-import "../styles/font.css";
+
 import Title from "./Title";
 import AllLikedEntitiesSection from "./AllLikedEntitiesSection";
 

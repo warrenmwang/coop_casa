@@ -1,6 +1,5 @@
 import React from "react";
 import { GENDER_OPTIONS } from "../constants";
-import "../styles/input.css";
 
 interface GenderInputArgs {
   value: string;

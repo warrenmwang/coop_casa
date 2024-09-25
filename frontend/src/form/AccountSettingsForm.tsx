@@ -11,7 +11,7 @@ import {
   User,
   UserDetails,
 } from "../types/Types";
-import "../styles/form.css";
+
 import TextSkeleton from "../skeleton/TextSkeleton";
 import { toast } from "react-toastify";
 import { EmptyUser } from "../types/Objects";

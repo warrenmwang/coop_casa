@@ -15,7 +15,6 @@ import {
   costNumsToPresentableString,
 } from "../utils/property";
 import FormButton from "../components/buttons/FormButton";
-import "../styles/button.css";
 import axios, { AxiosError } from "axios";
 import { useUpdateCommunity } from "../hooks/communities";
 

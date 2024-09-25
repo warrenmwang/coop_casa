@@ -1,7 +1,6 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
-import "../../styles/assets.css";
 
 const ShareLinkButton: React.FC = () => {
   const { pathname } = useLocation();

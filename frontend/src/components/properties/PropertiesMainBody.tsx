@@ -8,8 +8,7 @@ import SubmitButton from "../buttons/SubmitButton";
 import FetchErrorText from "../FetchErrorText";
 import { pageQPKey, filterAddressQPKey } from "../../constants";
 import { useGetPageOfPropertyIDs } from "../../hooks/properties";
-import "../../styles/contentBody.css";
-import "../../styles/form.css";
+
 import PaginationButtons from "../PaginationButtons";
 import {
   useGetPageNumSearchQueryParam,

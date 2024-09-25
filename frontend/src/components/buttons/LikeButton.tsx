@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useState } from "react";
 import HeartIcon from "../../icons/HeartIcon";
 
 type LikeButtonProps = {
@@ -10,7 +10,7 @@ const LikeButton: React.FC<LikeButtonProps> = ({
   initState,
   onClick = () => {},
 }) => {
-  const [isClicked, setIsClicked] = React.useState<boolean>(initState);
+  const [isClicked, setIsClicked] = useState<boolean>(initState);
 
   return (
     <>

@@ -1,7 +1,5 @@
 import React from "react";
 import Title from "../components/Title";
-import "../styles/contentBody.css";
-
 const ContactPage: React.FC = () => {
   return (
     <div className="content-body">

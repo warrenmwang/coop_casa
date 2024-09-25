@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Title from "../components/Title";
 
@@ -11,7 +11,6 @@ import { APIUserReceived, UserDetails } from "../types/Types";
 import ListerDashboard from "../components/ListerDashboard";
 import { EmptyUser } from "../types/Objects";
 
-import "../styles/contentBody.css";
 import {
   useGetUserAccountAuth,
   useGetUserAccountDetails,
@@ -48,7 +47,7 @@ const DashboardPage: React.FC = () => {
   const ready: boolean =
     userQuery.isFetched && authQuery.isFetched && roleQuery.isFetched;
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (authQuery.status === "success" && authenticated === false) {
       navigate(homePageLink);
     }
@@ -59,7 +58,7 @@ const DashboardPage: React.FC = () => {
       ? `Welcome ${userDetails.firstName} ${userDetails.lastName}`
       : `Welcome ${userDetails.email}`;
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (userQuery.status === "success") {
       if (userDetails.firstName === "" || userDetails.lastName === "") {
         navigate(accountSetupPageLink);

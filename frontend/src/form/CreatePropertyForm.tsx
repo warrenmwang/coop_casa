@@ -13,9 +13,7 @@ import {
   UserDetails,
 } from "../types/Types";
 import TextSkeleton from "../skeleton/TextSkeleton";
-import "../styles/font.css";
-import "../styles/input.css";
-import "../styles/form.css";
+
 import { toast } from "react-toastify";
 import axios, { AxiosError } from "axios";
 import { useGetUserAccountDetails } from "../hooks/account";

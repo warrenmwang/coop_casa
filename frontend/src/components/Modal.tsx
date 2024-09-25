@@ -1,5 +1,4 @@
-import * as React from "react";
-import "../styles/Modal.css";
+import React, { useCallback, useEffect } from "react";
 
 interface ModalProps {
   isOpen: boolean;
@@ -9,7 +8,7 @@ interface ModalProps {
 }
 
 const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
-  const handleEscape = React.useCallback(
+  const handleEscape = useCallback(
     (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         onClose();
@@ -18,7 +17,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
     [onClose],
   );
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
       document.addEventListener("keydown", handleEscape);

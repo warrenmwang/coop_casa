@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import SubmitButton from "../components/buttons/SubmitButton";
 import { validate as uuidValidate } from "uuid";
 import { Community } from "../types/Types";
-import "../styles/input.css";
+
 import { toast } from "react-toastify";
 import UpdateCommunityForm from "./UpdateCommunityForm";
 import { useDeleteCommunity } from "../hooks/communities";
