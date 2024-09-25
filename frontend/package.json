@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@craco/craco": "^7.1.0",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
     "@fontsource/roboto": "^5.0.13",
@@ -27,13 +28,14 @@
     "zod": "^3.23.8"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "testwatch": "react-scripts test",
-    "test": "react-scripts test --watchAll=false",
+    "start": "craco start",
+    "build": "craco build",
+    "testwatch": "craco test",
+    "test": "craco test --watchAll=false",
     "eject": "react-scripts eject",
     "lint": "eslint .",
-    "analyze": "source-map-explorer 'build/static/js/*.js'"
+    "analyze_": "source-map-explorer 'build/static/js/*.js'",
+    "analyze": "craco build --stats && webpack-bundle-analyzer build/bundle-stats.json"
   },
   "eslintConfig": {
     "extends": [

@@ -22,9 +22,9 @@ export const dashboardPageLink = "/dashboard";
 export const usersPageLink = "/users";
 
 // BACK END
-export const apiAuthGoogleOAuthLink = `${API_HOST}:${API_PORT}/auth/google`;
-export const apiAuthLogoutLink = `${API_HOST}:${API_PORT}/auth/google/logout`;
-export const apiAuthCheckLink = `${API_HOST}:${API_PORT}/auth/google/check`;
+export const apiAuthGoogleOAuthLink = `${API_HOST}:${API_PORT}/auth/v1/google`;
+export const apiAuthLogoutLink = `${API_HOST}:${API_PORT}/auth/v1/google/logout`;
+export const apiAuthCheckLink = `${API_HOST}:${API_PORT}/auth/v1/google/check`;
 
 export const apiAccountLink = `${API_HOST}:${API_PORT}/api/v1/account`;
 export const apiAccountUpdateLink = `${API_HOST}:${API_PORT}/api/v1/account`;
