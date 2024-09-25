@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import Title from "../components/Title";
 import Modal from "../components/Modal";
 import AccountSettingsForm from "../form/AccountSettingsForm";
@@ -12,7 +12,7 @@ import { useDeleteUserAccount, useGetUserAccountAuth } from "../hooks/account";
 
 // Authenticated Endpoint
 const AccountSettingsPage: React.FC = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
   const navigate = useNavigate();
 
   const authQuery = useGetUserAccountAuth();
@@ -39,12 +39,14 @@ const AccountSettingsPage: React.FC = () => {
   if (authQuery.status === "success") {
     authenticated = authQuery.data as boolean;
   }
-
-  if (!authenticated) {
-    navigate(homePageLink);
-  }
-
   const ready: boolean = authQuery.isFetched;
+
+  React.useEffect(() => {
+    if (ready && !authenticated) {
+      navigate(homePageLink);
+    }
+  }, [ready, authenticated]);
+
   if (!ready) {
     return <TextSkeleton />;
   }

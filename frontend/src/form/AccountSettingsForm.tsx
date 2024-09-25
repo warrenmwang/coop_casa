@@ -4,7 +4,7 @@ import LocationInput from "../input/LocationInput";
 import GenderInput from "../input/GenderInput";
 import TextInput from "../input/TextInput";
 import ImageInput from "../input/ImageInput";
-import { apiFile2ClientFile } from "../utils/utils";
+import { apiFile2ClientFile, isAccountSetup } from "../utils/utils";
 import {
   APIUserReceived,
   OrderedFile,
@@ -31,6 +31,7 @@ const AccountSettingsForm: React.FC = () => {
   const [formData, setFormData] = useState<User>(EmptyUser);
   const [isChanged, setIsChanged] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [accountIsSetup, setAccountIsSetup] = useState(false);
 
   const [userProfileImages, setUserProfileImages] = useState<OrderedFile[]>([]);
   const [formProfileImages, setFormProfileImages] = useState<OrderedFile[]>([]);
@@ -106,6 +107,7 @@ const AccountSettingsForm: React.FC = () => {
         interests: [...userDetails.interests],
         avatar: userAvatar,
       });
+      setAccountIsSetup(isAccountSetup(userDetails));
     }
     // Populate user profile images
     if (userProfileImagesQuery.status === "success") {
@@ -139,7 +141,13 @@ const AccountSettingsForm: React.FC = () => {
             again later.
           </FetchErrorText>
         )}
-      {ready && userQuery.isSuccess && (
+      {ready && userQuery.isSuccess && !accountIsSetup && (
+        <p className="text-green-600 text-lg mt-2">
+          Your account is not setup, please setup your account by going to the
+          dashboard. Otherwise, you can choose to delete your account here.
+        </p>
+      )}
+      {ready && userQuery.isSuccess && accountIsSetup && (
         <form className="form__vertical_inputs">
           {/* User Role and ID -- obviously not allowed to change, just displaying it! */}
           <div className="input__container ">

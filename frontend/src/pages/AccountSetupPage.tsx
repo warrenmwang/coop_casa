@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 
 // Components
@@ -20,9 +20,9 @@ import { EmptyUser } from "../types/Objects";
 import "../styles/form.css";
 import "../styles/contentBody.css";
 import SubmitButton from "../components/buttons/SubmitButton";
-import { dashboardPageLink } from "../urls";
+import { dashboardPageLink, homePageLink } from "../urls";
 import TextSkeleton from "../skeleton/TextSkeleton";
-import { apiFile2ClientFile } from "../utils/utils";
+import { apiFile2ClientFile, isAccountSetup } from "../utils/utils";
 
 import axios, { AxiosError } from "axios";
 import { toast } from "react-toastify";
@@ -30,24 +30,28 @@ import MultipleImageUploader from "../input/MultipleImageUploader";
 import { MAX_USER_PROFILE_IMGS_ALLOWED } from "../constants";
 import FormButton from "../components/buttons/FormButton";
 import {
+  useGetUserAccountAuth,
   useGetUserAccountDetails,
   useUpdateAccountSettings,
 } from "../hooks/account";
 
 const AccountSetupPage: React.FC = () => {
-  const navigate = useNavigate();
-
-  const [formData, setFormData] = useState<User>(EmptyUser);
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [errors, setMyMap] = useState<Map<string, boolean>>(
+  const [formData, setFormData] = React.useState<User>(EmptyUser);
+  const [isSubmitting, setIsSubmitting] = React.useState<boolean>(false);
+  const [errors, setMyMap] = React.useState<Map<string, boolean>>(
     new Map<string, boolean>(),
   ); // if any key value in errors is true, then there is a problem.
 
   // User Profile Images (opt)
-  const [userProfileImages, setUserProfileImages] = useState<OrderedFile[]>([]);
+  const [userProfileImages, setUserProfileImages] = React.useState<
+    OrderedFile[]
+  >([]);
 
   const userQuery = useGetUserAccountDetails();
   const updateUserAccount = useUpdateAccountSettings();
+
+  const navigate = useNavigate();
+  const authQuery = useGetUserAccountAuth();
 
   const setError = (key: string, value: boolean) => {
     setMyMap((prevMap) => {
@@ -116,19 +120,30 @@ const AccountSetupPage: React.FC = () => {
     );
   };
 
+  let authenticated: boolean = false;
+  if (authQuery.status === "success") {
+    authenticated = authQuery.data as boolean;
+  }
+  const ready: boolean = authQuery.isFetched;
+
   // Set interests error to true at first render
-  useEffect(() => {
+  React.useEffect(() => {
     if (formData.interests.length === 0) {
       setError("interests", true);
     }
   }, []);
 
   // Retrieve the ID and email
-  useEffect(() => {
+  React.useEffect(() => {
     if (userQuery.status === "success") {
       const received: APIUserReceived = userQuery.data;
       const userDetails: UserDetails = received.userDetails;
       const avatar: File | null = apiFile2ClientFile(received.avatarImageB64);
+
+      if (isAccountSetup(userDetails)) {
+        navigate(dashboardPageLink);
+      }
+
       setFormData({
         ...userDetails,
         avatar: avatar,
@@ -136,7 +151,12 @@ const AccountSetupPage: React.FC = () => {
     }
   }, [userQuery.status]);
 
-  const ready: boolean = userQuery.isFetched && formData.userId !== "";
+  React.useEffect(() => {
+    if (ready && !authenticated) {
+      navigate(homePageLink);
+    }
+  }, [ready, authenticated]);
+
   if (!ready) {
     return <TextSkeleton />;
   }

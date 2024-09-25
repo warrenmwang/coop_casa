@@ -1,4 +1,4 @@
-import { APIFileReceived, OrderedFile } from "../types/Types";
+import { APIFileReceived, OrderedFile, UserDetails } from "../types/Types";
 
 // Function to convert a File to Base64 string, useful for arbitrary binary format
 // user input into a string format for passing it around (i.e. serializing and sending over network)
@@ -70,3 +70,13 @@ export const fileArray2OrderedFileArray = (arr: File[]): OrderedFile[] => {
 export const deepCopyObjectJSONSerialize = <T>(obj: T): T => {
   return JSON.parse(JSON.stringify(obj));
 };
+
+export function isAccountSetup(userDetails: UserDetails): boolean {
+  if (userDetails.firstName === "") return false;
+  if (userDetails.lastName === "") return false;
+  if (userDetails.birthDate === "") return false;
+  if (userDetails.gender === "") return false;
+  if (userDetails.location === "") return false;
+  if (userDetails.interests.length === 0) return false;
+  return true;
+}
