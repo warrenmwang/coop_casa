@@ -12,6 +12,10 @@ import { useGetPageOfPropertyIDs } from "../../hooks/properties";
 import "../../styles/contentBody.css";
 import "../../styles/form.css";
 import PaginationButtons from "../PaginationButtons";
+import {
+  useGetPageNumSearchQueryParam,
+  useGetURLSearchQueryParam,
+} from "../../hooks/react-router";
 
 const PropertiesMainBody: React.FC = () => {
   const [searchIsSubmitting, setSearchIsSubmitting] = useState(false);
@@ -19,45 +23,20 @@ const PropertiesMainBody: React.FC = () => {
 
   const [pages, setPages] = useState<Map<number, string[]>>(new Map()); // <page num, property ids>
 
-  // Sync query params with state
-  // page num
-  let pageQP: string | null = searchParams.get(pageQPKey);
-  let startPageNum: number;
-  if (pageQP !== null && pageQP.length > 0) {
-    // use the given page num, or use 0 if not a valid number
-    pageQP = pageQP as string;
-    startPageNum = Number(pageQP);
-    if (Number.isNaN(startPageNum)) {
-      startPageNum = 0;
-    }
-    if (startPageNum < 0) {
-      startPageNum = 0;
-    }
-  } else {
-    // not given, start with first page (0)
-    startPageNum = 0;
-    searchParams.set(pageQPKey, `${startPageNum}`);
-    setSearchParams(searchParams);
-  }
-
-  const filterAddressQP: string | null = searchParams.get(filterAddressQPKey);
-  let filterAddressStr: string;
-  if (filterAddressQP !== null) {
-    filterAddressStr = filterAddressQP as string;
-  } else {
-    filterAddressStr = "";
-  }
-
   // Init our states from the query params
   // Current page number
-  const [currentPage, _setCurrentPage] = useState<number>(startPageNum);
+  const [currentPage, _setCurrentPage] = useState<number>(
+    useGetPageNumSearchQueryParam(),
+  );
   const setCurrentPage = (page: number) => {
     _setCurrentPage(page);
     searchParams.set(pageQPKey, `${page}`);
     setSearchParams(searchParams);
   };
   // Filter - address
-  const [filterAddress, setFilterAddress] = useState<string>(filterAddressStr);
+  const [filterAddress, setFilterAddress] = useState<string>(
+    useGetURLSearchQueryParam(filterAddressQPKey, ""),
+  );
 
   // Use react query hook to handle our data fetching and async state w/ caching of query results.
   const query = useGetPageOfPropertyIDs(currentPage, filterAddress);
@@ -149,10 +128,7 @@ const PropertiesMainBody: React.FC = () => {
 
       {/* If query is successful and there are properties, then show the current page of them! */}
       {pages.has(currentPage) && (
-        <PageOfProperties
-          key={currentPage}
-          propertyIDs={pages.get(currentPage) as string[]}
-        />
+        <PageOfProperties propertyIDs={pages.get(currentPage) as string[]} />
       )}
 
       {/* If no properties exist on platform, display a message. */}

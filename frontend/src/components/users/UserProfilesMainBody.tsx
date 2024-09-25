@@ -14,6 +14,10 @@ import SubmitButton from "../buttons/SubmitButton";
 import PageOfUserProfiles from "./PageOfUserProfiles";
 import { useGetPageOfUserProfiles } from "../../hooks/users";
 import PaginationButtons from "../PaginationButtons";
+import {
+  useGetPageNumSearchQueryParam,
+  useGetURLSearchQueryParam,
+} from "../../hooks/react-router";
 
 const UserProfilesMainBody: React.FC = () => {
   const [searchIsSubmitting, setSearchIsSubmitting] = useState<boolean>(false);
@@ -21,47 +25,16 @@ const UserProfilesMainBody: React.FC = () => {
 
   const [pages, setPages] = useState<Map<number, string[]>>(new Map()); // <page num, property ids>
 
-  // Grab the search params, to init our state.
-  let startPage: string | null = searchParams.get(pageQPKey);
-  let startPageNum: number;
-  if (startPage !== null && startPage.length > 0) {
-    // use the given page num, or use 0 if not a valid number
-    startPage = startPage as string;
-    startPageNum = Number(startPage);
-    if (Number.isNaN(startPageNum)) {
-      startPageNum = 0;
-    }
-    if (startPageNum < 0) {
-      startPageNum = 0;
-    }
-  } else {
-    // not given, start with first page (0)
-    startPageNum = 0;
-    searchParams.set(pageQPKey, `${startPageNum}`);
-    setSearchParams(searchParams);
-  }
-
-  const filterFirstNameQP: string | null =
-    searchParams.get(filterFirstNameQPKey);
-  let filterFirstNameStr: string;
-  if (filterFirstNameQP !== null) {
-    filterFirstNameStr = filterFirstNameQP as string;
-  } else {
-    filterFirstNameStr = "";
-  }
-
-  const filterLastNameQP: string | null = searchParams.get(filterLastNameQPKey);
-  let filterLastNameStr: string;
-  if (filterLastNameQP !== null) {
-    filterLastNameStr = filterLastNameQP as string;
-  } else {
-    filterLastNameStr = "";
-  }
-
   // Init our state from the query params
-  const [firstName, setFirstName] = useState<string>(filterFirstNameStr);
-  const [lastName, setLastName] = useState<string>(filterLastNameStr);
-  const [currentPage, _setCurrentPage] = useState<number>(startPageNum);
+  const [currentPage, _setCurrentPage] = useState<number>(
+    useGetPageNumSearchQueryParam(),
+  );
+  const [firstName, setFirstName] = useState<string>(
+    useGetURLSearchQueryParam(filterFirstNameQPKey, ""),
+  );
+  const [lastName, setLastName] = useState<string>(
+    useGetURLSearchQueryParam(filterLastNameQPKey, ""),
+  );
   const setCurrentPage = (page: number) => {
     // Want to update the query param for page number whenever the page
     // state is updated. This is fired by the pagination navigation buttons.
@@ -171,10 +144,7 @@ const UserProfilesMainBody: React.FC = () => {
 
       {/* If query is successful and there are user profiles, then show the current page of them! */}
       {pages.has(currentPage) && (
-        <PageOfUserProfiles
-          key={currentPage}
-          userIDs={pages.get(currentPage) as string[]}
-        />
+        <PageOfUserProfiles userIDs={pages.get(currentPage) as string[]} />
       )}
 
       {/* If no user profiles exist on platform, display a message. */}

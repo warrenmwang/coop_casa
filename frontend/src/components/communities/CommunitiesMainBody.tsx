@@ -16,6 +16,10 @@ import {
 import FetchErrorText from "../FetchErrorText";
 import { useGetPageOfCommunityIDs } from "../../hooks/communities";
 import PaginationButtons from "../PaginationButtons";
+import {
+  useGetPageNumSearchQueryParam,
+  useGetURLSearchQueryParam,
+} from "../../hooks/react-router";
 
 const CommunitiesMainBody: React.FC = () => {
   const [searchIsSubmitting, setSearchIsSubmitting] = useState<boolean>(false);
@@ -23,48 +27,16 @@ const CommunitiesMainBody: React.FC = () => {
 
   const [pages, setPages] = useState<Map<number, string[]>>(new Map()); // <page num, property ids>
 
-  // Grab the search params, to init our state.
-  let startPage: string | null = searchParams.get(pageQPKey);
-  let startPageNum: number;
-  if (startPage !== null && startPage.length > 0) {
-    // use the given page num, or use 0 if not a valid number
-    startPage = startPage as string;
-    startPageNum = Number(startPage);
-    if (Number.isNaN(startPageNum)) {
-      startPageNum = 0;
-    }
-    if (startPageNum < 0) {
-      startPageNum = 0;
-    }
-  } else {
-    // not given, start with first page (0)
-    startPageNum = 0;
-    searchParams.set(pageQPKey, `${startPageNum}`);
-    setSearchParams(searchParams);
-  }
-
-  const filterNameQP: string | null = searchParams.get(filterNameQPKey);
-  let filterNameStr: string;
-  if (filterNameQP !== null) {
-    filterNameStr = filterNameQP as string;
-  } else {
-    filterNameStr = "";
-  }
-
-  const filterDescriptionQP: string | null = searchParams.get(
-    filterDescriptionQPKey,
-  );
-  let filterDescriptionStr: string;
-  if (filterDescriptionQP !== null) {
-    filterDescriptionStr = filterDescriptionQP as string;
-  } else {
-    filterDescriptionStr = "";
-  }
-
   // Init our state from the query params
-  const [name, setName] = useState<string>(filterNameStr);
-  const [description, setDescription] = useState<string>(filterDescriptionStr);
-  const [currentPage, _setCurrentPage] = useState<number>(startPageNum);
+  const [name, setName] = useState<string>(
+    useGetURLSearchQueryParam(filterNameQPKey, ""),
+  );
+  const [description, setDescription] = useState<string>(
+    useGetURLSearchQueryParam(filterDescriptionQPKey, ""),
+  );
+  const [currentPage, _setCurrentPage] = useState<number>(
+    useGetPageNumSearchQueryParam(),
+  );
   const setCurrentPage = (page: number) => {
     // Want to update the query param for page number whenever the page
     // state is updated. This is fired by the pagination navigation buttons.
@@ -179,10 +151,7 @@ const CommunitiesMainBody: React.FC = () => {
 
       {/* If query is successful and there are communities, then show the current page of them! */}
       {pages.has(currentPage) && (
-        <PageOfCommunities
-          key={currentPage}
-          communityIDs={pages.get(currentPage) as string[]}
-        />
+        <PageOfCommunities communityIDs={pages.get(currentPage) as string[]} />
       )}
 
       {/* If no communities exist on platform, display a message. */}
