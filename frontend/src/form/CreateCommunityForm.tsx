@@ -17,6 +17,8 @@ import { toast } from "react-toastify";
 import axios, { AxiosError } from "axios";
 import { useGetUserAccountDetails } from "../hooks/account";
 import { useCreateCommunity } from "../hooks/communities";
+import { APIUserReceivedSchema } from "../types/Schema";
+import FetchErrorText from "../components/FetchErrorText";
 
 type TextFieldsConstruct = {
   id: string;
@@ -48,6 +50,7 @@ const CreateCommunityForm: React.FC = () => {
     new Map<string, boolean>(),
   ); // if any key value in errors is true, then there is a problem.
   const [images, setImages] = useState<OrderedFile[]>([]);
+  const [userID, setUserID] = useState<string>("");
 
   // Need to grab the user id from backend to use as adminUserId
   // for marking who the community belongs to.
@@ -55,7 +58,7 @@ const CreateCommunityForm: React.FC = () => {
   const createCommunity = useCreateCommunity();
 
   // Required fields we want from the user.
-  const communityRequiredFields: string[] = ["name", "description", "images"];
+  const communityRequiredFields: string[] = ["name", "images"];
 
   const setErrors = (key: string, value: boolean) => {
     setMyMap((prevMap) => {
@@ -121,16 +124,7 @@ const CreateCommunityForm: React.FC = () => {
   // As soon as we get user data, save it for the communities creation form.
   useEffect(() => {
     if (userQuery.status === "success") {
-      const received: APIUserReceived = userQuery.data;
-      const userDetails: UserDetails = received.userDetails;
-
-      // Set values that we don't want the user to fill in themselves.
-      // > community id as a UUIDV4, lister id (openauth id)
-      setCommunityDetails((prevState) => ({
-        ...prevState,
-        communityId: uuidv4(),
-        adminUserId: userDetails.userId,
-      }));
+      setUserID(userQuery.data.userDetails.userId);
     }
   }, [userQuery.status]);
 
@@ -156,8 +150,14 @@ const CreateCommunityForm: React.FC = () => {
       }
 
       // Format community with the details and images
+      // and inject a uuid for communityid and the adminuserid
+      // of the user
       const community: Community = {
-        details: communityDetails,
+        details: {
+          ...communityDetails,
+          communityId: uuidv4(),
+          adminUserId: userID,
+        },
         images: images.map((image) => image.file),
         users: [],
         properties: [],
@@ -169,7 +169,7 @@ const CreateCommunityForm: React.FC = () => {
         {
           onSuccess: () => {
             // Reset form on creation success
-            setCommunityDetails(EmptyCommunityDetails);
+            setCommunityDetails({ ...EmptyCommunityDetails });
             setImages([]);
             toast.success("Community created.");
           },
@@ -192,6 +192,15 @@ const CreateCommunityForm: React.FC = () => {
   const ready: boolean = userQuery.isFetched;
   if (!ready) {
     return <TextSkeleton />;
+  }
+
+  if (userQuery.status === "error") {
+    return (
+      <FetchErrorText>
+        Unable to verify your account identity and authority to create a
+        community at the moment.
+      </FetchErrorText>
+    );
   }
 
   return (

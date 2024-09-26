@@ -24,7 +24,7 @@ func ValidateCommunity(community database.CommunityFullInternal) error {
 		return errors.New("expected admin user id in community users list but is not")
 	}
 	// Validate community details
-	err := ValidateCommunity(community)
+	err := ValidateCommunityDetails(community.CommunityDetails)
 	if err != nil {
 		return err
 	}
@@ -93,7 +93,10 @@ func ValidatePropertyDetails(propertyDetails database.PropertyDetails) error {
 		return errors.New("listerUserId is not only numbers, which is expected content of oauth openid id")
 	}
 
-	// Ensure important fields are not empty, out of expected range, or contain profanity
+	// Ensure required fields are not empty, numeric fields should not be out of expected range
+	// all text fields should not contain profanity
+
+	// Property Name
 	if len(propertyDetails.Name) == 0 {
 		return errors.New("name cannot be empty")
 	}
@@ -101,6 +104,25 @@ func ValidatePropertyDetails(propertyDetails database.PropertyDetails) error {
 		return fmt.Errorf("name cannot contain profanity: %s", goaway.ExtractProfanity(propertyDetails.Name))
 	}
 
+	// Property Description
+	if goaway.IsProfane(propertyDetails.Description) {
+		return fmt.Errorf("description cannot contain profanity: %s", goaway.ExtractProfanity(propertyDetails.Description))
+	}
+
+	// Address 1
+	if len(propertyDetails.Address_1) == 0 {
+		return errors.New("address 1 cannot be empty")
+	}
+	if goaway.IsProfane(propertyDetails.Address_1) {
+		return fmt.Errorf("address 1 cannot contain profanity: %s", goaway.ExtractProfanity(propertyDetails.Address_1))
+	}
+
+	// Address 2
+	if goaway.IsProfane(propertyDetails.Address_2) {
+		return fmt.Errorf("address 2 cannot contain profanity: %s", goaway.ExtractProfanity(propertyDetails.Address_2))
+	}
+
+	// City
 	if len(propertyDetails.City) == 0 {
 		return errors.New("city cannot be empty")
 	}
@@ -108,6 +130,7 @@ func ValidatePropertyDetails(propertyDetails database.PropertyDetails) error {
 		return fmt.Errorf("city cannot contain profanity: %s", goaway.ExtractProfanity(propertyDetails.City))
 	}
 
+	// State
 	if len(propertyDetails.State) == 0 {
 		return errors.New("state is invalid")
 	}
@@ -115,6 +138,7 @@ func ValidatePropertyDetails(propertyDetails database.PropertyDetails) error {
 		return fmt.Errorf("state cannot contain profanity: %s", goaway.ExtractProfanity(propertyDetails.State))
 	}
 
+	// Zipcode
 	if len(propertyDetails.Zipcode) == 0 {
 		return errors.New("zipcode is invalid")
 	}
@@ -122,6 +146,7 @@ func ValidatePropertyDetails(propertyDetails database.PropertyDetails) error {
 		return fmt.Errorf("zipcode cannot contain profanity: %s", goaway.ExtractProfanity(propertyDetails.Zipcode))
 	}
 
+	// Country
 	if len(propertyDetails.Country) == 0 {
 		return errors.New("country is invalid")
 	}
@@ -129,26 +154,32 @@ func ValidatePropertyDetails(propertyDetails database.PropertyDetails) error {
 		return fmt.Errorf("country cannot contain profanity: %s", goaway.ExtractProfanity(propertyDetails.Country))
 	}
 
+	// Square Feet
 	if v := propertyDetails.Square_feet; v <= 0 || v > 999999999 {
 		return errors.New("square feet invalid")
 	}
 
+	// Number of Bedrooms
 	if v := propertyDetails.Num_bedrooms; v < 0 || v > 32767 {
 		return errors.New("number of bedrooms invalid")
 	}
 
+	// Number of Toilets
 	if v := propertyDetails.Num_toilets; v < 0 || v > 32767 {
 		return errors.New("number of toilets invalid")
 	}
 
+	// Number of Showers and Baths
 	if v := propertyDetails.Num_showers_baths; v < 0 || v > 32767 {
 		return errors.New("number of showers/baths invalid")
 	}
 
+	// Cost in Dollars
 	if v := propertyDetails.Cost_dollars; v <= 0 || v > 999999999999 {
 		return errors.New("cost in dollars invalid")
 	}
 
+	// Cost in Cents
 	if v := propertyDetails.Cost_cents; v < 0 || v > 99 {
 		return errors.New("cost in cents invalid")
 	}
