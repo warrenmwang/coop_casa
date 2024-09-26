@@ -171,7 +171,6 @@ const CreateCommunityForm: React.FC = () => {
             // Reset form on creation success
             setCommunityDetails(EmptyCommunityDetails);
             setImages([]);
-            setIsSubmitting(false);
             toast.success("Community created.");
           },
           onError: (error: Error | AxiosError) => {
@@ -181,6 +180,9 @@ const CreateCommunityForm: React.FC = () => {
               errMsg = `${(error as AxiosError).response?.data}`;
             }
             toast.error("Could not create community because: " + errMsg);
+          },
+          onSettled: () => {
+            setIsSubmitting(false);
           },
         },
       );

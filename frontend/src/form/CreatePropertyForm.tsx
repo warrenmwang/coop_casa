@@ -334,7 +334,6 @@ const CreatePropertyForm: React.FC = () => {
           onSuccess: () => {
             setPropertyDetails(EmptyPropertyDetails);
             setImages([]);
-            setIsSubmitting(false);
             toast.success("Property created.");
           },
           onError: (error: Error | AxiosError) => {
@@ -343,6 +342,9 @@ const CreatePropertyForm: React.FC = () => {
               errMsg = `${(error as AxiosError).response?.data}`;
             }
             toast.error("Could not create property because: " + errMsg);
+          },
+          onSettled: () => {
+            setIsSubmitting(false);
           },
         },
       );

@@ -210,7 +210,6 @@ const UpdateCommunityForm: React.FC<{
             setUsers([...community.users]);
             setProperties([...community.properties]);
             setIsChanged(false);
-            setIsSubmitting(false);
             toast.success("Community updated.");
           },
           onError: (error: Error | AxiosError) => {
@@ -219,6 +218,8 @@ const UpdateCommunityForm: React.FC<{
               errMsg = `${(error as AxiosError).response?.data}`;
             }
             toast.error(`Failed to update because: ${errMsg}`);
+          },
+          onSettled: () => {
             setIsSubmitting(false);
           },
         },

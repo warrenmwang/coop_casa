@@ -120,7 +120,6 @@ const UpdatePropertyForm: React.FC<{
             setFormDetails({ ...property.details });
             setFormImages([...property.images]);
             setIsChanged(false);
-            setIsSubmitting(false);
             toast.success("Property updated.");
           },
           onError: (error: Error | AxiosError) => {
@@ -129,6 +128,8 @@ const UpdatePropertyForm: React.FC<{
               errMsg = `${(error as AxiosError).response?.data}`;
             }
             toast.error(`Failed to update because: ${errMsg}`);
+          },
+          onSettled: () => {
             setIsSubmitting(false);
           },
         },
