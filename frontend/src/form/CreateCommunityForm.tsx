@@ -4,20 +4,13 @@ import TextInput from "../input/TextInput";
 import SubmitButton from "../components/buttons/SubmitButton";
 import MultipleImageUploader from "../input/MultipleImageUploader";
 import { MAX_COMMUNITY_IMGS_ALLOWED } from "../constants";
-import {
-  APIUserReceived,
-  OrderedFile,
-  CommunityDetails,
-  UserDetails,
-  Community,
-} from "../types/Types";
+import { OrderedFile, CommunityDetails, Community } from "../types/Types";
 import TextSkeleton from "../skeleton/TextSkeleton";
 
 import { toast } from "react-toastify";
 import axios, { AxiosError } from "axios";
 import { useGetUserAccountDetails } from "../hooks/account";
 import { useCreateCommunity } from "../hooks/communities";
-import { APIUserReceivedSchema } from "../types/Schema";
 import FetchErrorText from "../components/FetchErrorText";
 
 type TextFieldsConstruct = {
