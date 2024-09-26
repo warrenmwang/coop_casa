@@ -28,8 +28,9 @@
     "zod": "^3.23.8"
   },
   "scripts": {
-    "start": "craco start",
-    "build": "craco build",
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "cbuild": "craco build",
     "testwatch": "craco test",
     "test": "craco test --watchAll=false",
     "eject": "react-scripts eject",
