@@ -7,6 +7,8 @@ import UserOwnedPropertiesTable from "./properties/UserOwnedPropertiesTable";
 import UserOwnedCommunitiesTable from "./communities/UserOwnedCommunitiesTable";
 import AllLikedEntitiesSection from "./AllLikedEntitiesSection";
 import Title from "./Title";
+import TransferPropertyForm from "./properties/TransferPropertyForm";
+import TransferCommunityForm from "./communities/TransferCommunityForm";
 
 const ListerDashboard: React.FC = () => {
   const sections: string[] = ["Your Liked", "Property", "Community"];
@@ -44,7 +46,10 @@ const ListerDashboard: React.FC = () => {
 
       {currentSection === "Property" && (
         <div className="flex flex-col gap-5">
-          <UserOwnedPropertiesTable />
+          <div className="flex flex-row flex-wrap justify-center items-start gap-5">
+            <UserOwnedPropertiesTable />
+            <TransferPropertyForm />
+          </div>
           <div className="flex flex-row flex-wrap justify-center items-start gap-5">
             <CreatePropertyForm />
             <UpdatePropertyManager />
@@ -54,7 +59,10 @@ const ListerDashboard: React.FC = () => {
 
       {currentSection === "Community" && (
         <div className="flex flex-col gap-5">
-          <UserOwnedCommunitiesTable />
+          <div className="flex flex-row flex-wrap justify-center">
+            <UserOwnedCommunitiesTable />
+            <TransferCommunityForm />
+          </div>
           <div className="flex flex-row flex-wrap justify-center">
             <CreateCommunityForm />
             <UpdateCommunityManager />
