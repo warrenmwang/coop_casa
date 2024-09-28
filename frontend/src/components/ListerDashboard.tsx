@@ -1,7 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import CreatePropertyForm from "../form/CreatePropertyForm";
 import UpdatePropertyManager from "../form/UpdatePropertyManager";
-import { Grid } from "@mui/material";
 import CreateCommunityForm from "../form/CreateCommunityForm";
 import UpdateCommunityManager from "../form/UpdateCommunityManager";
 import UserOwnedPropertiesTable from "./properties/UserOwnedPropertiesTable";
@@ -10,35 +9,58 @@ import AllLikedEntitiesSection from "./AllLikedEntitiesSection";
 import Title from "./Title";
 
 const ListerDashboard: React.FC = () => {
+  const sections: string[] = ["Your Liked", "Property", "Community"];
+  const [currentSection, setCurrentSection] = useState<string>(sections[0]);
+
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    setCurrentSection(e.currentTarget.textContent as string);
+  };
+
   return (
     <>
-      <div className="min-w-full mx-auto">
-        <Grid container spacing={2}>
-          <Grid item lg={6}>
-            <UserOwnedPropertiesTable />
-          </Grid>
-          <Grid item lg={6}>
-            <UserOwnedCommunitiesTable />
-          </Grid>
-          <Grid item xs={12} sm={12} md={12} lg={6} style={{ gap: "0 24px" }}>
-            <CreatePropertyForm />
-          </Grid>
-          <Grid item xs={12} sm={12} md={12} lg={6} style={{ gap: "0 24px" }}>
-            <UpdatePropertyManager />
-          </Grid>
-          <Grid item xs={12} sm={12} md={12} lg={6} style={{ gap: "0 24px" }}>
-            <CreateCommunityForm />
-          </Grid>
-          <Grid item xs={12} sm={12} md={12} lg={6} style={{ gap: "0 24px" }}>
-            <UpdateCommunityManager />
-          </Grid>
-        </Grid>
-        <Title
-          title="Your Liked Collections"
-          description="If you're not seeing anything, go browse the users, properties, and communities that exist on Coop now!"
-        />
-        <AllLikedEntitiesSection />
+      {/* Screen Navigation Buttons */}
+      <div className="flex gap-2 my-2 p-2 bg-gray-100 rounded-lg w-fit mx-auto">
+        {sections.map((section, i) => (
+          <button
+            disabled={currentSection === section}
+            key={i}
+            className={`border-2 rounded-md  p-3 ${currentSection === section ? "bg-green-400 hover:bg-none" : "bg-gray-300 hover:bg-gray-400"}`}
+            onClick={handleClick}
+          >
+            {section}
+          </button>
+        ))}
       </div>
+
+      {currentSection === "Your Liked" && (
+        <div className="flex flex-col">
+          <Title
+            title="Your Liked Collections"
+            description="If you're not seeing anything, go browse the users, properties, and communities that exist on Coop now!"
+          />
+          <AllLikedEntitiesSection />
+        </div>
+      )}
+
+      {currentSection === "Property" && (
+        <div className="flex flex-col gap-5">
+          <UserOwnedPropertiesTable />
+          <div className="flex flex-row flex-wrap justify-center items-start gap-5">
+            <CreatePropertyForm />
+            <UpdatePropertyManager />
+          </div>
+        </div>
+      )}
+
+      {currentSection === "Community" && (
+        <div className="flex flex-col gap-5">
+          <UserOwnedCommunitiesTable />
+          <div className="flex flex-row flex-wrap justify-center">
+            <CreateCommunityForm />
+            <UpdateCommunityManager />
+          </div>
+        </div>
+      )}
     </>
   );
 };

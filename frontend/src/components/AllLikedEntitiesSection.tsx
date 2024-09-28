@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import { useGetLikedEntities } from "../hooks/account";
 import TextSkeleton from "../skeleton/TextSkeleton";
 import FetchErrorText from "./FetchErrorText";

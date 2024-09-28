@@ -249,14 +249,23 @@ func (h *PropertyHandler) CreatePropertiesHandler(w http.ResponseWriter, r *http
 			}
 		}
 
+		imageFile := database.FileInternal{
+			Filename: imageFileHeader.Filename,
+			Mimetype: imageFileHeader.Header.Get("Content-Type"),
+			Size:     imageFileHeader.Size,
+			Data:     imageData,
+		}
+
+		// Validation of images not implemented atm.
+		// err = validation.ValidateImage(imageFile)
+		// if err != nil {
+		// 	utils.RespondWithError(w, http.StatusBadRequest, err)
+		// 	return
+		// }
+
 		images = append(images, database.OrderedFileInternal{
 			OrderNum: i,
-			File: database.FileInternal{
-				Filename: imageFileHeader.Filename,
-				Mimetype: imageFileHeader.Header.Get("Content-Type"),
-				Size:     imageFileHeader.Size,
-				Data:     imageData,
-			},
+			File:     imageFile,
 		})
 	}
 

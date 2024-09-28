@@ -276,3 +276,16 @@ func ValidateUserDetails(userDetails database.UserDetails) error {
 
 	return nil
 }
+
+// TODO: use Google Cloud Vision API to validate image data for NSFW content.
+//
+// reject any image that has NSFW flagged.
+// Will need to sign up for this api and make sure local config is setup with API keys securely
+// and that in the google cloud console we have a hard limit / cap on the images we can process
+// to not exceed free tier
+// ok but really tho this function might be run too many times.
+// for now no...
+// func ValidateImage(image database.FileInternal) error {
+//
+// 	return nil
+// }

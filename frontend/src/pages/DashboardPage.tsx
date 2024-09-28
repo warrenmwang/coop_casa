@@ -55,8 +55,8 @@ const DashboardPage: React.FC = () => {
 
   const welcomeText =
     userDetails.firstName !== "" && userDetails.lastName !== ""
-      ? `Welcome ${userDetails.firstName} ${userDetails.lastName}`
-      : `Welcome ${userDetails.email}`;
+      ? `Welcome ${userDetails.firstName} ${userDetails.lastName} to Coop Homes!`
+      : `Please setup your account, you should be redirected to the setup page shortly upon seeing this.`;
 
   useEffect(() => {
     if (userQuery.status === "success") {
