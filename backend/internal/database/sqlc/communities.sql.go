@@ -495,6 +495,26 @@ func (q *Queries) GetUserOwnedCommunities(ctx context.Context, adminUserID strin
 	return items, nil
 }
 
+const updateCommunityAdmin = `-- name: UpdateCommunityAdmin :exec
+UPDATE 
+    communities
+SET
+    admin_user_id = $2,
+    updated_at = CURRENT_TIMESTAMP
+WHERE
+    community_id = $1
+`
+
+type UpdateCommunityAdminParams struct {
+	CommunityID string
+	AdminUserID string
+}
+
+func (q *Queries) UpdateCommunityAdmin(ctx context.Context, arg UpdateCommunityAdminParams) error {
+	_, err := q.db.ExecContext(ctx, updateCommunityAdmin, arg.CommunityID, arg.AdminUserID)
+	return err
+}
+
 const updateCommunityDetails = `-- name: UpdateCommunityDetails :exec
 UPDATE
     communities

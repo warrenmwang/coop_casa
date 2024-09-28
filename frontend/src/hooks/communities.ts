@@ -10,6 +10,7 @@ import {
   apiDeleteCommunity,
   apiGetCommunities,
   apiGetCommunity,
+  apiTransferCommunity,
   apiUpdateCommunity,
 } from "../api/community";
 import { Community } from "../types/Types";
@@ -76,6 +77,24 @@ export const useDeleteCommunity = () => {
     mutationFn: ({ communityID }: { communityID: string }) =>
       apiDeleteCommunity(communityID).then(() => communityID),
     onSuccess: (communityID: string) => {
+      return queryClient.invalidateQueries({
+        queryKey: [...communitiesKey, communityID],
+      });
+    },
+  });
+};
+
+export const useTransferCommunity = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      communityID,
+      userID,
+    }: {
+      communityID: string;
+      userID: string;
+    }) => apiTransferCommunity(communityID, userID),
+    onSuccess: (communityID) => {
       return queryClient.invalidateQueries({
         queryKey: [...communitiesKey, communityID],
       });

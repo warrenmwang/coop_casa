@@ -108,6 +108,15 @@ SET
 WHERE
     community_id = $1;
 
+-- name: UpdateCommunityAdmin :exec
+UPDATE 
+    communities
+SET
+    admin_user_id = $2,
+    updated_at = CURRENT_TIMESTAMP
+WHERE
+    community_id = $1;
+
 -- name: DeleteCommunityImages :exec
 DELETE FROM communities_images
 WHERE community_id = $1;

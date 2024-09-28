@@ -178,3 +178,16 @@ export const apiDeleteCommunityProperty = async (
     },
   );
 };
+
+export const apiTransferCommunity = async (
+  communityID: string,
+  userID: string,
+) => {
+  return axios.put(
+    `${apiCommunitiesLink}/transfer/ownership?communityId=${communityID}&userId=${userID}`,
+    {},
+    {
+      withCredentials: true,
+    },
+  );
+};

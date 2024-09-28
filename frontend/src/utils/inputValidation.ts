@@ -1,4 +1,5 @@
 import { toast } from "react-toastify";
+import { z } from "zod";
 import { MAX_TEXT_INPUT_LENGTH, MAX_IMAGE_FILE_SIZE } from "../constants";
 
 export const validateTextLength = (value: string): boolean => {
@@ -39,4 +40,10 @@ export const validateNumber = (n: string): boolean => {
   // Validate that string is a number (return true if is a number, else false if not)
   // source: https://stackoverflow.com/a/68007988
   return !isNaN(+n);
+};
+
+export const validateUUID = (uuid: string): [string, boolean] => {
+  const { data, success } = z.string().uuid().safeParse(uuid);
+  if (success) return [data, success];
+  else return ["", success];
 };

@@ -579,8 +579,11 @@ func (h *CommunityHandler) DeleteCommunitiesPropertiesHandler(w http.ResponseWri
 	propertyId := query.Get("propertyId")
 
 	// Ensure presence of query parameters
-	if communityId == "" || propertyId == "" {
-		utils.RespondWithError(w, http.StatusBadRequest, errors.New("missing query parameters in either/both communityId and propertyId"))
+	if communityId == "" {
+		utils.RespondWithError(w, http.StatusBadRequest, errors.New("missing \"communityId\" query parameter"))
+	}
+	if propertyId == "" {
+		utils.RespondWithError(w, http.StatusBadRequest, errors.New("missing \"propertyId\" query parameter"))
 		return
 	}
 
@@ -605,5 +608,82 @@ func (h *CommunityHandler) DeleteCommunitiesPropertiesHandler(w http.ResponseWri
 	}
 
 	// Respond ok
+	w.WriteHeader(http.StatusOK)
+}
+
+// PUT .../communities/transfer/ownership
+// AUTHED
+func (h *CommunityHandler) TransferCommunityOwnershipHandler(w http.ResponseWriter, r *http.Request) {
+	// Get authenticated user's ID
+	authedUserID, ok := r.Context().Value(auth.UserIDKey).(string)
+	if !ok {
+		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("user id blank"))
+		return
+	}
+
+	query := r.URL.Query()
+	communityId := query.Get("communityId")
+	userId := query.Get("userId")
+
+	// Ensure presence of query parameters
+	if communityId == "" {
+		utils.RespondWithError(w, http.StatusBadRequest, errors.New("missing \"communityId\" query parameter"))
+	}
+	if userId == "" {
+		utils.RespondWithError(w, http.StatusBadRequest, errors.New("missing \"userId\" query parameter"))
+		return
+	}
+
+	// Don't do anything if authedUserID is the same as the userId in the query parameter
+	// since that would be essentially a noop (transfer to yourself)
+	if authedUserID == userId {
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+
+	// Ensure community exists
+	_, err := h.server.DB().GetCommunityDetails(communityId)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusBadRequest, errors.New("community does not exist"))
+		return
+	}
+
+	// Ensure the other user Id exists
+	_, err = h.server.DB().GetPublicUserProfile(userId)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusBadRequest, errors.New("user does not exist"))
+		return
+	}
+
+	// Add the new admin user id to the community's list of users if not already a member
+	communityUserIDs, err := h.server.DB().GetCommunityUsers(communityId)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusInternalServerError, errors.New("couldn't get the community's members list"))
+		return
+	}
+	found := false
+	for _, id := range communityUserIDs {
+		if userId == id {
+			found = true
+			break
+		}
+	}
+	if !found {
+		communityUserIDs = append(communityUserIDs, userId)
+		err = h.server.DB().UpdateCommunityUsers(communityId, communityUserIDs)
+		if err != nil {
+			utils.RespondWithError(w, http.StatusInternalServerError, err)
+			return
+		}
+	}
+
+	// Update the community's admin user id
+	err = h.server.DB().UpdateCommunityAdmin(communityId, userId)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	// Success, respond ok
 	w.WriteHeader(http.StatusOK)
 }

@@ -97,6 +97,7 @@ type Service interface {
 	UpdateCommunityImages(communityId string, images []FileInternal) error
 	UpdateCommunityUsers(communityID string, userIDs []string) error
 	UpdateCommunityProperties(communityID string, propertyIDs []string) error
+	UpdateCommunityAdmin(communityID string, userID string) error
 	DeleteCommunity(communityId string) error
 	DeleteCommunityUser(communityId, userId string) error
 	DeleteCommunityProperty(communityId, propertyId string) error
@@ -1434,6 +1435,15 @@ func (s *service) UpdateCommunityProperties(communityID string, propertyIDs []st
 		}
 	}
 	return nil
+}
+
+func (s *service) UpdateCommunityAdmin(communityID string, userID string) error {
+	ctx := context.Background()
+	err := s.db_queries.UpdateCommunityAdmin(ctx, sqlc.UpdateCommunityAdminParams{
+		CommunityID: communityID,
+		AdminUserID: userID,
+	})
+	return err
 }
 
 func (s *service) DeleteCommunity(communityId string) error {
