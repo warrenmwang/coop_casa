@@ -10,7 +10,6 @@ import { toast } from "react-toastify";
 import {
   useDeleteUserAccount,
   useGetUserAccountAuth,
-  useGetUserAccountDetails,
   useGetUserAccountRole,
   useGetUserOwnedCommunitiesIDs,
   useGetUserOwnedPropertiesIDs,
