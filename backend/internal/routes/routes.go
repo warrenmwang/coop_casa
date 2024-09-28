@@ -83,6 +83,7 @@ func NewPropertyRouter(s interfaces.Server) http.Handler {
 	r.With(auth.AuthMiddleware).Get("/total", propertyHandlers.GetPropertiesTotalCountHandler)
 	r.With(auth.AuthMiddleware).Post("/", propertyHandlers.CreatePropertiesHandler)
 	r.With(auth.AuthMiddleware).Put("/{id}", propertyHandlers.UpdatePropertiesHandler)
+	r.With(auth.AuthMiddleware).Put("/transfer/ownership", propertyHandlers.TransferPropertyOwnershipHandler)
 	r.With(auth.AuthMiddleware).Delete("/{id}", propertyHandlers.DeletePropertiesHandler)
 
 	return r
@@ -101,6 +102,7 @@ func NewCommunityRouter(s interfaces.Server) http.Handler {
 	r.With(auth.AuthMiddleware).Post("/users", communityHandlers.CreateCommunitiesUserHandler)
 	r.With(auth.AuthMiddleware).Post("/properties", communityHandlers.CreateCommunitiesPropertyHandler)
 	r.With(auth.AuthMiddleware).Put("/{id}", communityHandlers.UpdateCommunitiesHandler)
+	r.With(auth.AuthMiddleware).Put("/transfer/ownership", communityHandlers.TransferCommunityOwnershipHandler)
 	r.With(auth.AuthMiddleware).Delete("/{id}", communityHandlers.DeleteCommunitiesHandler)
 	r.With(auth.AuthMiddleware).Delete("/users", communityHandlers.DeleteCommunitiesUserHandler)
 	r.With(auth.AuthMiddleware).Delete("/properties", communityHandlers.DeleteCommunitiesPropertiesHandler)

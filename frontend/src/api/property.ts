@@ -55,6 +55,19 @@ export const apiUpdateProperty = async (
   );
 };
 
+export const apiTransferProperty = async (
+  propertyID: string,
+  userID: string,
+) => {
+  return axios.put(
+    `${apiPropertiesLink}/transfer/ownership?propertyId=${propertyID}&userId=${userID}`,
+    {},
+    {
+      withCredentials: true,
+    },
+  );
+};
+
 // Get a single property based off of id
 export const apiGetProperty = async (propertyID: string): Promise<Property> => {
   return axios

@@ -10,6 +10,7 @@ import {
   apiDeleteProperty,
   apiGetProperties,
   apiGetProperty,
+  apiTransferProperty,
   apiUpdateProperty,
 } from "../api/property";
 import { Property } from "../types/Types";
@@ -71,6 +72,24 @@ export const useDeleteProperty = () => {
     mutationFn: ({ propertyID }: { propertyID: string }) =>
       apiDeleteProperty(propertyID).then(() => propertyID),
     onSuccess: (propertyID: string) => {
+      return queryClient.invalidateQueries({
+        queryKey: [...propertiesKey, propertyID],
+      });
+    },
+  });
+};
+
+export const useTransferProperty = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      propertyID,
+      userID,
+    }: {
+      propertyID: string;
+      userID: string;
+    }) => apiTransferProperty(propertyID, userID),
+    onSuccess: (propertyID) => {
       return queryClient.invalidateQueries({
         queryKey: [...propertiesKey, propertyID],
       });

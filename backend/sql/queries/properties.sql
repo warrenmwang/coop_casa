@@ -71,6 +71,15 @@ SET
 WHERE
     property_id = $1;
 
+-- name: UpdatePropertyLister :exec
+UPDATE
+    properties
+SET
+    lister_user_id = $2,
+    updated_at = CURRENT_TIMESTAMP
+WHERE
+    property_id = $1;
+
 -- name: DeletePropertyDetails :exec
 DELETE FROM properties
 WHERE property_id = $1;

@@ -444,3 +444,59 @@ func (h *PropertyHandler) DeletePropertiesHandler(w http.ResponseWriter, r *http
 	// Respond ok
 	w.WriteHeader(200)
 }
+
+// PUT .../properties/transfer/ownership
+// AUTHED
+func (h *PropertyHandler) TransferPropertyOwnershipHandler(w http.ResponseWriter, r *http.Request) {
+	// Get authenticated user's ID
+	authedUserID, ok := r.Context().Value(auth.UserIDKey).(string)
+	if !ok {
+		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("user id blank"))
+		return
+	}
+
+	query := r.URL.Query()
+	propertyId := query.Get("propertyId")
+	userId := query.Get("userId")
+
+	// Ensure presence of query parameters
+	if propertyId == "" {
+		utils.RespondWithError(w, http.StatusBadRequest, errors.New("missing \"propertyId\" query parameter"))
+		return
+	}
+	if userId == "" {
+		utils.RespondWithError(w, http.StatusBadRequest, errors.New("missing \"userId\" query parameter"))
+		return
+	}
+
+	// Don't do anything if authedUserID is the same as the userId in the query parameter
+	// since that would be essentially a noop (transfer to yourself)
+	if authedUserID == userId {
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+
+	// Ensure property exists
+	_, err := h.server.DB().GetPropertyDetails(propertyId)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusBadRequest, errors.New("property does not exist"))
+		return
+	}
+
+	// Ensure the other user exists
+	_, err = h.server.DB().GetPublicUserProfile(userId)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusBadRequest, errors.New("other user does not exist"))
+		return
+	}
+
+	// Update the property's lister to the new user
+	err = h.server.DB().UpdatePropertyLister(propertyId, userId)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	// Respond with Ok
+	w.WriteHeader(http.StatusOK)
+}

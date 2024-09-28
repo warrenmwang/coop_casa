@@ -79,6 +79,7 @@ type Service interface {
 	CheckDuplicateProperty(propertyDetails PropertyDetails) error
 	UpdatePropertyDetails(details PropertyDetails) error
 	UpdatePropertyImages(propertyID string, images []OrderedFileInternal) error
+	UpdatePropertyLister(propertyID string, userID string) error
 	DeleteProperty(propertyId string) error
 	DeletePropertyImage(propertyId string, imageOrderNum int16) error
 	DeleteUserOwnedProperties(userID string) error
@@ -1042,6 +1043,15 @@ func (s *service) UpdatePropertyImages(propertyID string, images []OrderedFileIn
 	}
 
 	return nil
+}
+
+func (s *service) UpdatePropertyLister(propertyID string, userID string) error {
+	ctx := context.Background()
+	err := s.db_queries.UpdatePropertyLister(ctx, sqlc.UpdatePropertyListerParams{
+		PropertyID:   propertyID,
+		ListerUserID: userID,
+	})
+	return err
 }
 
 // Delete both property details and all images for a given property id

@@ -436,3 +436,23 @@ func (q *Queries) UpdatePropertyDetails(ctx context.Context, arg UpdatePropertyD
 	)
 	return err
 }
+
+const updatePropertyLister = `-- name: UpdatePropertyLister :exec
+UPDATE
+    properties
+SET
+    lister_user_id = $2,
+    updated_at = CURRENT_TIMESTAMP
+WHERE
+    property_id = $1
+`
+
+type UpdatePropertyListerParams struct {
+	PropertyID   string
+	ListerUserID string
+}
+
+func (q *Queries) UpdatePropertyLister(ctx context.Context, arg UpdatePropertyListerParams) error {
+	_, err := q.db.ExecContext(ctx, updatePropertyLister, arg.PropertyID, arg.ListerUserID)
+	return err
+}
