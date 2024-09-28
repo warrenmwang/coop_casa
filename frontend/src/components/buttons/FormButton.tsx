@@ -10,8 +10,8 @@ type FormButtonProps = {
 };
 
 const colors: { gray: string; red: string } = {
-  gray: "px-4 py-2 bg-gray-300 rounded hover:bg-gray-400",
-  red: "mt-4 bg-red-500 text-white p-2 rounded-lg w-3/5 hover:bg-red-600",
+  gray: "button__gray",
+  red: "button__red_1",
 };
 
 const FormButton: React.FC<FormButtonProps> = ({

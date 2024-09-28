@@ -1047,9 +1047,15 @@ func (s *service) UpdatePropertyImages(propertyID string, images []OrderedFileIn
 
 func (s *service) UpdatePropertyLister(propertyID string, userID string) error {
 	ctx := context.Background()
-	err := s.db_queries.UpdatePropertyLister(ctx, sqlc.UpdatePropertyListerParams{
+
+	encryptedUserID, err := utils.EncryptString(userID, s.db_encrypt_key)
+	if err != nil {
+		return err
+	}
+
+	err = s.db_queries.UpdatePropertyLister(ctx, sqlc.UpdatePropertyListerParams{
 		PropertyID:   propertyID,
-		ListerUserID: userID,
+		ListerUserID: encryptedUserID,
 	})
 	return err
 }
@@ -1449,9 +1455,15 @@ func (s *service) UpdateCommunityProperties(communityID string, propertyIDs []st
 
 func (s *service) UpdateCommunityAdmin(communityID string, userID string) error {
 	ctx := context.Background()
-	err := s.db_queries.UpdateCommunityAdmin(ctx, sqlc.UpdateCommunityAdminParams{
+
+	encryptedUserID, err := utils.EncryptString(userID, s.db_encrypt_key)
+	if err != nil {
+		return err
+	}
+
+	err = s.db_queries.UpdateCommunityAdmin(ctx, sqlc.UpdateCommunityAdminParams{
 		CommunityID: communityID,
-		AdminUserID: userID,
+		AdminUserID: encryptedUserID,
 	})
 	return err
 }

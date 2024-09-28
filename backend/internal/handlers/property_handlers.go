@@ -490,6 +490,17 @@ func (h *PropertyHandler) TransferPropertyOwnershipHandler(w http.ResponseWriter
 		return
 	}
 
+	// Ensure the other user has a lister role
+	role, err := h.server.DB().GetUserRole(userId)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
+		return
+	}
+	if role == "regular" {
+		utils.RespondWithError(w, http.StatusBadRequest, errors.New("other user is not a lister and cannot be the new lister of the property"))
+		return
+	}
+
 	// Update the property's lister to the new user
 	err = h.server.DB().UpdatePropertyLister(propertyId, userId)
 	if err != nil {

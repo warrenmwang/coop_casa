@@ -33,7 +33,7 @@ const RegularDashboard: React.FC = () => {
 
       {currentSection === "Community" && (
         <div className="flex flex-col gap-5">
-          <div className="flex flex-row flex-wrap justify-center">
+          <div className="flex flex-col items-center">
             <UserOwnedCommunitiesTable />
             <TransferCommunityForm />
           </div>

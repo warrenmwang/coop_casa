@@ -18,7 +18,7 @@ const SubmitButton: React.FC<SubmitButtonProps> = ({
     <button
       id="submit"
       type="submit"
-      className={`bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded ${className}`}
+      className={`button__green ${className}`}
       disabled={isSubmitting}
       onClick={onClick}
     >

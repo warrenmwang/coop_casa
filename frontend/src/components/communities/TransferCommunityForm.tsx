@@ -2,9 +2,10 @@ import axios, { AxiosError } from "axios";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 import { useTransferCommunity } from "../../hooks/communities";
-import { validateUUID } from "../../utils/inputValidation";
+import { validateUserID, validateUUID } from "../../utils/inputValidation";
 import SubmitButton from "../buttons/SubmitButton";
 import Title from "../Title";
+import FormButton from "../buttons/FormButton";
 
 const TransferCommunityForm: React.FC = () => {
   const [communityID, setCommunityID] = useState<string>("");
@@ -15,25 +16,30 @@ const TransferCommunityForm: React.FC = () => {
 
   const handleInputCommunityID = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
-    const valueTrimmed = value.trim();
-    if (valueTrimmed) {
-      setCommunityID(valueTrimmed);
-    }
+    setCommunityID(value.trim());
   };
 
   const handleInputUserID = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
-    const valueTrimmed = value.trim();
-    if (valueTrimmed) {
-      setUserID(valueTrimmed);
-    }
+    setUserID(value.trim());
+  };
+
+  const clearform = () => {
+    setCommunityID("");
+    setUserID("");
   };
 
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!validateUUID(communityID)[1])
-      toast.error("Community ID is not a valid UUID.");
-    if (!validateUUID(userID)[1]) toast.error("User ID is not a valid UUID.");
+    if (!validateUUID(communityID)[1]) {
+      toast.error("Community ID is not a valid id.");
+      return;
+    }
+
+    if (!validateUserID(userID)) {
+      toast.error("User ID is not a valid id.");
+      return;
+    }
 
     // Run the mutation to transfer ownership of community to other user
     setIsSubmitting(true);
@@ -50,7 +56,7 @@ const TransferCommunityForm: React.FC = () => {
           if (axios.isAxiosError(error)) {
             errMsg = `${(error as AxiosError).response?.data}`;
           }
-          toast.error("Could not create community because: " + errMsg);
+          toast.error("Could not transfer community because: " + errMsg);
         },
         onSettled: () => {
           setIsSubmitting(false);
@@ -60,30 +66,39 @@ const TransferCommunityForm: React.FC = () => {
   };
 
   return (
-    <>
+    <div className="flex flex-col items-center">
       <Title
         title="Transfer Community To Another Person"
         description="You will need the community ID of a community you own and the user ID of the person that you want to transfer the community's ownership to."
       />
 
       <form onSubmit={handleFormSubmit}>
-        <label htmlFor="communityid">Community ID</label>
+        <label htmlFor="communityid" className="label__text_input_gray">
+          Community ID
+        </label>
         <input
           id="communityid"
           type="text"
           value={communityID}
           onChange={handleInputCommunityID}
+          className="input__text_gray_box"
         />
-        <label htmlFor="userid">User ID</label>
+        <label htmlFor="userid" className="label__text_input_gray">
+          User ID
+        </label>
         <input
           id="userid"
           type="text"
           value={userID}
           onChange={handleInputUserID}
+          className="input__text_gray_box"
         />
-        <SubmitButton isSubmitting={isSubmitting} />
+        <div className="flex gap-2">
+          <SubmitButton isSubmitting={isSubmitting} />
+          <FormButton onClick={clearform} color="gray" displayText="Clear" />
+        </div>
       </form>
-    </>
+    </div>
   );
 };
 
