@@ -7,9 +7,6 @@ type PageOfCommunitiesProps = {
   communityIDs: string[];
 };
 
-// TODO: is communityIDs array being reconstructed?
-// if so, memo's shallow copy will consider a new array of the same IDs
-// to be different and will re-render.
 const PageOfCommunities: React.FC<PageOfCommunitiesProps> = ({
   communityIDs,
 }) => {

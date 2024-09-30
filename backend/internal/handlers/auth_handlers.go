@@ -104,9 +104,9 @@ func (h *AuthHandler) CallbackHandler(w http.ResponseWriter, r *http.Request) {
 			// Initialize new role for the user
 			var role string
 			if user.UserId == h.adminUserID {
-				role = "admin"
+				role = config.USER_ROLE_ADMIN
 			} else {
-				role = "regular"
+				role = config.USER_ROLE_REGULAR
 			}
 
 			// Save role for user in the db

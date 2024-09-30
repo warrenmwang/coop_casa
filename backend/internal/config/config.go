@@ -9,6 +9,10 @@ import (
 
 var GlobalConfig *Config
 
+const USER_ROLE_REGULAR = "regular"
+const USER_ROLE_LISTER = "lister"
+const USER_ROLE_ADMIN = "admin"
+
 var GENDER_OPTIONS = map[string]struct{}{
 	"Man":                 {},
 	"Woman":               {},

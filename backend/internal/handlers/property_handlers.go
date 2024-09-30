@@ -128,7 +128,7 @@ func (h *PropertyHandler) GetListerInfoHandler(w http.ResponseWriter, r *http.Re
 		utils.RespondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
-	if role != "lister" && role != "admin" {
+	if role != config.USER_ROLE_LISTER && role != config.USER_ROLE_ADMIN {
 		utils.RespondWithError(w, http.StatusInternalServerError, errors.New("user is not a lister"))
 		return
 	}
@@ -176,7 +176,7 @@ func (h *PropertyHandler) CreatePropertiesHandler(w http.ResponseWriter, r *http
 		utils.RespondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
-	if role == "regular" {
+	if role == config.USER_ROLE_REGULAR {
 		utils.RespondWithError(w, http.StatusUnauthorized, err)
 		return
 	}
@@ -297,7 +297,7 @@ func (h *PropertyHandler) UpdatePropertiesHandler(w http.ResponseWriter, r *http
 		utils.RespondWithError(w, http.StatusUnauthorized, err)
 		return
 	}
-	if role == "regular" {
+	if role == config.USER_ROLE_REGULAR {
 		utils.RespondWithError(w, http.StatusUnauthorized, errors.New("you do not have permission to access this endpoint"))
 		return
 	}
@@ -336,7 +336,7 @@ func (h *PropertyHandler) UpdatePropertiesHandler(w http.ResponseWriter, r *http
 
 	// Also ensure lister id is not changed here on this endpoint (that is a separate endpoint, see below)
 	// and matches what is given
-	if role == "lister" {
+	if role == config.USER_ROLE_LISTER {
 		// cannot modify properties you do not own
 		if authedUserID != currDBPropertyDetails.ListerUserID {
 			utils.RespondWithError(w, http.StatusUnauthorized, errors.New("as a lister, your verified user id does not match the lister user id in the property details of the request you are making"))
@@ -347,7 +347,7 @@ func (h *PropertyHandler) UpdatePropertiesHandler(w http.ResponseWriter, r *http
 			utils.RespondWithError(w, http.StatusUnauthorized, errors.New("cannot change lister id of property you own on this endpoint"))
 			return
 		}
-	} else if role == "admin" {
+	} else if role == config.USER_ROLE_ADMIN {
 		// enforce cannot change lister id of property on this endpoint
 		if propertyDetails.ListerUserID != currDBPropertyDetails.ListerUserID {
 			utils.RespondWithError(w, http.StatusUnauthorized, errors.New("cannot change lister id of property you own on this endpoint"))
@@ -518,13 +518,13 @@ func (h *PropertyHandler) TransferPropertyOwnershipHandler(w http.ResponseWriter
 		return
 	}
 
-	// Ensure the other user has a lister role
+	// Ensure the other user has a lister or admin (i.e. not regular)
 	role, err := h.server.DB().GetUserRole(userId)
 	if err != nil {
 		utils.RespondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
-	if role == "regular" {
+	if role == config.USER_ROLE_REGULAR {
 		utils.RespondWithError(w, http.StatusBadRequest, errors.New("other user is not a lister and cannot be the new lister of the property"))
 		return
 	}

@@ -1,10 +1,15 @@
 # Coop.casa
 
-### Comment
+### Overview
 
 Just a project to learn about building full stack web applications around a theme that I own no creative rights to. I feel legally obligated to mention
 that this project is currently not a legal entity nor a real company. This does not indicate anything about
-whether Coop will exist in the future.
+whether Coop will exist in the future. The live demo of the site can be found [here](https://coop.casa/), and I make no guarantees
+about whether or not this service will be maintained indefinitely since it currently provides no real world value other than
+to convey an idea of what could exist.
+
+If you are a hacker type and see a vuln in my code and have too much free time to dive into this codebase, please submit an issue and I will fix it. Or better
+yet, submit a PR!
 
 ### Technical Details
 
@@ -39,7 +44,16 @@ There's a lot more Javascript libraries than Go libraries that I use that are no
 
 #### Development and Testing
 
-> TODO
+Started with [Create React App (CRA)](https://create-react-app.dev). NOTE: I would not recommend starting new projects with CRA in 2024, if you
+use options like [Vite](https://vitejs.dev/), but it still works nonetheless. 
+CRA configures Babel and Webpack under the hood, which may not be ideal if you want to customize them to your needs.
+This project, so far, has not warranted the need to modify those configuration files.
+
+I provide the bash script that I personally use for development in the `.dev` directory. However, it's just using `npm run start` for the client, 
+Go [air](https://github.com/air-verse/air) for the backend, and a docker container for the PostgreSQL DB. 
+
+Client tests are written using Jest, react testing library, msw.
+Backend tests are written using Go's standard library testing framework.
 
 ## Connecting Communities, Empowering Ownership.
 
