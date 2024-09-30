@@ -240,14 +240,15 @@ const CreatePropertyForm: React.FC = () => {
       id === "costCents"
     ) {
       // Validate string is a number
-      if (!validateNumber(value)) {
+      const { data, success } = validateNumber(value);
+      if (!success) {
         toast.error(`Value in field ${id} is not a number.`);
         return;
       }
       // save value for this field
       setPropertyDetails((prevState) => ({
         ...prevState,
-        [id]: Number(value),
+        [id]: data,
       }));
       return;
     }

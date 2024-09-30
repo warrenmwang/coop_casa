@@ -55,7 +55,7 @@ const AdminManageUserRoles: React.FC = () => {
   ) => {
     const { id, value } = e.target;
     if (id === "user_id") {
-      setUserID(value);
+      setUserID(value.trim());
     } else if (id === "role") {
       setRole(value);
     }

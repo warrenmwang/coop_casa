@@ -53,7 +53,8 @@ const UpdatePropertyForm: React.FC<{
       id === "costCents"
     ) {
       // Validate string is a number
-      if (!validateNumber(value)) {
+      const { data, success } = validateNumber(value);
+      if (!success) {
         toast.error(`Value in field ${id} is not a number.`);
         return;
       }
@@ -61,7 +62,7 @@ const UpdatePropertyForm: React.FC<{
       // convert to number and save value
       setFormDetails((prevState) => ({
         ...prevState,
-        [id]: Number(value),
+        [id]: data,
       }));
       return;
     }

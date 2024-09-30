@@ -42,7 +42,7 @@ const UpdatePropertyManager: React.FC = () => {
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
-    setPropertyID(e.target.value);
+    setPropertyID(e.target.value.trim());
   };
 
   const clearForm = (e: React.FormEvent) => {

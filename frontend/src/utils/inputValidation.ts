@@ -36,10 +36,8 @@ export const validateUserAvatarInput = (file: File): boolean => {
   return true;
 };
 
-export const validateNumber = (n: string): boolean => {
-  // Validate that string is a number (return true if is a number, else false if not)
-  // source: https://stackoverflow.com/a/68007988
-  return !isNaN(+n);
+export const validateNumber = (n: string) => {
+  return z.number().safeParse(n);
 };
 
 export const validateUUID = (uuid: string): [string, boolean] => {
