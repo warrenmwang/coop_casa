@@ -363,6 +363,19 @@ func (h *CommunityHandler) UpdateCommunitiesHandler(w http.ResponseWriter, r *ht
 		return
 	}
 
+	// Query for current community details of entity to check
+	// that the admin id is not modified here.
+	currDBCommunityDetails, err := h.server.DB().GetCommunityDetails(communityDetails.CommunityID)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	if communityDetails.AdminUserID != currDBCommunityDetails.AdminUserID {
+		utils.RespondWithError(w, http.StatusBadRequest, errors.New("cannot change admin user id of community on this endpoint"))
+		return
+	}
+
 	// Validate community's admin is the same id in token
 	if authedUserID != communityDetails.AdminUserID {
 		utils.RespondWithError(w, http.StatusUnauthorized, errors.New("userId in token does not match adminUserId of community details to be created"))

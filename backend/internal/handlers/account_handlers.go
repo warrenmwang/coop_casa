@@ -132,14 +132,14 @@ func (h *AccountHandler) UpdateAccountDetailsHandler(w http.ResponseWriter, r *h
 	// Ensure that the given user id is the same as the
 	// id in the token
 	if userIdFromToken != userDetails.UserID {
-		utils.RespondWithError(w, http.StatusBadRequest, errors.New("token user id does not match user id in form"))
+		utils.RespondWithError(w, http.StatusBadRequest, errors.New("verified user id does not match user id in form (cannot change user id)"))
 		return
 	}
 
 	// Prevent user from changing their email
 	// Ensure that the userDetails email is the same as the email in the token
 	if userEmailFromToken != userDetails.Email {
-		utils.RespondWithError(w, http.StatusUnauthorized, errors.New("can't change email tied to google account"))
+		utils.RespondWithError(w, http.StatusUnauthorized, errors.New("cannot change email tied to google account"))
 		return
 	}
 

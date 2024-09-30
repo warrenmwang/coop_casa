@@ -173,7 +173,7 @@ func (h *PropertyHandler) CreatePropertiesHandler(w http.ResponseWriter, r *http
 	}
 	role, err := h.server.DB().GetUserRole(userID)
 	if err != nil {
-		utils.RespondWithError(w, http.StatusUnauthorized, err)
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 	if role == "regular" {
@@ -284,20 +284,21 @@ func (h *PropertyHandler) CreatePropertiesHandler(w http.ResponseWriter, r *http
 // AUTHED
 func (h *PropertyHandler) UpdatePropertiesHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
-	userID, ok := r.Context().Value(auth.UserIDKey).(string)
+	authedUserID, ok := r.Context().Value(auth.UserIDKey).(string)
 	if !ok {
 		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("user id blank"))
 		return
 	}
+
 	// Ensure user has permission to create a property
 	// (i.e. a role of lister or admin)
-	role, err := h.server.DB().GetUserRole(userID)
+	role, err := h.server.DB().GetUserRole(authedUserID)
 	if err != nil {
 		utils.RespondWithError(w, http.StatusUnauthorized, err)
 		return
 	}
 	if role == "regular" {
-		utils.RespondWithError(w, http.StatusUnauthorized, err)
+		utils.RespondWithError(w, http.StatusUnauthorized, errors.New("you do not have permission to access this endpoint"))
 		return
 	}
 
@@ -325,6 +326,38 @@ func (h *PropertyHandler) UpdatePropertiesHandler(w http.ResponseWriter, r *http
 		return
 	}
 
+	// Query for current property details of entity to check
+	// that the lister id is not modified here.
+	currDBPropertyDetails, err := h.server.DB().GetPropertyDetails(propertyDetails.PropertyID)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	// Also ensure lister id is not changed here on this endpoint (that is a separate endpoint, see below)
+	// and matches what is given
+	if role == "lister" {
+		// cannot modify properties you do not own
+		if authedUserID != currDBPropertyDetails.ListerUserID {
+			utils.RespondWithError(w, http.StatusUnauthorized, errors.New("as a lister, your verified user id does not match the lister user id in the property details of the request you are making"))
+			return
+		}
+		// enforce cannot change lister id of property on this endpoint
+		if propertyDetails.ListerUserID != currDBPropertyDetails.ListerUserID {
+			utils.RespondWithError(w, http.StatusUnauthorized, errors.New("cannot change lister id of property you own on this endpoint"))
+			return
+		}
+	} else if role == "admin" {
+		// enforce cannot change lister id of property on this endpoint
+		if propertyDetails.ListerUserID != currDBPropertyDetails.ListerUserID {
+			utils.RespondWithError(w, http.StatusUnauthorized, errors.New("cannot change lister id of property you own on this endpoint"))
+			return
+		}
+	} else {
+		utils.RespondWithError(w, http.StatusBadRequest, errors.New("something went wrong, unexpected user role"))
+		return
+	}
+
 	// Validate property details
 	err = validation.ValidatePropertyDetails(propertyDetails)
 	if err != nil {
@@ -332,7 +365,7 @@ func (h *PropertyHandler) UpdatePropertiesHandler(w http.ResponseWriter, r *http
 		return
 	}
 
-	// Get property images
+	// Get count of property images sent
 	numberImagesRaw := r.FormValue("numImages") // should be at most 10, limited on expected frontend.
 	numberImagesInt64, err := strconv.ParseInt(numberImagesRaw, 10, 16)
 	if err != nil {
@@ -342,11 +375,12 @@ func (h *PropertyHandler) UpdatePropertiesHandler(w http.ResponseWriter, r *http
 	numberImages := int16(numberImagesInt64)
 
 	// Ensure that at least a single image is given for the property
-	if numberImages == 0 {
+	if numberImages < 1 {
 		utils.RespondWithError(w, http.StatusBadRequest, errors.New("property must have at least one property"))
 		return
 	}
 
+	// Get images from request
 	var images []database.OrderedFileInternal
 	for i := range numberImages {
 		imageDataRaw, imageFileHeader, err := r.FormFile(fmt.Sprintf("image%d", i))
@@ -377,12 +411,6 @@ func (h *PropertyHandler) UpdatePropertiesHandler(w http.ResponseWriter, r *http
 				Data:     imageData,
 			},
 		})
-	}
-
-	// Listers can only update their own properties, admins can modify any who cares if they own it or not
-	if role == "lister" && userID != propertyDetails.ListerUserID {
-		utils.RespondWithError(w, http.StatusUnauthorized, errors.New("you can only modify your own property as a lister"))
-		return
 	}
 
 	// Update property details
