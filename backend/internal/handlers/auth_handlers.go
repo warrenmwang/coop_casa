@@ -97,7 +97,7 @@ func (h *AuthHandler) CallbackHandler(w http.ResponseWriter, r *http.Request) {
 			// create new user for them
 			err = h.server.DB().CreateUser(user.UserId, user.Email)
 			if err != nil {
-				utils.RespondWithError(w, 500, fmt.Errorf("unable to create new user in database with err: %s", err.Error()))
+				utils.RespondWithError(w, http.StatusInternalServerError, fmt.Errorf("unable to create new user in database with err: %s", err.Error()))
 				return
 			}
 
@@ -112,10 +112,10 @@ func (h *AuthHandler) CallbackHandler(w http.ResponseWriter, r *http.Request) {
 			// Save role for user in the db
 			err := h.server.DB().CreateNewUserRole(user.UserId, role)
 			if err != nil {
-				utils.RespondWithError(w, 500, fmt.Errorf("unable to create new user role in database with err: %s", err.Error()))
+				utils.RespondWithError(w, http.StatusInternalServerError, fmt.Errorf("unable to create new user role in database with err: %s", err.Error()))
 			}
 		} else {
-			utils.RespondWithError(w, 500, err)
+			utils.RespondWithError(w, http.StatusInternalServerError, err)
 			return
 		}
 	}
@@ -124,7 +124,7 @@ func (h *AuthHandler) CallbackHandler(w http.ResponseWriter, r *http.Request) {
 	// Generate token with user info
 	tokenSigned, err := auth.GenerateToken(user, expireTime, h.jwtSecret)
 	if err != nil {
-		utils.RespondWithError(w, 500, err)
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 

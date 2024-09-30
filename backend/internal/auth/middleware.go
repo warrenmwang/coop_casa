@@ -86,7 +86,7 @@ func AdminAuthMiddleware(next http.Handler) http.Handler {
 
 		// Ensure userid is the admin user id
 		if userID != config.GlobalConfig.ADMIN_USER_ID {
-			utils.RespondWithError(w, 401, errors.New("unauthorized"))
+			utils.RespondWithError(w, http.StatusUnauthorized, errors.New("unauthorized"))
 			return
 		}
 

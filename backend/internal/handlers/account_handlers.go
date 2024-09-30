@@ -35,21 +35,21 @@ func (h *AccountHandler) GetAccountDetailsHandler(w http.ResponseWriter, r *http
 	// Get user id
 	userId, ok := r.Context().Value(auth.UserIDKey).(string)
 	if !ok {
-		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("userId blank"))
+		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("unable to parse yolur userId"))
 		return
 	}
 
 	// Get user details
 	userDetails, err := h.server.DB().GetUserDetails(userId)
 	if err != nil {
-		utils.RespondWithError(w, 405, err)
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 
 	// Get user avatar image
 	userAvatar, err := h.server.DB().GetUserAvatar(userId)
 	if err != nil {
-		utils.RespondWithError(w, 405, err)
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -87,7 +87,7 @@ func (h *AccountHandler) GetAccountDetailsHandler(w http.ResponseWriter, r *http
 		Data:     userAvatarDataB64,
 	}
 
-	utils.RespondWithJSON(w, 200, database.User{
+	utils.RespondWithJSON(w, http.StatusOK, database.User{
 		UserDetails: userDetails,
 		UserAvatar:  userAvatarFileExternal,
 	})
@@ -132,7 +132,7 @@ func (h *AccountHandler) UpdateAccountDetailsHandler(w http.ResponseWriter, r *h
 	// Ensure that the given user id is the same as the
 	// id in the token
 	if userIdFromToken != userDetails.UserID {
-		utils.RespondWithError(w, 400, errors.New("token user id does not match user id in form"))
+		utils.RespondWithError(w, http.StatusBadRequest, errors.New("token user id does not match user id in form"))
 		return
 	}
 
@@ -200,7 +200,7 @@ func (h *AccountHandler) DeleteAccountHandler(w http.ResponseWriter, r *http.Req
 	// Delete user account (details, role, avatar)
 	err := h.server.DB().DeleteUser(userId)
 	if err != nil {
-		utils.RespondWithError(w, 401, err)
+		utils.RespondWithError(w, http.StatusUnauthorized, err)
 		return
 	}
 
@@ -247,7 +247,7 @@ func (h *AccountHandler) GetUserRoleHandler(w http.ResponseWriter, r *http.Reque
 	}
 
 	// Return the user's role
-	utils.RespondWithJSON(w, 200, struct {
+	utils.RespondWithJSON(w, http.StatusOK, struct {
 		Role string `json:"role"`
 	}{
 		Role: role,
@@ -275,7 +275,7 @@ func (h *AccountHandler) GetUserOwnedCommunities(w http.ResponseWriter, r *http.
 		communityIds = []string{}
 	}
 
-	utils.RespondWithJSON(w, 200, struct {
+	utils.RespondWithJSON(w, http.StatusOK, struct {
 		CommunityIDs []string `json:"communityIDs"`
 	}{
 		CommunityIDs: communityIds,
@@ -458,7 +458,7 @@ func (h *AccountHandler) GetUserSavedProperties(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	utils.RespondWithJSON(w, 200, struct {
+	utils.RespondWithJSON(w, http.StatusOK, struct {
 		PropertyIDs []string `json:"propertyIDs"`
 	}{
 		PropertyIDs: propertyIds,
@@ -559,7 +559,7 @@ func (h *AccountHandler) GetUserSavedCommunities(w http.ResponseWriter, r *http.
 		return
 	}
 
-	utils.RespondWithJSON(w, 200, struct {
+	utils.RespondWithJSON(w, http.StatusOK, struct {
 		CommunityIDs []string `json:"communityIDs"`
 	}{
 		CommunityIDs: communityIds,
@@ -660,7 +660,7 @@ func (h *AccountHandler) GetUserSavedUsers(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	utils.RespondWithJSON(w, 200, struct {
+	utils.RespondWithJSON(w, http.StatusOK, struct {
 		UserIDs []string `json:"userIDs"`
 	}{
 		UserIDs: userIds,

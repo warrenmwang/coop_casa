@@ -47,7 +47,7 @@ func (h *UserProfileHandler) GetUsersHandler(w http.ResponseWriter, r *http.Requ
 
 	tmp, err = strconv.ParseInt(limit, 10, 32)
 	if err != nil {
-		utils.RespondWithError(w, 500, err)
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 	limitInt := int32(tmp)

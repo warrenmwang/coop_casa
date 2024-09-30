@@ -31,12 +31,12 @@ func (h *CommunityHandler) GetCommunityHandler(w http.ResponseWriter, r *http.Re
 	communityId := chi.URLParam(r, "id")
 	communityDetails, err := h.server.DB().GetCommunityDetails(communityId)
 	if err != nil {
-		utils.RespondWithError(w, 500, err)
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 	communityImagesInternal, err := h.server.DB().GetCommunityImages(communityId)
 	if err != nil {
-		utils.RespondWithError(w, 500, err)
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 	var communityImagesExternal []database.FileExternal
@@ -50,12 +50,12 @@ func (h *CommunityHandler) GetCommunityHandler(w http.ResponseWriter, r *http.Re
 	}
 	communityUsers, err := h.server.DB().GetCommunityUsers(communityId)
 	if err != nil {
-		utils.RespondWithError(w, 500, err)
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 	communityProperties, err := h.server.DB().GetCommunityProperties(communityId)
 	if err != nil {
-		utils.RespondWithError(w, 500, err)
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 	// Do not return nulls!
@@ -76,7 +76,7 @@ func (h *CommunityHandler) GetCommunityHandler(w http.ResponseWriter, r *http.Re
 		CommunityUsers:      communityUsers,
 		CommunityProperties: communityProperties,
 	}
-	utils.RespondWithJSON(w, 200, communityFull)
+	utils.RespondWithJSON(w, http.StatusOK, communityFull)
 }
 
 // GET .../communities
@@ -94,14 +94,14 @@ func (h *CommunityHandler) GetCommunitiesHandler(w http.ResponseWriter, r *http.
 	var offset int
 	offset, err := strconv.Atoi(pageStr)
 	if err != nil {
-		utils.RespondWithError(w, 422, fmt.Errorf("unable to parse page: %s", pageStr))
+		utils.RespondWithError(w, http.StatusUnprocessableEntity, fmt.Errorf("unable to parse page: %s", pageStr))
 		return
 	}
 
 	var limit int
 	limit, err = strconv.Atoi(limitStr)
 	if err != nil {
-		utils.RespondWithError(w, 422, fmt.Errorf("unable to parse limit: %s", limitStr))
+		utils.RespondWithError(w, http.StatusUnprocessableEntity, fmt.Errorf("unable to parse limit: %s", limitStr))
 		return
 	}
 
@@ -111,7 +111,7 @@ func (h *CommunityHandler) GetCommunitiesHandler(w http.ResponseWriter, r *http.
 	// Get communities with optional filters
 	communityIds, err := h.server.DB().GetNextPageCommunities(int32(limit), int32(offset), filterName, filterDescription)
 	if err != nil {
-		utils.RespondWithError(w, 500, err)
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -119,7 +119,7 @@ func (h *CommunityHandler) GetCommunitiesHandler(w http.ResponseWriter, r *http.
 		communityIds = []string{}
 	}
 
-	utils.RespondWithJSON(w, 200, struct {
+	utils.RespondWithJSON(w, http.StatusOK, struct {
 		CommunityIDs []string `json:"communityIDs"`
 	}{
 		CommunityIDs: communityIds,
@@ -141,7 +141,7 @@ func (h *CommunityHandler) CreateCommunitiesHandler(w http.ResponseWriter, r *ht
 	r.Body = http.MaxBytesReader(w, r.Body, int64(MAX_SIZE))
 	err := r.ParseMultipartForm(int64(MAX_SIZE) + 512)
 	if err != nil {
-		utils.RespondWithError(w, 500, err)
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -150,20 +150,20 @@ func (h *CommunityHandler) CreateCommunitiesHandler(w http.ResponseWriter, r *ht
 	var communityDetails database.CommunityDetails
 	err = json.Unmarshal([]byte(detailsRaw), &communityDetails)
 	if err != nil {
-		utils.RespondWithError(w, 500, err)
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 
 	// Validate community's admin is the same id in token
 	if authedUserID != communityDetails.AdminUserID {
-		utils.RespondWithError(w, 401, errors.New("userId in token does not match adminUserId of community details to be created"))
+		utils.RespondWithError(w, http.StatusUnauthorized, errors.New("userId in token does not match adminUserId of community details to be created"))
 		return
 	}
 
 	// Validate community details
 	err = validation.ValidateCommunityDetails(communityDetails)
 	if err != nil {
-		utils.RespondWithError(w, 400, err)
+		utils.RespondWithError(w, http.StatusBadRequest, err)
 		return
 	}
 
@@ -171,7 +171,7 @@ func (h *CommunityHandler) CreateCommunitiesHandler(w http.ResponseWriter, r *ht
 	numberImagesRaw := r.FormValue("numImages")
 	numberImagesInt64, err := strconv.ParseInt(numberImagesRaw, 10, 16)
 	if err != nil {
-		utils.RespondWithError(w, 500, err)
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 	numberImages := int16(numberImagesInt64)
@@ -180,19 +180,19 @@ func (h *CommunityHandler) CreateCommunitiesHandler(w http.ResponseWriter, r *ht
 	for i := range numberImages {
 		imageDataRaw, imageFileHeader, err := r.FormFile(fmt.Sprintf("image%d", i))
 		if err != nil {
-			utils.RespondWithError(w, 500, err)
+			utils.RespondWithError(w, http.StatusInternalServerError, err)
 			return
 		}
 		var imageData []byte
 		if imageDataRaw == nil {
-			utils.RespondWithError(w, 500, errors.New("image data is empty"))
+			utils.RespondWithError(w, http.StatusInternalServerError, errors.New("image data is empty"))
 			return
 		} else {
 			defer imageDataRaw.Close()
 
 			imageData, err = io.ReadAll(imageDataRaw)
 			if err != nil {
-				utils.RespondWithError(w, 500, err)
+				utils.RespondWithError(w, http.StatusInternalServerError, err)
 				return
 			}
 		}
@@ -208,7 +208,7 @@ func (h *CommunityHandler) CreateCommunitiesHandler(w http.ResponseWriter, r *ht
 	// Create community in db
 	err = h.server.DB().CreateCommunity(communityDetails, images)
 	if err != nil {
-		utils.RespondWithError(w, 500, err)
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -230,7 +230,7 @@ func (h *CommunityHandler) CreateCommunitiesUserHandler(w http.ResponseWriter, r
 	r.Body = http.MaxBytesReader(w, r.Body, int64(MAX_SIZE))
 	err := r.ParseMultipartForm(int64(MAX_SIZE + 10))
 	if err != nil {
-		utils.RespondWithError(w, 500, err)
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -241,31 +241,31 @@ func (h *CommunityHandler) CreateCommunitiesUserHandler(w http.ResponseWriter, r
 	var data FormData
 	formData := r.FormValue("data")
 	if len(formData) == 0 {
-		utils.RespondWithError(w, 400, errors.New("empty data given"))
+		utils.RespondWithError(w, http.StatusBadRequest, errors.New("empty data given"))
 		return
 	}
 
 	err = json.Unmarshal([]byte(formData), &data)
 	if err != nil {
-		utils.RespondWithError(w, 500, err)
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 
 	// Validate userId in JWT matches the adminId of the given community
 	communityDetails, err := h.server.DB().GetCommunityDetails(data.CommunityID)
 	if err != nil {
-		utils.RespondWithError(w, 500, err)
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 	if authedUserID != communityDetails.AdminUserID {
-		utils.RespondWithError(w, 401, errors.New("userId in JWT not the admin userId of community requested"))
+		utils.RespondWithError(w, http.StatusUnauthorized, errors.New("userId in JWT not the admin userId of community requested"))
 		return
 	}
 
 	// Add given user to given community
 	err = h.server.DB().CreateCommunityUser(data.CommunityID, data.UserID)
 	if err != nil {
-		utils.RespondWithError(w, 500, err)
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -287,7 +287,7 @@ func (h *CommunityHandler) CreateCommunitiesPropertyHandler(w http.ResponseWrite
 	r.Body = http.MaxBytesReader(w, r.Body, int64(MAX_SIZE))
 	err := r.ParseMultipartForm(int64(MAX_SIZE + 10))
 	if err != nil {
-		utils.RespondWithError(w, 500, err)
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -298,31 +298,31 @@ func (h *CommunityHandler) CreateCommunitiesPropertyHandler(w http.ResponseWrite
 	var data FormData
 	formData := r.FormValue("data")
 	if len(formData) == 0 {
-		utils.RespondWithError(w, 400, errors.New("empty data given"))
+		utils.RespondWithError(w, http.StatusBadRequest, errors.New("empty data given"))
 		return
 	}
 
 	err = json.Unmarshal([]byte(formData), &data)
 	if err != nil {
-		utils.RespondWithError(w, 500, err)
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 
 	// Validate userId in JWT matches the adminId of the given community
 	communityDetails, err := h.server.DB().GetCommunityDetails(data.CommunityID)
 	if err != nil {
-		utils.RespondWithError(w, 500, err)
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 	if authedUserID != communityDetails.AdminUserID {
-		utils.RespondWithError(w, 401, errors.New("userId in JWT not the admin userId of community requested"))
+		utils.RespondWithError(w, http.StatusUnauthorized, errors.New("userId in JWT not the admin userId of community requested"))
 		return
 	}
 
 	// Add propertyID to this community
 	err = h.server.DB().CreateCommunityProperty(communityDetails.CommunityID, data.PropertyID)
 	if err != nil {
-		utils.RespondWithError(w, 500, err)
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -344,7 +344,7 @@ func (h *CommunityHandler) UpdateCommunitiesHandler(w http.ResponseWriter, r *ht
 	r.Body = http.MaxBytesReader(w, r.Body, int64(MAX_SIZE))
 	err := r.ParseMultipartForm(int64(MAX_SIZE + 512))
 	if err != nil {
-		utils.RespondWithError(w, 500, err)
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -353,7 +353,7 @@ func (h *CommunityHandler) UpdateCommunitiesHandler(w http.ResponseWriter, r *ht
 	var communityDetails database.CommunityDetails
 	err = json.Unmarshal([]byte(detailsRaw), &communityDetails)
 	if err != nil {
-		utils.RespondWithError(w, 500, err)
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -365,14 +365,14 @@ func (h *CommunityHandler) UpdateCommunitiesHandler(w http.ResponseWriter, r *ht
 
 	// Validate community's admin is the same id in token
 	if authedUserID != communityDetails.AdminUserID {
-		utils.RespondWithError(w, 401, errors.New("userId in token does not match adminUserId of community details to be created"))
+		utils.RespondWithError(w, http.StatusUnauthorized, errors.New("userId in token does not match adminUserId of community details to be created"))
 		return
 	}
 
 	// Validate community details
 	err = validation.ValidateCommunityDetails(communityDetails)
 	if err != nil {
-		utils.RespondWithError(w, 400, err)
+		utils.RespondWithError(w, http.StatusBadRequest, err)
 		return
 	}
 
@@ -380,7 +380,7 @@ func (h *CommunityHandler) UpdateCommunitiesHandler(w http.ResponseWriter, r *ht
 	numberImagesRaw := r.FormValue("numImages")
 	numberImagesInt64, err := strconv.ParseInt(numberImagesRaw, 10, 16)
 	if err != nil {
-		utils.RespondWithError(w, 500, err)
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 	numberImages := int16(numberImagesInt64)
@@ -389,19 +389,19 @@ func (h *CommunityHandler) UpdateCommunitiesHandler(w http.ResponseWriter, r *ht
 	for i := range numberImages {
 		imageDataRaw, imageFileHeader, err := r.FormFile(fmt.Sprintf("image%d", i))
 		if err != nil {
-			utils.RespondWithError(w, 500, err)
+			utils.RespondWithError(w, http.StatusInternalServerError, err)
 			return
 		}
 		var imageData []byte
 		if imageDataRaw == nil {
-			utils.RespondWithError(w, 500, errors.New("image data is empty"))
+			utils.RespondWithError(w, http.StatusInternalServerError, errors.New("image data is empty"))
 			return
 		} else {
 			defer imageDataRaw.Close()
 
 			imageData, err = io.ReadAll(imageDataRaw)
 			if err != nil {
-				utils.RespondWithError(w, 500, err)
+				utils.RespondWithError(w, http.StatusInternalServerError, err)
 				return
 			}
 		}
@@ -419,7 +419,7 @@ func (h *CommunityHandler) UpdateCommunitiesHandler(w http.ResponseWriter, r *ht
 	var userIDs []string
 	err = json.Unmarshal([]byte(userIDsRaw), &userIDs)
 	if err != nil {
-		utils.RespondWithError(w, 500, err)
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -428,7 +428,7 @@ func (h *CommunityHandler) UpdateCommunitiesHandler(w http.ResponseWriter, r *ht
 	var propertyIDs []string
 	err = json.Unmarshal([]byte(propertyIDsRaw), &propertyIDs)
 	if err != nil {
-		utils.RespondWithError(w, 500, err)
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -449,12 +449,12 @@ func (h *CommunityHandler) UpdateCommunitiesHandler(w http.ResponseWriter, r *ht
 	// Update community details and images
 	err = h.server.DB().UpdateCommunityDetails(communityDetails)
 	if err != nil {
-		utils.RespondWithError(w, 500, err)
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 	err = h.server.DB().UpdateCommunityImages(communityDetails.CommunityID, images)
 	if err != nil {
-		utils.RespondWithError(w, 500, err)
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -486,27 +486,27 @@ func (h *CommunityHandler) DeleteCommunitiesHandler(w http.ResponseWriter, r *ht
 
 	communityId := chi.URLParam(r, "id")
 	if len(communityId) == 0 {
-		utils.RespondWithError(w, 400, errors.New("no communityId given"))
+		utils.RespondWithError(w, http.StatusBadRequest, errors.New("no communityId given"))
 		return
 	}
 
 	// Try to get community
 	communityDetails, err := h.server.DB().GetCommunityDetails(communityId)
 	if err != nil {
-		utils.RespondWithError(w, 500, err)
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 
 	// Ensure user is an admin of the community
 	if communityDetails.AdminUserID != authedUserID {
-		utils.RespondWithError(w, 401, errors.New("account not authorized for this action"))
+		utils.RespondWithError(w, http.StatusUnauthorized, errors.New("account not authorized for this action"))
 		return
 	}
 
 	// Delete community
 	err = h.server.DB().DeleteCommunity(communityId)
 	if err != nil {
-		utils.RespondWithError(w, 500, err)
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 

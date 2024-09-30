@@ -31,12 +31,12 @@ func (h *AdminHandler) AdminGetUsers(w http.ResponseWriter, r *http.Request) {
 
 	// Limit and offset cannot be empty strings
 	if limitStr == "" {
-		utils.RespondWithError(w, 422, errors.New("query with empty limit string is not valid"))
+		utils.RespondWithError(w, http.StatusUnprocessableEntity, errors.New("query with empty limit string is not valid"))
 		return
 	}
 
 	if offsetStr == "" {
-		utils.RespondWithError(w, 422, errors.New("query with empty offset string is not valid"))
+		utils.RespondWithError(w, http.StatusUnprocessableEntity, errors.New("query with empty offset string is not valid"))
 		return
 	}
 
@@ -45,24 +45,24 @@ func (h *AdminHandler) AdminGetUsers(w http.ResponseWriter, r *http.Request) {
 	var offset int
 	limit, err := strconv.Atoi(limitStr)
 	if err != nil {
-		utils.RespondWithError(w, 422, errors.New("invalid limit string"))
+		utils.RespondWithError(w, http.StatusUnprocessableEntity, errors.New("invalid limit string"))
 		return
 	}
 	offset, err = strconv.Atoi(offsetStr)
 	if err != nil {
-		utils.RespondWithError(w, 422, errors.New("invalid offset string"))
+		utils.RespondWithError(w, http.StatusUnprocessableEntity, errors.New("invalid offset string"))
 		return
 	}
 
 	// Get all users from the db
 	users, err := h.server.DB().AdminGetUsers(int32(limit), int32(offset))
 	if err != nil {
-		utils.RespondWithError(w, 500, err)
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 
 	// Return the users
-	utils.RespondWithJSON(w, 200, struct {
+	utils.RespondWithJSON(w, http.StatusOK, struct {
 		UserDetails []database.UserDetails `json:"userDetails"`
 	}{
 		UserDetails: users,
@@ -78,7 +78,7 @@ func (h *AdminHandler) AdminGetUsersRoles(w http.ResponseWriter, r *http.Request
 
 	// Ensure that we have something
 	if userIdsStr == "" {
-		utils.RespondWithError(w, 422, errors.New("query with empty string when expecting userId(s) is not valid input"))
+		utils.RespondWithError(w, http.StatusUnprocessableEntity, errors.New("query with empty string when expecting userId(s) is not valid input"))
 		return
 	}
 
@@ -87,7 +87,7 @@ func (h *AdminHandler) AdminGetUsersRoles(w http.ResponseWriter, r *http.Request
 	// Get the roles for the users specified in the request body
 	roles, err := h.server.DB().AdminGetUsersRoles(userIds)
 	if err != nil {
-		utils.RespondWithError(w, 500, err)
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -107,7 +107,7 @@ func (h *AdminHandler) AdminGetUsersRoles(w http.ResponseWriter, r *http.Request
 	}
 
 	// Return the roles
-	utils.RespondWithJSON(w, 200, struct {
+	utils.RespondWithJSON(w, http.StatusOK, struct {
 		UserRoles []tmp `json:"userRoles"`
 	}{
 		UserRoles: results,
@@ -126,11 +126,11 @@ func (h *AdminHandler) UpdateUserRoleHandler(w http.ResponseWriter, r *http.Requ
 
 	// Ensure query parameters are given
 	if userID == "" {
-		utils.RespondWithError(w, 422, errors.New("userID cannot be empty"))
+		utils.RespondWithError(w, http.StatusUnprocessableEntity, errors.New("userID cannot be empty"))
 		return
 	}
 	if role == "" {
-		utils.RespondWithError(w, 422, errors.New("role cannot be empty"))
+		utils.RespondWithError(w, http.StatusUnprocessableEntity, errors.New("role cannot be empty"))
 		return
 	}
 
@@ -143,7 +143,7 @@ func (h *AdminHandler) UpdateUserRoleHandler(w http.ResponseWriter, r *http.Requ
 	// Update role for the user specified in the request body in the db
 	err := h.server.DB().UpdateUserRole(userID, role)
 	if err != nil {
-		utils.RespondWithError(w, 500, err)
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 
