@@ -9,7 +9,7 @@ export default [
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,
   pluginReact.configs.flat.recommended,
-  { ignores: ["build/", "node_modules", "craco.config.js"] },
+  { ignores: ["build/", "node_modules", "**/*.config.js", "styleMock.js"] },
   {
     settings: {
       react: {

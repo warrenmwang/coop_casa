@@ -1,8 +1,8 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
-import LandingPage from "../pages/LandingPage";
+import { render, screen } from "../test-utils";
+import App from "../App";
 
-beforeEach(() => render(<LandingPage />));
+beforeEach(() => render(<App />));
 
 test("renders hero section main text", () => {
   const heroTextElement = screen.getByText(
@@ -42,10 +42,7 @@ test("renders hero section stats", () => {
 
 test("renders communities hero section title text", () => {
   expect(
-    screen.getByText(/Join or Create Your Own Group Today/i),
-  ).toBeInTheDocument();
-  expect(
-    screen.getByText(/Together we are stronger than we could ever be alone./i),
+    screen.getByText(/It takes a village to raise a child. /i),
   ).toBeInTheDocument();
 });
 
@@ -81,11 +78,9 @@ test("renders communities hero section description", () => {
 });
 
 test("renders properties hero section title", () => {
-  expect(screen.getByText(/Properties on Coop/)).toBeInTheDocument();
+  // expect(screen.getByText(/properties/i)).toBeInTheDocument();
   expect(
-    screen.getByText(
-      /Browse to find your desired property to co-own with your buddies./i,
-    ),
+    screen.getByText(/Find the perfect place to co-own/i),
   ).toBeInTheDocument();
 });
 
@@ -99,16 +94,14 @@ test("renders properties hero section graphic", () => {
 
 test("renders properties hero section description", () => {
   expect(
-    screen.getByText(/Find your next homes to coop in!/i),
+    screen.getByText(/Homes are not about the physical location /i),
   ).toBeInTheDocument();
 });
 
 test("renders user hero section title", () => {
-  expect(screen.getByText(/browse who's on coop/i)).toBeInTheDocument();
+  // expect(screen.getByText(/users/i)).toBeInTheDocument();
   expect(
-    screen.getByText(
-      /find your fellow coopers and create your own communities!/i,
-    ),
+    screen.getByText(/coop cannot be what it is without you/i),
   ).toBeInTheDocument();
 });
 

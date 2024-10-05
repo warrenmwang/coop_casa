@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@craco/craco": "^7.1.0",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
     "@fontsource/roboto": "^5.0.13",
@@ -58,6 +57,10 @@
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@babel/preset-env": "^7.25.7",
+    "@babel/preset-react": "^7.25.7",
+    "@babel/preset-typescript": "^7.25.7",
+    "@craco/craco": "^7.1.0",
     "@eslint/js": "^9.9.1",
     "@tanstack/eslint-plugin-query": "^5.47.0",
     "@tanstack/react-query-devtools": "^5.51.1",
@@ -87,5 +90,14 @@
     "typescript-eslint": "^8.3.0",
     "web-vitals": "^4.2.3",
     "webpack-bundle-analyzer": "^4.10.2"
+  },
+  "jest": {
+    "moduleNameMapper": {
+      "\\.(css|less|scss|sass)$": "<rootDir>/styleMock.js"
+    },
+    "transformIgnorePatterns": [
+      "/node_modules/(?!(.*.mjs|@myorg/mypackage|axios|react-native|react-native-reanimated|@react-native|@react-navigation))"
+    ]
   }
+
 }

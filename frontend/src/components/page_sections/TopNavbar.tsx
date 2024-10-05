@@ -72,9 +72,9 @@ const TopNavbar: React.FC = () => {
     ...(authenticated
       ? [{ name: "Dashboard", href: dashboardPageLink, current: false }]
       : []),
-    { name: "Users", href: usersPageLink, current: false },
     { name: "Communities", href: communitiesPageLink, current: false },
     { name: "Properties", href: propertiesPageLink, current: false },
+    { name: "Users", href: usersPageLink, current: false },
   ];
 
   return (
