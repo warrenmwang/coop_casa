@@ -1,5 +1,5 @@
 -- +goose Up
-CREATE TABLE properties(
+CREATE TABLE properties (
     id serial PRIMARY KEY,
     property_id text NOT NULL UNIQUE,
     lister_user_id text NOT NULL,
@@ -20,10 +20,11 @@ CREATE TABLE properties(
     misc_note text,
     created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_list_user_id_properties FOREIGN KEY (lister_user_id) REFERENCES users(user_id) ON DELETE CASCADE
+    CONSTRAINT fk_list_user_id_properties FOREIGN KEY (lister_user_id) REFERENCES users (user_id) ON DELETE CASCADE
 );
 
-CREATE TABLE properties_images(
+
+CREATE TABLE properties_images (
     id serial PRIMARY KEY,
     property_id text NOT NULL,
     order_num smallint NOT NULL,
@@ -32,11 +33,12 @@ CREATE TABLE properties_images(
     "size" bigint NOT NULL,
     "data" bytea NOT NULL,
     created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_property_id_properties_images FOREIGN KEY (property_id) REFERENCES properties(property_id) ON DELETE CASCADE
+    CONSTRAINT fk_property_id_properties_images FOREIGN KEY (property_id) REFERENCES properties (property_id) ON DELETE CASCADE
 );
+
 
 -- +goose Down
 DROP TABLE IF EXISTS properties_images;
 
-DROP TABLE IF EXISTS properties;
 
+DROP TABLE IF EXISTS properties;

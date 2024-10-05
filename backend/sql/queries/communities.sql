@@ -11,8 +11,12 @@ SELECT
 FROM
     communities
 ORDER BY
-    similarity("name", $3) DESC
-LIMIT $1 OFFSET $2;
+    similarity ("name", $3) DESC
+LIMIT
+    $1
+OFFSET
+    $2;
+
 
 -- name: GetNextPageCommunitiesFilterByDescription :many
 SELECT
@@ -20,8 +24,12 @@ SELECT
 FROM
     communities
 ORDER BY
-    similarity("description", $3) DESC
-LIMIT $1 OFFSET $2;
+    similarity ("description", $3) DESC
+LIMIT
+    $1
+OFFSET
+    $2;
+
 
 -- name: GetNextPageCommunitiesFilteredByCombination :many
 SELECT
@@ -29,8 +37,12 @@ SELECT
 FROM
     communities
 ORDER BY
-    0.4 * similarity("name", $3) + 0.6 * similarity("description", $4) DESC
-LIMIT $1 OFFSET $2;
+    0.4 * similarity ("name", $3) + 0.6 * similarity ("description", $4) DESC
+LIMIT
+    $1
+OFFSET
+    $2;
+
 
 -- name: GetNextPageCommunities :many
 SELECT
@@ -39,23 +51,50 @@ FROM
     communities
 ORDER BY
     id
-LIMIT $1 OFFSET $2;
+LIMIT
+    $1
+OFFSET
+    $2;
+
 
 -- name: CreateCommunityDetails :exec
-INSERT INTO communities(community_id, admin_user_id, "name", "description")
-    VALUES ($1, $2, $3, $4);
+INSERT INTO
+    communities (
+        community_id,
+        admin_user_id,
+        "name",
+        "description"
+    )
+VALUES
+    ($1, $2, $3, $4);
+
 
 -- name: CreateCommunityImage :exec
-INSERT INTO communities_images(community_id, file_name, mime_type, "size", "data")
-    VALUES ($1, $2, $3, $4, $5);
+INSERT INTO
+    communities_images (
+        community_id,
+        file_name,
+        mime_type,
+        "size",
+        "data"
+    )
+VALUES
+    ($1, $2, $3, $4, $5);
+
 
 -- name: CreateCommunityProperty :exec
-INSERT INTO communities_properties(community_id, property_id)
-    VALUES ($1, $2);
+INSERT INTO
+    communities_properties (community_id, property_id)
+VALUES
+    ($1, $2);
+
 
 -- name: CreateCommunityUser :exec
-INSERT INTO communities_users(community_id, user_id)
-    VALUES ($1, $2);
+INSERT INTO
+    communities_users (community_id, user_id)
+VALUES
+    ($1, $2);
+
 
 -- name: GetCommunityDetails :one
 SELECT
@@ -65,6 +104,7 @@ FROM
 WHERE
     community_id = $1;
 
+
 -- name: GetCommunityImages :many
 SELECT
     *
@@ -72,6 +112,7 @@ FROM
     communities_images
 WHERE
     community_id = $1;
+
 
 -- name: GetCommunityProperties :many
 SELECT
@@ -81,6 +122,7 @@ FROM
 WHERE
     community_id = $1;
 
+
 -- name: GetCommunityUsers :many
 SELECT
     *
@@ -88,6 +130,7 @@ FROM
     communities_users
 WHERE
     community_id = $1;
+
 
 -- name: GetUserOwnedCommunities :many
 SELECT
@@ -97,9 +140,9 @@ FROM
 WHERE
     admin_user_id = $1;
 
+
 -- name: UpdateCommunityDetails :exec
-UPDATE
-    communities
+UPDATE communities
 SET
     admin_user_id = $2,
     "name" = $3,
@@ -108,42 +151,55 @@ SET
 WHERE
     community_id = $1;
 
+
 -- name: UpdateCommunityAdmin :exec
-UPDATE 
-    communities
+UPDATE communities
 SET
     admin_user_id = $2,
     updated_at = CURRENT_TIMESTAMP
 WHERE
     community_id = $1;
 
+
 -- name: DeleteCommunityImages :exec
 DELETE FROM communities_images
-WHERE community_id = $1;
+WHERE
+    community_id = $1;
+
 
 -- name: DeleteCommunityProperties :exec
 DELETE FROM communities_properties
-WHERE community_id = $1;
+WHERE
+    community_id = $1;
+
 
 -- name: DeleteCommunityProperty :exec
 DELETE FROM communities_properties
-WHERE community_id = $1
+WHERE
+    community_id = $1
     AND property_id = $2;
+
 
 -- name: DeleteCommunityUsers :exec
 DELETE FROM communities_users
-WHERE community_id = $1;
+WHERE
+    community_id = $1;
+
 
 -- name: DeleteCommunityUser :exec
 DELETE FROM communities_users
-WHERE community_id = $1
+WHERE
+    community_id = $1
     AND user_id = $2;
+
 
 -- name: DeleteCommunity :exec
 DELETE FROM communities
-WHERE community_id = $1;
+WHERE
+    community_id = $1;
+
 
 -- name: DeleteUserOwnedCommunities :exec
 DELETE FROM communities
-WHERE admin_user_id = $1;
-
+WHERE
+    admin_user_id = $1;

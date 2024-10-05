@@ -1,5 +1,5 @@
 -- +goose Up
-CREATE TABLE users(
+CREATE TABLE users (
     id serial PRIMARY KEY,
     user_id text NOT NULL UNIQUE,
     email text NOT NULL UNIQUE,
@@ -8,12 +8,13 @@ CREATE TABLE users(
     birth_date text,
     gender text,
     "location" text,
-    interests text[],
+    interests TEXT[],
     created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE users_avatars(
+
+CREATE TABLE users_avatars (
     id serial PRIMARY KEY,
     user_id text NOT NULL UNIQUE,
     file_name text,
@@ -21,11 +22,12 @@ CREATE TABLE users_avatars(
     "size" bigint,
     "data" bytea,
     updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_user_id_users_avatars FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+    CONSTRAINT fk_user_id_users_avatars FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE
 );
+
 
 -- +goose Down
 DROP TABLE IF EXISTS users_avatars;
 
-DROP TABLE IF EXISTS users;
 
+DROP TABLE IF EXISTS users;
