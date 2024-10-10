@@ -2,6 +2,8 @@ import React from "react";
 import RouteRenderer from "./components/RouteRenderer";
 import { BrowserRouter } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
+import TopNavbar from "./components/page_sections/TopNavbar";
+import Footer from "./components/page_sections/Footer";
 import "react-toastify/dist/ReactToastify.css";
 import "react-image-gallery/styles/css/image-gallery.css";
 import "./styles/container.css";
@@ -22,7 +24,11 @@ function App() {
   return (
     <BrowserRouter>
       <ToastContainer />
-      <RouteRenderer />
+      <TopNavbar />
+      <main>
+        <RouteRenderer />
+      </main>
+      <Footer />
     </BrowserRouter>
   );
 }
