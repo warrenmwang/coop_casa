@@ -10,8 +10,10 @@ import (
 )
 
 const createUserSavedCommunity = `-- name: CreateUserSavedCommunity :exec
-INSERT INTO users_saved_communities(user_id, community_id)
-    VALUES ($1, $2)
+INSERT INTO
+    users_saved_communities (user_id, community_id)
+VALUES
+    ($1, $2)
 `
 
 type CreateUserSavedCommunityParams struct {
@@ -25,8 +27,10 @@ func (q *Queries) CreateUserSavedCommunity(ctx context.Context, arg CreateUserSa
 }
 
 const createUserSavedProperty = `-- name: CreateUserSavedProperty :exec
-INSERT INTO users_saved_properties(user_id, property_id)
-    VALUES ($1, $2)
+INSERT INTO
+    users_saved_properties (user_id, property_id)
+VALUES
+    ($1, $2)
 `
 
 type CreateUserSavedPropertyParams struct {
@@ -40,8 +44,10 @@ func (q *Queries) CreateUserSavedProperty(ctx context.Context, arg CreateUserSav
 }
 
 const createUserSavedUser = `-- name: CreateUserSavedUser :exec
-INSERT INTO users_saved_users(user_id, saved_user_id)
-    VALUES ($1, $2)
+INSERT INTO
+    users_saved_users (user_id, saved_user_id)
+VALUES
+    ($1, $2)
 `
 
 type CreateUserSavedUserParams struct {
@@ -56,7 +62,8 @@ func (q *Queries) CreateUserSavedUser(ctx context.Context, arg CreateUserSavedUs
 
 const deleteUserSavedCommunities = `-- name: DeleteUserSavedCommunities :exec
 DELETE FROM users_saved_communities
-WHERE user_id = $1
+WHERE
+    user_id = $1
 `
 
 // Delete's all of the user's saved communities.
@@ -67,7 +74,8 @@ func (q *Queries) DeleteUserSavedCommunities(ctx context.Context, userID string)
 
 const deleteUserSavedCommunity = `-- name: DeleteUserSavedCommunity :exec
 DELETE FROM users_saved_communities
-WHERE user_id = $1
+WHERE
+    user_id = $1
     AND community_id = $2
 `
 
@@ -83,7 +91,8 @@ func (q *Queries) DeleteUserSavedCommunity(ctx context.Context, arg DeleteUserSa
 
 const deleteUserSavedProperties = `-- name: DeleteUserSavedProperties :exec
 DELETE FROM users_saved_properties
-WHERE user_id = $1
+WHERE
+    user_id = $1
 `
 
 // Delete's all of the user's saved properties.
@@ -94,7 +103,8 @@ func (q *Queries) DeleteUserSavedProperties(ctx context.Context, userID string) 
 
 const deleteUserSavedProperty = `-- name: DeleteUserSavedProperty :exec
 DELETE FROM users_saved_properties
-WHERE user_id = $1
+WHERE
+    user_id = $1
     AND property_id = $2
 `
 
@@ -111,7 +121,8 @@ func (q *Queries) DeleteUserSavedProperty(ctx context.Context, arg DeleteUserSav
 
 const deleteUserSavedUser = `-- name: DeleteUserSavedUser :exec
 DELETE FROM users_saved_users
-WHERE user_id = $1
+WHERE
+    user_id = $1
     AND saved_user_id = $2
 `
 
@@ -127,7 +138,8 @@ func (q *Queries) DeleteUserSavedUser(ctx context.Context, arg DeleteUserSavedUs
 
 const deleteUserSavedUsers = `-- name: DeleteUserSavedUsers :exec
 DELETE FROM users_saved_users
-WHERE user_id = $1
+WHERE
+    user_id = $1
 `
 
 // Delete's all of the user's saved users.

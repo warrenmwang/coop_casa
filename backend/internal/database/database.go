@@ -37,6 +37,9 @@ type Service interface {
 	AdminGetUsers(limit, offset int32) ([]UserDetails, error)
 	AdminGetUsersRoles(userIds []string) ([]string, error)
 
+	// Lister functions
+	GetManyListersDetails(limit, offset int32, nameFilter string) ([]ListerDetails, error)
+
 	// Users Account
 	CreateUser(userId, email string) error
 	GetUserDetails(userId string) (UserDetails, error)
@@ -199,6 +202,62 @@ func (s *service) AdminGetUsers(limit, offset int32) ([]UserDetails, error) {
 	}
 
 	return decryptedUsers, nil
+}
+
+// -------------- LISTER FUNCTIONS ------------------
+
+func (s *service) GetManyListersDetails(limit, offset int32, nameFilter string) ([]ListerDetails, error) {
+	ctx := context.Background()
+
+	// Encrypt the lister role string to only get listers from query
+	listerRole_E, err := utils.EncryptString(config.USER_ROLE_LISTER, s.db_encrypt_key)
+	if err != nil {
+		return []ListerDetails{}, nil
+	}
+
+	// Encrypt name and query DB
+	listerDetails_E, err := s.db_queries.GetManyListerInformation(ctx, sqlc.GetManyListerInformationParams{
+		Limit:   limit,
+		Offset:  offset,
+		Similarity: nameFilter,
+		Role: listerRole_E,
+	})
+	if err != nil {
+		return []ListerDetails{}, err
+	}
+
+	// Decrypt each lister's information
+	var listerDetails_D []ListerDetails
+	for _, detail := range listerDetails_E {
+		userID, err := utils.DecryptString(detail.UserID, s.db_encrypt_key)
+		if err != nil {
+			return []ListerDetails{}, err
+		}
+
+		email, err := utils.DecryptString(detail.Email, s.db_encrypt_key)
+		if err != nil {
+			return []ListerDetails{}, err
+		}
+
+		firstName, err := utils.DecryptString(detail.FirstName.String, s.db_encrypt_key)
+		if err != nil {
+			return []ListerDetails{}, err
+		}
+
+		lastName, err := utils.DecryptString(detail.LastName.String, s.db_encrypt_key)
+		if err != nil {
+			return []ListerDetails{}, err
+		}
+
+		listerDetails_D = append(listerDetails_D, ListerDetails{
+			UserID:    userID,
+			Email:     email,
+			FirstName: firstName,
+			LastName:  lastName,
+		})
+	}
+
+	return listerDetails_D, nil
 }
 
 // -------------- USERS ACCOUNT ------------------

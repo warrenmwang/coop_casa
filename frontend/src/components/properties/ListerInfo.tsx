@@ -1,5 +1,5 @@
 import React from "react";
-import { ListerBasicInfo } from "../../types/Types";
+import { PublicListerBasicInfo } from "../../types/Types";
 import FetchErrorText from "../../components/FetchErrorText";
 import { useGetLister } from "../../hooks/lister";
 
@@ -10,7 +10,7 @@ type ListerInfoProps = {
 const ListerInfo: React.FC<ListerInfoProps> = ({ listerID }) => {
   const { data, status } = useGetLister(listerID);
 
-  const lister = data as ListerBasicInfo;
+  const lister = data as PublicListerBasicInfo;
 
   return (
     <>

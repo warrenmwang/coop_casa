@@ -34,10 +34,11 @@ export const APIUserReceivedSchema = z.object({
   avatarImageB64: APIFileReceivedSchema,
 });
 
-export const ListerBasicInfoSchema = z.object({
+export const PublicListerBasicInfoSchema = z.object({
+  userId: z.string(),
+  email: z.string().email(),
   firstName: z.string(),
   lastName: z.string(),
-  email: z.string().email(),
 });
 
 export const AccountSetupPageFormDataSchema = z.object({

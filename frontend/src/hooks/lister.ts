@@ -1,13 +1,27 @@
 import { useQuery, UseQueryResult } from "@tanstack/react-query";
-import { apiGetListerInfo } from "../api/property";
-import { ListerBasicInfo } from "../types/Types";
+import { PublicListerBasicInfo } from "../types/Types";
 import { listerKey } from "../reactQueryKeys";
+import {
+  apiGetListerInfo,
+  apiListerGetPageOfListersDetails,
+} from "../api/lister";
 
 export const useGetLister = (
   listerID: string,
-): UseQueryResult<ListerBasicInfo, Error> => {
+): UseQueryResult<PublicListerBasicInfo, Error> => {
   return useQuery({
     queryKey: [...listerKey, listerID],
     queryFn: () => apiGetListerInfo(listerID),
+  });
+};
+
+export const useGetSetOfListers = (
+  limit: number,
+  page: number,
+  nameFilter: string,
+) => {
+  return useQuery({
+    queryKey: [...listerKey, limit, page, nameFilter],
+    queryFn: () => apiListerGetPageOfListersDetails(limit, page, nameFilter),
   });
 };

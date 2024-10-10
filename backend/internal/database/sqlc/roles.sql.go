@@ -10,8 +10,10 @@ import (
 )
 
 const createNewUserRole = `-- name: CreateNewUserRole :exec
-INSERT INTO roles(user_id, "role")
-    VALUES ($1, $2)
+INSERT INTO
+    roles (user_id, "role")
+VALUES
+    ($1, $2)
 `
 
 type CreateNewUserRoleParams struct {
@@ -26,7 +28,8 @@ func (q *Queries) CreateNewUserRole(ctx context.Context, arg CreateNewUserRolePa
 
 const deleteUserRole = `-- name: DeleteUserRole :exec
 DELETE FROM roles
-WHERE user_id = $1
+WHERE
+    user_id = $1
 `
 
 func (q *Queries) DeleteUserRole(ctx context.Context, userID string) error {
@@ -56,8 +59,7 @@ func (q *Queries) GetUserRole(ctx context.Context, userID string) (Role, error) 
 }
 
 const updateUserRole = `-- name: UpdateUserRole :exec
-UPDATE
-    roles
+UPDATE roles
 SET
     "role" = $2,
     updated_at = CURRENT_TIMESTAMP

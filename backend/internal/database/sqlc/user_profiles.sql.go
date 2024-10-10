@@ -21,7 +21,10 @@ WHERE
     AND gender IS NOT NULL
     AND "location" IS NOT NULL
     AND interests IS NOT NULL
-LIMIT $1 OFFSET $2
+LIMIT
+    $1
+OFFSET
+    $2
 `
 
 type GetNextPageOfPublicUsersParams struct {
@@ -66,8 +69,11 @@ WHERE
     AND "location" IS NOT NULL
     AND interests IS NOT NULL
 ORDER BY
-    0.5 * similarity("first_name", $3) + 0.5 * similarity("last_name", $4) DESC
-LIMIT $1 OFFSET $2
+    0.5 * similarity ("first_name", $3) + 0.5 * similarity ("last_name", $4) DESC
+LIMIT
+    $1
+OFFSET
+    $2
 `
 
 type GetNextPageOfPublicUsersFilterByNameParams struct {

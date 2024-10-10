@@ -26,6 +26,13 @@ type OrderedFileExternal struct {
 	File     FileExternal `json:"file"`
 }
 
+type ListerDetails struct {
+	UserID    string `json:"userId"`
+	Email     string `json:"email"`
+	FirstName string `json:"firstName"`
+	LastName  string `json:"lastName"`
+}
+
 type UserDetails struct {
 	UserID    string   `json:"userId"`
 	Email     string   `json:"email"`
@@ -109,4 +116,11 @@ type PublicUserProfile struct {
 	Images       []FileExternal           `json:"images"`
 	CommunityIDs []string                 `json:"communityIDs"`
 	PropertyIDs  []string                 `json:"propertyIDs"`
+}
+
+type PublicBasicListerDetails struct {
+	UserID    string `json:"userId"`
+	Email     string `json:"email"`
+	FirstName string `json:"firstName"`
+	LastName  string `json:"lastName"`
 }

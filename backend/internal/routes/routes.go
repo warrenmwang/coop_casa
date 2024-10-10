@@ -58,6 +58,18 @@ func NewAccountRouter(s interfaces.Server) http.Handler {
 	return r
 }
 
+// .../lister
+func NewListerRouter(s interfaces.Server) http.Handler {
+	r := chi.NewRouter()
+
+	listerHandlers := handlers.NewListerHandlers(s)
+
+	r.Get("/{id}", listerHandlers.GetListerInfoHandler)
+	r.With(auth.AuthMiddleware).Get("/", listerHandlers.GetListersFromListersHandler)
+
+	return r
+}
+
 // .../admin
 func NewAdminRouter(s interfaces.Server) http.Handler {
 	r := chi.NewRouter()
@@ -78,7 +90,6 @@ func NewPropertyRouter(s interfaces.Server) http.Handler {
 	propertyHandlers := handlers.NewPropertyHandlers(s)
 	r.Get("/{id}", propertyHandlers.GetPropertyHandler)
 	r.Get("/", propertyHandlers.GetPropertiesHandler)
-	r.Get("/lister", propertyHandlers.GetListerInfoHandler)
 
 	r.With(auth.AuthMiddleware).Get("/total", propertyHandlers.GetPropertiesTotalCountHandler)
 	r.With(auth.AuthMiddleware).Post("/", propertyHandlers.CreatePropertiesHandler)
@@ -148,6 +159,10 @@ func RegisterRoutes(s interfaces.Server) http.Handler {
 	// Admin
 	adminRouter := NewAdminRouter(s)
 	apiRouter.Mount("/admin", adminRouter)
+
+	// Lister
+	listerRouter := NewListerRouter(s)
+	apiRouter.Mount("/lister", listerRouter)
 
 	// Properties
 	propertyRouter := NewPropertyRouter(s)

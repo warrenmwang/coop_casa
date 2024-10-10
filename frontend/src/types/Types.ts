@@ -10,7 +10,7 @@ import {
   APIUserReceivedSchema,
   CommunityDetailsSchema,
   CommunitySchema,
-  ListerBasicInfoSchema,
+  PublicListerBasicInfoSchema,
   OrderedFileSchema,
   PropertyDetailsSchema,
   PropertySchema,
@@ -28,7 +28,7 @@ export type APIFileReceived = z.infer<typeof APIFileReceivedSchema>;
 
 export type UserDetails = z.infer<typeof UserDetailsSchema>;
 
-export type ListerBasicInfo = z.infer<typeof ListerBasicInfoSchema>;
+export type PublicListerBasicInfo = z.infer<typeof PublicListerBasicInfoSchema>;
 
 export type AccountSetupPageFormData = z.infer<
   typeof AccountSetupPageFormDataSchema

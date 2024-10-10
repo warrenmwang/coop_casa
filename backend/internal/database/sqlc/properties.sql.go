@@ -15,12 +15,15 @@ SELECT
     count(*)
 FROM
     properties
-WHERE (lower(trim(address_1)) = lower(trim($1))
-    AND lower(trim(coalesce(address_2, ''))) = lower(trim($2))
-    AND lower(trim(city)) = lower(trim($3))
-    AND lower(trim("state")) = lower(trim($4))
-    AND lower(trim(zipcode)) = lower(trim($5))
-    AND lower(trim(country)) = lower(trim($6)))
+WHERE
+    (
+        lower(trim(address_1)) = lower(trim($1))
+        AND lower(trim(coalesce(address_2, ''))) = lower(trim($2))
+        AND lower(trim(city)) = lower(trim($3))
+        AND lower(trim("state")) = lower(trim($4))
+        AND lower(trim(zipcode)) = lower(trim($5))
+        AND lower(trim(country)) = lower(trim($6))
+    )
 `
 
 type CheckIsPropertyDuplicateParams struct {
@@ -47,8 +50,46 @@ func (q *Queries) CheckIsPropertyDuplicate(ctx context.Context, arg CheckIsPrope
 }
 
 const createPropertyDetails = `-- name: CreatePropertyDetails :exec
-INSERT INTO properties(property_id, lister_user_id, "name", "description", address_1, address_2, city, "state", zipcode, country, square_feet, num_bedrooms, num_toilets, num_showers_baths, cost_dollars, cost_cents, misc_note)
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
+INSERT INTO
+    properties (
+        property_id,
+        lister_user_id,
+        "name",
+        "description",
+        address_1,
+        address_2,
+        city,
+        "state",
+        zipcode,
+        country,
+        square_feet,
+        num_bedrooms,
+        num_toilets,
+        num_showers_baths,
+        cost_dollars,
+        cost_cents,
+        misc_note
+    )
+VALUES
+    (
+        $1,
+        $2,
+        $3,
+        $4,
+        $5,
+        $6,
+        $7,
+        $8,
+        $9,
+        $10,
+        $11,
+        $12,
+        $13,
+        $14,
+        $15,
+        $16,
+        $17
+    )
 `
 
 type CreatePropertyDetailsParams struct {
@@ -95,8 +136,17 @@ func (q *Queries) CreatePropertyDetails(ctx context.Context, arg CreatePropertyD
 }
 
 const createPropertyImage = `-- name: CreatePropertyImage :exec
-INSERT INTO properties_images(property_id, order_num, file_name, mime_type, "size", "data")
-    VALUES ($1, $2, $3, $4, $5, $6)
+INSERT INTO
+    properties_images (
+        property_id,
+        order_num,
+        file_name,
+        mime_type,
+        "size",
+        "data"
+    )
+VALUES
+    ($1, $2, $3, $4, $5, $6)
 `
 
 type CreatePropertyImageParams struct {
@@ -122,7 +172,8 @@ func (q *Queries) CreatePropertyImage(ctx context.Context, arg CreatePropertyIma
 
 const deleteListerProperties = `-- name: DeleteListerProperties :exec
 DELETE FROM properties
-WHERE lister_user_id = $1
+WHERE
+    lister_user_id = $1
 `
 
 func (q *Queries) DeleteListerProperties(ctx context.Context, listerUserID string) error {
@@ -132,7 +183,8 @@ func (q *Queries) DeleteListerProperties(ctx context.Context, listerUserID strin
 
 const deletePropertyDetails = `-- name: DeletePropertyDetails :exec
 DELETE FROM properties
-WHERE property_id = $1
+WHERE
+    property_id = $1
 `
 
 func (q *Queries) DeletePropertyDetails(ctx context.Context, propertyID string) error {
@@ -142,7 +194,8 @@ func (q *Queries) DeletePropertyDetails(ctx context.Context, propertyID string) 
 
 const deletePropertyImage = `-- name: DeletePropertyImage :exec
 DELETE FROM properties_images
-WHERE property_id = $1
+WHERE
+    property_id = $1
     AND order_num = $2
 `
 
@@ -158,7 +211,8 @@ func (q *Queries) DeletePropertyImage(ctx context.Context, arg DeletePropertyIma
 
 const deletePropertyImages = `-- name: DeletePropertyImages :exec
 DELETE FROM properties_images
-WHERE property_id = $1
+WHERE
+    property_id = $1
 `
 
 func (q *Queries) DeletePropertyImages(ctx context.Context, propertyID string) error {
@@ -173,7 +227,10 @@ FROM
     properties
 ORDER BY
     id
-LIMIT $1 OFFSET $2
+LIMIT
+    $1
+OFFSET
+    $2
 `
 
 type GetNextPagePropertiesParams struct {
@@ -210,8 +267,24 @@ SELECT
 FROM
     properties
 ORDER BY
-    similarity(CONCAT(address_1, ', ', address_2, ', ', city, ', ', zipcode, ', ', country), $3) DESC
-LIMIT $1 OFFSET $2
+    similarity (
+        CONCAT(
+            address_1,
+            ', ',
+            address_2,
+            ', ',
+            city,
+            ', ',
+            zipcode,
+            ', ',
+            country
+        ),
+        $3
+    ) DESC
+LIMIT
+    $1
+OFFSET
+    $2
 `
 
 type GetNextPagePropertiesFilterByAddressParams struct {
@@ -370,8 +443,7 @@ func (q *Queries) GetUserOwnedProperties(ctx context.Context, listerUserID strin
 }
 
 const updatePropertyDetails = `-- name: UpdatePropertyDetails :exec
-UPDATE
-    properties
+UPDATE properties
 SET
     "name" = $2,
     "description" = $3,
@@ -438,8 +510,7 @@ func (q *Queries) UpdatePropertyDetails(ctx context.Context, arg UpdatePropertyD
 }
 
 const updatePropertyLister = `-- name: UpdatePropertyLister :exec
-UPDATE
-    properties
+UPDATE properties
 SET
     lister_user_id = $2,
     updated_at = CURRENT_TIMESTAMP

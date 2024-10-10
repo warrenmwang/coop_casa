@@ -112,44 +112,6 @@ func (h *PropertyHandler) GetPropertiesHandler(w http.ResponseWriter, r *http.Re
 	})
 }
 
-// GET .../properties/lister
-// NO AUTH
-func (h *PropertyHandler) GetListerInfoHandler(w http.ResponseWriter, r *http.Request) {
-	query := r.URL.Query()
-	listerID := query.Get("listerID")
-	if listerID == "" {
-		utils.RespondWithError(w, http.StatusUnprocessableEntity, errors.New("listerID empty"))
-		return
-	}
-
-	// Check the role of the userid
-	role, err := h.server.DB().GetUserRole(listerID)
-	if err != nil {
-		utils.RespondWithError(w, http.StatusInternalServerError, err)
-		return
-	}
-	if role != config.USER_ROLE_LISTER && role != config.USER_ROLE_ADMIN {
-		utils.RespondWithError(w, http.StatusInternalServerError, errors.New("user is not a lister"))
-		return
-	}
-
-	// userID is a lister, return the email and name for basic contact information
-	lister, err := h.server.DB().GetUserDetails(listerID)
-	if err != nil {
-		utils.RespondWithError(w, http.StatusInternalServerError, err)
-		return
-	}
-
-	utils.RespondWithJSON(w, http.StatusOK, struct {
-		FirstName string `json:"firstName"`
-		LastName  string `json:"lastName"`
-		Email     string `json:"email"`
-	}{
-		FirstName: lister.FirstName,
-		LastName:  lister.LastName,
-		Email:     lister.Email,
-	})
-}
 
 // GET .../properties/total
 // AUTHED
@@ -171,6 +133,7 @@ func (h *PropertyHandler) CreatePropertiesHandler(w http.ResponseWriter, r *http
 		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("user id blank"))
 		return
 	}
+	// Ensure authed user has proper permissions by checking their role
 	role, err := h.server.DB().GetUserRole(userID)
 	if err != nil {
 		utils.RespondWithError(w, http.StatusInternalServerError, err)

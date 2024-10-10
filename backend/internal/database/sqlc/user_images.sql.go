@@ -10,8 +10,10 @@ import (
 )
 
 const createUserImage = `-- name: CreateUserImage :exec
-INSERT INTO user_images(user_id, file_name, mime_type, size, data)
-    VALUES ($1, $2, $3, $4, $5)
+INSERT INTO
+    user_images (user_id, file_name, mime_type, size, data)
+VALUES
+    ($1, $2, $3, $4, $5)
 `
 
 type CreateUserImageParams struct {
@@ -35,7 +37,8 @@ func (q *Queries) CreateUserImage(ctx context.Context, arg CreateUserImageParams
 
 const deleteUserImages = `-- name: DeleteUserImages :exec
 DELETE FROM user_images
-WHERE user_id = $1
+WHERE
+    user_id = $1
 `
 
 func (q *Queries) DeleteUserImages(ctx context.Context, userID string) error {

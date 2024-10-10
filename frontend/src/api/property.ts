@@ -1,5 +1,5 @@
-import { Property, OrderedFile, ListerBasicInfo } from "../types/Types";
-import { apiPropertiesLink, apiListerLink } from "../urls";
+import { Property, OrderedFile } from "../types/Types";
+import { apiPropertiesLink } from "../urls";
 import {
   pageQPKey,
   filterAddressQPKey,
@@ -11,7 +11,6 @@ import axios from "axios";
 import {
   APIPropertyReceivedSchema,
   APIReceivedPropertyIDsSchema,
-  ListerBasicInfoSchema,
 } from "../types/Schema";
 import { z } from "zod";
 
@@ -128,29 +127,6 @@ export const apiDeleteProperty = async (
   return axios.delete(`${apiPropertiesLink}/${propertyID}`, {
     withCredentials: true,
   });
-};
-
-// Get lister info
-export const apiGetListerInfo = async (
-  listerID: string,
-): Promise<ListerBasicInfo> => {
-  return (
-    axios
-      .get(`${apiListerLink}?listerID=${listerID}`, {
-        headers: {
-          Accept: "application/json",
-        },
-      })
-      .then((res) => res.data)
-      // .then((data) => data as ListerBasicInfo);
-      .then((data) => {
-        const res = ListerBasicInfoSchema.safeParse(data);
-        if (res.success) return res.data;
-        throw new Error(
-          "Validation failed: received lister basic info does not match expected schema",
-        );
-      })
-  );
 };
 
 // Get total count of properties in db

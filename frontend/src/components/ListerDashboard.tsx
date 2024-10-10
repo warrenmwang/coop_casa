@@ -9,9 +9,10 @@ import AllLikedEntitiesSection from "./AllLikedEntitiesSection";
 import Title from "./Title";
 import TransferPropertyForm from "./properties/TransferPropertyForm";
 import TransferCommunityForm from "./communities/TransferCommunityForm";
+import BrowseListers from "./BrowseListers";
 
 const ListerDashboard: React.FC = () => {
-  const sections: string[] = ["Your Liked", "Property", "Community"];
+  const sections: string[] = ["Lister", "Your Liked", "Property", "Community"];
   const [currentSection, setCurrentSection] = useState<string>(sections[0]);
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -33,6 +34,16 @@ const ListerDashboard: React.FC = () => {
           </button>
         ))}
       </div>
+
+      {currentSection === "Lister" && (
+        <div>
+          <Title
+            title="Lister Section"
+            description="Information and settings only for listers are present here."
+          />
+          <BrowseListers />
+        </div>
+      )}
 
       {currentSection === "Your Liked" && (
         <div className="flex flex-col">

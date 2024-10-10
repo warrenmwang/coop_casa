@@ -48,19 +48,19 @@ const AdminDisplayUsers: React.FC = () => {
       <table className="min-w-full bg-white rounded-lg">
         <thead>
           <tr className="bg-gray-100">
-            <th className="px-4 py-2 border border-gray-300 text-gray-700 font-semibold">
+            <th className="table__row">
               UserID
             </th>
-            <th className="px-4 py-2 border border-gray-300 text-gray-700 font-semibold">
+            <th className="table__row">
               Email
             </th>
-            <th className="px-4 py-2 border border-gray-300 text-gray-700 font-semibold">
+            <th className="table__row">
               First Name
             </th>
-            <th className="px-4 py-2 border border-gray-300 text-gray-700 font-semibold">
+            <th className="table__row">
               Last Name
             </th>
-            <th className="px-4 py-2 border border-gray-300 text-gray-700 font-semibold">
+            <th className="table__row">
               Role
             </th>
           </tr>

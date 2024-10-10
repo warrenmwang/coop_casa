@@ -11,8 +11,15 @@ import (
 )
 
 const createCommunityDetails = `-- name: CreateCommunityDetails :exec
-INSERT INTO communities(community_id, admin_user_id, "name", "description")
-    VALUES ($1, $2, $3, $4)
+INSERT INTO
+    communities (
+        community_id,
+        admin_user_id,
+        "name",
+        "description"
+    )
+VALUES
+    ($1, $2, $3, $4)
 `
 
 type CreateCommunityDetailsParams struct {
@@ -33,8 +40,16 @@ func (q *Queries) CreateCommunityDetails(ctx context.Context, arg CreateCommunit
 }
 
 const createCommunityImage = `-- name: CreateCommunityImage :exec
-INSERT INTO communities_images(community_id, file_name, mime_type, "size", "data")
-    VALUES ($1, $2, $3, $4, $5)
+INSERT INTO
+    communities_images (
+        community_id,
+        file_name,
+        mime_type,
+        "size",
+        "data"
+    )
+VALUES
+    ($1, $2, $3, $4, $5)
 `
 
 type CreateCommunityImageParams struct {
@@ -57,8 +72,10 @@ func (q *Queries) CreateCommunityImage(ctx context.Context, arg CreateCommunityI
 }
 
 const createCommunityProperty = `-- name: CreateCommunityProperty :exec
-INSERT INTO communities_properties(community_id, property_id)
-    VALUES ($1, $2)
+INSERT INTO
+    communities_properties (community_id, property_id)
+VALUES
+    ($1, $2)
 `
 
 type CreateCommunityPropertyParams struct {
@@ -72,8 +89,10 @@ func (q *Queries) CreateCommunityProperty(ctx context.Context, arg CreateCommuni
 }
 
 const createCommunityUser = `-- name: CreateCommunityUser :exec
-INSERT INTO communities_users(community_id, user_id)
-    VALUES ($1, $2)
+INSERT INTO
+    communities_users (community_id, user_id)
+VALUES
+    ($1, $2)
 `
 
 type CreateCommunityUserParams struct {
@@ -88,7 +107,8 @@ func (q *Queries) CreateCommunityUser(ctx context.Context, arg CreateCommunityUs
 
 const deleteCommunity = `-- name: DeleteCommunity :exec
 DELETE FROM communities
-WHERE community_id = $1
+WHERE
+    community_id = $1
 `
 
 func (q *Queries) DeleteCommunity(ctx context.Context, communityID string) error {
@@ -98,7 +118,8 @@ func (q *Queries) DeleteCommunity(ctx context.Context, communityID string) error
 
 const deleteCommunityImages = `-- name: DeleteCommunityImages :exec
 DELETE FROM communities_images
-WHERE community_id = $1
+WHERE
+    community_id = $1
 `
 
 func (q *Queries) DeleteCommunityImages(ctx context.Context, communityID string) error {
@@ -108,7 +129,8 @@ func (q *Queries) DeleteCommunityImages(ctx context.Context, communityID string)
 
 const deleteCommunityProperties = `-- name: DeleteCommunityProperties :exec
 DELETE FROM communities_properties
-WHERE community_id = $1
+WHERE
+    community_id = $1
 `
 
 func (q *Queries) DeleteCommunityProperties(ctx context.Context, communityID string) error {
@@ -118,7 +140,8 @@ func (q *Queries) DeleteCommunityProperties(ctx context.Context, communityID str
 
 const deleteCommunityProperty = `-- name: DeleteCommunityProperty :exec
 DELETE FROM communities_properties
-WHERE community_id = $1
+WHERE
+    community_id = $1
     AND property_id = $2
 `
 
@@ -134,7 +157,8 @@ func (q *Queries) DeleteCommunityProperty(ctx context.Context, arg DeleteCommuni
 
 const deleteCommunityUser = `-- name: DeleteCommunityUser :exec
 DELETE FROM communities_users
-WHERE community_id = $1
+WHERE
+    community_id = $1
     AND user_id = $2
 `
 
@@ -150,7 +174,8 @@ func (q *Queries) DeleteCommunityUser(ctx context.Context, arg DeleteCommunityUs
 
 const deleteCommunityUsers = `-- name: DeleteCommunityUsers :exec
 DELETE FROM communities_users
-WHERE community_id = $1
+WHERE
+    community_id = $1
 `
 
 func (q *Queries) DeleteCommunityUsers(ctx context.Context, communityID string) error {
@@ -160,7 +185,8 @@ func (q *Queries) DeleteCommunityUsers(ctx context.Context, communityID string) 
 
 const deleteUserOwnedCommunities = `-- name: DeleteUserOwnedCommunities :exec
 DELETE FROM communities
-WHERE admin_user_id = $1
+WHERE
+    admin_user_id = $1
 `
 
 func (q *Queries) DeleteUserOwnedCommunities(ctx context.Context, adminUserID string) error {
@@ -303,7 +329,10 @@ FROM
     communities
 ORDER BY
     id
-LIMIT $1 OFFSET $2
+LIMIT
+    $1
+OFFSET
+    $2
 `
 
 type GetNextPageCommunitiesParams struct {
@@ -340,8 +369,11 @@ SELECT
 FROM
     communities
 ORDER BY
-    similarity("description", $3) DESC
-LIMIT $1 OFFSET $2
+    similarity ("description", $3) DESC
+LIMIT
+    $1
+OFFSET
+    $2
 `
 
 type GetNextPageCommunitiesFilterByDescriptionParams struct {
@@ -379,8 +411,11 @@ SELECT
 FROM
     communities
 ORDER BY
-    similarity("name", $3) DESC
-LIMIT $1 OFFSET $2
+    similarity ("name", $3) DESC
+LIMIT
+    $1
+OFFSET
+    $2
 `
 
 type GetNextPageCommunitiesFilterByNameParams struct {
@@ -424,8 +459,11 @@ SELECT
 FROM
     communities
 ORDER BY
-    0.4 * similarity("name", $3) + 0.6 * similarity("description", $4) DESC
-LIMIT $1 OFFSET $2
+    0.4 * similarity ("name", $3) + 0.6 * similarity ("description", $4) DESC
+LIMIT
+    $1
+OFFSET
+    $2
 `
 
 type GetNextPageCommunitiesFilteredByCombinationParams struct {
@@ -496,8 +534,7 @@ func (q *Queries) GetUserOwnedCommunities(ctx context.Context, adminUserID strin
 }
 
 const updateCommunityAdmin = `-- name: UpdateCommunityAdmin :exec
-UPDATE 
-    communities
+UPDATE communities
 SET
     admin_user_id = $2,
     updated_at = CURRENT_TIMESTAMP
@@ -516,8 +553,7 @@ func (q *Queries) UpdateCommunityAdmin(ctx context.Context, arg UpdateCommunityA
 }
 
 const updateCommunityDetails = `-- name: UpdateCommunityDetails :exec
-UPDATE
-    communities
+UPDATE communities
 SET
     admin_user_id = $2,
     "name" = $3,
