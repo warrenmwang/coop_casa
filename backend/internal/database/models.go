@@ -44,8 +44,23 @@ type UserDetails struct {
 	Interests []string `json:"interests"`
 }
 
+type UserStatus struct {
+	UserID       string `json:"userId"`
+	SetterUserID string `json:"setterUserId"`
+	Status       string `json:"status"`
+	Comment      string `json:"comment"`
+}
+
+// NOTE: struct embedding acts like extending/composition, you can directly access
+// the fields under UserStatus as if they were directly defined in this struct
+type UserStatusTimeStamped struct {
+	UserStatus UserStatus
+	CreatedAt  time.Time `json:"createdAt"`
+	UpdatedAt  time.Time `json:"updatedAt"`
+}
+
 type UsersSavedProperty struct {
-	UserID     string    `json:"userID"`
+	UserID     string    `json:"userID"` 
 	PropertyID string    `json:"propertyID"`
 	CreatedAt  time.Time `json:"createdAt"`
 }

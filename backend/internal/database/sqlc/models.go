@@ -136,3 +136,13 @@ type UsersSavedUser struct {
 	SavedUserID string
 	CreatedAt   time.Time
 }
+
+type UsersStatus struct {
+	ID           int32
+	UserID       string
+	SetterUserID string
+	Status       string
+	Comment      sql.NullString
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
+}

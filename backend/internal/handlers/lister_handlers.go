@@ -22,7 +22,7 @@ func NewListerHandlers(s interfaces.Server) *ListerHandler {
 	return &ListerHandler{server: s}
 }
 
-// GET .../properties/lister
+// GET .../
 // AUTHED
 func (h *ListerHandler) GetListersFromListersHandler(w http.ResponseWriter, r *http.Request) {
 	// Get authenticated user's ID
@@ -83,7 +83,7 @@ func (h *ListerHandler) GetListersFromListersHandler(w http.ResponseWriter, r *h
 	utils.RespondWithJSON(w, http.StatusOK, listersDetails)
 }
 
-// GET .../properties/lister/{id}
+// GET .../{id}
 // NO AUTH
 func (h *ListerHandler) GetListerInfoHandler(w http.ResponseWriter, r *http.Request) {
 	listerID := chi.URLParam(r, "id")

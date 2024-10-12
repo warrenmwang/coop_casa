@@ -13,6 +13,16 @@ const USER_ROLE_REGULAR = "regular"
 const USER_ROLE_LISTER = "lister"
 const USER_ROLE_ADMIN = "admin"
 
+const USER_STATUS_NORMAL = "normal"
+const USER_STATUS_PRIVATE = "private"
+const USER_STATUS_FLAGGED = "flagged"
+
+var USER_STATUS_OPTIONS = map[string]struct{}{
+	USER_STATUS_NORMAL:  {},
+	USER_STATUS_PRIVATE: {},
+	USER_STATUS_FLAGGED: {},
+}
+
 var GENDER_OPTIONS = map[string]struct{}{
 	"Man":                 {},
 	"Woman":               {},

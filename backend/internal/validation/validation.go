@@ -6,7 +6,6 @@ import (
 	"backend/internal/utils"
 	"errors"
 	"fmt"
-	"time"
 
 	goaway "github.com/TwiN/go-away"
 	"github.com/google/uuid"
@@ -38,20 +37,8 @@ func ValidateCommunityDetails(details database.CommunityDetails) error {
 	}
 
 	// Admin user id is expected to be an oauth openid string
-	// which at the time of writing only contains numeric values
-	// and is what we will expect.
-	if len(details.AdminUserID) == 0 {
-		return errors.New("adminUserId cannot be empty string")
-	}
-	isOnlyNumbers := true
-	for _, c := range details.AdminUserID {
-		if c < '0' || c > '9' {
-			isOnlyNumbers = false
-			break
-		}
-	}
-	if !isOnlyNumbers {
-		return errors.New("adminUserId is not only numbers, which is expected content of oauth openid id")
+	if err := utils.EnsureValidOpenID(details.AdminUserID, "admin id"); err != nil {
+		return err
 	}
 
 	// Validate name
@@ -79,18 +66,8 @@ func ValidatePropertyDetails(propertyDetails database.PropertyDetails) error {
 	}
 
 	// Ensure lister id is present
-	if len(propertyDetails.ListerUserID) == 0 {
-		return errors.New("property's lister id is empty")
-	}
-	isOnlyNumbers := true
-	for _, c := range propertyDetails.ListerUserID {
-		if c < '0' || c > '9' {
-			isOnlyNumbers = false
-			break
-		}
-	}
-	if !isOnlyNumbers {
-		return errors.New("listerUserId is not only numbers, which is expected content of oauth openid id")
+	if err := utils.EnsureValidOpenID(propertyDetails.ListerUserID, "lister id"); err != nil {
+		return err
 	}
 
 	// Ensure required fields are not empty, numeric fields should not be out of expected range
@@ -189,18 +166,8 @@ func ValidatePropertyDetails(propertyDetails database.PropertyDetails) error {
 
 func ValidateUserDetails(userDetails database.UserDetails) error {
 	// Ensure id field is present and valid
-	if len(userDetails.UserID) == 0 {
-		return errors.New("user id is empty")
-	}
-	isOnlyNumbers := true
-	for _, c := range userDetails.UserID {
-		if c < '0' || c > '9' {
-			isOnlyNumbers = false
-			break
-		}
-	}
-	if !isOnlyNumbers {
-		return errors.New("user id is not only numbers, which is expected content of oauth openid id")
+	if err := utils.EnsureValidOpenID(userDetails.UserID, "user id"); err != nil {
+		return err
 	}
 
 	// Ensure email is a proper email
@@ -224,18 +191,10 @@ func ValidateUserDetails(userDetails database.UserDetails) error {
 	}
 
 	// Ensure user is more than 18 years of age
-	layout := "2006-01-02"
-	birthDateTime, err := time.Parse(layout, userDetails.BirthDate)
+	ageYears, err := utils.CalculateAge(userDetails.BirthDate)
 	if err != nil {
 		return err
 	}
-
-	now := time.Now()
-	ageYears := now.Year() - birthDateTime.Year()
-	if now.YearDay() < birthDateTime.Day() {
-		ageYears--
-	}
-
 	if ageYears < 18 {
 		return errors.New("user not required minimum age of 18")
 	}
@@ -266,11 +225,40 @@ func ValidateUserDetails(userDetails database.UserDetails) error {
 	}
 	// Validate each interest, no profanity, and is an interest we currently support
 	for _, interest := range userDetails.Interests {
-		if goaway.IsProfane(interest) {
-			return fmt.Errorf("interest \"%s\" contains profanity: %s", interest, goaway.ExtractProfanity(interest))
+		if profaneWord := goaway.ExtractProfanity(interest); profaneWord != "" {
+			return fmt.Errorf("interest \"%s\" contains profanity: %s", interest, profaneWord)
 		}
 		if _, exists := config.INTERESTS_OPTIONS[interest]; !exists {
 			return fmt.Errorf("interest \"%s\" is not one of our supported options", interest)
+		}
+	}
+
+	return nil
+}
+
+func ValidateUserStatusData(status database.UserStatus) error {
+	// User account id
+	if err := utils.EnsureValidOpenID(status.UserID, "user id"); err != nil {
+		return err
+	}
+
+	// Setter account id
+	if err := utils.EnsureValidOpenID(status.SetterUserID, "setter user id"); err != nil {
+		return err
+	}
+
+	// Status
+	if len(status.Status) == 0 {
+		return errors.New("status cannot be empty")
+	}
+	if _, exists := config.USER_STATUS_OPTIONS[status.Status]; !exists {
+		return fmt.Errorf("user status \"%s\" is not valid", status.Status)
+	}
+
+	// Comment, if present
+	if len(status.Comment) > 0 {
+		if profaneWord := goaway.ExtractProfanity(status.Comment); profaneWord != "" {
+			return fmt.Errorf("comment \"%s\" cannot contain profanity %s", status.Comment, profaneWord)
 		}
 	}
 

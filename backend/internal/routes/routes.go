@@ -55,6 +55,11 @@ func NewAccountRouter(s interfaces.Server) http.Handler {
 	r.Delete("/saved/users/{id}", accountHandlers.DeleteUserSavedUser)
 	r.Delete("/saved/users/", accountHandlers.DeleteUserSavedUsers)
 
+	// account status
+	r.Get("/status/{id}", accountHandlers.GetUserStatus)
+	r.Post("/status", accountHandlers.CreateUserStatus)
+	r.Put("/status/{id}", accountHandlers.UpdateUserStatus)
+
 	return r
 }
 

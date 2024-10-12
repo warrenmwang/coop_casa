@@ -66,11 +66,17 @@ type Service interface {
 	DeleteUserSavedCommunities(userID string) error
 	DeleteUserSavedUsers(userID string) error
 
+	// Users status
+	CreateUserStatus(userID, setterUserID, status, comment string) error
+	GetUserStatus(userID string) (UserStatusTimeStamped, error)
+	UpdateUserStatus(userID, setterUserID, status, comment string) error
+	DeleteUserStatus(userID string) error
+
 	// Roles
 	CreateNewUserRole(userId, role string) error
 	GetUserRole(userId string) (string, error)
 	UpdateUserRole(userId, role string) error
-	DeleteUserRole(userId string) error
+	// DeleteUserRole(userId string) error
 
 	// Properties
 	CreateProperty(propertyDetails PropertyDetails, images []OrderedFileInternal) error
@@ -217,10 +223,10 @@ func (s *service) GetManyListersDetails(limit, offset int32, nameFilter string) 
 
 	// Encrypt name and query DB
 	listerDetails_E, err := s.db_queries.GetManyListerInformation(ctx, sqlc.GetManyListerInformationParams{
-		Limit:   limit,
-		Offset:  offset,
+		Limit:      limit,
+		Offset:     offset,
 		Similarity: nameFilter,
-		Role: listerRole_E,
+		Role:       listerRole_E,
 	})
 	if err != nil {
 		return []ListerDetails{}, err
@@ -806,6 +812,140 @@ func (s *service) DeleteUserSavedUsers(userID string) error {
 	return err
 }
 
+// -------------- USERS STATUS ------------------
+
+func (s *service) CreateUserStatus(userID, setterUserID, status, comment string) error {
+	ctx := context.Background()
+
+	// Encrypt all data
+	userID_E, err := utils.EncryptString(userID, s.db_encrypt_key)
+	if err != nil {
+		return err
+	}
+
+	setterUserID_E, err := utils.EncryptString(setterUserID, s.db_encrypt_key)
+	if err != nil {
+		return err
+	}
+
+	status_E, err := utils.EncryptString(status, s.db_encrypt_key)
+	if err != nil {
+		return err
+	}
+
+	comment_E, err := utils.EncryptString(comment, s.db_encrypt_key)
+	if err != nil {
+		return err
+	}
+
+	// Setup sql null string type for comment which could be empty string
+	commentNullString := sql.NullString{
+		String: comment_E,
+		Valid:  false,
+	}
+	if comment != "" {
+		commentNullString.Valid = true
+	}
+
+	// Insert new user status into db
+	err = s.db_queries.CreateUserStatus(ctx, sqlc.CreateUserStatusParams{
+		UserID:       userID_E,
+		SetterUserID: setterUserID_E,
+		Status:       status_E,
+		Comment:      commentNullString,
+	})
+	return err
+}
+
+func (s *service) GetUserStatus(userID string) (UserStatusTimeStamped, error) {
+	ctx := context.Background()
+
+	userID_E, err := utils.EncryptString(userID, s.db_encrypt_key)
+	if err != nil {
+		return UserStatusTimeStamped{}, err
+	}
+
+	userStatus_E, err := s.db_queries.GetUserStatus(ctx, userID_E)
+	if err != nil {
+		return UserStatusTimeStamped{}, err
+	}
+
+	// Decrypt users status information
+	setterUserID_D, err := utils.DecryptString(userStatus_E.SetterUserID, s.db_encrypt_key)
+	if err != nil {
+		return UserStatusTimeStamped{}, err
+	}
+	status_D, err := utils.DecryptString(userStatus_E.Status, s.db_encrypt_key)
+	if err != nil {
+		return UserStatusTimeStamped{}, err
+	}
+	comment_D, err := utils.DecryptString(userStatus_E.Comment.String, s.db_encrypt_key)
+	if err != nil {
+		return UserStatusTimeStamped{}, err
+	}
+
+	return UserStatusTimeStamped{
+		UserStatus: UserStatus{
+			UserID:       userID,
+			SetterUserID: setterUserID_D,
+			Status:       status_D,
+			Comment:      comment_D,
+		},
+		CreatedAt:    userStatus_E.CreatedAt,
+		UpdatedAt:    userStatus_E.UpdatedAt,
+	}, nil
+}
+
+func (s *service) UpdateUserStatus(userID, setterUserID, status, comment string) error {
+	ctx := context.Background()
+
+	// Encrypt all data
+	userID_E, err := utils.EncryptString(userID, s.db_encrypt_key)
+	if err != nil {
+		return err
+	}
+
+	setterUserID_E, err := utils.EncryptString(setterUserID, s.db_encrypt_key)
+	if err != nil {
+		return err
+	}
+
+	status_E, err := utils.EncryptString(status, s.db_encrypt_key)
+	if err != nil {
+		return err
+	}
+
+	comment_E, err := utils.EncryptString(comment, s.db_encrypt_key)
+	if err != nil {
+		return err
+	}
+
+	// Setup sql null string type for comment which could be empty string
+	commentNullString := sql.NullString{
+		String: comment_E,
+		Valid:  false,
+	}
+	if comment != "" {
+		commentNullString.Valid = true
+	}
+
+	return s.db_queries.UpdateUserStatus(ctx, sqlc.UpdateUserStatusParams{
+		UserID:       userID_E,
+		SetterUserID: setterUserID_E,
+		Status:       status_E,
+		Comment:      commentNullString,
+	})
+}
+
+func (s *service) DeleteUserStatus(userID string) error {
+	ctx := context.Background()
+	userID_E, err := utils.EncryptString(userID, s.db_encrypt_key)
+	if err != nil {
+		return err
+	}
+	return s.db_queries.DeleteUserStatus(ctx, userID_E)
+}
+
 // -------------- ROLES ------------------
 // Roles
 // Create a new role for a user, limited to one role per user
@@ -883,19 +1023,19 @@ func (s *service) UpdateUserRole(userId, role string) error {
 
 // Delete the user's role (since users must have a role as long as their account exists
 // this means the user's account has been deleted)
-func (s *service) DeleteUserRole(userId string) error {
-	ctx := context.Background()
-
-	// Encrypt the user id
-	userIdEncrypted, err := utils.EncryptString(userId, s.db_encrypt_key)
-	if err != nil {
-		return err
-	}
-
-	// Delete the user's role
-	err = s.db_queries.DeleteUserRole(ctx, userIdEncrypted)
-	return err
-}
+// func (s *service) DeleteUserRole(userId string) error {
+// 	ctx := context.Background()
+//
+// 	// Encrypt the user id
+// 	userIdEncrypted, err := utils.EncryptString(userId, s.db_encrypt_key)
+// 	if err != nil {
+// 		return err
+// 	}
+//
+// 	// Delete the user's role
+// 	err = s.db_queries.DeleteUserRole(ctx, userIdEncrypted)
+// 	return err
+// }
 
 // Properties
 func (s *service) CreateProperty(propertyDetails PropertyDetails, images []OrderedFileInternal) error {

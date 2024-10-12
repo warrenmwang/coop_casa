@@ -197,7 +197,7 @@ func (h *AccountHandler) DeleteAccountHandler(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	// Delete user account (details, role, avatar)
+	// Delete user account (details, then CASCADE deletes matching role, user_avatar, user_status)
 	err := h.server.DB().DeleteUser(userId)
 	if err != nil {
 		utils.RespondWithError(w, http.StatusUnauthorized, err)
@@ -741,5 +741,160 @@ func (h *AccountHandler) DeleteUserSavedUsers(w http.ResponseWriter, r *http.Req
 	}
 
 	// Respond with ok
+	w.WriteHeader(http.StatusOK)
+}
+
+// POST .../account/status
+// AUTHED
+func (h *AccountHandler) CreateUserStatus(w http.ResponseWriter, r *http.Request) {
+	// Get authed user id
+	authedUserId, ok := r.Context().Value(auth.UserIDKey).(string)
+	if !ok {
+		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("userId blank"))
+		return
+	}
+
+	// Users with privileges below admin can only update their own status
+	// Prepare for check later by first getting the user's role from DB
+	userRole, err := h.server.DB().GetUserRole(authedUserId)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	// Set max reading size for body
+	MAX_SIZE := 1 << 10 // 1 KiB should be more than enough
+	r.Body = http.MaxBytesReader(w, r.Body, int64(MAX_SIZE))
+	err = r.ParseMultipartForm(int64(MAX_SIZE + 512))
+	if err != nil {
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	// Parse user status data
+	var userStatus database.UserStatus
+	err = json.Unmarshal([]byte(r.FormValue("data")), &userStatus)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusBadRequest, errors.New("unable to parse provided user status data"))
+		return
+	}
+
+	// Verify user status data
+	err = validation.ValidateUserStatusData(userStatus)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	// Verify user can modify this user's status
+	if userRole != config.USER_ROLE_ADMIN && userStatus.UserID != authedUserId {
+		utils.RespondWithError(w, http.StatusUnauthorized, errors.New("you are not authorized to create this user's account's status"))
+		return
+	}
+
+	// Insert accepted values, ignoring other fields which we expect to fill ourselves, into db
+	err = h.server.DB().CreateUserStatus(userStatus.UserID, userStatus.SetterUserID, userStatus.Status, userStatus.Comment)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	// Reply ok
+	w.WriteHeader(http.StatusCreated)
+}
+
+// GET .../account/status/{id}
+// AUTHED
+func (h *AccountHandler) GetUserStatus(w http.ResponseWriter, r *http.Request) {
+	authedUserId, ok := r.Context().Value(auth.UserIDKey).(string)
+	if !ok {
+		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("userId blank"))
+		return
+	}
+
+	// Users with privilege below admin cannot request account status for
+	// accounts not their own
+	userRole, err := h.server.DB().GetUserRole(authedUserId)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
+		return
+	}
+	requestedStatusUserID := chi.URLParam(r, "id")
+	if userRole != config.USER_ROLE_ADMIN && requestedStatusUserID != authedUserId {
+		utils.RespondWithError(w, http.StatusUnauthorized, errors.New("you do not have permission to see that user's status"))
+		return
+	}
+
+	// Get status and reply with it
+	userStatus, err := h.server.DB().GetUserStatus(requestedStatusUserID)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
+		return
+	}
+	utils.RespondWithJSON(w, http.StatusOK, userStatus)
+}
+
+// PUT .../account/status/{id}
+// AUTHED
+func (h *AccountHandler) UpdateUserStatus(w http.ResponseWriter, r *http.Request) {
+	authedUserId, ok := r.Context().Value(auth.UserIDKey).(string)
+	if !ok {
+		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("authenticated but unknown userId"))
+		return
+	}
+
+	// Users with privileges below admin can only update their own status
+	// Prepare for check later by first getting the user's role from DB
+	userRole, err := h.server.DB().GetUserRole(authedUserId)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	// Set max reading size for body
+	MAX_SIZE := 1 << 10 // 1 KiB should be more than enough
+	r.Body = http.MaxBytesReader(w, r.Body, int64(MAX_SIZE))
+	err = r.ParseMultipartForm(int64(MAX_SIZE + 512))
+	if err != nil {
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	// Parse user status data
+	var userStatus database.UserStatus
+	err = json.Unmarshal([]byte(r.FormValue("data")), &userStatus)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusBadRequest, errors.New("unable to parse provided user status data"))
+		return
+	}
+
+	// Verify user status data
+	err = validation.ValidateUserStatusData(userStatus)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	// Ensure userid in data is the same as the userid from the url
+	urlUserID := chi.URLParam(r, "id")
+	if urlUserID != userStatus.UserID {
+		utils.RespondWithError(w, http.StatusBadRequest, errors.New("userid in url does not match the user id in the request body"))
+		return
+	}
+
+	// Verify user can update this user's status based on their role
+	if userRole != config.USER_ROLE_ADMIN && userStatus.UserID != authedUserId {
+		utils.RespondWithError(w, http.StatusUnauthorized, errors.New("you are not authorized to create this user's account's status"))
+		return
+	}
+
+	// Insert accepted values, ignoring other fields which we expect to fill ourselves, into db
+	err = h.server.DB().UpdateUserStatus(userStatus.UserID, userStatus.SetterUserID, userStatus.Status, userStatus.Comment)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	// Reply ok
 	w.WriteHeader(http.StatusOK)
 }

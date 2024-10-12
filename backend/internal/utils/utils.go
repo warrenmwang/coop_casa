@@ -7,6 +7,7 @@ import (
 	"database/sql"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"net/mail"
@@ -66,6 +67,23 @@ func IsValidEmail(email string) bool {
 	mailParseRes := err == nil
 
 	return regexRes && mailParseRes
+}
+
+func EnsureValidOpenID(id string, idName string) error {
+	if len(id) == 0 {
+		return fmt.Errorf("%s is empty", idName)
+	}
+	isOnlyNumbers := true
+	for _, c := range id {
+		if c < '0' || c > '9' {
+			isOnlyNumbers = false
+			break
+		}
+	}
+	if !isOnlyNumbers {
+		return fmt.Errorf("%s is not only numbers, which is expected content of oauth openid id", idName)
+	}
+	return nil
 }
 
 // Encrypt bytes
