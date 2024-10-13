@@ -1,11 +1,11 @@
 import axios from "axios";
-import { apiUsersLink } from "../urls";
+import { apiUsersLink } from "urls";
 import {
   filterFirstNameQPKey,
   filterLastNameQPKey,
   limitQPKey,
   pageQPKey,
-} from "../constants";
+} from "appConstants";
 import { APIFileReceived, UserProfile } from "../types/Types";
 import { apiFile2ClientFile } from "../utils/utils";
 import {

@@ -1,6 +1,6 @@
 import React from "react";
-import { useGetLikedEntities } from "../hooks/account";
-import TextSkeleton from "../skeleton/TextSkeleton";
+import { useGetLikedEntities } from "hooks/account";
+import TextSkeleton from "components/skeleton/TextSkeleton";
 import FetchErrorText from "./FetchErrorText";
 import LayoutSectionUsersProfilesWithModal from "./LayoutSectionUsersProfilesWithModal";
 import LayoutSectionCommunitiesWithModal from "./LayoutSectionCommunitiesWithModal";
@@ -10,7 +10,7 @@ import {
   communitiesPageLink,
   propertiesPageLink,
   usersPageLink,
-} from "../urls";
+} from "urls";
 
 const AllLikedEntitiesSection: React.FC = () => {
   const likedEntities = useGetLikedEntities();

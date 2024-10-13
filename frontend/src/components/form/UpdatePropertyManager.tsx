@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
-import SubmitButton from "../components/buttons/SubmitButton";
+import SubmitButton from "../buttons/SubmitButton";
 import { validate as uuidValidate } from "uuid";
-import { apiGetProperty } from "../api/property";
-import { Property } from "../types/Types";
+import { apiGetProperty } from "../../api/property";
+import { Property } from "../../types/Types";
 
 import { toast } from "react-toastify";
 import UpdatePropertyForm from "./UpdatePropertyForm";
-import { useDeleteProperty } from "../hooks/properties";
+import { useDeleteProperty } from "hooks/properties";
 import axios, { AxiosError } from "axios";
 
 const UpdatePropertyManager: React.FC = () => {

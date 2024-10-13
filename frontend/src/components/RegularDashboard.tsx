@@ -4,8 +4,8 @@ import Title from "./Title";
 import AllLikedEntitiesSection from "./AllLikedEntitiesSection";
 import UserOwnedCommunitiesTable from "./communities/UserOwnedCommunitiesTable";
 import TransferCommunityForm from "./communities/TransferCommunityForm";
-import CreateCommunityForm from "../form/CreateCommunityForm";
-import UpdateCommunityManager from "../form/UpdateCommunityManager";
+import CreateCommunityForm from "components/form/CreateCommunityForm";
+import UpdateCommunityManager from "components/form/UpdateCommunityManager";
 
 const RegularDashboard: React.FC = () => {
   const sections: string[] = ["Your Liked", "Community"];

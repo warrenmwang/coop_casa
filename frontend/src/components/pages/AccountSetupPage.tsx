@@ -2,37 +2,37 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 // Components
-import Title from "../components/Title";
+import Title from "components/Title";
 import {
   APIUserReceived,
   OrderedFile,
   User,
   UserDetails,
-} from "../types/Types";
-import LocationInput from "../input/LocationInput";
-import InterestsInput from "../input/InterestsInput";
-import GenderInput from "../input/GenderInput";
-import TextInput from "../input/TextInput";
-import ImageInput from "../input/ImageInput";
-import { EmptyUser } from "../types/Objects";
+} from "types/Types";
+import LocationInput from "components/input/LocationInput";
+import InterestsInput from "components/input/InterestsInput";
+import GenderInput from "components/input/GenderInput";
+import TextInput from "components/input/TextInput";
+import ImageInput from "components/input/ImageInput";
+import { EmptyUser } from "types/Objects";
 
 // Styles
 
-import SubmitButton from "../components/buttons/SubmitButton";
-import { dashboardPageLink, homePageLink } from "../urls";
-import TextSkeleton from "../skeleton/TextSkeleton";
-import { apiFile2ClientFile, isAccountSetup } from "../utils/utils";
+import SubmitButton from "components/buttons/SubmitButton";
+import { dashboardPageLink, homePageLink } from "urls";
+import TextSkeleton from "components/skeleton/TextSkeleton";
+import { apiFile2ClientFile, isAccountSetup } from "utils/utils";
 
 import axios, { AxiosError } from "axios";
 import { toast } from "react-toastify";
-import MultipleImageUploader from "../input/MultipleImageUploader";
-import { MAX_USER_PROFILE_IMGS_ALLOWED } from "../constants";
-import FormButton from "../components/buttons/FormButton";
+import MultipleImageUploader from "components/input/MultipleImageUploader";
+import { MAX_USER_PROFILE_IMGS_ALLOWED } from "appConstants";
+import FormButton from "components/buttons/FormButton";
 import {
   useGetUserAccountAuth,
   useGetUserAccountDetails,
   useUpdateAccountSettings,
-} from "../hooks/account";
+} from "hooks/account";
 
 const AccountSetupPage: React.FC = () => {
   const [formData, setFormData] = useState<User>(EmptyUser);

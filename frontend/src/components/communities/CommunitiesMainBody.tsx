@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import CardGridSkeleton from "../../skeleton/CardGridSkeleton";
+import CardGridSkeleton from "components/skeleton/CardGridSkeleton";
 import PageOfCommunities from "./PageOfCommunities";
 
-import SearchBar from "../../input/SearchBar";
+import SearchBar from "components/input/SearchBar";
 
 import SubmitButton from "../buttons/SubmitButton";
 import { useSearchParams } from "react-router-dom";
@@ -11,14 +11,14 @@ import {
   filterNameQPKey,
   filterDescriptionQPKey,
   MAX_NUMBER_COMMUNITIES_PER_PAGE,
-} from "../../constants";
+} from "appConstants";
 import FetchErrorText from "../FetchErrorText";
-import { useGetPageOfCommunityIDs } from "../../hooks/communities";
+import { useGetPageOfCommunityIDs } from "hooks/communities";
 import PaginationButtons from "../PaginationButtons";
 import {
   useGetPageNumSearchQueryParam,
   useGetURLSearchQueryParam,
-} from "../../hooks/react-router";
+} from "hooks/react-router";
 import {
   getURLSearchQueryParam,
   updateURLSearchQueryParam,

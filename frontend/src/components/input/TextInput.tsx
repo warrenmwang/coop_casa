@@ -3,8 +3,8 @@ import {
   validateTextLength,
   validateDate,
   validateEmail,
-} from "../utils/inputValidation";
-import { MAX_TEXT_INPUT_LENGTH } from "../constants";
+} from "../../utils/inputValidation";
+import { MAX_TEXT_INPUT_LENGTH } from "appConstants";
 
 interface TextInputArgs {
   setFormData: (id: string, value: string) => void;

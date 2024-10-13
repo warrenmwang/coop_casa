@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { useGetProperties } from "../hooks/properties";
+import { useGetProperties } from "hooks/properties";
 import { Property } from "../types/Types";
 import PropertyCard from "./properties/PropertyCard";
 import Modal from "./Modal";
 
-import { LIKED_ENTITIES_DISPLAY_NUM_PREVIEW } from "../constants";
+import { LIKED_ENTITIES_DISPLAY_NUM_PREVIEW } from "appConstants";
 
 type LayoutSectionPropertiesWithModalProps = {
   propertyIDs: string[];

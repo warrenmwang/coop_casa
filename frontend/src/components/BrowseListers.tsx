@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useGetSetOfListers } from "../hooks/lister";
-import TextSkeleton from "../skeleton/TextSkeleton";
+import { useGetSetOfListers } from "hooks/lister";
+import TextSkeleton from "components/skeleton/TextSkeleton";
 import SubmitButton from "./buttons/SubmitButton";
 import FetchErrorText from "./FetchErrorText";
 import PaginationButtons from "./PaginationButtons";

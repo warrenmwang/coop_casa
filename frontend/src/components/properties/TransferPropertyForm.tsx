@@ -1,7 +1,7 @@
 import axios, { AxiosError } from "axios";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
-import { useTransferProperty } from "../../hooks/properties";
+import { useTransferProperty } from "hooks/properties";
 import { validateUserID, validateUUID } from "../../utils/inputValidation";
 import FormButton from "../buttons/FormButton";
 import SubmitButton from "../buttons/SubmitButton";

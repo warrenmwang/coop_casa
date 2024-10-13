@@ -5,18 +5,18 @@ import {
   filterLastNameQPKey,
   MAX_NUMBER_USER_PROFILES_PER_PAGE,
   pageQPKey,
-} from "../../constants";
+} from "appConstants";
 import FetchErrorText from "../FetchErrorText";
-import CardGridSkeleton from "../../skeleton/CardGridSkeleton";
-import SearchBar from "../../input/SearchBar";
+import CardGridSkeleton from "components/skeleton/CardGridSkeleton";
+import SearchBar from "components/input/SearchBar";
 import SubmitButton from "../buttons/SubmitButton";
 import PageOfUserProfiles from "./PageOfUserProfiles";
-import { useGetPageOfUserProfiles } from "../../hooks/users";
+import { useGetPageOfUserProfiles } from "hooks/users";
 import PaginationButtons from "../PaginationButtons";
 import {
   useGetPageNumSearchQueryParam,
   useGetURLSearchQueryParam,
-} from "../../hooks/react-router";
+} from "hooks/react-router";
 import {
   getURLSearchQueryParam,
   updateURLSearchQueryParam,

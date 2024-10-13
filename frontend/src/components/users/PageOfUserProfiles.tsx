@@ -1,7 +1,7 @@
 import React from "react";
 import { UserProfile } from "../../types/Types";
 import UserProfileCard from "./UserProfileCard";
-import { useGetUserProfiles } from "../../hooks/users";
+import { useGetUserProfiles } from "hooks/users";
 
 const PageOfUserProfiles: React.FC<{ userIDs: string[] }> = ({ userIDs }) => {
   const userProfileQueries = useGetUserProfiles(userIDs);

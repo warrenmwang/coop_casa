@@ -1,22 +1,22 @@
 import React, { useState, useEffect } from "react";
 import TextInput from "../input/TextInput";
 import MultipleImageUploader from "../input/MultipleImageUploader";
-import { MAX_COMMUNITY_IMGS_ALLOWED } from "../constants";
+import { MAX_COMMUNITY_IMGS_ALLOWED } from "appConstants";
 import {
   fileArray2OrderedFileArray,
   orderedFileArray2FileArray,
-} from "../utils/utils";
-import { OrderedFile, Community, CommunityDetails } from "../types/Types";
+} from "../../utils/utils";
+import { OrderedFile, Community, CommunityDetails } from "../../types/Types";
 import { toast } from "react-toastify";
-import { useGetUserProfiles } from "../hooks/users";
-import { useGetProperties } from "../hooks/properties";
+import { useGetUserProfiles } from "hooks/users";
+import { useGetProperties } from "hooks/properties";
 import {
   constructAddressString,
   costNumsToPresentableString,
-} from "../utils/property";
-import FormButton from "../components/buttons/FormButton";
+} from "../../utils/property";
+import FormButton from "../buttons/FormButton";
 import axios, { AxiosError } from "axios";
-import { useUpdateCommunity } from "../hooks/communities";
+import { useUpdateCommunity } from "hooks/communities";
 
 const UpdateCommunityForm: React.FC<{
   community: Community;

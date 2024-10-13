@@ -2,7 +2,7 @@ import axios from "axios";
 import { z } from "zod";
 import { PublicListerBasicInfoSchema } from "../types/Schema";
 import { PublicListerBasicInfo } from "../types/Types";
-import { apiListerLink } from "../urls";
+import { apiListerLink } from "urls";
 
 // Get public, basic lister info
 export const apiGetListerInfo = async (

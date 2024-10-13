@@ -1,6 +1,6 @@
 import React from "react";
 import { Community } from "../../types/Types";
-import { communitiesPageLink } from "../../urls";
+import { communitiesPageLink } from "urls";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardMedia } from "@mui/material";
 

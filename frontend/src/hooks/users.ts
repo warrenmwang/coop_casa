@@ -1,5 +1,5 @@
 import { useQueries, useQuery, UseQueryResult } from "@tanstack/react-query";
-import { MAX_NUMBER_USER_PROFILES_PER_PAGE } from "../constants";
+import { MAX_NUMBER_USER_PROFILES_PER_PAGE } from "appConstants";
 import {
   apiGetUserProfile,
   apiGetUserProfileImages,

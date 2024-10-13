@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import SubmitButton from "../components/buttons/SubmitButton";
+import SubmitButton from "../buttons/SubmitButton";
 
 import { toast } from "react-toastify";
 import axios, { AxiosError } from "axios";
-import { useAdminUpdateUserRole } from "../hooks/admin";
+import { useAdminUpdateUserRole } from "hooks/admin";
 
 const AdminManageUserRoles: React.FC = () => {
   const roleTypes = ["lister", "regular"];

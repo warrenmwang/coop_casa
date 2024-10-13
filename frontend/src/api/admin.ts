@@ -1,4 +1,4 @@
-import { apiAccountStatusLink, apiAdminUsersLink, apiAdminUsersRolesLink } from "../urls";
+import { apiAccountStatusLink, apiAdminUsersLink, apiAdminUsersRolesLink } from "urls";
 import { UserDetails } from "../types/Types";
 import axios, { AxiosResponse } from "axios";
 import { AdminUpdateUserRoleResponse } from "../types/Responses";

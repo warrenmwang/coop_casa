@@ -1,11 +1,11 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import SoftRightAngleArrow from "../icons/SoftRightAngleArrow";
+import SoftRightAngleArrow from "components/icons/SoftRightAngleArrow";
 import {
   communitiesPageLink,
   propertiesPageLink,
   usersPageLink,
-} from "../urls";
+} from "urls";
 import Title from "./Title";
 
 const CallToAction: React.FC = () => {

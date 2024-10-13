@@ -3,14 +3,14 @@ import {
   apiCommunitiesLink,
   apiCommunitiesPropertiesLink,
   apiCommunitiesUsersLink,
-} from "../urls";
+} from "urls";
 import { apiFile2ClientFile } from "../utils/utils";
 import {
   pageQPKey,
   filterDescriptionQPKey,
   filterNameQPKey,
   MAX_NUMBER_COMMUNITIES_PER_PAGE,
-} from "../constants";
+} from "appConstants";
 import axios from "axios";
 import {
   APICommunityReceivedSchema,

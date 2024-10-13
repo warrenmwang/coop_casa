@@ -1,8 +1,8 @@
 import * as React from "react";
-import { useGetUserOwnedCommunitiesIDs } from "../../hooks/account";
-import TextSkeleton from "../../skeleton/TextSkeleton";
+import { useGetUserOwnedCommunitiesIDs } from "hooks/account";
+import TextSkeleton from "components/skeleton/TextSkeleton";
 import FetchErrorText from "../FetchErrorText";
-import { useGetCommunities } from "../../hooks/communities";
+import { useGetCommunities } from "hooks/communities";
 
 const Table: React.FC<{ communityIDs: string[] }> = ({ communityIDs }) => {
   if (communityIDs === null) {

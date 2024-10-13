@@ -1,5 +1,5 @@
 import { SetURLSearchParams } from "react-router-dom";
-import { pageQPKey } from "../constants";
+import { pageQPKey } from "appConstants";
 
 export function getURLSearchQueryParam(
   searchParams: URLSearchParams,

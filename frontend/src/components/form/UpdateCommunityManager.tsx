@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
-import SubmitButton from "../components/buttons/SubmitButton";
+import SubmitButton from "../buttons/SubmitButton";
 import { validate as uuidValidate } from "uuid";
-import { Community } from "../types/Types";
+import { Community } from "../../types/Types";
 
 import { toast } from "react-toastify";
 import UpdateCommunityForm from "./UpdateCommunityForm";
-import { useDeleteCommunity } from "../hooks/communities";
+import { useDeleteCommunity } from "hooks/communities";
 import axios, { AxiosError } from "axios";
-import { apiGetCommunity } from "../api/community";
+import { apiGetCommunity } from "../../api/community";
 
 const UpdateCommunityManager: React.FC = () => {
   // ------------ For Getting the community details

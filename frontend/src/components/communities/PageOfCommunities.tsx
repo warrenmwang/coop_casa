@@ -1,7 +1,7 @@
 import React from "react";
 import { Community } from "../../types/Types";
 import CommunityCard from "./CommunityCard";
-import { useGetCommunities } from "../../hooks/communities";
+import { useGetCommunities } from "hooks/communities";
 
 type PageOfCommunitiesProps = {
   communityIDs: string[];

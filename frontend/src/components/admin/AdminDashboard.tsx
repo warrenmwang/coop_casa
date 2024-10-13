@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import CreatePropertyForm from "../../form/CreatePropertyForm";
-import AdminManageUserRoles from "../../form/AdminManageUserRoles";
-import UpdatePropertyManager from "../../form/UpdatePropertyManager";
-import CreateCommunityForm from "../../form/CreateCommunityForm";
-import UpdateCommunityManager from "../../form/UpdateCommunityManager";
+import CreatePropertyForm from "components/form/CreatePropertyForm";
+import AdminManageUserRoles from "components/form/AdminManageUserRoles";
+import UpdatePropertyManager from "components/form/UpdatePropertyManager";
+import CreateCommunityForm from "components/form/CreateCommunityForm";
+import UpdateCommunityManager from "components/form/UpdateCommunityManager";
 import AdminDisplayUsers from "./AdminDisplayUsers";
 import UserOwnedPropertiesTable from "../properties/UserOwnedPropertiesTable";
 import UserOwnedCommunitiesTable from "../communities/UserOwnedCommunitiesTable";
@@ -12,6 +12,7 @@ import Title from "../Title";
 import TransferPropertyForm from "../properties/TransferPropertyForm";
 import TransferCommunityForm from "../communities/TransferCommunityForm";
 import BrowseListers from "../BrowseListers";
+import AdminManageUserStatuses from "./AdminManageUserStatuses";
 
 const AdminDashboard: React.FC = () => {
   const sections: string[] = [
@@ -47,6 +48,7 @@ const AdminDashboard: React.FC = () => {
         <>
           <AdminDisplayUsers />
           <AdminManageUserRoles />
+          <AdminManageUserStatuses />
         </>
       )}
 

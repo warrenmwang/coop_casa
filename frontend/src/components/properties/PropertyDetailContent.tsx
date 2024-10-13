@@ -1,5 +1,5 @@
 import React from "react";
-import { propertiesPageLink } from "../../urls";
+import { propertiesPageLink } from "urls";
 import { Box } from "@mui/material";
 import CustomImageGallery, {
   ImageGalleryItemsInput,
@@ -15,7 +15,7 @@ import {
   useGetLikedProperties,
   useLikeProperty,
   useUnlikeProperty,
-} from "../../hooks/account";
+} from "hooks/account";
 import debounce from "lodash.debounce";
 import axios, { AxiosError } from "axios";
 import { toast } from "react-toastify";

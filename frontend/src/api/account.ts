@@ -6,7 +6,7 @@ import {
   apiUserRoleLink,
   apiAccountUserProfileImagesLink,
   apiAccountStatusLink,
-} from "../urls";
+} from "urls";
 import { User, APIUserReceived, APIReceivedUserStatus } from "../types/Types";
 import axios, { AxiosResponse } from "axios";
 import { DeleteUserResponse, LogoutUserResponse } from "../types/Responses";

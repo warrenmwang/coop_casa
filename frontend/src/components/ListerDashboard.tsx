@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import CreatePropertyForm from "../form/CreatePropertyForm";
-import UpdatePropertyManager from "../form/UpdatePropertyManager";
-import CreateCommunityForm from "../form/CreateCommunityForm";
-import UpdateCommunityManager from "../form/UpdateCommunityManager";
+import CreatePropertyForm from "components/form/CreatePropertyForm";
+import UpdatePropertyManager from "components/form/UpdatePropertyManager";
+import CreateCommunityForm from "components/form/CreateCommunityForm";
+import UpdateCommunityManager from "components/form/UpdateCommunityManager";
 import UserOwnedPropertiesTable from "./properties/UserOwnedPropertiesTable";
 import UserOwnedCommunitiesTable from "./communities/UserOwnedCommunitiesTable";
 import AllLikedEntitiesSection from "./AllLikedEntitiesSection";

@@ -1,10 +1,10 @@
 import { Property, OrderedFile } from "../types/Types";
-import { apiPropertiesLink } from "../urls";
+import { apiPropertiesLink } from "urls";
 import {
   pageQPKey,
   filterAddressQPKey,
   MAX_NUMBER_PROPERTIES_PER_PAGE,
-} from "../constants";
+} from "appConstants";
 import { apiFile2ClientFile } from "../utils/utils";
 
 import axios from "axios";

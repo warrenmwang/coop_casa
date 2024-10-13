@@ -4,27 +4,27 @@ import LocationInput from "../input/LocationInput";
 import GenderInput from "../input/GenderInput";
 import TextInput from "../input/TextInput";
 import ImageInput from "../input/ImageInput";
-import { apiFile2ClientFile, isAccountSetup } from "../utils/utils";
+import { apiFile2ClientFile, isAccountSetup } from "../../utils/utils";
 import {
   APIUserReceived,
   OrderedFile,
   User,
   UserDetails,
-} from "../types/Types";
+} from "../../types/Types";
 
-import TextSkeleton from "../skeleton/TextSkeleton";
+import TextSkeleton from "components/skeleton/TextSkeleton";
 import { toast } from "react-toastify";
-import { EmptyUser } from "../types/Objects";
-import FetchErrorText from "../components/FetchErrorText";
+import { EmptyUser } from "types/Objects";
+import FetchErrorText from "../FetchErrorText";
 import axios, { AxiosError } from "axios";
-import FormButton from "../components/buttons/FormButton";
+import FormButton from "../buttons/FormButton";
 import MultipleImageUploader from "../input/MultipleImageUploader";
 import {
   useGetAccountUserProfileImages,
   useGetUserAccountDetails,
   useGetUserAccountRole,
   useUpdateAccountSettings,
-} from "../hooks/account";
+} from "hooks/account";
 
 const AccountSettingsForm: React.FC = () => {
   const [user, setUser] = useState<User>(EmptyUser);

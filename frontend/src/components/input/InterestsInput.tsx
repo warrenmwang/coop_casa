@@ -1,5 +1,5 @@
 import React from "react";
-import { interestsOptions } from "../constants";
+import { interestsOptions } from "appConstants";
 
 interface InterestsInputProps {
   values: string[];

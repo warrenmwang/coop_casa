@@ -1,23 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { validateNumber } from "../utils/inputValidation";
+import { validateNumber } from "../../utils/inputValidation";
 import TextInput from "../input/TextInput";
-import SubmitButton from "../components/buttons/SubmitButton";
+import SubmitButton from "../buttons/SubmitButton";
 import MultipleImageUploader from "../input/MultipleImageUploader";
-import { MAX_PROPERTY_IMGS_ALLOWED } from "../constants";
+import { MAX_PROPERTY_IMGS_ALLOWED } from "appConstants";
 import {
   APIUserReceived,
   OrderedFile,
   Property,
   PropertyDetails,
   UserDetails,
-} from "../types/Types";
-import TextSkeleton from "../skeleton/TextSkeleton";
+} from "../../types/Types";
+import TextSkeleton from "components/skeleton/TextSkeleton";
 
 import { toast } from "react-toastify";
 import axios, { AxiosError } from "axios";
-import { useGetUserAccountDetails } from "../hooks/account";
-import { useCreateProperty } from "../hooks/properties";
+import { useGetUserAccountDetails } from "hooks/account";
+import { useCreateProperty } from "hooks/properties";
 
 type TextFieldsConstruct = {
   id: string;

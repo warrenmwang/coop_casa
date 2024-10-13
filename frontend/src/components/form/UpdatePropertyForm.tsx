@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { OrderedFile, Property, PropertyDetails } from "../types/Types";
+import { OrderedFile, Property, PropertyDetails } from "../../types/Types";
 import TextInput from "../input/TextInput";
 import MultipleImageUploader from "../input/MultipleImageUploader";
-import { MAX_PROPERTY_IMGS_ALLOWED } from "../constants";
+import { MAX_PROPERTY_IMGS_ALLOWED } from "appConstants";
 
-import { validateNumber } from "../utils/inputValidation";
+import { validateNumber } from "../../utils/inputValidation";
 import { toast } from "react-toastify";
 import axios, { AxiosError } from "axios";
-import { useUpdateProperty } from "../hooks/properties";
+import { useUpdateProperty } from "hooks/properties";
 
 const UpdatePropertyForm: React.FC<{
   property: Property;

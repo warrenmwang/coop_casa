@@ -1,6 +1,6 @@
 import React from "react";
 import { Box } from "@mui/material";
-import { communitiesPageLink } from "../../urls";
+import { communitiesPageLink } from "urls";
 import ShareLinkButton from "../buttons/ShareLinkButton";
 import CustomImageGallery, {
   ImageGalleryItemsInput,
@@ -15,7 +15,7 @@ import {
   useGetLikedCommunities,
   useLikeCommunity,
   useUnlikeCommunity,
-} from "../../hooks/account";
+} from "hooks/account";
 import debounce from "lodash.debounce";
 import axios, { AxiosError } from "axios";
 import { toast } from "react-toastify";

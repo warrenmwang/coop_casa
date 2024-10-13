@@ -1,6 +1,6 @@
 import { toast } from "react-toastify";
 import { z } from "zod";
-import { MAX_TEXT_INPUT_LENGTH, MAX_IMAGE_FILE_SIZE } from "../constants";
+import { MAX_TEXT_INPUT_LENGTH, MAX_IMAGE_FILE_SIZE } from "appConstants";
 
 export const validateTextLength = (value: string): boolean => {
   // Check if the value length exceeds our MAX_TEXT_INPUT_LENGTH characters

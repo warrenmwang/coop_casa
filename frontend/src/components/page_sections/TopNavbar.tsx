@@ -10,18 +10,18 @@ import {
   usersPageLink,
   communitiesPageLink,
   propertiesPageLink,
-} from "../../urls";
+} from "urls";
 import { APIUserReceived } from "../../types/Types";
 import { apiFile2ClientFile } from "../../utils/utils";
 import { toast } from "react-toastify";
 import axios, { AxiosError } from "axios";
-import UserProfileIcon from "../../icons/UserProfileIcon/UserProfileIcon";
-import DefaultUserProfileIcon from "../../icons/DefaultUserProfile/DefaultUserProfileIcon";
+import UserProfileIcon from "components/icons/UserProfileIcon/UserProfileIcon";
+import DefaultUserProfileIcon from "components/icons/DefaultUserProfile/DefaultUserProfileIcon";
 import {
   useGetUserAccountAuth,
   useGetUserAccountDetails,
   useLogoutUser,
-} from "../../hooks/account";
+} from "hooks/account";
 
 function classNames(...classes: (string | undefined | null | false)[]) {
   return classes.filter(Boolean).join(" ");

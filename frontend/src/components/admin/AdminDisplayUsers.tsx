@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { toast } from "react-toastify";
-import TextSkeleton from "../../skeleton/TextSkeleton";
+import TextSkeleton from "components/skeleton/TextSkeleton";
 import {
   useAdminGetUserDetails,
   useAdminGetUserRoles,
-} from "../../hooks/admin";
+} from "hooks/admin";
 
 const AdminDisplayUsers: React.FC = () => {
   const limit = 10;

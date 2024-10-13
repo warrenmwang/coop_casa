@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import Title from "../components/Title";
-import Modal from "../components/Modal";
-import AccountSettingsForm from "../form/AccountSettingsForm";
+import Title from "components/Title";
+import Modal from "components/Modal";
+import AccountSettingsForm from "components/form/AccountSettingsForm";
 import { useNavigate } from "react-router-dom";
-import { dashboardPageLink, homePageLink } from "../urls";
-import TextSkeleton from "../skeleton/TextSkeleton";
+import { dashboardPageLink, homePageLink } from "urls";
+import TextSkeleton from "components/skeleton/TextSkeleton";
 import axios, { AxiosError } from "axios";
 import { toast } from "react-toastify";
 import {
@@ -13,7 +13,7 @@ import {
   useGetUserAccountRole,
   useGetUserOwnedCommunitiesIDs,
   useGetUserOwnedPropertiesIDs,
-} from "../hooks/account";
+} from "hooks/account";
 
 // Authenticated Endpoint
 const AccountSettingsPage: React.FC = () => {

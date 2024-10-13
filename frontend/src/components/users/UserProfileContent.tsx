@@ -1,7 +1,7 @@
 import * as React from "react";
 import { UserProfile } from "../../types/Types";
 import { Box } from "@mui/material";
-import { usersPageLink } from "../../urls";
+import { usersPageLink } from "urls";
 import ShareLinkButton from "../buttons/ShareLinkButton";
 import CustomImageGallery, {
   ImageGalleryItemsInput,
@@ -14,7 +14,7 @@ import {
   useGetLikedUsers,
   useLikeUser,
   useUnlikeUser,
-} from "../../hooks/account";
+} from "hooks/account";
 import BackButton from "../buttons/BackButton";
 import BrowsePageButton from "./BrowsePageButton";
 import debounce from "lodash.debounce";

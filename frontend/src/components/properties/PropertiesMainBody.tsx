@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { MAX_NUMBER_PROPERTIES_PER_PAGE } from "../../constants";
-import CardGridSkeleton from "../../skeleton/CardGridSkeleton";
-import SearchBar from "../../input/SearchBar";
+import { MAX_NUMBER_PROPERTIES_PER_PAGE } from "appConstants";
+import CardGridSkeleton from "components/skeleton/CardGridSkeleton";
+import SearchBar from "components/input/SearchBar";
 import PageOfProperties from "./PageOfProperties";
 import { useSearchParams } from "react-router-dom";
 import SubmitButton from "../buttons/SubmitButton";
 import FetchErrorText from "../FetchErrorText";
-import { pageQPKey, filterAddressQPKey } from "../../constants";
-import { useGetPageOfPropertyIDs } from "../../hooks/properties";
+import { pageQPKey, filterAddressQPKey } from "appConstants";
+import { useGetPageOfPropertyIDs } from "hooks/properties";
 
 import PaginationButtons from "../PaginationButtons";
 import {
   useGetPageNumSearchQueryParam,
   useGetURLSearchQueryParam,
-} from "../../hooks/react-router";
+} from "hooks/react-router";
 import {
   getURLSearchQueryParam,
   updateURLSearchQueryParam,

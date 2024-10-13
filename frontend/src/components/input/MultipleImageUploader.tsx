@@ -1,12 +1,12 @@
 import React, { useEffect, useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { MAX_IMAGE_FILE_SIZE, MAX_PROPERTY_IMGS_ALLOWED } from "../constants";
-import { OrderedFile } from "../types/Types";
+import { MAX_IMAGE_FILE_SIZE, MAX_PROPERTY_IMGS_ALLOWED } from "appConstants";
+import { OrderedFile } from "../../types/Types";
 import {
   orderedFileArray2FileArray,
   fileArray2OrderedFileArray,
-} from "../utils/utils";
-import FormButton from "../components/buttons/FormButton";
+} from "../../utils/utils";
+import FormButton from "../buttons/FormButton";
 
 /*
 
