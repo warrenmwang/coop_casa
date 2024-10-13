@@ -33,6 +33,7 @@ export const apiAccountUserProfileImagesLink = `${API_HOST}:${API_PORT}/api/v1/a
 export const apiAccountUserSavedCommunties = `${API_HOST}:${API_PORT}/api/v1/account/saved/communities`;
 export const apiAccountUserSavedProperties = `${API_HOST}:${API_PORT}/api/v1/account/saved/properties`;
 export const apiAccountUserSavedUsers = `${API_HOST}:${API_PORT}/api/v1/account/saved/users`;
+export const apiAccountStatusLink = `${API_HOST}:${API_PORT}/api/v1/account/status`;
 
 export const apiAdminUsersLink = `${API_HOST}:${API_PORT}/api/v1/admin/users`;
 export const apiAdminUsersRolesLink = `${API_HOST}:${API_PORT}/api/v1/admin/users/roles`;

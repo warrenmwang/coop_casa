@@ -13,11 +13,9 @@ export const UserDetailsSchema = z.object({
   firstName: z.string(),
   lastName: z.string(),
   birthDate: z.union([
-    z
-      .string()
-      .refine((val) => val === "", {
-        message: "String must be empty if not date string",
-      }),
+    z.string().refine((val) => val === "", {
+      message: "String must be empty if not date string",
+    }),
     z.string().date(),
   ]),
   gender: z.string(),
@@ -165,4 +163,20 @@ export const APIReceivedUserRolesSchema = z.object({
       role: z.string().min(1),
     }),
   ),
+});
+
+export const APIReceivedUserStatusSchema = z.object({
+  userId: z.string().min(1),
+  setterUserId: z.string().min(1),
+  status: z.string().min(1),
+  comment: z.string(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+});
+
+export const UserStatusNoTimestampsSchema = z.object({
+  userId: z.string().min(1),
+  setterUserId: z.string().min(1),
+  status: z.string().min(1),
+  comment: z.string(),
 });

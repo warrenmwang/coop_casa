@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { toast } from "react-toastify";
-import { apiListerGetPageOfListersDetails } from "../api/lister";
 import { useGetSetOfListers } from "../hooks/lister";
 import TextSkeleton from "../skeleton/TextSkeleton";
 import SubmitButton from "./buttons/SubmitButton";
 import FetchErrorText from "./FetchErrorText";
+import PaginationButtons from "./PaginationButtons";
 
 const BrowseListers: React.FC = () => {
   const [page, setPage] = useState<number>(0);
@@ -16,6 +15,18 @@ const BrowseListers: React.FC = () => {
     e.preventDefault();
     setNameFilter(name);
     setSubmitting(true);
+  };
+
+  const handleNavPage = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    const element = e.target as HTMLElement;
+    const pageToGoTo = Number(element.innerHTML) - 1;
+    setPage(pageToGoTo);
+  };
+
+  const handleNextPage = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    setPage((prev) => prev + 1);
   };
 
   const listersQuery = useGetSetOfListers(9, page, nameFilter);
@@ -47,28 +58,41 @@ const BrowseListers: React.FC = () => {
           <SubmitButton isSubmitting={submitting} />
         </form>
         {listersQuery.isFetching && <TextSkeleton />}
-        {listersQuery.isSuccess && (
-          <table className="min-w-full bg-white rounded-lg">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="table__row">User ID</th>
-                <th className="table__row">Email</th>
-                <th className="table__row">First Name</th>
-                <th className="table__row">Last Name</th>
-              </tr>
-            </thead>
-            <tbody>
-              {listersQuery.data &&
-                listersQuery.data.map((data) => (
-                  <tr className="bg-gray-100">
+        {listersQuery.isError && (
+          <FetchErrorText>
+            Sorry, but we couldn&apos;t fetch any listers at this moment.{" "}
+          </FetchErrorText>
+        )}
+        {listersQuery.isSuccess && listersQuery.data && (
+          <>
+            <table className="min-w-full bg-white rounded-lg">
+              <thead>
+                <tr className="bg-gray-100">
+                  <th className="table__row">User ID</th>
+                  <th className="table__row">Email</th>
+                  <th className="table__row">First Name</th>
+                  <th className="table__row">Last Name</th>
+                </tr>
+              </thead>
+              <tbody>
+                {listersQuery.data.map((data) => (
+                  <tr key={data.userId} className="bg-gray-100">
                     <th className="table__row">{data.userId}</th>
                     <th className="table__row">{data.email}</th>
                     <th className="table__row">{data.firstName}</th>
                     <th className="table__row">{data.lastName}</th>
                   </tr>
                 ))}
-            </tbody>
-          </table>
+              </tbody>
+            </table>
+            <PaginationButtons
+              currentPage={page}
+              currentPageSize={listersQuery.data.length}
+              setSize={9}
+              handleNavPage={handleNavPage}
+              handleNextPage={handleNextPage}
+            />
+          </>
         )}
       </div>
     </div>

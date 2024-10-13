@@ -7,6 +7,7 @@ import {
 } from "@tanstack/react-query";
 import {
   apiAccountDelete,
+  apiAccountGetStatus,
   apiAccountGetUserLikedCommunities,
   apiAccountGetUserLikedProperties,
   apiAccountGetUserLikedUsers,
@@ -17,6 +18,7 @@ import {
   apiAccountUnlikeCommunity,
   apiAccountUnlikeProperty,
   apiAccountUnlikeUser,
+  apiAccountUpdateStatus,
   apiGetUser,
   apiGetUserAuth,
   apiGetUserOwnedCommunities,
@@ -37,6 +39,7 @@ import {
   userLikedUsersKey,
   userLikedPropertiesKey,
   userLikedCommunitiesKey,
+  userStatusKey,
 } from "../reactQueryKeys";
 import { apiGetUserOwnedProperties } from "../api/account";
 
@@ -239,5 +242,34 @@ export const useGetLikedEntities = () => {
         queryFn: apiAccountGetUserLikedCommunities,
       },
     ],
+  });
+};
+
+export const useGetAccountStatus = (userId: string) => {
+  return useQuery({
+    queryKey: userStatusKey,
+    queryFn: () => apiAccountGetStatus(userId),
+  });
+};
+
+export const useUpdateAccountStatus = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      userId,
+      setterUserId,
+      status,
+      comment,
+    }: {
+      userId: string;
+      setterUserId: string;
+      status: string;
+      comment: string;
+    }) => apiAccountUpdateStatus(userId, setterUserId, status, comment),
+    onSuccess: () => {
+      return queryClient.invalidateQueries({
+        queryKey: userStatusKey,
+      });
+    },
   });
 };

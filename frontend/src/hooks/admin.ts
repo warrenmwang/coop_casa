@@ -5,12 +5,17 @@ import {
   UseQueryResult,
 } from "@tanstack/react-query";
 import {
+  apiAdminCreateUserStatus,
   apiAdminGetUsersDetails,
   apiAdminGetUsersRoles,
   apiAdminUpdateUserRole,
 } from "../api/admin";
 import { UserDetails } from "../types/Types";
-import { adminUserDetailsKey, adminUserRolesKey } from "../reactQueryKeys";
+import {
+  adminUserDetailsKey,
+  adminUserRolesKey,
+  userStatusKey,
+} from "../reactQueryKeys";
 
 export const useAdminGetUserDetails = (
   limit: number,
@@ -38,6 +43,28 @@ export const useAdminUpdateUserRole = () => {
     onSuccess: () => {
       return queryClient.invalidateQueries({
         queryKey: [...adminUserRolesKey],
+      });
+    },
+  });
+};
+
+export const useAdminCreateUserStatus = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      userId,
+      setterUserId,
+      status,
+      comment,
+    }: {
+      userId: string;
+      setterUserId: string;
+      status: string;
+      comment: string;
+    }) => apiAdminCreateUserStatus(userId, setterUserId, status, comment),
+    onSuccess: () => {
+      return queryClient.invalidateQueries({
+        queryKey: userStatusKey,
       });
     },
   });

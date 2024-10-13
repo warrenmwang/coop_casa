@@ -18,6 +18,8 @@ import {
   UserProfileDetailsSchema,
   UserProfileSchema,
   UserSchema,
+  APIReceivedUserStatusSchema,
+  UserStatusNoTimestampsSchema,
 } from "./Schema";
 
 export type User = z.infer<typeof UserSchema>;
@@ -64,4 +66,9 @@ export type UserProfile = z.infer<typeof UserProfileSchema>;
 
 export type APIReceivedUserProfileImages = z.infer<
   typeof APIReceivedUserProfileImagesSchema
+>;
+
+export type APIReceivedUserStatus = z.infer<typeof APIReceivedUserStatusSchema>;
+export type UserStatusNoTimestamps = z.infer<
+  typeof UserStatusNoTimestampsSchema
 >;

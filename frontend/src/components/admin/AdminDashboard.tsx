@@ -11,9 +11,16 @@ import AllLikedEntitiesSection from "../AllLikedEntitiesSection";
 import Title from "../Title";
 import TransferPropertyForm from "../properties/TransferPropertyForm";
 import TransferCommunityForm from "../communities/TransferCommunityForm";
+import BrowseListers from "../BrowseListers";
 
 const AdminDashboard: React.FC = () => {
-  const sections: string[] = ["Admin", "Your Liked", "Property", "Community"];
+  const sections: string[] = [
+    "Admin",
+    "Lister",
+    "Your Liked",
+    "Property",
+    "Community",
+  ];
   const [currentSection, setCurrentSection] = useState<string>(sections[0]);
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -40,6 +47,12 @@ const AdminDashboard: React.FC = () => {
         <>
           <AdminDisplayUsers />
           <AdminManageUserRoles />
+        </>
+      )}
+
+      {currentSection === "Lister" && (
+        <>
+          <BrowseListers />
         </>
       )}
 

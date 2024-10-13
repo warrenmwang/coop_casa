@@ -112,9 +112,18 @@ func (h *AuthHandler) CallbackHandler(w http.ResponseWriter, r *http.Request) {
 			// Save role for user in the db
 			err := h.server.DB().CreateNewUserRole(user.UserId, role)
 			if err != nil {
-				utils.RespondWithError(w, http.StatusInternalServerError, fmt.Errorf("unable to create new user role in database with err: %s", err.Error()))
+				utils.RespondWithError(w, http.StatusInternalServerError, fmt.Errorf("unable to create new user role in database with err: %s", err))
+				return
+			}
+
+			// Initialize a normal status for the new user
+			err = h.server.DB().CreateUserStatus(user.UserId, user.UserId, config.USER_STATUS_NORMAL, "")
+			if err != nil {
+				utils.RespondWithError(w, http.StatusInternalServerError, err)
+				return
 			}
 		} else {
+			// Unexpected error
 			utils.RespondWithError(w, http.StatusInternalServerError, err)
 			return
 		}

@@ -5,8 +5,9 @@ import {
   apiAuthCheckLink,
   apiUserRoleLink,
   apiAccountUserProfileImagesLink,
+  apiAccountStatusLink,
 } from "../urls";
-import { User, APIUserReceived } from "../types/Types";
+import { User, APIUserReceived, APIReceivedUserStatus } from "../types/Types";
 import axios, { AxiosResponse } from "axios";
 import { DeleteUserResponse, LogoutUserResponse } from "../types/Responses";
 import { apiFile2ClientFile } from "../utils/utils";
@@ -14,6 +15,7 @@ import {
   APIReceivedCommunityIDsSchema,
   APIReceivedPropertyIDsSchema,
   APIReceivedUserIDsSchema,
+  APIReceivedUserStatusSchema,
   UserDetailsSchema,
 } from "../types/Schema";
 
@@ -302,4 +304,46 @@ export const apiAccountUnlikeCommunity = async (communityID: string) => {
   return axios.delete(`${apiAccountLink}/saved/communities/${communityID}`, {
     withCredentials: true,
   });
+};
+
+export const apiAccountUpdateStatus = async (
+  userID: string,
+  setterUserID: string,
+  status: string,
+  comment: string = "",
+) => {
+  const formData = new FormData();
+  formData.set(
+    "data",
+    JSON.stringify({
+      userId: userID,
+      setterUserId: setterUserID,
+      status: status,
+      comment: comment,
+    }),
+  );
+
+  return axios.put(`${apiAccountStatusLink}/${userID}`, formData, {
+    withCredentials: true,
+  });
+};
+
+export const apiAccountGetStatus = async (
+  userID: string,
+): Promise<APIReceivedUserStatus> => {
+  return axios
+    .get(`${apiAccountStatusLink}/${userID}`, {
+      headers: {
+        Accept: "application/json",
+      },
+      withCredentials: true,
+    })
+    .then((res) => res.data)
+    .then((data) => {
+      const res = APIReceivedUserStatusSchema.safeParse(data);
+      if (res.success) return res.data;
+      throw new Error(
+        "Validation failed: received user status does not match expected schema",
+      );
+    });
 };

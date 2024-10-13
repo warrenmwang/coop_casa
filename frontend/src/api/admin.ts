@@ -1,4 +1,4 @@
-import { apiAdminUsersLink, apiAdminUsersRolesLink } from "../urls";
+import { apiAccountStatusLink, apiAdminUsersLink, apiAdminUsersRolesLink } from "../urls";
 import { UserDetails } from "../types/Types";
 import axios, { AxiosResponse } from "axios";
 import { AdminUpdateUserRoleResponse } from "../types/Responses";
@@ -68,4 +68,26 @@ export const apiAdminUpdateUserRole = async (
       withCredentials: true,
     },
   );
+};
+
+export const apiAdminCreateUserStatus = async (
+  userID: string,
+  setterUserID: string,
+  status: string,
+  comment: string = "",
+) => {
+  const formData = new FormData();
+  formData.set(
+    "data",
+    JSON.stringify({
+      userId: userID,
+      setterUserId: setterUserID,
+      status: status,
+      comment: comment,
+    }),
+  );
+
+  return axios.post(apiAccountStatusLink, formData, {
+    withCredentials: true,
+  });
 };
