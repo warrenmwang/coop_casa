@@ -15,9 +15,8 @@ import {
   costNumsToPresentableString,
 } from "../../utils/property";
 import FormButton from "../buttons/FormButton";
-import axios, { AxiosError } from "axios";
 import { useUpdateCommunity } from "hooks/communities";
-import { mutationErrorCallback } from "utils/callbacks";
+import { mutationErrorCallbackCreator } from "utils/callbacks";
 
 const UpdateCommunityForm: React.FC<{
   community: Community;
@@ -215,10 +214,8 @@ const UpdateCommunityForm: React.FC<{
             setCommunity({ ...formCommunity });
             toast.success("Community updated.");
           },
-          onError: mutationErrorCallback,
-          onSettled: () => {
-            setIsSubmitting(false);
-          },
+          onError: mutationErrorCallbackCreator("Failed to update"),
+          onSettled: () => setIsSubmitting(false),
         },
       );
     }

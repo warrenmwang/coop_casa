@@ -7,7 +7,7 @@ import { Property } from "../../types/Types";
 import { toast } from "react-toastify";
 import UpdatePropertyForm from "./UpdatePropertyForm";
 import { useDeleteProperty } from "hooks/properties";
-import axios, { AxiosError } from "axios";
+import { mutationErrorCallbackCreator } from "utils/callbacks";
 
 const UpdatePropertyManager: React.FC = () => {
   const [getPropertyDetailsIsSubmitting, setGetPropertyDetailsIsSubmitting] =
@@ -78,16 +78,8 @@ const UpdatePropertyManager: React.FC = () => {
             setProperty(null);
             toast.success("Deleted property.");
           },
-          onError: (error: Error | AxiosError) => {
-            let errMsg: string = error.message;
-            if (axios.isAxiosError(error)) {
-              errMsg = `${(error as AxiosError).response?.data}`;
-            }
-            toast.error(`Failed to update because: ${errMsg}`);
-          },
-          onSettled() {
-            setIsDeleting(false);
-          },
+          onError: mutationErrorCallbackCreator("Unable to delete property"),
+          onSettled: () => setIsDeleting(false),
         },
       );
     }

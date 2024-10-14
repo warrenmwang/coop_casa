@@ -17,11 +17,10 @@ import {
   useUnlikeProperty,
 } from "hooks/account";
 import debounce from "lodash.debounce";
-import axios, { AxiosError } from "axios";
-import { toast } from "react-toastify";
 import LikeButton from "../buttons/LikeButton";
 import BackButton from "../buttons/BackButton";
 import BrowsePageButton from "../users/BrowsePageButton";
+import { mutationErrorCallbackCreator } from "utils/callbacks";
 
 type PropertyDetailContentProps = {
   property: Property;
@@ -73,26 +72,14 @@ const PropertyDetailContent: React.FC<PropertyDetailContentProps> = ({
       unlikeProperty.mutate(
         { propertyID: property.details.propertyId },
         {
-          onError: (error: Error | AxiosError) => {
-            let errMsg: string = error.message;
-            if (axios.isAxiosError(error)) {
-              errMsg = `${(error as AxiosError).response?.data}`;
-            }
-            toast.error(`Unabled to unlike community: ${errMsg}`);
-          },
+          onError: mutationErrorCallbackCreator("Unable to unlike property"),
         },
       );
     } else {
       likeProperty.mutate(
         { propertyID: property.details.propertyId },
         {
-          onError: (error: Error | AxiosError) => {
-            let errMsg: string = error.message;
-            if (axios.isAxiosError(error)) {
-              errMsg = `${(error as AxiosError).response?.data}`;
-            }
-            toast.error(`Unabled to like community: ${errMsg}`);
-          },
+          onError: mutationErrorCallbackCreator("Unable to like property"),
         },
       );
     }

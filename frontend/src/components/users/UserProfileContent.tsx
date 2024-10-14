@@ -10,16 +10,11 @@ import defaultProfileImage from "../../assets/profile.jpg";
 import LayoutSectionCommunitiesWithModal from "../LayoutSectionCommunitiesWithModal";
 import LayoutSectionPropertiesWithModal from "../LayoutSectionProperiesWithModal";
 import LikeButton from "../buttons/LikeButton";
-import {
-  useGetLikedUsers,
-  useLikeUser,
-  useUnlikeUser,
-} from "hooks/account";
+import { useGetLikedUsers, useLikeUser, useUnlikeUser } from "hooks/account";
 import BackButton from "../buttons/BackButton";
 import BrowsePageButton from "./BrowsePageButton";
 import debounce from "lodash.debounce";
-import axios, { AxiosError } from "axios";
-import { toast } from "react-toastify";
+import { mutationErrorCallbackCreator } from "utils/callbacks";
 
 const UserProfileContent: React.FC<{ userProfile: UserProfile }> = ({
   userProfile,
@@ -43,26 +38,14 @@ const UserProfileContent: React.FC<{ userProfile: UserProfile }> = ({
       unlikeUser.mutate(
         { userID: userProfile.details.userId },
         {
-          onError: (error: Error | AxiosError) => {
-            let errMsg: string = error.message;
-            if (axios.isAxiosError(error)) {
-              errMsg = `${(error as AxiosError).response?.data}`;
-            }
-            toast.error(`Error: unabled to unlike user because: ${errMsg}`);
-          },
+          onError: mutationErrorCallbackCreator("Unable to unlike user"),
         },
       );
     } else {
       likeUser.mutate(
         { userID: userProfile.details.userId },
         {
-          onError: (error: Error | AxiosError) => {
-            let errMsg: string = error.message;
-            if (axios.isAxiosError(error)) {
-              errMsg = `${(error as AxiosError).response?.data}`;
-            }
-            toast.error(`Error: unabled to like user because: ${errMsg}`);
-          },
+          onError: mutationErrorCallbackCreator("Unable to like user"),
         },
       );
     }

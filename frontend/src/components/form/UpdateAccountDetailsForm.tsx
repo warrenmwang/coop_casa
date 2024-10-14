@@ -13,10 +13,8 @@ import {
 } from "../../types/Types";
 
 import TextSkeleton from "components/skeleton/TextSkeleton";
-import { toast } from "react-toastify";
 import { EmptyUser } from "types/Objects";
 import FetchErrorText from "../FetchErrorText";
-import axios, { AxiosError } from "axios";
 import FormButton from "../buttons/FormButton";
 import MultipleImageUploader from "../input/MultipleImageUploader";
 import {
@@ -25,6 +23,7 @@ import {
   useGetUserAccountRole,
   useUpdateAccountSettings,
 } from "hooks/account";
+import { mutationErrorCallbackCreator } from "utils/callbacks";
 
 const UpdateAccountDetailsForm: React.FC = () => {
   const [user, setUser] = useState<User>(EmptyUser);
@@ -61,13 +60,7 @@ const UpdateAccountDetailsForm: React.FC = () => {
           setIsChanged(false);
           setIsSubmitting(false);
         },
-        onError: (error: Error | AxiosError) => {
-          let errMsg: string = error.message;
-          if (axios.isAxiosError(error)) {
-            errMsg = `${(error as AxiosError).response?.data}`;
-          }
-          toast.error(`Failed to update because: ${errMsg}`);
-        },
+        onError: mutationErrorCallbackCreator("Failed to update"),
       },
     );
   };

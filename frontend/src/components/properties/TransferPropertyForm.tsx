@@ -1,4 +1,3 @@
-import axios, { AxiosError } from "axios";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 import { useTransferProperty } from "hooks/properties";
@@ -6,6 +5,7 @@ import { validateUserID, validateUUID } from "../../utils/inputValidation";
 import FormButton from "../buttons/FormButton";
 import SubmitButton from "../buttons/SubmitButton";
 import Title from "../Title";
+import { mutationErrorCallbackCreator } from "utils/callbacks";
 
 const TransferPropertyForm: React.FC = () => {
   const [propertyID, setPropertyID] = useState<string>("");
@@ -51,16 +51,8 @@ const TransferPropertyForm: React.FC = () => {
           setUserID("");
           toast.success("Property ownership transferred.");
         },
-        onError: (error: Error | AxiosError) => {
-          let errMsg: string = error.message;
-          if (axios.isAxiosError(error)) {
-            errMsg = `${(error as AxiosError).response?.data}`;
-          }
-          toast.error("Could not transfer Property because: " + errMsg);
-        },
-        onSettled: () => {
-          setIsSubmitting(false);
-        },
+        onError: mutationErrorCallbackCreator("Could not transfer property"),
+        onSettled: () => setIsSubmitting(false),
       },
     );
   };

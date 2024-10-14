@@ -13,8 +13,6 @@ import {
 } from "urls";
 import { APIUserReceived } from "../../types/Types";
 import { apiFile2ClientFile } from "../../utils/utils";
-import { toast } from "react-toastify";
-import axios, { AxiosError } from "axios";
 import UserProfileIcon from "components/icons/UserProfileIcon/UserProfileIcon";
 import DefaultUserProfileIcon from "components/icons/DefaultUserProfile/DefaultUserProfileIcon";
 import {
@@ -22,6 +20,7 @@ import {
   useGetUserAccountDetails,
   useLogoutUser,
 } from "hooks/account";
+import { mutationErrorCallbackCreator } from "utils/callbacks";
 
 function classNames(...classes: (string | undefined | null | false)[]) {
   return classes.filter(Boolean).join(" ");
@@ -34,13 +33,7 @@ const TopNavbar: React.FC = () => {
   const mutation = useLogoutUser();
   const handleLogout = () =>
     mutation.mutate(undefined, {
-      onError: (error: Error | AxiosError) => {
-        let errMsg: string = error.message;
-        if (axios.isAxiosError(error)) {
-          errMsg = `${(error as AxiosError).response?.data}`;
-        }
-        toast.error(`Failed to logout: ${errMsg}`);
-      },
+      onError: mutationErrorCallbackCreator("Failed to logout"),
     });
 
   let authenticated: boolean = false;

@@ -1,4 +1,3 @@
-import { AccountCircleRounded } from "@mui/icons-material";
 import SubmitButton from "components/buttons/SubmitButton";
 import FetchErrorText from "components/FetchErrorText";
 import TextSkeleton from "components/skeleton/TextSkeleton";
@@ -6,7 +5,7 @@ import Title from "components/Title";
 import { useGetAccountStatus, useUpdateAccountStatus } from "hooks/account";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { mutationErrorCallback } from "utils/callbacks";
+import { mutationErrorCallbackCreator } from "utils/callbacks";
 
 // add account status and conditional text of a comment if the account status was set by an admin
 // a popup should show up on the screen the next time an account flagged logs in tho.
@@ -29,13 +28,9 @@ const UpdateAccountStatusForm: React.FC = () => {
     updateStatusMutation.mutate(
       { status },
       {
-        onSuccess: () => {
-          toast.success("Account status updated.");
-        },
-        onError: mutationErrorCallback,
-        onSettled: () => {
-          setIsSubmitting(false);
-        },
+        onSuccess: () => toast.success("Account status updated."),
+        onError: mutationErrorCallbackCreator("Failed to update"),
+        onSettled: () => setIsSubmitting(false),
       },
     );
   };

@@ -17,8 +17,7 @@ import {
   useUnlikeCommunity,
 } from "hooks/account";
 import debounce from "lodash.debounce";
-import axios, { AxiosError } from "axios";
-import { toast } from "react-toastify";
+import { mutationErrorCallbackCreator } from "utils/callbacks";
 
 const CommunityDetailContent: React.FC<{ community: Community }> = ({
   community,
@@ -39,26 +38,14 @@ const CommunityDetailContent: React.FC<{ community: Community }> = ({
       unlikeCommunity.mutate(
         { communityID: community.details.communityId },
         {
-          onError: (error: Error | AxiosError) => {
-            let errMsg: string = error.message;
-            if (axios.isAxiosError(error)) {
-              errMsg = `${(error as AxiosError).response?.data}`;
-            }
-            toast.error(`Unabled to unlike community: ${errMsg}`);
-          },
+          onError: mutationErrorCallbackCreator("Unable to like community"),
         },
       );
     } else {
       likeCommunity.mutate(
         { communityID: community.details.communityId },
         {
-          onError: (error: Error | AxiosError) => {
-            let errMsg: string = error.message;
-            if (axios.isAxiosError(error)) {
-              errMsg = `${(error as AxiosError).response?.data}`;
-            }
-            toast.error(`Unabled to like community: ${errMsg}`);
-          },
+          onError: mutationErrorCallbackCreator("Unable to like community"),
         },
       );
     }

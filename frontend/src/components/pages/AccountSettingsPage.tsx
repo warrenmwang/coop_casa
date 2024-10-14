@@ -5,17 +5,15 @@ import UpdateAccountDetailsForm from "components/form/UpdateAccountDetailsForm";
 import { useNavigate } from "react-router-dom";
 import { dashboardPageLink, homePageLink } from "urls";
 import TextSkeleton from "components/skeleton/TextSkeleton";
-import axios, { AxiosError } from "axios";
-import { toast } from "react-toastify";
 import {
   useDeleteUserAccount,
   useGetUserAccountAuth,
-  useGetUserAccountRole,
   useGetUserOwnedCommunitiesIDs,
   useGetUserOwnedPropertiesIDs,
 } from "hooks/account";
 import UpdateAccountStatusForm from "components/form/UpdateAccountStatusForm";
 import WizardNavigationButtons from "components/buttons/WizardNavigationButtons";
+import { mutationErrorCallbackCreator } from "utils/callbacks";
 
 // Authenticated Endpoint
 const AccountSettingsPage: React.FC = () => {
@@ -26,38 +24,23 @@ const AccountSettingsPage: React.FC = () => {
   const [currentSection, setCurrentSection] = useState<string>(sections[0]);
 
   const authQuery = useGetUserAccountAuth(); // for loading account is logged in
-  const roleQuery = useGetUserAccountRole(); // for delete note for listers
 
-  // for delete note for listers
   const propertiesQuery = useGetUserOwnedPropertiesIDs();
   const communitiesQuery = useGetUserOwnedCommunitiesIDs();
 
   const mutation = useDeleteUserAccount();
   const handleDelete = () => {
     mutation.mutate(undefined, {
-      onSuccess: () => {
-        navigate("/");
-      },
-      onError: (error: Error | AxiosError) => {
-        let errMsg: string = error.message;
-        if (axios.isAxiosError(error)) {
-          errMsg = `${(error as AxiosError).response?.data}`;
-        }
-        toast.error(
-          `Something went wrong in deleting the account: ${errMsg}. Try again.`,
-        );
-      },
+      onSuccess: () => navigate("/"),
+      onError: mutationErrorCallbackCreator(
+        "Error in trying to delete account",
+      ),
     });
   };
 
   let authenticated: boolean = false;
   if (authQuery.status === "success") {
     authenticated = authQuery.data;
-  }
-
-  let role: string = "";
-  if (roleQuery.status === "success") {
-    role = roleQuery.data;
   }
 
   let numProperties = 0;
@@ -126,7 +109,7 @@ const AccountSettingsPage: React.FC = () => {
                 <b>{numCommunities}</b> communities where you are the admin on
                 Coop. Any properties or communities that you have listed will be
                 automatically taken down. Properties can be transferred to
-                another lister. Communities' admin position can be transferred
+                another lister. Communities&apos; admin position can be transferred
                 to any other user on Coop. If you want to transfer any of these
                 now, head over to the
                 <button

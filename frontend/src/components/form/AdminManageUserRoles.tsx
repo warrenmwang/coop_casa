@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import SubmitButton from "../buttons/SubmitButton";
 
 import { toast } from "react-toastify";
-import axios, { AxiosError } from "axios";
 import { useAdminUpdateUserRole } from "hooks/admin";
+import { mutationErrorCallbackCreator } from "utils/callbacks";
 
 const AdminManageUserRoles: React.FC = () => {
   const roleTypes = ["lister", "regular"];
@@ -11,7 +11,7 @@ const AdminManageUserRoles: React.FC = () => {
   const [userID, setUserID] = useState<string>("");
   const [role, setRole] = useState<string>("");
 
-  const mutation = useAdminUpdateUserRole();
+  const updateUserRoleMutation = useAdminUpdateUserRole();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,23 +29,16 @@ const AdminManageUserRoles: React.FC = () => {
       return;
     }
 
-    mutation.mutate(
+    updateUserRoleMutation.mutate(
       { userID, role },
       {
         onSuccess: () => {
           toast.success("User role updated.");
           setUserID("");
           setRole("");
-          setIsSubmitting(false);
         },
-        onError: (error: Error | AxiosError) => {
-          let errMsg: string = error.message;
-          if (axios.isAxiosError(error)) {
-            errMsg = `${(error as AxiosError).response?.data}`;
-          }
-          toast.error(`Failed to update because: ${errMsg}`);
-          setIsSubmitting(false);
-        },
+        onError: mutationErrorCallbackCreator("Failed to update"),
+        onSettled: () => setIsSubmitting(false),
       },
     );
   };

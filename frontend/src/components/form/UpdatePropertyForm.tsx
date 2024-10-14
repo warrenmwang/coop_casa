@@ -6,8 +6,8 @@ import { MAX_PROPERTY_IMGS_ALLOWED } from "appConstants";
 
 import { validateNumber } from "../../utils/inputValidation";
 import { toast } from "react-toastify";
-import axios, { AxiosError } from "axios";
 import { useUpdateProperty } from "hooks/properties";
+import { mutationErrorCallbackCreator } from "utils/callbacks";
 
 const UpdatePropertyForm: React.FC<{
   property: Property;
@@ -123,16 +123,8 @@ const UpdatePropertyForm: React.FC<{
             setIsChanged(false);
             toast.success("Property updated.");
           },
-          onError: (error: Error | AxiosError) => {
-            let errMsg: string = error.message;
-            if (axios.isAxiosError(error)) {
-              errMsg = `${(error as AxiosError).response?.data}`;
-            }
-            toast.error(`Failed to update because: ${errMsg}`);
-          },
-          onSettled: () => {
-            setIsSubmitting(false);
-          },
+          onError: mutationErrorCallbackCreator("Failed to update"),
+          onSettled: () => setIsSubmitting(false),
         },
       );
     }

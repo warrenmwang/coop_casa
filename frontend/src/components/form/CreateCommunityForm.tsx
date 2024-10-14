@@ -8,10 +8,10 @@ import { OrderedFile, CommunityDetails, Community } from "../../types/Types";
 import TextSkeleton from "components/skeleton/TextSkeleton";
 
 import { toast } from "react-toastify";
-import axios, { AxiosError } from "axios";
 import { useGetUserAccountDetails } from "hooks/account";
 import { useCreateCommunity } from "hooks/communities";
 import FetchErrorText from "../FetchErrorText";
+import { mutationErrorCallbackCreator } from "utils/callbacks";
 
 type TextFieldsConstruct = {
   id: string;
@@ -166,17 +166,8 @@ const CreateCommunityForm: React.FC = () => {
             setImages([]);
             toast.success("Community created.");
           },
-          onError: (error: Error | AxiosError) => {
-            // Notify user of creation error
-            let errMsg: string = error.message;
-            if (axios.isAxiosError(error)) {
-              errMsg = `${(error as AxiosError).response?.data}`;
-            }
-            toast.error("Could not create community because: " + errMsg);
-          },
-          onSettled: () => {
-            setIsSubmitting(false);
-          },
+          onError: mutationErrorCallbackCreator("Unable to create community"),
+          onSettled: () => setIsSubmitting(false),
         },
       );
     }

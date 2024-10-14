@@ -3,12 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 // Components
 import Title from "components/Title";
-import {
-  APIUserReceived,
-  OrderedFile,
-  User,
-  UserDetails,
-} from "types/Types";
+import { APIUserReceived, OrderedFile, User, UserDetails } from "types/Types";
 import LocationInput from "components/input/LocationInput";
 import InterestsInput from "components/input/InterestsInput";
 import GenderInput from "components/input/GenderInput";
@@ -23,7 +18,6 @@ import { dashboardPageLink, homePageLink } from "urls";
 import TextSkeleton from "components/skeleton/TextSkeleton";
 import { apiFile2ClientFile, isAccountSetup } from "utils/utils";
 
-import axios, { AxiosError } from "axios";
 import { toast } from "react-toastify";
 import MultipleImageUploader from "components/input/MultipleImageUploader";
 import { MAX_USER_PROFILE_IMGS_ALLOWED } from "appConstants";
@@ -33,6 +27,7 @@ import {
   useGetUserAccountDetails,
   useUpdateAccountSettings,
 } from "hooks/account";
+import { mutationErrorCallbackCreator } from "utils/callbacks";
 
 const AccountSetupPage: React.FC = () => {
   const [formData, setFormData] = useState<User>(EmptyUser);
@@ -99,20 +94,9 @@ const AccountSetupPage: React.FC = () => {
     updateUserAccount.mutate(
       { formData, images: userProfileImages.map((image) => image.file) },
       {
-        onSuccess: () => {
-          navigate(dashboardPageLink);
-        },
-        onError: (error: Error | AxiosError) => {
-          // try to use help text about error if provided by backend
-          let errMsg: string = error.message;
-          if (axios.isAxiosError(error)) {
-            errMsg = `${(error as AxiosError).response?.data}`;
-          }
-          toast.error(`Unable to setup account due to reason: ${errMsg}.`);
-        },
-        onSettled: () => {
-          setIsSubmitting(false);
-        },
+        onSuccess: () => navigate(dashboardPageLink),
+        onError: mutationErrorCallbackCreator("Unable to setup account"),
+        onSettled: () => setIsSubmitting(false),
       },
     );
   };

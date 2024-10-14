@@ -1,4 +1,3 @@
-import axios, { AxiosError } from "axios";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 import { useTransferCommunity } from "hooks/communities";
@@ -6,6 +5,7 @@ import { validateUserID, validateUUID } from "../../utils/inputValidation";
 import SubmitButton from "../buttons/SubmitButton";
 import Title from "../Title";
 import FormButton from "../buttons/FormButton";
+import { mutationErrorCallbackCreator } from "utils/callbacks";
 
 const TransferCommunityForm: React.FC = () => {
   const [communityID, setCommunityID] = useState<string>("");
@@ -51,16 +51,8 @@ const TransferCommunityForm: React.FC = () => {
           setUserID("");
           toast.success("Community ownership transferred.");
         },
-        onError: (error: Error | AxiosError) => {
-          let errMsg: string = error.message;
-          if (axios.isAxiosError(error)) {
-            errMsg = `${(error as AxiosError).response?.data}`;
-          }
-          toast.error("Could not transfer community because: " + errMsg);
-        },
-        onSettled: () => {
-          setIsSubmitting(false);
-        },
+        onError: mutationErrorCallbackCreator("Could not transfer community"),
+        onSettled: () => setIsSubmitting(false),
       },
     );
   };

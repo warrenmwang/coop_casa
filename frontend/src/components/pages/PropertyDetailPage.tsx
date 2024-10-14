@@ -1,6 +1,6 @@
 import React from "react";
 import { useParams } from "react-router-dom";
-import { Property } from "../types/Types";
+import { Property } from "types/Types";
 import CardSkeleton from "components/skeleton/CardSkeleton";
 import FetchErrorText from "components/FetchErrorText";
 import PropertyDetailContent from "components/properties/PropertyDetailContent";

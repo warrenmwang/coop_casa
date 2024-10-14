@@ -15,9 +15,9 @@ import {
 import TextSkeleton from "components/skeleton/TextSkeleton";
 
 import { toast } from "react-toastify";
-import axios, { AxiosError } from "axios";
 import { useGetUserAccountDetails } from "hooks/account";
 import { useCreateProperty } from "hooks/properties";
+import { mutationErrorCallbackCreator } from "utils/callbacks";
 
 type TextFieldsConstruct = {
   id: string;
@@ -337,16 +337,8 @@ const CreatePropertyForm: React.FC = () => {
             setImages([]);
             toast.success("Property created.");
           },
-          onError: (error: Error | AxiosError) => {
-            let errMsg: string = error.message;
-            if (axios.isAxiosError(error)) {
-              errMsg = `${(error as AxiosError).response?.data}`;
-            }
-            toast.error("Could not create property because: " + errMsg);
-          },
-          onSettled: () => {
-            setIsSubmitting(false);
-          },
+          onError: mutationErrorCallbackCreator("Could not create property"),
+          onSettled: () => setIsSubmitting(false),
         },
       );
     }

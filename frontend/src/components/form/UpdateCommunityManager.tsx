@@ -6,8 +6,8 @@ import { Community } from "../../types/Types";
 import { toast } from "react-toastify";
 import UpdateCommunityForm from "./UpdateCommunityForm";
 import { useDeleteCommunity } from "hooks/communities";
-import axios, { AxiosError } from "axios";
 import { apiGetCommunity } from "../../api/community";
+import { mutationErrorCallbackCreator } from "utils/callbacks";
 
 const UpdateCommunityManager: React.FC = () => {
   // ------------ For Getting the community details
@@ -79,16 +79,8 @@ const UpdateCommunityManager: React.FC = () => {
             setCommunity(null);
             toast.success("Deleted community.");
           },
-          onError: (error: Error | AxiosError) => {
-            let errMsg: string = error.message;
-            if (axios.isAxiosError(error)) {
-              errMsg = `${(error as AxiosError).response?.data}`;
-            }
-            toast.error(`Failed to delete because: ${errMsg}`);
-          },
-          onSettled: () => {
-            setIsDeleting(false);
-          },
+          onError: mutationErrorCallbackCreator("Failed to delete"),
+          onSettled: () => setIsDeleting(false),
         },
       );
     }
