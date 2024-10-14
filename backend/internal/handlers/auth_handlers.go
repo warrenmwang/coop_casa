@@ -89,19 +89,34 @@ func (h *AuthHandler) CallbackHandler(w http.ResponseWriter, r *http.Request) {
 		Email:  gothUser.Email,
 	}
 
-	// Create new user in DB if this is their first time in the database
+	// Create new user in DB if this is their first time logging into app
 	_, err = h.server.DB().GetUserDetails(user.UserId)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			// this user is not recorded in db, then it is the first time they have logged in to app.
+			// This user is not recorded in db, then it is the first time they have logged in to app.
 			// create new user for them
 			err = h.server.DB().CreateUser(user.UserId, user.Email)
 			if err != nil {
 				utils.RespondWithError(w, http.StatusInternalServerError, fmt.Errorf("unable to create new user in database with err: %s", err.Error()))
 				return
 			}
+		} else {
+			// Unexpected error
+			utils.RespondWithError(w, http.StatusInternalServerError, err)
+			return
+		}
+	}
 
-			// Initialize new role for the user
+	// Since new features are being added that were not considered for in the original
+	// design of this app, I have decided to make the unforatunate decision to make
+	// extraneous database calls everytime a user re-engages with OAuth for logging in
+	// to check if relevant data that every account needs to have exists or not. If it
+	// doesn't exist we will initialize that data with the default values.
+
+	// Initialize default role for user if not exist
+	_, err = h.server.DB().GetUserRole(user.UserId)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
 			var role string
 			if user.UserId == h.adminUserID {
 				role = config.USER_ROLE_ADMIN
@@ -115,20 +130,26 @@ func (h *AuthHandler) CallbackHandler(w http.ResponseWriter, r *http.Request) {
 				utils.RespondWithError(w, http.StatusInternalServerError, fmt.Errorf("unable to create new user role in database with err: %s", err))
 				return
 			}
+		} else {
+			utils.RespondWithError(w, http.StatusInternalServerError, err)
+			return
+		}
+	}
 
-			// Initialize a normal status for the new user
+	// Initialize a default status of normal for user if not exist in db
+	_, err = h.server.DB().GetUserStatus(user.UserId)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
 			err = h.server.DB().CreateUserStatus(user.UserId, user.UserId, config.USER_STATUS_NORMAL, "")
 			if err != nil {
 				utils.RespondWithError(w, http.StatusInternalServerError, err)
 				return
 			}
 		} else {
-			// Unexpected error
 			utils.RespondWithError(w, http.StatusInternalServerError, err)
 			return
 		}
 	}
-	// If err was nil user is already in db, just return with token
 
 	// Generate token with user info
 	tokenSigned, err := auth.GenerateToken(user, expireTime, h.jwtSecret)

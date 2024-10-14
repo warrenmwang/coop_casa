@@ -5,10 +5,15 @@ import (
 	"backend/internal/database"
 	"backend/internal/interfaces"
 	"backend/internal/utils"
+	"backend/internal/validation"
+	"encoding/json"
 	"errors"
+	"io"
 	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/go-chi/chi/v5"
 )
 
 type AdminHandler struct {
@@ -23,7 +28,7 @@ func NewAdminHandlers(s interfaces.Server) *AdminHandler {
 // GET .../admin/users
 // AUTHED
 // Only returns the user details (no avatar images)
-func (h *AdminHandler) AdminGetUsers(w http.ResponseWriter, r *http.Request) {
+func (h *AdminHandler) AdminGetUsersHandler(w http.ResponseWriter, r *http.Request) {
 	// Get limit and offset from query params
 	query := r.URL.Query()
 	limitStr := query.Get("limit")
@@ -71,7 +76,7 @@ func (h *AdminHandler) AdminGetUsers(w http.ResponseWriter, r *http.Request) {
 
 // GET .../admin/users/roles
 // AUTHED
-func (h *AdminHandler) AdminGetUsersRoles(w http.ResponseWriter, r *http.Request) {
+func (h *AdminHandler) AdminGetUsersRolesHandler(w http.ResponseWriter, r *http.Request) {
 	// Get the userIds from the query parameter
 	query := r.URL.Query()
 	userIdsStr := query.Get("userIds")
@@ -149,4 +154,117 @@ func (h *AdminHandler) UpdateUserRoleHandler(w http.ResponseWriter, r *http.Requ
 
 	// Return response ok
 	w.WriteHeader(200)
+}
+
+// GET .../admin/users/status/{id}
+// AUTHED
+func (h *AdminHandler) AdminGetUserStatusHandler(w http.ResponseWriter, r *http.Request) {
+	// Get the user status of the id in the url param
+	requestedStatusUserID := chi.URLParam(r, "id")
+	userStatus, err := h.server.DB().GetUserStatus(requestedStatusUserID)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
+		return
+	}
+	utils.RespondWithJSON(w, http.StatusOK, userStatus)
+}
+
+// POST .../admin/users/status
+// AUTHED
+// Create a user status based on the information in the request body
+func (h *AdminHandler) AdminCreateUserStatusHandler(w http.ResponseWriter, r *http.Request) {
+
+	// Parse the user status from request body
+	var userStatusTmp struct {
+		UserID  string `json:"userId"`
+		Status  string `json:"status"`
+		Comment string `json:"comment"`
+	}
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusBadRequest, err)
+		return
+	}
+	err = json.Unmarshal(body, &userStatusTmp)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusBadRequest, errors.New("unable to parse provided user status data"))
+		return
+	}
+
+	// Insert admin user id into the object
+	userStatus := database.UserStatus{
+		UserID:       userStatusTmp.UserID,
+		SetterUserID: h.adminUserID,
+		Status:       userStatusTmp.Status,
+		Comment:      userStatusTmp.Comment,
+	}
+
+	// Verify user status data
+	err = validation.ValidateUserStatusData(userStatus)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	// Insert data into db after verification
+	err = h.server.DB().CreateUserStatus(userStatus.UserID, userStatus.SetterUserID, userStatus.Status, userStatus.Comment)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+}
+
+// PUT .../admin/users/status/{id}
+// AUTHED
+func (h *AdminHandler) AdminUpdateUserStatusHandler(w http.ResponseWriter, r *http.Request) {
+	// Parse the user status to populate DB with
+	var userStatusTmp struct {
+		UserID  string `json:"userId"`
+		Status  string `json:"status"`
+		Comment string `json:"comment"`
+	}
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusBadRequest, err)
+		return
+	}
+	err = json.Unmarshal(body, &userStatusTmp)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusBadRequest, errors.New("unable to parse provided user status data"))
+		return
+	}
+
+	// Assert that url user id matches request body's data user id
+	if userStatusTmp.UserID != chi.URLParam(r, "id") {
+		utils.RespondWithError(w, http.StatusBadRequest, errors.New("user id in url param does not match user id in request body data"))
+		return
+	}
+
+	// Insert admin user id into the object
+	userStatus := database.UserStatus{
+		UserID:       userStatusTmp.UserID,
+		SetterUserID: h.adminUserID,
+		Status:       userStatusTmp.Status,
+		Comment:      userStatusTmp.Comment,
+	}
+
+	// Verify user status data
+	err = validation.ValidateUserStatusData(userStatus)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	// Update user status in db
+	err = h.server.DB().UpdateUserStatus(userStatus.UserID, userStatus.SetterUserID, userStatus.Status, userStatus.Comment)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	// Reply ok
+	w.WriteHeader(http.StatusOK)
+
 }

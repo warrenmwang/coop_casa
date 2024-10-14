@@ -26,7 +26,7 @@ import {
   useUpdateAccountSettings,
 } from "hooks/account";
 
-const AccountSettingsForm: React.FC = () => {
+const UpdateAccountDetailsForm: React.FC = () => {
   const [user, setUser] = useState<User>(EmptyUser);
   const [formData, setFormData] = useState<User>(EmptyUser);
   const [isChanged, setIsChanged] = useState(false);
@@ -130,24 +130,31 @@ const AccountSettingsForm: React.FC = () => {
     userQuery.isFetched &&
     userProfileImagesQuery.isFetched;
 
+  if (!ready) {
+    return <TextSkeleton />;
+  }
+
+  if (
+    ready &&
+    (userQuery.isError || userProfileImagesQuery.isError || roleQuery.isError)
+  ) {
+    return (
+      <FetchErrorText>
+        Sorry, we couldn{"'"}t fetch your data at this moment. Please try again
+        later.
+      </FetchErrorText>
+    );
+  }
+
   return (
     <>
-      {ready &&
-        (userQuery.isError ||
-          userProfileImagesQuery.isError ||
-          roleQuery.isError) && (
-          <FetchErrorText>
-            Sorry, we couldn{"'"}t fetch your data at this moment. Please try
-            again later.
-          </FetchErrorText>
-        )}
-      {ready && userQuery.isSuccess && !accountIsSetup && (
+      {userQuery.isSuccess && !accountIsSetup && (
         <p className="text-green-600 text-lg mt-2">
           Your account is not setup, please setup your account by going to the
           dashboard. Otherwise, you can choose to delete your account here.
         </p>
       )}
-      {ready && userQuery.isSuccess && accountIsSetup && (
+      {userQuery.isSuccess && accountIsSetup && (
         <form className="form__vertical_inputs">
           {/* User Role and ID -- obviously not allowed to change, just displaying it! */}
           <div className="input__container ">
@@ -280,9 +287,8 @@ const AccountSettingsForm: React.FC = () => {
           )}
         </form>
       )}
-      {!ready && <TextSkeleton />}
     </>
   );
 };
 
-export default AccountSettingsForm;
+export default UpdateAccountDetailsForm;

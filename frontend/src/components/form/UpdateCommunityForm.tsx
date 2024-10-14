@@ -17,6 +17,7 @@ import {
 import FormButton from "../buttons/FormButton";
 import axios, { AxiosError } from "axios";
 import { useUpdateCommunity } from "hooks/communities";
+import { mutationErrorCallback } from "utils/callbacks";
 
 const UpdateCommunityForm: React.FC<{
   community: Community;
@@ -214,13 +215,7 @@ const UpdateCommunityForm: React.FC<{
             setCommunity({ ...formCommunity });
             toast.success("Community updated.");
           },
-          onError: (error: Error | AxiosError) => {
-            let errMsg: string = error.message;
-            if (axios.isAxiosError(error)) {
-              errMsg = `${(error as AxiosError).response?.data}`;
-            }
-            toast.error(`Failed to update because: ${errMsg}`);
-          },
+          onError: mutationErrorCallback,
           onSettled: () => {
             setIsSubmitting(false);
           },

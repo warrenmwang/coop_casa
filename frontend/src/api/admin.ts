@@ -1,10 +1,15 @@
-import { apiAccountStatusLink, apiAdminUsersLink, apiAdminUsersRolesLink } from "urls";
-import { UserDetails } from "../types/Types";
+import {
+  apiAccountStatusLink,
+  apiAdminUsersLink,
+  apiAdminUsersRolesLink,
+} from "urls";
+import { UserDetails, UserStatusTimeStamped } from "../types/Types";
 import axios, { AxiosResponse } from "axios";
 import { AdminUpdateUserRoleResponse } from "../types/Responses";
 import {
   APIReceivedUserDetailsSchema,
   APIReceivedUserRolesSchema,
+  UserStatusSchemaTimeStamped,
 } from "../types/Schema";
 
 export const apiAdminGetUsersDetails = async (
@@ -70,24 +75,64 @@ export const apiAdminUpdateUserRole = async (
   );
 };
 
-export const apiAdminCreateUserStatus = async (
+export const apiAdminGetAccountStatus = async (
   userID: string,
-  setterUserID: string,
-  status: string,
-  comment: string = "",
-) => {
-  const formData = new FormData();
-  formData.set(
-    "data",
-    JSON.stringify({
-      userId: userID,
-      setterUserId: setterUserID,
-      status: status,
-      comment: comment,
-    }),
-  );
+): Promise<UserStatusTimeStamped> => {
+  return axios
+    .get(`${apiAdminUsersLink}/status/${userID}`, {
+      headers: {
+        Accept: "application/json",
+      },
+      withCredentials: true,
+    })
+    .then((res) => res.data)
+    .then((data) => {
+      const res = UserStatusSchemaTimeStamped.safeParse(data);
+      if (res.success) return res.data;
+      throw new Error(
+        "Validation failed: received user status does not match expected schema",
+      );
+    });
+};
 
-  return axios.post(apiAccountStatusLink, formData, {
-    withCredentials: true,
-  });
+export const apiAdminCreateUserStatus = async (
+  userId: string,
+  status: string,
+  comment: string,
+) => {
+  return axios.post(
+    `${apiAdminUsersLink}/status`,
+    JSON.stringify({
+      userId,
+      status,
+      comment,
+    }),
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      withCredentials: true,
+    },
+  );
+};
+
+export const apiAdminUpdateUserStatus = async (
+  userId: string,
+  status: string,
+  comment: string,
+) => {
+  return axios.put(
+    `${apiAdminUsersLink}/status/${userId}`,
+    JSON.stringify({
+      userId,
+      status,
+      comment,
+    }),
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      withCredentials: true,
+    },
+  );
 };

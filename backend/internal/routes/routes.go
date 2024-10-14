@@ -11,7 +11,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 )
 
-// /auth
+// .../auth
 func NewAuthRouter(s interfaces.Server) http.Handler {
 	r := chi.NewRouter()
 	authHandlers := handlers.NewAuthHandlers(s)
@@ -33,32 +33,31 @@ func NewAccountRouter(s interfaces.Server) http.Handler {
 	r.Get("/", accountHandlers.GetAccountDetailsHandler)
 	r.Post("/", accountHandlers.UpdateAccountDetailsHandler)
 	r.Delete("/", accountHandlers.DeleteAccountHandler)
-	r.Get("/role", accountHandlers.GetUserRoleHandler)
-	r.Get("/communities", accountHandlers.GetUserOwnedCommunities)
-	r.Get("/properties", accountHandlers.GetUserOwnedProperties)
-	r.Get("/images", accountHandlers.GetUserProfileImages)
-	r.Post("/images", accountHandlers.UpdateUserProfileImages)
+	r.Get("/role", accountHandlers.GetAccountRoleHandler)
+	r.Get("/communities", accountHandlers.GetAccountOwnedCommunitiesHandler)
+	r.Get("/properties", accountHandlers.GetAccountOwnedPropertiesHandler)
+	r.Get("/images", accountHandlers.GetAccountProfileImagesHandler)
+	r.Post("/images", accountHandlers.UpdateAccountProfileImagesHandler)
 
 	// saved entities
-	r.Get("/saved/properties", accountHandlers.GetUserSavedProperties)
-	r.Post("/saved/properties", accountHandlers.CreateUserSavedProperty)
-	r.Delete("/saved/properties/{id}", accountHandlers.DeleteUserSavedProperty)
-	r.Delete("/saved/properties/", accountHandlers.DeleteUserSavedProperties)
+	r.Get("/saved/properties", accountHandlers.GetAccountSavedPropertiesHandler)
+	r.Post("/saved/properties", accountHandlers.CreateAccountSavedPropertyHandler)
+	r.Delete("/saved/properties/{id}", accountHandlers.DeleteAccountSavedPropertyHandler)
+	r.Delete("/saved/properties/", accountHandlers.DeleteAccountSavedPropertiesHandler)
 
-	r.Get("/saved/communities", accountHandlers.GetUserSavedCommunities)
-	r.Post("/saved/communities", accountHandlers.CreateUserSavedCommunity)
-	r.Delete("/saved/communities/{id}", accountHandlers.DeleteUserSavedCommunity)
-	r.Delete("/saved/communities/", accountHandlers.DeleteUserSavedCommunities)
+	r.Get("/saved/communities", accountHandlers.GetAccountSavedCommunitiesHandler)
+	r.Post("/saved/communities", accountHandlers.CreateAccountSavedCommunityHandler)
+	r.Delete("/saved/communities/{id}", accountHandlers.DeleteAccountSavedCommunityHandler)
+	r.Delete("/saved/communities/", accountHandlers.DeleteAccountSavedCommunitiesHandler)
 
-	r.Get("/saved/users", accountHandlers.GetUserSavedUsers)
-	r.Post("/saved/users", accountHandlers.CreateUserSavedUser)
-	r.Delete("/saved/users/{id}", accountHandlers.DeleteUserSavedUser)
-	r.Delete("/saved/users/", accountHandlers.DeleteUserSavedUsers)
+	r.Get("/saved/users", accountHandlers.GetAccountSavedUsersHandler)
+	r.Post("/saved/users", accountHandlers.CreateAccountSavedUserHandler)
+	r.Delete("/saved/users/{id}", accountHandlers.DeleteAccountSavedUserHandler)
+	r.Delete("/saved/users/", accountHandlers.DeleteAccountSavedUsersHandler)
 
 	// account status
-	r.Get("/status/{id}", accountHandlers.GetUserStatus)
-	r.Post("/status", accountHandlers.CreateUserStatus)
-	r.Put("/status/{id}", accountHandlers.UpdateUserStatus)
+	r.Get("/status", accountHandlers.GetAccountStatusHandler)
+	r.Put("/status", accountHandlers.UpdateAccountStatusHandler)
 
 	return r
 }
@@ -81,9 +80,13 @@ func NewAdminRouter(s interfaces.Server) http.Handler {
 	r.Use(auth.AdminAuthMiddleware)
 
 	adminHandlers := handlers.NewAdminHandlers(s)
-	r.Get("/users", adminHandlers.AdminGetUsers)
-	r.Get("/users/roles", adminHandlers.AdminGetUsersRoles)
+	r.Get("/users", adminHandlers.AdminGetUsersHandler)
+	r.Get("/users/roles", adminHandlers.AdminGetUsersRolesHandler)
 	r.Post("/users/roles", adminHandlers.UpdateUserRoleHandler)
+
+	r.Get("/users/status/{id}", adminHandlers.AdminGetUserStatusHandler)
+	r.Post("/users/status", adminHandlers.AdminCreateUserStatusHandler)
+	r.Put("/users/status/{id}", adminHandlers.AdminUpdateUserStatusHandler)
 
 	return r
 }

@@ -165,18 +165,15 @@ export const APIReceivedUserRolesSchema = z.object({
   ),
 });
 
-export const APIReceivedUserStatusSchema = z.object({
+export const UserStatusSchema = z.object({
   userId: z.string().min(1),
   setterUserId: z.string().min(1),
   status: z.string().min(1),
   comment: z.string(),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
 });
 
-export const UserStatusNoTimestampsSchema = z.object({
-  userId: z.string().min(1),
-  setterUserId: z.string().min(1),
-  status: z.string().min(1),
-  comment: z.string(),
+export const UserStatusSchemaTimeStamped = z.object({
+  userStatus: UserStatusSchema,
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
 });

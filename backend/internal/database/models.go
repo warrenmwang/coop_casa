@@ -51,16 +51,14 @@ type UserStatus struct {
 	Comment      string `json:"comment"`
 }
 
-// NOTE: struct embedding acts like extending/composition, you can directly access
-// the fields under UserStatus as if they were directly defined in this struct
 type UserStatusTimeStamped struct {
-	UserStatus UserStatus
-	CreatedAt  time.Time `json:"createdAt"`
-	UpdatedAt  time.Time `json:"updatedAt"`
+	UserStatus UserStatus `json:"userStatus"`
+	CreatedAt  time.Time  `json:"createdAt"`
+	UpdatedAt  time.Time  `json:"updatedAt"`
 }
 
 type UsersSavedProperty struct {
-	UserID     string    `json:"userID"` 
+	UserID     string    `json:"userID"`
 	PropertyID string    `json:"propertyID"`
 	CreatedAt  time.Time `json:"createdAt"`
 }

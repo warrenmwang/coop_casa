@@ -231,7 +231,7 @@ func (h *AccountHandler) DeleteAccountHandler(w http.ResponseWriter, r *http.Req
 
 // GET .../account/role
 // AUTHED
-func (h *AccountHandler) GetUserRoleHandler(w http.ResponseWriter, r *http.Request) {
+func (h *AccountHandler) GetAccountRoleHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
 	userId, ok := r.Context().Value(auth.UserIDKey).(string)
 	if !ok {
@@ -256,7 +256,7 @@ func (h *AccountHandler) GetUserRoleHandler(w http.ResponseWriter, r *http.Reque
 
 // GET .../account/communities
 // AUTHED
-func (h *AccountHandler) GetUserOwnedCommunities(w http.ResponseWriter, r *http.Request) {
+func (h *AccountHandler) GetAccountOwnedCommunitiesHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
 	userId, ok := r.Context().Value(auth.UserIDKey).(string)
 	if !ok {
@@ -285,7 +285,7 @@ func (h *AccountHandler) GetUserOwnedCommunities(w http.ResponseWriter, r *http.
 // GET .../account/properties
 // AUTHED
 // Lister is able to retrieve the properties that they are put on the site
-func (h *AccountHandler) GetUserOwnedProperties(w http.ResponseWriter, r *http.Request) {
+func (h *AccountHandler) GetAccountOwnedPropertiesHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
 	userID, ok := r.Context().Value(auth.UserIDKey).(string)
 	if !ok {
@@ -313,7 +313,7 @@ func (h *AccountHandler) GetUserOwnedProperties(w http.ResponseWriter, r *http.R
 
 // GET .../account/images
 // AUTHED
-func (h *AccountHandler) GetUserProfileImages(w http.ResponseWriter, r *http.Request) {
+func (h *AccountHandler) GetAccountProfileImagesHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
 	userID, ok := r.Context().Value(auth.UserIDKey).(string)
 	if !ok {
@@ -349,7 +349,7 @@ func (h *AccountHandler) GetUserProfileImages(w http.ResponseWriter, r *http.Req
 
 // POST ../account/images
 // AUTHED
-func (h *AccountHandler) UpdateUserProfileImages(w http.ResponseWriter, r *http.Request) {
+func (h *AccountHandler) UpdateAccountProfileImagesHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
 	userID, ok := r.Context().Value(auth.UserIDKey).(string)
 	if !ok {
@@ -443,7 +443,7 @@ func (h *AccountHandler) UpdateUserProfileImages(w http.ResponseWriter, r *http.
 
 // GET .../account/saved/properties
 // AUTHED
-func (h *AccountHandler) GetUserSavedProperties(w http.ResponseWriter, r *http.Request) {
+func (h *AccountHandler) GetAccountSavedPropertiesHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
 	userID, ok := r.Context().Value(auth.UserIDKey).(string)
 	if !ok {
@@ -467,7 +467,7 @@ func (h *AccountHandler) GetUserSavedProperties(w http.ResponseWriter, r *http.R
 
 // POST .../account/saved/properties
 // AUTHED
-func (h *AccountHandler) CreateUserSavedProperty(w http.ResponseWriter, r *http.Request) {
+func (h *AccountHandler) CreateAccountSavedPropertyHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
 	userID, ok := r.Context().Value(auth.UserIDKey).(string)
 	if !ok {
@@ -495,7 +495,7 @@ func (h *AccountHandler) CreateUserSavedProperty(w http.ResponseWriter, r *http.
 
 // DELETE .../account/saved/properties/{id}
 // AUTHED
-func (h *AccountHandler) DeleteUserSavedProperty(w http.ResponseWriter, r *http.Request) {
+func (h *AccountHandler) DeleteAccountSavedPropertyHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
 	userID, ok := r.Context().Value(auth.UserIDKey).(string)
 	if !ok {
@@ -523,7 +523,7 @@ func (h *AccountHandler) DeleteUserSavedProperty(w http.ResponseWriter, r *http.
 
 // DELETE .../account/saved/properties
 // AUTHED
-func (h *AccountHandler) DeleteUserSavedProperties(w http.ResponseWriter, r *http.Request) {
+func (h *AccountHandler) DeleteAccountSavedPropertiesHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
 	userID, ok := r.Context().Value(auth.UserIDKey).(string)
 	if !ok {
@@ -544,7 +544,7 @@ func (h *AccountHandler) DeleteUserSavedProperties(w http.ResponseWriter, r *htt
 
 // GET .../account/saved/communities
 // AUTHED
-func (h *AccountHandler) GetUserSavedCommunities(w http.ResponseWriter, r *http.Request) {
+func (h *AccountHandler) GetAccountSavedCommunitiesHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
 	userID, ok := r.Context().Value(auth.UserIDKey).(string)
 	if !ok {
@@ -568,7 +568,7 @@ func (h *AccountHandler) GetUserSavedCommunities(w http.ResponseWriter, r *http.
 
 // POST .../account/saved/communities
 // AUTHED
-func (h *AccountHandler) CreateUserSavedCommunity(w http.ResponseWriter, r *http.Request) {
+func (h *AccountHandler) CreateAccountSavedCommunityHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
 	userID, ok := r.Context().Value(auth.UserIDKey).(string)
 	if !ok {
@@ -596,7 +596,7 @@ func (h *AccountHandler) CreateUserSavedCommunity(w http.ResponseWriter, r *http
 
 // DELETE .../account/saved/communities/{id}
 // AUTHED
-func (h *AccountHandler) DeleteUserSavedCommunity(w http.ResponseWriter, r *http.Request) {
+func (h *AccountHandler) DeleteAccountSavedCommunityHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
 	userID, ok := r.Context().Value(auth.UserIDKey).(string)
 	if !ok {
@@ -624,7 +624,7 @@ func (h *AccountHandler) DeleteUserSavedCommunity(w http.ResponseWriter, r *http
 
 // DELETE .../account/saved/communities
 // AUTHED
-func (h *AccountHandler) DeleteUserSavedCommunities(w http.ResponseWriter, r *http.Request) {
+func (h *AccountHandler) DeleteAccountSavedCommunitiesHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
 	userID, ok := r.Context().Value(auth.UserIDKey).(string)
 	if !ok {
@@ -645,7 +645,7 @@ func (h *AccountHandler) DeleteUserSavedCommunities(w http.ResponseWriter, r *ht
 
 // GET ../account/saved/users
 // AUTHED
-func (h *AccountHandler) GetUserSavedUsers(w http.ResponseWriter, r *http.Request) {
+func (h *AccountHandler) GetAccountSavedUsersHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
 	userId, ok := r.Context().Value(auth.UserIDKey).(string)
 	if !ok {
@@ -669,7 +669,7 @@ func (h *AccountHandler) GetUserSavedUsers(w http.ResponseWriter, r *http.Reques
 
 // POST .../account/saved/users
 // AUTHED
-func (h *AccountHandler) CreateUserSavedUser(w http.ResponseWriter, r *http.Request) {
+func (h *AccountHandler) CreateAccountSavedUserHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
 	userId, ok := r.Context().Value(auth.UserIDKey).(string)
 	if !ok {
@@ -697,7 +697,7 @@ func (h *AccountHandler) CreateUserSavedUser(w http.ResponseWriter, r *http.Requ
 
 // DELETE .../account/saved/users/{id}
 // AUTHED
-func (h *AccountHandler) DeleteUserSavedUser(w http.ResponseWriter, r *http.Request) {
+func (h *AccountHandler) DeleteAccountSavedUserHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
 	userId, ok := r.Context().Value(auth.UserIDKey).(string)
 	if !ok {
@@ -725,7 +725,7 @@ func (h *AccountHandler) DeleteUserSavedUser(w http.ResponseWriter, r *http.Requ
 
 // DELETE .../account/saved/users
 // AUTHED
-func (h *AccountHandler) DeleteUserSavedUsers(w http.ResponseWriter, r *http.Request) {
+func (h *AccountHandler) DeleteAccountSavedUsersHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
 	userId, ok := r.Context().Value(auth.UserIDKey).(string)
 	if !ok {
@@ -744,89 +744,18 @@ func (h *AccountHandler) DeleteUserSavedUsers(w http.ResponseWriter, r *http.Req
 	w.WriteHeader(http.StatusOK)
 }
 
-// POST .../account/status
+// GET .../account/status
 // AUTHED
-func (h *AccountHandler) CreateUserStatus(w http.ResponseWriter, r *http.Request) {
-	// Get authed user id
+func (h *AccountHandler) GetAccountStatusHandler(w http.ResponseWriter, r *http.Request) {
+	// Get user id from authed context
 	authedUserId, ok := r.Context().Value(auth.UserIDKey).(string)
 	if !ok {
 		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("userId blank"))
 		return
 	}
 
-	// Users with privileges below admin can only update their own status
-	// Prepare for check later by first getting the user's role from DB
-	userRole, err := h.server.DB().GetUserRole(authedUserId)
-	if err != nil {
-		utils.RespondWithError(w, http.StatusInternalServerError, err)
-		return
-	}
-
-	// Set max reading size for body
-	MAX_SIZE := 1 << 10 // 1 KiB should be more than enough
-	r.Body = http.MaxBytesReader(w, r.Body, int64(MAX_SIZE))
-	err = r.ParseMultipartForm(int64(MAX_SIZE + 512))
-	if err != nil {
-		utils.RespondWithError(w, http.StatusInternalServerError, err)
-		return
-	}
-
-	// Parse user status data
-	var userStatus database.UserStatus
-	err = json.Unmarshal([]byte(r.FormValue("data")), &userStatus)
-	if err != nil {
-		utils.RespondWithError(w, http.StatusBadRequest, errors.New("unable to parse provided user status data"))
-		return
-	}
-
-	// Verify user status data
-	err = validation.ValidateUserStatusData(userStatus)
-	if err != nil {
-		utils.RespondWithError(w, http.StatusBadRequest, err)
-		return
-	}
-
-	// Verify user can modify this user's status
-	if userRole != config.USER_ROLE_ADMIN && userStatus.UserID != authedUserId {
-		utils.RespondWithError(w, http.StatusUnauthorized, errors.New("you are not authorized to create this user's account's status"))
-		return
-	}
-
-	// Insert accepted values, ignoring other fields which we expect to fill ourselves, into db
-	err = h.server.DB().CreateUserStatus(userStatus.UserID, userStatus.SetterUserID, userStatus.Status, userStatus.Comment)
-	if err != nil {
-		utils.RespondWithError(w, http.StatusInternalServerError, err)
-		return
-	}
-
-	// Reply ok
-	w.WriteHeader(http.StatusCreated)
-}
-
-// GET .../account/status/{id}
-// AUTHED
-func (h *AccountHandler) GetUserStatus(w http.ResponseWriter, r *http.Request) {
-	authedUserId, ok := r.Context().Value(auth.UserIDKey).(string)
-	if !ok {
-		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("userId blank"))
-		return
-	}
-
-	// Users with privilege below admin cannot request account status for
-	// accounts not their own
-	userRole, err := h.server.DB().GetUserRole(authedUserId)
-	if err != nil {
-		utils.RespondWithError(w, http.StatusInternalServerError, err)
-		return
-	}
-	requestedStatusUserID := chi.URLParam(r, "id")
-	if userRole != config.USER_ROLE_ADMIN && requestedStatusUserID != authedUserId {
-		utils.RespondWithError(w, http.StatusUnauthorized, errors.New("you do not have permission to see that user's status"))
-		return
-	}
-
-	// Get status and reply with it
-	userStatus, err := h.server.DB().GetUserStatus(requestedStatusUserID)
+	// Get user's account status and reply with it
+	userStatus, err := h.server.DB().GetUserStatus(authedUserId)
 	if err != nil {
 		utils.RespondWithError(w, http.StatusInternalServerError, err)
 		return
@@ -834,62 +763,60 @@ func (h *AccountHandler) GetUserStatus(w http.ResponseWriter, r *http.Request) {
 	utils.RespondWithJSON(w, http.StatusOK, userStatus)
 }
 
-// PUT .../account/status/{id}
+// PUT .../account/status
 // AUTHED
-func (h *AccountHandler) UpdateUserStatus(w http.ResponseWriter, r *http.Request) {
+// Endpoint is for the account to be updated by the user themself
+func (h *AccountHandler) UpdateAccountStatusHandler(w http.ResponseWriter, r *http.Request) {
+	// Get authed user id
 	authedUserId, ok := r.Context().Value(auth.UserIDKey).(string)
 	if !ok {
 		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("authenticated but unknown userId"))
 		return
 	}
 
-	// Users with privileges below admin can only update their own status
-	// Prepare for check later by first getting the user's role from DB
-	userRole, err := h.server.DB().GetUserRole(authedUserId)
+	// User cannot update their status if the admin has flagged their account.
+	currUserStatus, err := h.server.DB().GetUserStatus(authedUserId)
 	if err != nil {
 		utils.RespondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
-
-	// Set max reading size for body
-	MAX_SIZE := 1 << 10 // 1 KiB should be more than enough
-	r.Body = http.MaxBytesReader(w, r.Body, int64(MAX_SIZE))
-	err = r.ParseMultipartForm(int64(MAX_SIZE + 512))
-	if err != nil {
-		utils.RespondWithError(w, http.StatusInternalServerError, err)
+	if currUserStatus.UserStatus.Status == config.USER_STATUS_FLAGGED {
+		utils.RespondWithError(w, http.StatusUnauthorized, errors.New("your account has been flagged and you cannot update your status until you fix the problems with your account mentioned in the status comment provided by the admin. contact admin if you have any questions."))
 		return
 	}
 
-	// Parse user status data
-	var userStatus database.UserStatus
-	err = json.Unmarshal([]byte(r.FormValue("data")), &userStatus)
-	if err != nil {
-		utils.RespondWithError(w, http.StatusBadRequest, errors.New("unable to parse provided user status data"))
-		return
+	// Get status from body JSON
+	var statusStruct struct {
+		Status string `json:"status"`
 	}
-
-	// Verify user status data
-	err = validation.ValidateUserStatusData(userStatus)
+	body, err := io.ReadAll(r.Body)
 	if err != nil {
+		log.Println("error in io readall")
 		utils.RespondWithError(w, http.StatusBadRequest, err)
 		return
 	}
+	err = json.Unmarshal(body, &statusStruct)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
+		return
+	}
+	status := statusStruct.Status
 
-	// Ensure userid in data is the same as the userid from the url
-	urlUserID := chi.URLParam(r, "id")
-	if urlUserID != userStatus.UserID {
-		utils.RespondWithError(w, http.StatusBadRequest, errors.New("userid in url does not match the user id in the request body"))
+	// Validate status
+	if _, exists := config.USER_STATUS_OPTIONS[status]; !exists {
+		utils.RespondWithError(w, http.StatusBadRequest, fmt.Errorf("status %s is not a valid status", status))
 		return
 	}
 
-	// Verify user can update this user's status based on their role
-	if userRole != config.USER_ROLE_ADMIN && userStatus.UserID != authedUserId {
-		utils.RespondWithError(w, http.StatusUnauthorized, errors.New("you are not authorized to create this user's account's status"))
+	// Assert that user cannot flag their own account.
+	// User can only set their account status to normal or private.
+	if status == config.USER_STATUS_FLAGGED {
+		utils.RespondWithError(w, http.StatusBadRequest, errors.New("you cannot flag your own account status"))
 		return
 	}
 
 	// Insert accepted values, ignoring other fields which we expect to fill ourselves, into db
-	err = h.server.DB().UpdateUserStatus(userStatus.UserID, userStatus.SetterUserID, userStatus.Status, userStatus.Comment)
+	err = h.server.DB().UpdateUserStatus(authedUserId, authedUserId, status, "")
 	if err != nil {
 		utils.RespondWithError(w, http.StatusInternalServerError, err)
 		return

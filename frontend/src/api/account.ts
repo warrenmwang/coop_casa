@@ -7,7 +7,7 @@ import {
   apiAccountUserProfileImagesLink,
   apiAccountStatusLink,
 } from "urls";
-import { User, APIUserReceived, APIReceivedUserStatus } from "../types/Types";
+import { User, APIUserReceived, UserStatusTimeStamped } from "../types/Types";
 import axios, { AxiosResponse } from "axios";
 import { DeleteUserResponse, LogoutUserResponse } from "../types/Responses";
 import { apiFile2ClientFile } from "../utils/utils";
@@ -15,8 +15,8 @@ import {
   APIReceivedCommunityIDsSchema,
   APIReceivedPropertyIDsSchema,
   APIReceivedUserIDsSchema,
-  APIReceivedUserStatusSchema,
   UserDetailsSchema,
+  UserStatusSchemaTimeStamped,
 } from "../types/Schema";
 
 import { APIReceivedUserProfileImages } from "../types/Types";
@@ -306,33 +306,18 @@ export const apiAccountUnlikeCommunity = async (communityID: string) => {
   });
 };
 
-export const apiAccountUpdateStatus = async (
-  userID: string,
-  setterUserID: string,
-  status: string,
-  comment: string = "",
-) => {
-  const formData = new FormData();
-  formData.set(
-    "data",
-    JSON.stringify({
-      userId: userID,
-      setterUserId: setterUserID,
-      status: status,
-      comment: comment,
-    }),
-  );
-
-  return axios.put(`${apiAccountStatusLink}/${userID}`, formData, {
+export const apiAccountUpdateStatus = async (status: string) => {
+  return axios.put(apiAccountStatusLink, JSON.stringify({ status }), {
+    headers: {
+      "Content-Type": "application/json",
+    },
     withCredentials: true,
   });
 };
 
-export const apiAccountGetStatus = async (
-  userID: string,
-): Promise<APIReceivedUserStatus> => {
+export const apiAccountGetStatus = async (): Promise<UserStatusTimeStamped> => {
   return axios
-    .get(`${apiAccountStatusLink}/${userID}`, {
+    .get(`${apiAccountStatusLink}`, {
       headers: {
         Accept: "application/json",
       },
@@ -340,7 +325,7 @@ export const apiAccountGetStatus = async (
     })
     .then((res) => res.data)
     .then((data) => {
-      const res = APIReceivedUserStatusSchema.safeParse(data);
+      const res = UserStatusSchemaTimeStamped.safeParse(data);
       if (res.success) return res.data;
       throw new Error(
         "Validation failed: received user status does not match expected schema",

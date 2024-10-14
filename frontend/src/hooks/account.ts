@@ -245,27 +245,18 @@ export const useGetLikedEntities = () => {
   });
 };
 
-export const useGetAccountStatus = (userId: string) => {
+export const useGetAccountStatus = () => {
   return useQuery({
     queryKey: userStatusKey,
-    queryFn: () => apiAccountGetStatus(userId),
+    queryFn: () => apiAccountGetStatus(),
   });
 };
 
 export const useUpdateAccountStatus = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({
-      userId,
-      setterUserId,
-      status,
-      comment,
-    }: {
-      userId: string;
-      setterUserId: string;
-      status: string;
-      comment: string;
-    }) => apiAccountUpdateStatus(userId, setterUserId, status, comment),
+    mutationFn: ({ status }: { status: string }) =>
+      apiAccountUpdateStatus(status),
     onSuccess: () => {
       return queryClient.invalidateQueries({
         queryKey: userStatusKey,
