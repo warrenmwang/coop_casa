@@ -4,22 +4,24 @@ import TextSkeleton from "components/skeleton/TextSkeleton";
 import {
   useAdminGetUserDetails,
   useAdminGetUserRoles,
+  useAdminGetUserStatuses,
 } from "hooks/admin";
+import { MAX_USERS_PER_PAGE } from "appConstants";
 
 const AdminDisplayUsers: React.FC = () => {
-  const limit = 10;
   const [page, setPage] = useState<number>(0);
 
-  const { data: userDetails, isFetching: userDetailsIsFetching } =
-    useAdminGetUserDetails(limit, page);
+  const userDetailsQueries = useAdminGetUserDetails(MAX_USERS_PER_PAGE, page);
 
   const userIDs: string[] =
-    userDetails?.map((userDetail) => userDetail.userId) || [];
+    userDetailsQueries.data?.map((userDetail) => userDetail.userId) || [];
 
-  const { data: userRoles, isFetching: userRolesIsFetching } =
-    useAdminGetUserRoles(userIDs);
+  const userRoleQueries = useAdminGetUserRoles(userIDs);
 
-  const isLastPage: boolean = (userDetails?.length || 0) < limit;
+  const userStatusQueries = useAdminGetUserStatuses(userIDs);
+
+  const isLastPage: boolean =
+    (userDetailsQueries.data?.length || 0) < MAX_USERS_PER_PAGE;
 
   // user role - next button
   const handleNext = () => {
@@ -35,7 +37,7 @@ const AdminDisplayUsers: React.FC = () => {
     setPage((prevPage) => Math.max(prevPage - 1, 0));
   };
 
-  if (userDetailsIsFetching || userRolesIsFetching) {
+  if (userDetailsQueries.isFetching || userRoleQueries.isFetching) {
     return <TextSkeleton />;
   }
 
@@ -45,43 +47,29 @@ const AdminDisplayUsers: React.FC = () => {
       <div className="flex justify-center items-center space-x-4 mt-4 py-1">
         <h1 className="h1_custom">User Management</h1>
       </div>
-      <table className="min-w-full bg-white rounded-lg">
+      <table className="min-w-full">
         <thead>
           <tr className="bg-gray-100">
-            <th className="table__row">
-              UserID
-            </th>
-            <th className="table__row">
-              Email
-            </th>
-            <th className="table__row">
-              First Name
-            </th>
-            <th className="table__row">
-              Last Name
-            </th>
-            <th className="table__row">
-              Role
-            </th>
+            <th className="table__col">UserID</th>
+            <th className="table__col">Email</th>
+            <th className="table__col">First Name</th>
+            <th className="table__col">Last Name</th>
+            <th className="table__col">Role</th>
+            <th className="table__col">Status</th>
           </tr>
         </thead>
         <tbody>
-          {userDetails?.map((user, index) => (
+          {userDetailsQueries.data?.map((user, index) => (
             <tr key={user.userId} className="hover:bg-gray-50">
-              <td className="px-4 py-2 border border-gray-300 text-gray-700">
-                {user.userId}
-              </td>
-              <td className="px-4 py-2 border border-gray-300 text-gray-700">
-                {user.email}
-              </td>
-              <td className="px-4 py-2 border border-gray-300 text-gray-700">
-                {user.firstName}
-              </td>
-              <td className="px-4 py-2 border border-gray-300 text-gray-700">
-                {user.lastName}
-              </td>
-              <td className="px-4 py-2 border border-gray-300 text-gray-700">
-                {userRoles?.at(index)}
+              <td className="table__col">{user.userId}</td>
+              <td className="table__col">{user.email}</td>
+              <td className="table__col">{user.firstName}</td>
+              <td className="table__col">{user.lastName}</td>
+              <td className="table__col">{userRoleQueries.data?.at(index)}</td>
+              <td className="table__col">
+                {userStatusQueries?.at(index)?.data?.userStatus.status
+                  ? userStatusQueries?.at(index)?.data?.userStatus.status
+                  : "Unknown"}
               </td>
             </tr>
           ))}

@@ -22,6 +22,7 @@ export const publicUserProfileImagesKey = ["user", "profile", "images"];
 // Admin
 export const adminUserDetailsKey = ["admin", "user", "details"];
 export const adminUserRolesKey = ["admin", "user", "roles"];
+export const adminUserStatusesKey = ["admin", "user", "statuses"];
 
 // Communities
 export const communitiesKey = ["communities"];

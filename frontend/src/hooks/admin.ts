@@ -1,20 +1,23 @@
 import {
   useMutation,
+  useQueries,
   useQuery,
   useQueryClient,
   UseQueryResult,
 } from "@tanstack/react-query";
 import {
   apiAdminCreateUserStatus,
+  apiAdminGetAccountStatus,
   apiAdminGetUsersDetails,
   apiAdminGetUsersRoles,
   apiAdminUpdateUserRole,
+  apiAdminUpdateUserStatus,
 } from "../api/admin";
 import { UserDetails } from "../types/Types";
 import {
   adminUserDetailsKey,
   adminUserRolesKey,
-  userStatusKey,
+  adminUserStatusesKey,
 } from "../reactQueryKeys";
 
 export const useAdminGetUserDetails = (
@@ -48,23 +51,50 @@ export const useAdminUpdateUserRole = () => {
   });
 };
 
+export const useAdminGetUserStatuses = (userIDs: string[]) => {
+  return useQueries({
+    queries: userIDs.map((userId) => ({
+      queryKey: [...adminUserStatusesKey, userId],
+      queryFn: () => apiAdminGetAccountStatus(userId),
+    })),
+  });
+};
+
 export const useAdminCreateUserStatus = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({
       userId,
-      setterUserId,
       status,
       comment,
     }: {
       userId: string;
-      setterUserId: string;
       status: string;
       comment: string;
-    }) => apiAdminCreateUserStatus(userId, setterUserId, status, comment),
+    }) => apiAdminCreateUserStatus(userId, status, comment),
     onSuccess: () => {
       return queryClient.invalidateQueries({
-        queryKey: userStatusKey,
+        queryKey: adminUserStatusesKey,
+      });
+    },
+  });
+};
+
+export const useAdminUpdateUserStatus = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      userId,
+      status,
+      comment,
+    }: {
+      userId: string;
+      status: string;
+      comment: string;
+    }) => apiAdminUpdateUserStatus(userId, status, comment),
+    onSuccess: () => {
+      return queryClient.invalidateQueries({
+        queryKey: adminUserStatusesKey,
       });
     },
   });

@@ -57,44 +57,48 @@ const UpdateAccountStatusForm: React.FC = () => {
     <>
       <Title title="Account status" />
 
-      {accountStatusQuery.data.userStatus.comment && (
-        <h2 className="label__text_input_gray">
-          Status Comment: {accountStatusQuery.data.userStatus.comment}
-        </h2>
-      )}
-
-      {/* TODO: update form */}
-
       {accountStatusQuery.data.userStatus.status === "flagged" ? (
         <h1 className="h1_custom">
           Your account has been flagged and forcibly privated by the admin for
-          the following reason: {accountStatusQuery.data.userStatus.comment}.
-          Resolve those issues and the admin will review your account as soon as
-          they can.
+          the following reason:{" "}
+          <span className="text-red-500">
+            {accountStatusQuery.data.userStatus.comment}
+          </span>
+          . Resolve those issues and the admin will review your account as soon
+          as they can to unflag your account. Your account acts as if it were
+          privated when flagged.
         </h1>
       ) : (
-        <form onSubmit={handleSubmit}>
-          <label className="label__text_input_gray" htmlFor="accountStatus">
-            Your Account Status
-          </label>
-          <select
-            id="accountStatus"
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-            className="input__text_gray_box"
-            required
-          >
-            <option value="normal">
-              Public -- Normal default status of all accounts. Your profile is
-              visible to anyone.
-            </option>
-            <option value="private">
-              Private -- Hides your account profile to other users.
-            </option>
-          </select>
+        <>
+          {accountStatusQuery.data.userStatus.comment && (
+            <h2 className="label__text_input_gray">
+              Status Comment: {accountStatusQuery.data.userStatus.comment}
+            </h2>
+          )}
 
-          <SubmitButton isSubmitting={isSubmitting} />
-        </form>
+          <form onSubmit={handleSubmit}>
+            <label className="label__text_input_gray" htmlFor="accountStatus">
+              Your Account Status
+            </label>
+            <select
+              id="accountStatus"
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+              className="input__text_gray_box"
+              required
+            >
+              <option value="normal">
+                Public -- Normal default status of all accounts. Your profile is
+                visible to anyone.
+              </option>
+              <option value="private">
+                Private -- Hides your account profile to other users.
+              </option>
+            </select>
+
+            <SubmitButton isSubmitting={isSubmitting} />
+          </form>
+        </>
       )}
     </>
   );

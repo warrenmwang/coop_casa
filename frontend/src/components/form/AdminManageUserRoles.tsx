@@ -4,9 +4,9 @@ import SubmitButton from "../buttons/SubmitButton";
 import { toast } from "react-toastify";
 import { useAdminUpdateUserRole } from "hooks/admin";
 import { mutationErrorCallbackCreator } from "utils/callbacks";
+import { USER_ROLE_OPTIONS } from "appConstants";
 
 const AdminManageUserRoles: React.FC = () => {
-  const roleTypes = ["lister", "regular"];
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [userID, setUserID] = useState<string>("");
   const [role, setRole] = useState<string>("");
@@ -55,7 +55,7 @@ const AdminManageUserRoles: React.FC = () => {
   };
 
   return (
-    <>
+    <div className="flex flex-col w-full md:w-1/2">
       <div className="flex justify-center items-center space-x-4 mt-4 py-1">
         <h1 className="h1_custom">Update User Role</h1>
       </div>
@@ -63,7 +63,7 @@ const AdminManageUserRoles: React.FC = () => {
       <form className="form__vertical_inputs">
         {/* user id input */}
         <label className="label__text_input_gray" htmlFor="user_id">
-          User ID
+          User ID <span className="text-red-500">*</span>
         </label>
         <input
           type="text"
@@ -76,7 +76,7 @@ const AdminManageUserRoles: React.FC = () => {
 
         {/* drop down of role types */}
         <label className="label__text_input_gray" htmlFor="role">
-          Role
+          Role <span className="text-red-500">*</span>
         </label>
         <select
           id="role"
@@ -85,7 +85,7 @@ const AdminManageUserRoles: React.FC = () => {
           defaultValue=""
         >
           <option value="">Select Option</option>
-          {roleTypes.map((role) => {
+          {USER_ROLE_OPTIONS.map((role) => {
             return (
               <option key={role} value={role}>
                 {role}
@@ -97,7 +97,7 @@ const AdminManageUserRoles: React.FC = () => {
         {/* submit for updating user role */}
         <SubmitButton isSubmitting={isSubmitting} onClick={handleSubmit} />
       </form>
-    </>
+    </div>
   );
 };
 

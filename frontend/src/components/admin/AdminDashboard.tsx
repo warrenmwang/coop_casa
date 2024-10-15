@@ -40,8 +40,10 @@ const AdminDashboard: React.FC = () => {
       {currentSection === "Admin" && (
         <>
           <AdminDisplayUsers />
-          <AdminManageUserRoles />
-          <AdminManageUserStatuses />
+          <div className="flex flex-wrap md:flex-nowrap">
+            <AdminManageUserRoles />
+            <AdminManageUserStatuses />
+          </div>
         </>
       )}
 

@@ -10,6 +10,9 @@ export const MAX_COMMUNITY_IMGS_ALLOWED = 5;
 export const MAX_NUMBER_PROPERTIES_PER_PAGE = 9;
 export const MAX_NUMBER_COMMUNITIES_PER_PAGE = 9;
 export const MAX_NUMBER_USER_PROFILES_PER_PAGE = 9;
+export const MAX_USERS_PER_PAGE = 10;
+export const LIKED_ENTITIES_DISPLAY_NUM_PREVIEW = 3;
+
 export const GENDER_OPTIONS = [
   "Man",
   "Woman",
@@ -20,18 +23,7 @@ export const GENDER_OPTIONS = [
   "Prefer Not To State",
 ];
 
-export const pageQPKey = "page";
-export const limitQPKey = "limit";
-
-export const filterNameQPKey = "communityFilterName";
-export const filterDescriptionQPKey = "communityFilterDescription";
-
-export const filterAddressQPKey = "filterAddress";
-
-export const filterFirstNameQPKey = "filterFirstName";
-export const filterLastNameQPKey = "filterLastName";
-
-export const interestsOptions = [
+export const INTERESTS_OPTIONS = [
   "Reading",
   "Traveling",
   "Cooking",
@@ -48,4 +40,20 @@ export const interestsOptions = [
   "Dance",
 ];
 
-export const LIKED_ENTITIES_DISPLAY_NUM_PREVIEW = 3;
+export const USER_STATUS_OPTIONS = ["normal", "private", "flagged"];
+export const USER_STATUS_NORMAL = "normal";
+export const USER_STATUS_PRIVATE = "private";
+export const USER_STATUS_FLAGGED = "flagged";
+
+export const USER_ROLE_OPTIONS = ["lister", "regular"];
+
+export const pageQPKey = "page";
+export const limitQPKey = "limit";
+
+export const filterNameQPKey = "communityFilterName";
+export const filterDescriptionQPKey = "communityFilterDescription";
+
+export const filterAddressQPKey = "filterAddress";
+
+export const filterFirstNameQPKey = "filterFirstName";
+export const filterLastNameQPKey = "filterLastName";

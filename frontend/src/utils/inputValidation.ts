@@ -47,6 +47,7 @@ export const validateUUID = (uuid: string): [string, boolean] => {
 };
 
 export const validateUserID = (userID: string): boolean => {
-  const { success } = z.coerce.number().safeParse(userID);
-  return success;
+  let tmp = z.string().min(1).safeParse(userID);
+  if (!tmp.success) return false;
+  return z.coerce.number().safeParse(tmp.data).success;
 };

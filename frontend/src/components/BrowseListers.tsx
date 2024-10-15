@@ -68,19 +68,19 @@ const BrowseListers: React.FC = () => {
             <table className="min-w-full bg-white rounded-lg">
               <thead>
                 <tr className="bg-gray-100">
-                  <th className="table__row">User ID</th>
-                  <th className="table__row">Email</th>
-                  <th className="table__row">First Name</th>
-                  <th className="table__row">Last Name</th>
+                  <th className="table__col">User ID</th>
+                  <th className="table__col">Email</th>
+                  <th className="table__col">First Name</th>
+                  <th className="table__col">Last Name</th>
                 </tr>
               </thead>
               <tbody>
                 {listersQuery.data.map((data) => (
                   <tr key={data.userId} className="bg-gray-100">
-                    <th className="table__row">{data.userId}</th>
-                    <th className="table__row">{data.email}</th>
-                    <th className="table__row">{data.firstName}</th>
-                    <th className="table__row">{data.lastName}</th>
+                    <th className="table__col">{data.userId}</th>
+                    <th className="table__col">{data.email}</th>
+                    <th className="table__col">{data.firstName}</th>
+                    <th className="table__col">{data.lastName}</th>
                   </tr>
                 ))}
               </tbody>

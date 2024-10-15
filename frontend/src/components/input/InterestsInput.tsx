@@ -1,5 +1,5 @@
 import React from "react";
-import { interestsOptions } from "appConstants";
+import { INTERESTS_OPTIONS } from "appConstants";
 
 interface InterestsInputProps {
   values: string[];
@@ -55,7 +55,7 @@ const InterestsInput: React.FC<InterestsInputProps> = ({
         className="block w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white"
         id="interests"
       >
-        {interestsOptions.map((interest) => (
+        {INTERESTS_OPTIONS.map((interest) => (
           <label
             key={interest}
             htmlFor={interest}
