@@ -88,6 +88,10 @@ func NewAdminRouter(s interfaces.Server) http.Handler {
 	r.Post("/users/status", adminHandlers.AdminCreateUserStatusHandler)
 	r.Put("/users/status/{id}", adminHandlers.AdminUpdateUserStatusHandler)
 
+	r.Get("/total/properties", adminHandlers.GetTotalPropertiesCountHandler)
+	r.Get("/total/communities", adminHandlers.GetTotalCommunitiesCountHandler)
+	r.Get("/total/users", adminHandlers.GetTotalUsersCountHandler)
+
 	return r
 }
 
@@ -99,7 +103,6 @@ func NewPropertyRouter(s interfaces.Server) http.Handler {
 	r.Get("/{id}", propertyHandlers.GetPropertyHandler)
 	r.Get("/", propertyHandlers.GetPropertiesHandler)
 
-	r.With(auth.AuthMiddleware).Get("/total", propertyHandlers.GetPropertiesTotalCountHandler)
 	r.With(auth.AuthMiddleware).Post("/", propertyHandlers.CreatePropertiesHandler)
 	r.With(auth.AuthMiddleware).Put("/{id}", propertyHandlers.UpdatePropertiesHandler)
 	r.With(auth.AuthMiddleware).Put("/transfer/ownership", propertyHandlers.TransferPropertyOwnershipHandler)

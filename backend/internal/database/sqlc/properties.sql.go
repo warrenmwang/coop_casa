@@ -226,7 +226,23 @@ SELECT
 FROM
     properties
 ORDER BY
-    id
+    CASE
+        WHEN $3 <> '' THEN similarity (
+            CONCAT(
+                address_1,
+                ', ',
+                address_2,
+                ', ',
+                city,
+                ', ',
+                zipcode,
+                ', ',
+                country
+            ),
+            $3
+        )
+        ELSE 1
+    END DESC
 LIMIT
     $1
 OFFSET
@@ -234,67 +250,13 @@ OFFSET
 `
 
 type GetNextPagePropertiesParams struct {
-	Limit  int32
-	Offset int32
+	Limit   int32
+	Offset  int32
+	Column3 interface{}
 }
 
 func (q *Queries) GetNextPageProperties(ctx context.Context, arg GetNextPagePropertiesParams) ([]string, error) {
-	rows, err := q.db.QueryContext(ctx, getNextPageProperties, arg.Limit, arg.Offset)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []string
-	for rows.Next() {
-		var property_id string
-		if err := rows.Scan(&property_id); err != nil {
-			return nil, err
-		}
-		items = append(items, property_id)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const getNextPagePropertiesFilterByAddress = `-- name: GetNextPagePropertiesFilterByAddress :many
-SELECT
-    property_id
-FROM
-    properties
-ORDER BY
-    similarity (
-        CONCAT(
-            address_1,
-            ', ',
-            address_2,
-            ', ',
-            city,
-            ', ',
-            zipcode,
-            ', ',
-            country
-        ),
-        $3
-    ) DESC
-LIMIT
-    $1
-OFFSET
-    $2
-`
-
-type GetNextPagePropertiesFilterByAddressParams struct {
-	Limit      int32
-	Offset     int32
-	Similarity string
-}
-
-func (q *Queries) GetNextPagePropertiesFilterByAddress(ctx context.Context, arg GetNextPagePropertiesFilterByAddressParams) ([]string, error) {
-	rows, err := q.db.QueryContext(ctx, getNextPagePropertiesFilterByAddress, arg.Limit, arg.Offset, arg.Similarity)
+	rows, err := q.db.QueryContext(ctx, getNextPageProperties, arg.Limit, arg.Offset, arg.Column3)
 	if err != nil {
 		return nil, err
 	}
@@ -392,20 +354,6 @@ func (q *Queries) GetPropertyImages(ctx context.Context, propertyID string) ([]P
 		return nil, err
 	}
 	return items, nil
-}
-
-const getTotalCountProperties = `-- name: GetTotalCountProperties :one
-SELECT
-    count(*)
-FROM
-    properties
-`
-
-func (q *Queries) GetTotalCountProperties(ctx context.Context) (int64, error) {
-	row := q.db.QueryRowContext(ctx, getTotalCountProperties)
-	var count int64
-	err := row.Scan(&count)
-	return count, err
 }
 
 const getUserOwnedProperties = `-- name: GetUserOwnedProperties :many

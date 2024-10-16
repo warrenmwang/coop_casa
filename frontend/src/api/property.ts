@@ -128,19 +128,3 @@ export const apiDeleteProperty = async (
     withCredentials: true,
   });
 };
-
-// Get total count of properties in db
-export const apiGetTotalCountProperties = async (): Promise<number> => {
-  return axios
-    .get(`${apiPropertiesLink}/total`, {
-      withCredentials: true,
-    })
-    .then((response) => response.data)
-    .then((data) => {
-      const res = z.number().safeParse(data);
-      if (res.success) return res.data;
-      throw new Error(
-        "Validation failed: received total count properties does not match expected schema",
-      );
-    });
-};

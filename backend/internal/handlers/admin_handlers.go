@@ -269,3 +269,36 @@ func (h *AdminHandler) AdminUpdateUserStatusHandler(w http.ResponseWriter, r *ht
 	w.WriteHeader(http.StatusOK)
 
 }
+
+// GET .../admin/total/properties
+// AUTHED
+func (h *AdminHandler) GetTotalPropertiesCountHandler(w http.ResponseWriter, r *http.Request) {
+	count, err := h.server.DB().GetTotalCountProperties()
+	if err != nil {
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
+		return
+	}
+	utils.RespondWithJSON(w, http.StatusOK, count)
+}
+
+// GET .../admin/total/communities
+// AUTHED
+func (h *AdminHandler) GetTotalCommunitiesCountHandler(w http.ResponseWriter, r *http.Request) {
+	count, err := h.server.DB().GetTotalCountCommunities()
+	if err != nil {
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
+		return
+	}
+	utils.RespondWithJSON(w, http.StatusOK, count)
+}
+
+// GET .../admin/total/users
+// AUTHED
+func (h *AdminHandler) GetTotalUsersCountHandler(w http.ResponseWriter, r *http.Request) {
+	count, err := h.server.DB().GetTotalCountUsers()
+	if err != nil {
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
+		return
+	}
+	utils.RespondWithJSON(w, http.StatusOK, count)
+}

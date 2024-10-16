@@ -14,6 +14,7 @@ import TransferCommunityForm from "../communities/TransferCommunityForm";
 import BrowseListers from "../BrowseListers";
 import AdminManageUserStatuses from "./AdminManageUserStatuses";
 import WizardNavigationButtons from "components/buttons/WizardNavigationButtons";
+import AdminTotalCounters from "./AdminTotalCounters";
 
 const AdminDashboard: React.FC = () => {
   const sections: string[] = [
@@ -39,6 +40,7 @@ const AdminDashboard: React.FC = () => {
 
       {currentSection === "Admin" && (
         <>
+          <AdminTotalCounters />
           <AdminDisplayUsers />
           <div className="flex flex-wrap md:flex-nowrap">
             <AdminManageUserRoles />

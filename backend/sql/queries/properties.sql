@@ -64,26 +64,6 @@ WHERE
     property_id = $1;
 
 
--- name: GetNextPageProperties :many
-SELECT
-    property_id
-FROM
-    properties
-ORDER BY
-    id
-LIMIT
-    $1
-OFFSET
-    $2;
-
-
--- name: GetTotalCountProperties :one
-SELECT
-    count(*)
-FROM
-    properties;
-
-
 -- name: GetUserOwnedProperties :many
 SELECT
     property_id
@@ -178,7 +158,7 @@ WHERE
     );
 
 
--- name: GetNextPagePropertiesFilterByAddress :many
+-- name: GetNextPageProperties :many
 SELECT
     property_id
 FROM

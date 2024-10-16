@@ -36,6 +36,9 @@ type Service interface {
 	// Admin functions
 	AdminGetUsers(limit, offset int32, name string) ([]UserDetails, error)
 	AdminGetUsersRoles(userIds []string) ([]string, error)
+	GetTotalCountProperties() (int64, error)
+	GetTotalCountCommunities() (int64, error)
+	GetTotalCountUsers() (int64, error)
 
 	// Lister functions
 	GetManyListersDetails(limit, offset int32, nameFilter string) ([]ListerDetails, error)
@@ -83,7 +86,6 @@ type Service interface {
 	GetPropertyDetails(propertyId string) (PropertyDetails, error)
 	GetPropertyImages(propertyId string) ([]OrderedFileInternal, error)
 	GetNextPageProperties(limit, offset int32, addressFilter string) ([]string, error)
-	GetTotalCountProperties() (int64, error)
 	GetListerOwnedProperties(userID string) ([]string, error)
 	CheckDuplicateProperty(propertyDetails PropertyDetails) error
 	UpdatePropertyDetails(details PropertyDetails) error
@@ -1162,23 +1164,11 @@ func (s *service) GetPropertyImages(propertyId string) ([]OrderedFileInternal, e
 func (s *service) GetNextPageProperties(limit, offset int32, addressFilter string) ([]string, error) {
 	ctx := context.Background()
 
-	if addressFilter == "" {
-		// Get the encrypted properties details
-		propertyIDs, err := s.db_queries.GetNextPageProperties(ctx, sqlc.GetNextPagePropertiesParams{
-			Limit:  limit,
-			Offset: offset,
-		})
-		if err != nil {
-			return []string{}, err
-		}
-		return propertyIDs, nil
-	}
-
 	// There is an addressFilter
-	propertyIDs, err := s.db_queries.GetNextPagePropertiesFilterByAddress(ctx, sqlc.GetNextPagePropertiesFilterByAddressParams{
-		Limit:      limit,
-		Offset:     offset,
-		Similarity: addressFilter,
+	propertyIDs, err := s.db_queries.GetNextPageProperties(ctx, sqlc.GetNextPagePropertiesParams{
+		Limit:   limit,
+		Offset:  offset,
+		Column3: addressFilter,
 	})
 	if err != nil {
 		return []string{}, err
@@ -1276,16 +1266,6 @@ func (s *service) DeleteProperty(propertyId string) error {
 	}
 
 	return err
-}
-
-// Get count of properties
-func (s *service) GetTotalCountProperties() (int64, error) {
-	ctx := context.Background()
-	num, err := s.db_queries.GetTotalCountProperties(ctx)
-	if err != nil {
-		return -1, err
-	}
-	return num, nil
 }
 
 func (s *service) GetListerOwnedProperties(userID string) ([]string, error) {
@@ -1389,6 +1369,33 @@ func (s *service) AdminGetUsersRoles(userIds []string) ([]string, error) {
 	}
 
 	return userRoles, nil
+}
+
+func (s *service) GetTotalCountProperties() (int64, error) {
+	ctx := context.Background()
+	num, err := s.db_queries.GetTotalCountProperties(ctx)
+	if err != nil {
+		return -1, err
+	}
+	return num, nil
+}
+
+func (s *service) GetTotalCountCommunities() (int64, error) {
+	ctx := context.Background()
+	num, err := s.db_queries.GetTotalCountCommunities(ctx)
+	if err != nil {
+		return -1, err
+	}
+	return num, nil
+}
+
+func (s *service) GetTotalCountUsers() (int64, error) {
+	ctx := context.Background()
+	num, err := s.db_queries.GetTotalCountUsers(ctx)
+	if err != nil {
+		return -1, err
+	}
+	return num, nil
 }
 
 // ---------------- Communities --------------------

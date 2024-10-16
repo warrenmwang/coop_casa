@@ -112,18 +112,6 @@ func (h *PropertyHandler) GetPropertiesHandler(w http.ResponseWriter, r *http.Re
 	})
 }
 
-
-// GET .../properties/total
-// AUTHED
-func (h *PropertyHandler) GetPropertiesTotalCountHandler(w http.ResponseWriter, r *http.Request) {
-	count, err := h.server.DB().GetTotalCountProperties()
-	if err != nil {
-		utils.RespondWithError(w, http.StatusInternalServerError, err)
-		return
-	}
-	utils.RespondWithJSON(w, http.StatusOK, count)
-}
-
 // POST .../properties
 // AUTHED
 func (h *PropertyHandler) CreatePropertiesHandler(w http.ResponseWriter, r *http.Request) {

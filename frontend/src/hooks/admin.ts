@@ -8,6 +8,9 @@ import {
 import {
   apiAdminCreateUserStatus,
   apiAdminGetAccountStatus,
+  apiAdminGetTotalCountCommunities,
+  apiAdminGetTotalCountProperties,
+  apiAdminGetTotalCountUsers,
   apiAdminGetUsersDetails,
   apiAdminGetUsersRoles,
   apiAdminUpdateUserRole,
@@ -15,6 +18,7 @@ import {
 } from "../api/admin";
 import { UserDetails } from "../types/Types";
 import {
+  adminTotalsKey,
   adminUserDetailsKey,
   adminUserRolesKey,
   adminUserStatusesKey,
@@ -98,5 +102,26 @@ export const useAdminUpdateUserStatus = () => {
         queryKey: adminUserStatusesKey,
       });
     },
+  });
+};
+
+export const useAdminGetTotalNumberProperties = () => {
+  return useQuery({
+    queryKey: [...adminTotalsKey, "properties"],
+    queryFn: apiAdminGetTotalCountProperties,
+  });
+};
+
+export const useAdminGetTotalNumberCommunities = () => {
+  return useQuery({
+    queryKey: [...adminTotalsKey, "communities"],
+    queryFn: apiAdminGetTotalCountCommunities,
+  });
+};
+
+export const useAdminGetTotalNumberUsers = () => {
+  return useQuery({
+    queryKey: [...adminTotalsKey, "users"],
+    queryFn: apiAdminGetTotalCountUsers,
   });
 };

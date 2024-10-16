@@ -37,6 +37,7 @@ export const apiAccountStatusLink = `${API_HOST}:${API_PORT}/api/v1/account/stat
 
 export const apiAdminUsersLink = `${API_HOST}:${API_PORT}/api/v1/admin/users`;
 export const apiAdminUsersRolesLink = `${API_HOST}:${API_PORT}/api/v1/admin/users/roles`;
+export const apiAdminTotalsLink = `${API_HOST}:${API_PORT}/api/v1/admin/total`;
 
 export const apiPropertiesLink = `${API_HOST}:${API_PORT}/api/v1/properties`;
 export const apiListerLink = `${API_HOST}:${API_PORT}/api/v1/lister`;

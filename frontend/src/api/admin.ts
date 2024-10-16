@@ -1,4 +1,8 @@
-import { apiAdminUsersLink, apiAdminUsersRolesLink } from "urls";
+import {
+  apiAdminTotalsLink,
+  apiAdminUsersLink,
+  apiAdminUsersRolesLink,
+} from "urls";
 import { UserDetails, UserStatusTimeStamped } from "../types/Types";
 import axios, { AxiosResponse } from "axios";
 import { AdminUpdateUserRoleResponse } from "../types/Responses";
@@ -7,6 +11,7 @@ import {
   APIReceivedUserRolesSchema,
   UserStatusSchemaTimeStamped,
 } from "../types/Schema";
+import { z } from "zod";
 
 export const apiAdminGetUsersDetails = async (
   limit: number,
@@ -135,4 +140,49 @@ export const apiAdminUpdateUserStatus = async (
       withCredentials: true,
     },
   );
+};
+
+export const apiAdminGetTotalCountProperties = async (): Promise<number> => {
+  return axios
+    .get(`${apiAdminTotalsLink}/properties`, {
+      withCredentials: true,
+    })
+    .then((response) => response.data)
+    .then((data) => {
+      const res = z.number().safeParse(data);
+      if (res.success) return res.data;
+      throw new Error(
+        "Validation failed: received total count properties does not match expected schema",
+      );
+    });
+};
+
+export const apiAdminGetTotalCountCommunities = async (): Promise<number> => {
+  return axios
+    .get(`${apiAdminTotalsLink}/communities`, {
+      withCredentials: true,
+    })
+    .then((response) => response.data)
+    .then((data) => {
+      const res = z.number().safeParse(data);
+      if (res.success) return res.data;
+      throw new Error(
+        "Validation failed: received total count communities does not match expected schema",
+      );
+    });
+};
+
+export const apiAdminGetTotalCountUsers = async (): Promise<number> => {
+  return axios
+    .get(`${apiAdminTotalsLink}/users`, {
+      withCredentials: true,
+    })
+    .then((response) => response.data)
+    .then((data) => {
+      const res = z.number().safeParse(data);
+      if (res.success) return res.data;
+      throw new Error(
+        "Validation failed: received total count users does not match expected schema",
+      );
+    });
 };
