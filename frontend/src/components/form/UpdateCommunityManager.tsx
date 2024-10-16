@@ -8,6 +8,8 @@ import UpdateCommunityForm from "./UpdateCommunityForm";
 import { useDeleteCommunity } from "hooks/communities";
 import { apiGetCommunity } from "../../api/community";
 import { mutationErrorCallbackCreator } from "utils/callbacks";
+import { useQuery } from "@tanstack/react-query";
+import { communitiesKey } from "reactQueryKeys";
 
 const UpdateCommunityManager: React.FC = () => {
   // ------------ For Getting the community details
@@ -29,6 +31,11 @@ const UpdateCommunityManager: React.FC = () => {
   };
 
   const deleteCommunity = useDeleteCommunity();
+  const communityQuery = useQuery({
+    queryKey: [...communitiesKey, communityID],
+    queryFn: () => apiGetCommunity(communityID),
+    enabled: getCommunityDetailsIsSubmitting,
+  });
 
   const handleDelete = (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,6 +45,18 @@ const UpdateCommunityManager: React.FC = () => {
       return;
     }
     setIsDeleting(true);
+    deleteCommunity.mutate(
+      { communityID },
+      {
+        onSuccess: () => {
+          setCommunityID("");
+          setCommunity(null);
+          toast.success("Deleted community.");
+        },
+        onError: mutationErrorCallbackCreator("Failed to delete"),
+        onSettled: () => setIsDeleting(false),
+      },
+    );
   };
 
   const handleChange = (
@@ -52,42 +71,18 @@ const UpdateCommunityManager: React.FC = () => {
     setCommunity(null);
   };
 
-  // TODO: refactor me to use react query !
   useEffect(() => {
-    const foo = async () => {
-      // get the community data using the propertID
-      try {
-        const community = await apiGetCommunity(communityID);
-        setCommunity(community);
-      } catch (err) {
-        toast.error(`Error in getting requested community: ${err}`);
-      }
-      setGetCommunityDetailsIsSubmitting(false);
-    };
-    if (getCommunityDetailsIsSubmitting) {
-      foo();
-    }
-  }, [getCommunityDetailsIsSubmitting]);
-
-  useEffect(() => {
-    if (isDeleting) {
-      deleteCommunity.mutate(
-        { communityID },
-        {
-          onSuccess: () => {
-            setCommunityID("");
-            setCommunity(null);
-            toast.success("Deleted community.");
-          },
-          onError: mutationErrorCallbackCreator("Failed to delete"),
-          onSettled: () => setIsDeleting(false),
-        },
+    if (communityQuery.status === "success" && communityQuery.data) {
+      setCommunity(communityQuery.data);
+    } else if (communityQuery.status === "error") {
+      toast.error(
+        `Error in getting requested community: ${communityQuery.error.message}`,
       );
     }
-  }, [isDeleting]);
+  }, [communityQuery.status]);
 
   return (
-    <div className="">
+    <div className="flex flex-col items-center">
       <div className="px-3">
         <h1 className="h1_custom">Update Community</h1>
         <h4 className="h4_custom">
@@ -95,7 +90,7 @@ const UpdateCommunityManager: React.FC = () => {
           you. You will need the specific community{"'"}s ID.
         </h4>
         {/* query community data form */}
-        <form className="" onSubmit={getCommunityDetails}>
+        <form className="form__vertical_inputs" onSubmit={getCommunityDetails}>
           <div className="flex flex-col">
             <label className="label__text_input_gray">
               Get community details via ID.

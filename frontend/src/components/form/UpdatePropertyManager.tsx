@@ -8,6 +8,8 @@ import { toast } from "react-toastify";
 import UpdatePropertyForm from "./UpdatePropertyForm";
 import { useDeleteProperty } from "hooks/properties";
 import { mutationErrorCallbackCreator } from "utils/callbacks";
+import { useQuery } from "@tanstack/react-query";
+import { propertiesKey } from "reactQueryKeys";
 
 const UpdatePropertyManager: React.FC = () => {
   const [getPropertyDetailsIsSubmitting, setGetPropertyDetailsIsSubmitting] =
@@ -23,11 +25,15 @@ const UpdatePropertyManager: React.FC = () => {
       toast.error("Not a valid property ID.");
       return;
     }
-
     setGetPropertyDetailsIsSubmitting(true);
   };
 
   const deleteProperty = useDeleteProperty();
+  const propertyQuery = useQuery({
+    queryKey: [...propertiesKey, propertyID],
+    queryFn: () => apiGetProperty(propertyID),
+    enabled: getPropertyDetailsIsSubmitting,
+  });
 
   const handleDelete = (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,6 +43,18 @@ const UpdatePropertyManager: React.FC = () => {
       return;
     }
     setIsDeleting(true);
+    deleteProperty.mutate(
+      { propertyID },
+      {
+        onSuccess: () => {
+          setPropertyID("");
+          setProperty(null);
+          toast.success("Deleted property.");
+        },
+        onError: mutationErrorCallbackCreator("Unable to delete property"),
+        onSettled: () => setIsDeleting(false),
+      },
+    );
   };
 
   const handleChange = (
@@ -51,42 +69,18 @@ const UpdatePropertyManager: React.FC = () => {
     setProperty(null);
   };
 
-  // TODO: refactor to use react query !
   useEffect(() => {
-    const foo = async () => {
-      // get the property data using the propertID
-      try {
-        const property = await apiGetProperty(propertyID);
-        setProperty(property);
-      } catch (err) {
-        toast.error(`Error in getting requested property: ${err}`);
-      }
-      setGetPropertyDetailsIsSubmitting(false);
-    };
-    if (getPropertyDetailsIsSubmitting) {
-      foo();
-    }
-  }, [getPropertyDetailsIsSubmitting]);
-
-  useEffect(() => {
-    if (isDeleting) {
-      deleteProperty.mutate(
-        { propertyID },
-        {
-          onSuccess: () => {
-            setPropertyID("");
-            setProperty(null);
-            toast.success("Deleted property.");
-          },
-          onError: mutationErrorCallbackCreator("Unable to delete property"),
-          onSettled: () => setIsDeleting(false),
-        },
+    if (propertyQuery.status === "success" && propertyQuery.data) {
+      setProperty(propertyQuery.data);
+    } else if (propertyQuery.status === "error") {
+      toast.error(
+        `Error in getting requested property: ${propertyQuery.error.message}`,
       );
     }
-  }, [isDeleting]);
+  }, [propertyQuery.status]);
 
   return (
-    <div className="">
+    <div className="flex flex-col items-center">
       <div className="px-3">
         <h1 className="h1_custom">Update Property</h1>
         <h4 className="h4_custom">
@@ -94,7 +88,7 @@ const UpdatePropertyManager: React.FC = () => {
           you. You will need the specific property{"'"}s ID.
         </h4>
         {/* query property data form */}
-        <form className="" onSubmit={getPropertyDetails}>
+        <form className="form__vertical_inputs" onSubmit={getPropertyDetails}>
           <div className="flex flex-col">
             <label className="label__text_input_gray">
               Get property details via ID.
