@@ -1,7 +1,7 @@
 -- +goose Up
 CREATE TABLE users_status (
     id serial PRIMARY KEY,
-    user_id text NOT NULL,
+    user_id text NOT NULL UNIQUE,
     setter_user_id text NOT NULL,
     status text NOT NULL,
     comment text,

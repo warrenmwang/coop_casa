@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"backend/internal/config"
 	"backend/internal/database"
 	"backend/internal/interfaces"
 	"backend/internal/utils"
@@ -78,6 +79,14 @@ func (h *UserProfileHandler) GetUsersHandler(w http.ResponseWriter, r *http.Requ
 func (h *UserProfileHandler) GetUserHandler(w http.ResponseWriter, r *http.Request) {
 	userID := chi.URLParam(r, "id")
 
+	// Don't respond with profile if account status is not normal/public
+	accountStatus, err := h.server.DB().GetUserStatus(userID)
+	if accountStatus.UserStatus.Status != config.USER_STATUS_NORMAL {
+		utils.RespondWithError(w, http.StatusForbidden, errors.New("profile is not public at this time"))
+		return
+	}
+
+	// O.w. return with public profile
 	userPublicProfile, err := h.server.DB().GetPublicUserProfile(userID)
 	if err != nil {
 		utils.RespondWithError(w, http.StatusInternalServerError, err)

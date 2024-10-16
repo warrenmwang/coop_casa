@@ -891,8 +891,8 @@ func (s *service) GetUserStatus(userID string) (UserStatusTimeStamped, error) {
 			Status:       status_D,
 			Comment:      comment_D,
 		},
-		CreatedAt:    userStatus_E.CreatedAt,
-		UpdatedAt:    userStatus_E.UpdatedAt,
+		CreatedAt: userStatus_E.CreatedAt,
+		UpdatedAt: userStatus_E.UpdatedAt,
 	}, nil
 }
 
@@ -1722,9 +1722,17 @@ func (s *service) DeleteUserOwnedCommunities(userID string) error {
 func (s *service) GetNextPagePublicUserIDs(limit, offset int32) ([]string, error) {
 	ctx := context.Background()
 
+	// Encrypt the normal status to be used to filter out user profiles whose
+	// account statuses are not normal/public.
+	normalStatus_E, err := utils.EncryptString(config.USER_STATUS_NORMAL, s.db_encrypt_key)
+	if err != nil {
+		return []string{}, err
+	}
+
 	userIdsEncrypted, err := s.db_queries.GetNextPageOfPublicUsers(ctx, sqlc.GetNextPageOfPublicUsersParams{
 		Limit:  limit,
 		Offset: offset,
+		Status: normalStatus_E,
 	})
 	if err != nil {
 		return []string{}, err
@@ -1755,11 +1763,19 @@ func (s *service) GetNextPagePublicUserIDsFilterByName(limit, offset int32, firs
 		return []string{}, err
 	}
 
+	// Encrypt the normal status to be used to filter out user profiles whose
+	// account statuses are not normal/public.
+	normalStatus_E, err := utils.EncryptString(config.USER_STATUS_NORMAL, s.db_encrypt_key)
+	if err != nil {
+		return []string{}, err
+	}
+
 	userIdsEncrypted, err := s.db_queries.GetNextPageOfPublicUsersFilterByName(ctx, sqlc.GetNextPageOfPublicUsersFilterByNameParams{
 		Limit:        limit,
 		Offset:       offset,
 		Similarity:   encryptedFirstName,
 		Similarity_2: encryptedLastName,
+		Status:       normalStatus_E,
 	})
 	if err != nil {
 		return []string{}, err

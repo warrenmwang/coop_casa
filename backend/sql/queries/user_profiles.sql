@@ -1,11 +1,13 @@
 -- Public Users API Queries
 -- name: GetNextPageOfPublicUsers :many
 SELECT
-    user_id
+    users.user_id
 FROM
     users
+    INNER JOIN users_status ON users.user_id = users_status.user_id
 WHERE
-    first_name IS NOT NULL
+    users_status.status = $3
+    AND first_name IS NOT NULL
     AND last_name IS NOT NULL
     AND birth_date IS NOT NULL
     AND gender IS NOT NULL
@@ -19,11 +21,13 @@ OFFSET
 
 -- name: GetNextPageOfPublicUsersFilterByName :many
 SELECT
-    user_id
+    users.user_id
 FROM
     users
+    INNER JOIN users_status ON users.user_id = users_status.user_id
 WHERE
-    first_name IS NOT NULL
+    users_status.status = $5
+    AND first_name IS NOT NULL
     AND last_name IS NOT NULL
     AND birth_date IS NOT NULL
     AND gender IS NOT NULL

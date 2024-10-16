@@ -11,11 +11,13 @@ import (
 
 const getNextPageOfPublicUsers = `-- name: GetNextPageOfPublicUsers :many
 SELECT
-    user_id
+    users.user_id
 FROM
     users
+    INNER JOIN users_status ON users.user_id = users_status.user_id
 WHERE
-    first_name IS NOT NULL
+    users_status.status = $3
+    AND first_name IS NOT NULL
     AND last_name IS NOT NULL
     AND birth_date IS NOT NULL
     AND gender IS NOT NULL
@@ -30,11 +32,12 @@ OFFSET
 type GetNextPageOfPublicUsersParams struct {
 	Limit  int32
 	Offset int32
+	Status string
 }
 
 // Public Users API Queries
 func (q *Queries) GetNextPageOfPublicUsers(ctx context.Context, arg GetNextPageOfPublicUsersParams) ([]string, error) {
-	rows, err := q.db.QueryContext(ctx, getNextPageOfPublicUsers, arg.Limit, arg.Offset)
+	rows, err := q.db.QueryContext(ctx, getNextPageOfPublicUsers, arg.Limit, arg.Offset, arg.Status)
 	if err != nil {
 		return nil, err
 	}
@@ -58,11 +61,13 @@ func (q *Queries) GetNextPageOfPublicUsers(ctx context.Context, arg GetNextPageO
 
 const getNextPageOfPublicUsersFilterByName = `-- name: GetNextPageOfPublicUsersFilterByName :many
 SELECT
-    user_id
+    users.user_id
 FROM
     users
+    INNER JOIN users_status ON users.user_id = users_status.user_id
 WHERE
-    first_name IS NOT NULL
+    users_status.status = $5
+    AND first_name IS NOT NULL
     AND last_name IS NOT NULL
     AND birth_date IS NOT NULL
     AND gender IS NOT NULL
@@ -81,6 +86,7 @@ type GetNextPageOfPublicUsersFilterByNameParams struct {
 	Offset       int32
 	Similarity   string
 	Similarity_2 string
+	Status       string
 }
 
 func (q *Queries) GetNextPageOfPublicUsersFilterByName(ctx context.Context, arg GetNextPageOfPublicUsersFilterByNameParams) ([]string, error) {
@@ -89,6 +95,7 @@ func (q *Queries) GetNextPageOfPublicUsersFilterByName(ctx context.Context, arg 
 		arg.Offset,
 		arg.Similarity,
 		arg.Similarity_2,
+		arg.Status,
 	)
 	if err != nil {
 		return nil, err

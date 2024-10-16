@@ -1,17 +1,14 @@
 import { USER_STATUS_FLAGGED, USER_STATUS_OPTIONS } from "appConstants";
 import SubmitButton from "components/buttons/SubmitButton";
 import Title from "components/Title";
-import { useAdminCreateUserStatus, useAdminUpdateUserStatus } from "hooks/admin";
+import {
+  useAdminUpdateUserStatus,
+} from "hooks/admin";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 import { mutationErrorCallbackCreator } from "utils/callbacks";
 import { validateUserID } from "utils/inputValidation";
 
-// TODO:
-// Allow querying for user account statuses and create and update them
-// 1. be able to see all the account statuses of users
-// 2. be able to update any account status and give a comment
-// 3. be able to create account status for accounts that DONT have a status yet (new accounts should be initialized with a normal status when that is deployed in prod)!
 const AdminManageUserStatuses: React.FC = () => {
   const [userID, setUserID] = useState<string>("");
   const [userStatus, setUserStatus] = useState<string>("");
