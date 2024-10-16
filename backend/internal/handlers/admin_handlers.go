@@ -33,6 +33,7 @@ func (h *AdminHandler) AdminGetUsersHandler(w http.ResponseWriter, r *http.Reque
 	query := r.URL.Query()
 	limitStr := query.Get("limit")
 	offsetStr := query.Get("offset")
+	name := query.Get("name")
 
 	// Limit and offset cannot be empty strings
 	if limitStr == "" {
@@ -60,7 +61,7 @@ func (h *AdminHandler) AdminGetUsersHandler(w http.ResponseWriter, r *http.Reque
 	}
 
 	// Get all users from the db
-	users, err := h.server.DB().AdminGetUsers(int32(limit), int32(offset))
+	users, err := h.server.DB().AdminGetUsers(int32(limit), int32(offset), name)
 	if err != nil {
 		utils.RespondWithError(w, http.StatusInternalServerError, err)
 		return

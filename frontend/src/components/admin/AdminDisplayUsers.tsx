@@ -1,17 +1,28 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { toast } from "react-toastify";
-import TextSkeleton from "components/skeleton/TextSkeleton";
 import {
   useAdminGetUserDetails,
   useAdminGetUserRoles,
   useAdminGetUserStatuses,
 } from "hooks/admin";
 import { MAX_USERS_PER_PAGE } from "appConstants";
+import AdminDisplayUsersTable from "./AdminDisplayUsersTable";
+import debounce from "lodash.debounce";
 
 const AdminDisplayUsers: React.FC = () => {
   const [page, setPage] = useState<number>(0);
+  const [name, setName] = useState<string>("");
+  const [displayName, setDisplayName] = useState<string>("");
+  const debouncedSetName = useCallback(
+    debounce((n) => setName(n), 250),
+    [],
+  );
 
-  const userDetailsQueries = useAdminGetUserDetails(MAX_USERS_PER_PAGE, page);
+  const userDetailsQueries = useAdminGetUserDetails(
+    MAX_USERS_PER_PAGE,
+    page,
+    name,
+  );
 
   const userIDs: string[] =
     userDetailsQueries.data?.map((userDetail) => userDetail.userId) || [];
@@ -22,6 +33,11 @@ const AdminDisplayUsers: React.FC = () => {
 
   const isLastPage: boolean =
     (userDetailsQueries.data?.length || 0) < MAX_USERS_PER_PAGE;
+
+  const handleUserNameInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setDisplayName(e.target.value);
+    debouncedSetName(e.target.value);
+  };
 
   // user role - next button
   const handleNext = () => {
@@ -37,46 +53,28 @@ const AdminDisplayUsers: React.FC = () => {
     setPage((prevPage) => Math.max(prevPage - 1, 0));
   };
 
-  if (userDetailsQueries.isFetching || userRoleQueries.isFetching) {
-    return <TextSkeleton />;
-  }
-
   return (
     <div>
-      {/* table that shows all the users */}
       <div className="flex justify-center items-center space-x-4 mt-4 py-1">
         <h1 className="h1_custom">User Management</h1>
       </div>
-      <table className="min-w-full">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="table__col">UserID</th>
-            <th className="table__col">Email</th>
-            <th className="table__col">First Name</th>
-            <th className="table__col">Last Name</th>
-            <th className="table__col">Role</th>
-            <th className="table__col">Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {userDetailsQueries.data?.map((user, index) => (
-            <tr key={user.userId} className="hover:bg-gray-50">
-              <td className="table__col">{user.userId}</td>
-              <td className="table__col">{user.email}</td>
-              <td className="table__col">{user.firstName}</td>
-              <td className="table__col">{user.lastName}</td>
-              <td className="table__col">{userRoleQueries.data?.at(index)}</td>
-              <td className="table__col">
-                {userStatusQueries?.at(index)?.data?.userStatus.status
-                  ? userStatusQueries?.at(index)?.data?.userStatus.status
-                  : "Unknown"}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
 
-      {/* TODO: future feature: be able to search for users by their First and Last Name */}
+      <form>
+        <label className="label__text_input_gray">Filter users by name</label>
+        <input
+          type="text"
+          placeholder="First and last name"
+          value={displayName}
+          onChange={handleUserNameInput}
+          className="input__text_gray_box"
+        />
+      </form>
+
+      <AdminDisplayUsersTable
+        userDetailsQueries={userDetailsQueries}
+        userRoleQueries={userRoleQueries}
+        userStatusQueries={userStatusQueries}
+      />
 
       {/* Prev and Next Pagination Buttons */}
       <div className="flex justify-center items-center space-x-4 mt-4 py-1">

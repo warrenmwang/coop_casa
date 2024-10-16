@@ -34,7 +34,7 @@ type Service interface {
 	Health() map[string]string
 
 	// Admin functions
-	AdminGetUsers(limit, offset int32) ([]UserDetails, error)
+	AdminGetUsers(limit, offset int32, name string) ([]UserDetails, error)
 	AdminGetUsersRoles(userIds []string) ([]string, error)
 
 	// Lister functions
@@ -136,13 +136,19 @@ func (s *service) Health() map[string]string {
 
 // -------------- ADMIN FUNCTIONS ------------------
 // Admin functions
-func (s *service) AdminGetUsers(limit, offset int32) ([]UserDetails, error) {
+func (s *service) AdminGetUsers(limit, offset int32, name string) ([]UserDetails, error) {
 	ctx := context.Background()
+
+	name_E, err := utils.EncryptString(name, s.db_encrypt_key)
+	if err != nil {
+		return []UserDetails{}, err
+	}
 
 	// Get users using the limit and offset provided
 	usersEncrypted, err := s.db_queries.AdminGetUsers(ctx, sqlc.AdminGetUsersParams{
-		Limit:  limit,
-		Offset: offset,
+		Limit:   limit,
+		Offset:  offset,
+		Column3: name_E,
 	})
 	if err != nil {
 		return []UserDetails{}, err

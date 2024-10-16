@@ -184,20 +184,23 @@ SELECT
 FROM
     properties
 ORDER BY
-    similarity (
-        CONCAT(
-            address_1,
-            ', ',
-            address_2,
-            ', ',
-            city,
-            ', ',
-            zipcode,
-            ', ',
-            country
-        ),
-        $3
-    ) DESC
+    CASE
+        WHEN $3 <> '' THEN similarity (
+            CONCAT(
+                address_1,
+                ', ',
+                address_2,
+                ', ',
+                city,
+                ', ',
+                zipcode,
+                ', ',
+                country
+            ),
+            $3
+        )
+        ELSE 1
+    END DESC
 LIMIT
     $1
 OFFSET

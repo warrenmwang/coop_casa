@@ -8,7 +8,6 @@ const stats = [
   // { name: "Active Members", value: "4" },
 ];
 
-// TODO: refactor out the CSS styles.
 const HeaderSection: React.FC = () => {
   const textColor1 = "black";
   const block1ClassName = `text-4xl font-bold tracking-tight text-${textColor1} sm:text-6xl`;

@@ -1,7 +1,4 @@
-import {
-  apiAdminUsersLink,
-  apiAdminUsersRolesLink,
-} from "urls";
+import { apiAdminUsersLink, apiAdminUsersRolesLink } from "urls";
 import { UserDetails, UserStatusTimeStamped } from "../types/Types";
 import axios, { AxiosResponse } from "axios";
 import { AdminUpdateUserRoleResponse } from "../types/Responses";
@@ -14,15 +11,19 @@ import {
 export const apiAdminGetUsersDetails = async (
   limit: number,
   page: number,
+  name: string,
 ): Promise<UserDetails[]> => {
   return axios
-    .get(`${apiAdminUsersLink}?limit=${limit}&offset=${page * limit}`, {
-      headers: {
-        Accept: "application/json",
-      },
+    .get(
+      `${apiAdminUsersLink}?limit=${limit}&offset=${page * limit}&name=${name}`,
+      {
+        headers: {
+          Accept: "application/json",
+        },
 
-      withCredentials: true,
-    })
+        withCredentials: true,
+      },
+    )
     .then((res) => res.data)
     .then((data) => {
       const res = APIReceivedUserDetailsSchema.safeParse(data);

@@ -18,7 +18,10 @@ SELECT
 FROM
     users
 ORDER BY
-    id
+    CASE
+        WHEN $3 <> '' THEN similarity (CONCAT(first_name, ' ', last_name), $3)
+        ELSE 1
+    END DESC
 LIMIT
     $1
 OFFSET
@@ -26,12 +29,14 @@ OFFSET
 `
 
 type AdminGetUsersParams struct {
-	Limit  int32
-	Offset int32
+	Limit   int32
+	Offset  int32
+	Column3 interface{}
 }
 
+// want to filter by similarity to name if name argument is present.
 func (q *Queries) AdminGetUsers(ctx context.Context, arg AdminGetUsersParams) ([]User, error) {
-	rows, err := q.db.QueryContext(ctx, adminGetUsers, arg.Limit, arg.Offset)
+	rows, err := q.db.QueryContext(ctx, adminGetUsers, arg.Limit, arg.Offset, arg.Column3)
 	if err != nil {
 		return nil, err
 	}

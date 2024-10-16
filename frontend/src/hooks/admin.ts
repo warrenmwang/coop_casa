@@ -23,10 +23,11 @@ import {
 export const useAdminGetUserDetails = (
   limit: number,
   page: number,
+  name: string,
 ): UseQueryResult<UserDetails[], Error> => {
   return useQuery({
-    queryKey: [...adminUserDetailsKey, limit, page],
-    queryFn: () => apiAdminGetUsersDetails(limit, page),
+    queryKey: [...adminUserDetailsKey, limit, page, name],
+    queryFn: () => apiAdminGetUsersDetails(limit, page, name),
   });
 };
 
