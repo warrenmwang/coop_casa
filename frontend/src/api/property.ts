@@ -12,7 +12,6 @@ import {
   APIPropertyReceivedSchema,
   APIReceivedPropertyIDsSchema,
 } from "../types/Schema";
-import { z } from "zod";
 
 export const apiCreateNewProperty = async (
   property: Property,
