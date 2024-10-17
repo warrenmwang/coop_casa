@@ -60,12 +60,12 @@ export const PropertyDetailsSchema = z.object({
   state: z.string(),
   zipcode: z.string(),
   country: z.string(),
-  squareFeet: z.number(),
-  numBedrooms: z.number(),
-  numToilets: z.number(),
-  numShowersBaths: z.number(),
-  costDollars: z.number(),
-  costCents: z.number(),
+  squareFeet: z.coerce.number(),
+  numBedrooms: z.coerce.number(),
+  numToilets: z.coerce.number(),
+  numShowersBaths: z.coerce.number(),
+  costDollars: z.coerce.number(),
+  costCents: z.coerce.number(),
   miscNote: z.string(),
 });
 

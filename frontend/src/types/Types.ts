@@ -38,6 +38,26 @@ export type AccountSetupPageFormData = z.infer<
 
 export type PropertyDetails = z.infer<typeof PropertyDetailsSchema>;
 
+export type FormPropertyDetails = {
+  propertyId: string;
+  listerUserId: string;
+  name: string;
+  description: string;
+  address1: string;
+  address2: string;
+  city: string;
+  state: string;
+  zipcode: string;
+  country: string;
+  squareFeet: string;
+  numBedrooms: string;
+  numToilets: string;
+  numShowersBaths: string;
+  costDollars: string;
+  costCents: string;
+  miscNote: string;
+};
+
 export type APIOrderedFile = z.infer<typeof APIOrderedFileSchema>;
 
 export type APIPropertyReceived = z.infer<typeof APIPropertyReceivedSchema>;

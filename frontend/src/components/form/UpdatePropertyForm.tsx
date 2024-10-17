@@ -3,8 +3,6 @@ import { OrderedFile, Property, PropertyDetails } from "../../types/Types";
 import TextInput from "../input/TextInput";
 import MultipleImageUploader from "../input/MultipleImageUploader";
 import { MAX_PROPERTY_IMGS_ALLOWED } from "appConstants";
-
-import { validateNumber } from "../../utils/inputValidation";
 import { toast } from "react-toastify";
 import { useUpdateProperty } from "hooks/properties";
 import { mutationErrorCallbackCreator } from "utils/callbacks";
@@ -42,32 +40,6 @@ const UpdatePropertyForm: React.FC<{
   };
 
   const textInputSetFormData = (id: string, value: string) => {
-    // need to convert the text input type=number values
-    // from variable type string into number
-    if (
-      id === "squareFeet" ||
-      id === "numBedrooms" ||
-      id === "numToilets" ||
-      id === "numShowersBaths" ||
-      id === "costDollars" ||
-      id === "costCents"
-    ) {
-      // Validate string is a number
-      const { data, success } = validateNumber(value);
-      if (!success) {
-        toast.error(`Value in field ${id} is not a number.`);
-        return;
-      }
-
-      // convert to number and save value
-      setFormDetails((prevState) => ({
-        ...prevState,
-        [id]: data,
-      }));
-      return;
-    }
-
-    // text value
     setFormDetails((prevState) => ({
       ...prevState,
       [id]: value,

@@ -175,7 +175,7 @@ func (h *PropertyHandler) CreatePropertiesHandler(w http.ResponseWriter, r *http
 
 	// Ensure that at least a single image is given for the property
 	if numberImages == 0 {
-		utils.RespondWithError(w, http.StatusBadRequest, errors.New("property must have at least one property"))
+		utils.RespondWithError(w, http.StatusBadRequest, errors.New("property must have at least one image"))
 		return
 	}
 
@@ -327,7 +327,7 @@ func (h *PropertyHandler) UpdatePropertiesHandler(w http.ResponseWriter, r *http
 
 	// Ensure that at least a single image is given for the property
 	if numberImages < 1 {
-		utils.RespondWithError(w, http.StatusBadRequest, errors.New("property must have at least one property"))
+		utils.RespondWithError(w, http.StatusBadRequest, errors.New("property must have at least one image"))
 		return
 	}
 
