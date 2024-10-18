@@ -12,6 +12,7 @@ import {
   UserStatusSchemaTimeStamped,
 } from "../types/Schema";
 import { z } from "zod";
+import { USER_ROLE_LISTER } from "appConstants";
 
 export const apiAdminGetUsersDetails = async (
   limit: number,
@@ -70,9 +71,11 @@ export const apiAdminGetUsersRoles = async (
 export const apiAdminUpdateUserRole = async (
   userID: string,
   role: string,
+  propertyTransfer?: boolean,
+  transferUserID?: string,
 ): Promise<AxiosResponse<AdminUpdateUserRoleResponse>> => {
   return axios.post<AdminUpdateUserRoleResponse>(
-    `${apiAdminUsersRolesLink}?userID=${userID}&role=${role}`,
+    `${apiAdminUsersRolesLink}?userID=${userID}&role=${role}&propertyTransfer=${propertyTransfer}&transferUserID=${transferUserID}`,
     {},
     {
       withCredentials: true,

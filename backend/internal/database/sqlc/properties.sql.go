@@ -390,6 +390,25 @@ func (q *Queries) GetUserOwnedProperties(ctx context.Context, listerUserID strin
 	return items, nil
 }
 
+const transferAllPropertiesToAnotherLister = `-- name: TransferAllPropertiesToAnotherLister :exec
+UPDATE properties
+SET
+    lister_user_id = $2,
+    updated_at = CURRENT_TIMESTAMP
+WHERE
+    lister_user_id = $1
+`
+
+type TransferAllPropertiesToAnotherListerParams struct {
+	ListerUserID   string
+	ListerUserID_2 string
+}
+
+func (q *Queries) TransferAllPropertiesToAnotherLister(ctx context.Context, arg TransferAllPropertiesToAnotherListerParams) error {
+	_, err := q.db.ExecContext(ctx, transferAllPropertiesToAnotherLister, arg.ListerUserID, arg.ListerUserID_2)
+	return err
+}
+
 const updatePropertyDetails = `-- name: UpdatePropertyDetails :exec
 UPDATE properties
 SET

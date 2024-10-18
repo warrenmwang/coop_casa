@@ -46,8 +46,18 @@ export const useAdminGetUserRoles = (userIDs: string[]) => {
 export const useAdminUpdateUserRole = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ userID, role }: { userID: string; role: string }) =>
-      apiAdminUpdateUserRole(userID, role),
+    mutationFn: ({
+      userID,
+      role,
+      propertyTransfer,
+      transferUserID,
+    }: {
+      userID: string;
+      role: string;
+      propertyTransfer?: boolean | undefined;
+      transferUserID?: string | undefined;
+    }) =>
+      apiAdminUpdateUserRole(userID, role, propertyTransfer, transferUserID),
     onSuccess: () => {
       return queryClient.invalidateQueries({
         queryKey: [...adminUserRolesKey],

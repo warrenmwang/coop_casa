@@ -117,6 +117,15 @@ WHERE
     property_id = $1;
 
 
+-- name: TransferAllPropertiesToAnotherLister :exec
+UPDATE properties
+SET
+    lister_user_id = $2,
+    updated_at = CURRENT_TIMESTAMP
+WHERE
+    lister_user_id = $1;
+
+
 -- name: DeletePropertyDetails :exec
 DELETE FROM properties
 WHERE

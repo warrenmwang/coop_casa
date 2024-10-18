@@ -91,6 +91,7 @@ type Service interface {
 	UpdatePropertyDetails(details PropertyDetails) error
 	UpdatePropertyImages(propertyID string, images []OrderedFileInternal) error
 	UpdatePropertyLister(propertyID string, userID string) error
+	TransferAllPropertiesToOtherUser(fromUserID, toUserID string) error
 	DeleteProperty(propertyId string) error
 	DeletePropertyImage(propertyId string, imageOrderNum int16) error
 	DeleteUserOwnedProperties(userID string) error
@@ -1253,6 +1254,24 @@ func (s *service) UpdatePropertyLister(propertyID string, userID string) error {
 		ListerUserID: encryptedUserID,
 	})
 	return err
+}
+
+func (s *service) TransferAllPropertiesToOtherUser(fromUserID, toUserID string) error {
+	ctx := context.Background()
+
+	fromUserID_E, err := utils.EncryptString(fromUserID, s.db_encrypt_key)
+	if err != nil {
+		return err
+	}
+	toUserID_E, err := utils.EncryptString(toUserID, s.db_encrypt_key)
+	if err != nil {
+		return err
+	}
+
+	return s.db_queries.TransferAllPropertiesToAnotherLister(ctx, sqlc.TransferAllPropertiesToAnotherListerParams{
+		ListerUserID:   fromUserID_E,
+		ListerUserID_2: toUserID_E,
+	})
 }
 
 // Delete both property details and all images for a given property id

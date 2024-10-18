@@ -424,8 +424,62 @@ func (h *PropertyHandler) DeletePropertiesHandler(w http.ResponseWriter, r *http
 	w.WriteHeader(200)
 }
 
+// POST .../properties/transfer/ownership/all
+// AUTHED
+func (h *PropertyHandler) TransferAllPropertiesOwnershipHandler(w http.ResponseWriter, r *http.Request) {
+	// Get authenticated user's ID
+	authedUserID, ok := r.Context().Value(auth.UserIDKey).(string)
+	if !ok {
+		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("user id blank"))
+		return
+	}
+
+	query := r.URL.Query()
+	userId := query.Get("userId")
+
+	if userId == "" {
+		utils.RespondWithError(w, http.StatusBadRequest, errors.New("missing \"userId\" query parameter"))
+		return
+	}
+
+	// Don't do anything if authedUserID is the same as the userId in the query parameter
+	// since that would be essentially a noop (transfer to yourself)
+	if authedUserID == userId {
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+
+	// Ensure the other user exists
+	_, err := h.server.DB().GetPublicUserProfile(userId)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusBadRequest, errors.New("other user does not exist"))
+		return
+	}
+
+	// Ensure the other user has a lister or admin (i.e. not regular)
+	role, err := h.server.DB().GetUserRole(userId)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
+		return
+	}
+	if role == config.USER_ROLE_REGULAR {
+		utils.RespondWithError(w, http.StatusBadRequest, errors.New("other user is not a lister and cannot be the new lister of the property"))
+		return
+	}
+
+	// Transfer all of authed user's properties to the other lister+ account
+	err = h.server.DB().TransferAllPropertiesToOtherUser(authedUserID, userId)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
 // PUT .../properties/transfer/ownership
 // AUTHED
+// Transfers a property that the caller owns to the user account specified via the query parameter.
 func (h *PropertyHandler) TransferPropertyOwnershipHandler(w http.ResponseWriter, r *http.Request) {
 	// Get authenticated user's ID
 	authedUserID, ok := r.Context().Value(auth.UserIDKey).(string)

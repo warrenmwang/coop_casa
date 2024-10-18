@@ -17,6 +17,12 @@ const USER_STATUS_NORMAL = "normal"
 const USER_STATUS_PRIVATE = "private"
 const USER_STATUS_FLAGGED = "flagged"
 
+var USER_ROLE_OPTIONS = map[string]struct{}{
+	USER_ROLE_REGULAR: {},
+	USER_ROLE_LISTER:  {},
+	USER_ROLE_ADMIN:   {},
+}
+
 var USER_STATUS_OPTIONS = map[string]struct{}{
 	USER_STATUS_NORMAL:  {},
 	USER_STATUS_PRIVATE: {},

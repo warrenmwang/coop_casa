@@ -46,6 +46,8 @@ export const USER_STATUS_PRIVATE = "private";
 export const USER_STATUS_FLAGGED = "flagged";
 
 export const USER_ROLE_OPTIONS = ["lister", "regular"];
+export const USER_ROLE_LISTER = "lister";
+export const USER_ROLE_REGULAR = "regular";
 
 export const pageQPKey = "page";
 export const limitQPKey = "limit";

@@ -8,6 +8,7 @@ import (
 	"backend/internal/validation"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"strconv"
@@ -128,15 +129,21 @@ func (h *AdminHandler) UpdateUserRoleHandler(w http.ResponseWriter, r *http.Requ
 	// Get the role from the request body
 	query := r.URL.Query()
 	userID := query.Get("userID")
-	role := query.Get("role")
+	newRole := query.Get("role")
 
 	// Ensure query parameters are given
 	if userID == "" {
 		utils.RespondWithError(w, http.StatusUnprocessableEntity, errors.New("userID cannot be empty"))
 		return
 	}
-	if role == "" {
+	if newRole == "" {
 		utils.RespondWithError(w, http.StatusUnprocessableEntity, errors.New("role cannot be empty"))
+		return
+	}
+
+	// Ensure role is valid
+	if _, exists := config.USER_ROLE_OPTIONS[newRole]; !exists {
+		utils.RespondWithError(w, http.StatusBadRequest, fmt.Errorf("newRole %s is not a valid user role", newRole))
 		return
 	}
 
@@ -146,8 +153,73 @@ func (h *AdminHandler) UpdateUserRoleHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
+	// Check if current role of account to update is a lister
+	// If so, we need additional information that should be provided as a query parameter
+	// about what to do with the lister's properties, if the lister has any properties at all.
+	currUserRole, err := h.server.DB().GetUserRole(userID)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	// If new role is same as old role, do nothing and return ok
+	if newRole == currUserRole {
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+
+	if currUserRole == config.USER_ROLE_LISTER {
+		// Fetch query parameters to determine whether to transfer the properties
+		// of the user or to simply delete them
+		doPropertyTransfer := query.Get("propertyTransfer")
+		if doPropertyTransfer == "" {
+			utils.RespondWithError(w, http.StatusBadRequest, errors.New("propertyTransfer query paramter not provided but is necessary when altering the role of an account that is currently a lister"))
+			return
+		}
+		doPropertyTransfer_bool, err := strconv.ParseBool(doPropertyTransfer)
+		if err != nil {
+			utils.RespondWithError(w, http.StatusBadRequest, errors.New("could not parse propertyTransfer value, it should be a boolean like true or false"))
+			return
+		}
+		if doPropertyTransfer_bool {
+			// Transfer the properties to the other user
+			userToTransferTo := query.Get("transferUserID")
+			if userToTransferTo == "" {
+				utils.RespondWithError(w, http.StatusBadRequest, errors.New("transferUserID query parameter is empty but is necessary for transferring properties to"))
+				return
+			}
+			if err := utils.EnsureValidOpenID(userToTransferTo, "transferUserID"); err != nil {
+				utils.RespondWithError(w, http.StatusBadRequest, errors.New("transferUserID is not a valid user ID"))
+				return
+			}
+			// Ensure the other user id is lister!
+			otherUserRole, err := h.server.DB().GetUserRole(userToTransferTo)
+			if err != nil {
+				utils.RespondWithError(w, http.StatusInternalServerError, err)
+				return
+			}
+			if otherUserRole == config.USER_ROLE_REGULAR {
+				utils.RespondWithError(w, http.StatusInternalServerError, errors.New("other user must be a lister in order to transfer the properties to them"))
+				return
+			}
+
+			err = h.server.DB().TransferAllPropertiesToOtherUser(userID, userToTransferTo)
+			if err != nil {
+				utils.RespondWithError(w, http.StatusInternalServerError, err)
+				return
+			}
+		} else {
+			// Delete all properties of the user
+			err = h.server.DB().DeleteUserOwnedProperties(userID)
+			if err != nil {
+				utils.RespondWithError(w, http.StatusInternalServerError, err)
+				return
+			}
+		}
+	}
+
 	// Update role for the user specified in the request body in the db
-	err := h.server.DB().UpdateUserRole(userID, role)
+	err = h.server.DB().UpdateUserRole(userID, newRole)
 	if err != nil {
 		utils.RespondWithError(w, http.StatusInternalServerError, err)
 		return
