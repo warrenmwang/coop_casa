@@ -103,6 +103,23 @@ func (h *ListerHandler) GetListerInfoHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
+	// Check the account status of the lister, if not normal/public
+	// then return an anonymized thing
+	status, err := h.server.DB().GetUserStatus(listerID)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
+		return
+	}
+	if status.UserStatus.Status != config.USER_STATUS_NORMAL {
+		utils.RespondWithJSON(w, http.StatusOK, database.PublicBasicListerDetails{
+			UserID:    "0000000000000",
+			Email:     "privated@account.com",
+			FirstName: "User Profile",
+			LastName:  "Privated",
+		})
+		return
+	}
+
 	// userID is a lister, return the email and name for basic contact information
 	lister, err := h.server.DB().GetUserDetails(listerID)
 	if err != nil {
