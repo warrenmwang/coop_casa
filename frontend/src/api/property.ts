@@ -56,14 +56,30 @@ export const apiUpdateProperty = async (
 export const apiTransferProperty = async (
   propertyID: string,
   userID: string,
-) => {
-  return axios.put(
-    `${apiPropertiesLink}/transfer/ownership?propertyId=${propertyID}&userId=${userID}`,
-    {},
-    {
-      withCredentials: true,
-    },
-  );
+): Promise<string> => {
+  return axios
+    .put(
+      `${apiPropertiesLink}/transfer/ownership?propertyId=${propertyID}&userId=${userID}`,
+      {},
+      {
+        withCredentials: true,
+      },
+    )
+    .then(() => userID);
+};
+
+export const apiTransferAllProperties = async (
+  userID: string,
+): Promise<string> => {
+  return axios
+    .post(
+      `${apiPropertiesLink}/transfer/ownership/all?userId=${userID}`,
+      {},
+      {
+        withCredentials: true,
+      },
+    )
+    .then(() => userID);
 };
 
 // Get a single property based off of id
@@ -122,8 +138,10 @@ export const apiGetProperties = async (
 
 export const apiDeleteProperty = async (
   propertyID: string,
-): Promise<Response | null> => {
-  return axios.delete(`${apiPropertiesLink}/${propertyID}`, {
-    withCredentials: true,
-  });
+): Promise<string> => {
+  return axios
+    .delete(`${apiPropertiesLink}/${propertyID}`, {
+      withCredentials: true,
+    })
+    .then(() => propertyID);
 };

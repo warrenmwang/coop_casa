@@ -12,7 +12,6 @@ import {
   UserStatusSchemaTimeStamped,
 } from "../types/Schema";
 import { z } from "zod";
-import { USER_ROLE_LISTER } from "appConstants";
 
 export const apiAdminGetUsersDetails = async (
   limit: number,

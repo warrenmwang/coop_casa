@@ -10,6 +10,7 @@ import {
   apiDeleteProperty,
   apiGetProperties,
   apiGetProperty,
+  apiTransferAllProperties,
   apiTransferProperty,
   apiUpdateProperty,
 } from "../api/property";
@@ -70,8 +71,8 @@ export const useDeleteProperty = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ propertyID }: { propertyID: string }) =>
-      apiDeleteProperty(propertyID).then(() => propertyID),
-    onSuccess: (propertyID: string) => {
+      apiDeleteProperty(propertyID),
+    onSuccess: (propertyID) => {
       return queryClient.invalidateQueries({
         queryKey: [...propertiesKey, propertyID],
       });
@@ -89,6 +90,18 @@ export const useTransferProperty = () => {
       propertyID: string;
       userID: string;
     }) => apiTransferProperty(propertyID, userID),
+    onSuccess: (propertyID) => {
+      return queryClient.invalidateQueries({
+        queryKey: [...propertiesKey, propertyID],
+      });
+    },
+  });
+};
+
+export const useTransferAllProperties = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (userID: string) => apiTransferAllProperties(userID),
     onSuccess: (propertyID) => {
       return queryClient.invalidateQueries({
         queryKey: [...propertiesKey, propertyID],

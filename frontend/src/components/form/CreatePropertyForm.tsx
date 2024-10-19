@@ -329,7 +329,7 @@ const CreatePropertyForm: React.FC = () => {
         />
 
         <label htmlFor="miscNote" className="label__text_input_gray">
-          "Misc. Notes (any comment that may not have been appropriate to put in
+          Misc. Notes (any comment that may not have been appropriate to put in
           the property description that the lister feels the buyer should know
           about should go here)
         </label>

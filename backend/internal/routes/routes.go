@@ -106,6 +106,7 @@ func NewPropertyRouter(s interfaces.Server) http.Handler {
 	r.With(auth.AuthMiddleware).Post("/", propertyHandlers.CreatePropertiesHandler)
 	r.With(auth.AuthMiddleware).Put("/{id}", propertyHandlers.UpdatePropertiesHandler)
 	r.With(auth.AuthMiddleware).Put("/transfer/ownership", propertyHandlers.TransferPropertyOwnershipHandler)
+	r.With(auth.AuthMiddleware).Post("/transfer/ownership/all", propertyHandlers.TransferAllPropertiesOwnershipHandler)
 	r.With(auth.AuthMiddleware).Delete("/{id}", propertyHandlers.DeletePropertiesHandler)
 
 	return r

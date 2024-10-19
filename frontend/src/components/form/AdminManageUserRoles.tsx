@@ -10,7 +10,6 @@ import {
   USER_ROLE_REGULAR,
 } from "appConstants";
 import { validateUserID } from "utils/inputValidation";
-import { property } from "lodash";
 
 const AdminManageUserRoles: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -106,7 +105,6 @@ const AdminManageUserRoles: React.FC = () => {
           className="input__text_gray_box w-full"
           value={role}
           onChange={(e) => setRole(e.target.value)}
-          defaultValue=""
           required
         >
           <option value="">Select Option</option>
