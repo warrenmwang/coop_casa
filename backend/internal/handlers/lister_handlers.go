@@ -112,7 +112,7 @@ func (h *ListerHandler) GetListerInfoHandler(w http.ResponseWriter, r *http.Requ
 	}
 	if status.UserStatus.Status != config.USER_STATUS_NORMAL {
 		utils.RespondWithJSON(w, http.StatusOK, database.PublicBasicListerDetails{
-			UserID:    "0000000000000",
+			UserID:    "000000000000000000000",
 			Email:     "privated@account.com",
 			FirstName: "User Profile",
 			LastName:  "Privated",

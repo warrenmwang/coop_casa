@@ -8,7 +8,7 @@ export const APIFileReceivedSchema = z.object({
 });
 
 export const UserDetailsSchema = z.object({
-  userId: z.string(),
+  userId: z.string().length(21),
   email: z.string().email(),
   firstName: z.string(),
   lastName: z.string(),
@@ -33,7 +33,7 @@ export const APIUserReceivedSchema = z.object({
 });
 
 export const PublicListerBasicInfoSchema = z.object({
-  userId: z.string(),
+  userId: z.string().length(21),
   email: z.string().email(),
   firstName: z.string(),
   lastName: z.string(),
@@ -111,7 +111,7 @@ export const CommunitySchema = z.object({
 });
 
 export const UserProfileDetailsSchema = z.object({
-  userId: z.string(),
+  userId: z.string().length(21),
   firstName: z.string(),
   lastName: z.string(),
   ageInYears: z.number(),
@@ -166,7 +166,7 @@ export const APIReceivedUserRolesSchema = z.object({
 });
 
 export const UserStatusSchema = z.object({
-  userId: z.string().min(1),
+  userId: z.string().length(21),
   setterUserId: z.string().min(1),
   status: z.string().min(1),
   comment: z.string(),
