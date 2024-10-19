@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import {
-  filterFirstNameQPKey,
-  filterLastNameQPKey,
+  FILTER_FIRST_NAME_QP_KEY,
+  FILTER_LAST_NAME_QP_KEY,
   MAX_NUMBER_USER_PROFILES_PER_PAGE,
-  pageQPKey,
+  PAGE_QP_KEY,
 } from "appConstants";
 import FetchErrorText from "../FetchErrorText";
 import CardGridSkeleton from "components/skeleton/CardGridSkeleton";
@@ -31,10 +31,10 @@ const UserProfilesMainBody: React.FC = () => {
     useGetPageNumSearchQueryParam(),
   );
   const [firstName, setFirstName] = useState<string>(
-    useGetURLSearchQueryParam(filterFirstNameQPKey, ""),
+    useGetURLSearchQueryParam(FILTER_FIRST_NAME_QP_KEY, ""),
   );
   const [lastName, setLastName] = useState<string>(
-    useGetURLSearchQueryParam(filterLastNameQPKey, ""),
+    useGetURLSearchQueryParam(FILTER_LAST_NAME_QP_KEY, ""),
   );
   const setCurrentPage = (page: number) => {
     // Want to update the query param for page number whenever the page
@@ -42,7 +42,7 @@ const UserProfilesMainBody: React.FC = () => {
     // The other filters handled by the input forms are automatically handled by
     // the binding between the input elements and the query params.
     _setCurrentPage(page);
-    updateURLSearchQueryParam(setSearchParams, pageQPKey, page.toString());
+    updateURLSearchQueryParam(setSearchParams, PAGE_QP_KEY, page.toString());
   };
 
   const query = useGetPageOfUserProfiles(currentPage, firstName, lastName);
@@ -78,12 +78,12 @@ const UserProfilesMainBody: React.FC = () => {
     if (searchIsSubmitting) {
       const filterFirstNameTmp = getURLSearchQueryParam(
         searchParams,
-        filterFirstNameQPKey,
+        FILTER_FIRST_NAME_QP_KEY,
         "",
       );
       const filterLastNameTmp = getURLSearchQueryParam(
         searchParams,
-        filterLastNameQPKey,
+        FILTER_LAST_NAME_QP_KEY,
         "",
       );
 
@@ -107,14 +107,14 @@ const UserProfilesMainBody: React.FC = () => {
         <div className="flex-col flex-grow items-center">
           <label className="label__text_input_gray">First Name</label>
           <SearchBar
-            searchQueryParamKey={filterFirstNameQPKey}
+            searchQueryParamKey={FILTER_FIRST_NAME_QP_KEY}
             placeholder="First Name"
           ></SearchBar>
         </div>
         <div className="flex-col flex-grow">
           <label className="label__text_input_gray">Last Name</label>
           <SearchBar
-            searchQueryParamKey={filterLastNameQPKey}
+            searchQueryParamKey={FILTER_LAST_NAME_QP_KEY}
             placeholder="Last Name"
           ></SearchBar>
         </div>

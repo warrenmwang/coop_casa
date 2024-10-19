@@ -1,10 +1,10 @@
 import axios from "axios";
 import { apiUsersLink } from "urls";
 import {
-  filterFirstNameQPKey,
-  filterLastNameQPKey,
-  limitQPKey,
-  pageQPKey,
+  FILTER_FIRST_NAME_QP_KEY,
+  FILTER_LAST_NAME_QP_KEY,
+  LIMIT_QP_KEY,
+  PAGE_QP_KEY,
 } from "appConstants";
 import { APIFileReceived, UserProfile } from "../types/Types";
 import { apiFile2ClientFile } from "../utils/utils";
@@ -22,7 +22,7 @@ export const apiGetUserProfiles = async (
 ): Promise<string[]> => {
   return axios
     .get(
-      `${apiUsersLink}?${pageQPKey}=${page}&${limitQPKey}=${limit}&${filterFirstNameQPKey}=${filterFirstName}&${filterLastNameQPKey}=${filterLastName}`,
+      `${apiUsersLink}?${PAGE_QP_KEY}=${page}&${LIMIT_QP_KEY}=${limit}&${FILTER_FIRST_NAME_QP_KEY}=${filterFirstName}&${FILTER_LAST_NAME_QP_KEY}=${filterLastName}`,
       {
         headers: {
           Accept: "application/json",

@@ -6,7 +6,7 @@ import PageOfProperties from "./PageOfProperties";
 import { useSearchParams } from "react-router-dom";
 import SubmitButton from "../buttons/SubmitButton";
 import FetchErrorText from "../FetchErrorText";
-import { pageQPKey, filterAddressQPKey } from "appConstants";
+import { PAGE_QP_KEY, FILTER_ADDRESS_QP_KEY } from "appConstants";
 import { useGetPageOfPropertyIDs } from "hooks/properties";
 
 import PaginationButtons from "../PaginationButtons";
@@ -30,11 +30,11 @@ const PropertiesMainBody: React.FC = () => {
   );
   const setCurrentPage = (page: number) => {
     _setCurrentPage(page);
-    updateURLSearchQueryParam(setSearchParams, pageQPKey, page.toString());
+    updateURLSearchQueryParam(setSearchParams, PAGE_QP_KEY, page.toString());
   };
   // Filter - address
   const [filterAddress, setFilterAddress] = useState<string>(
-    useGetURLSearchQueryParam(filterAddressQPKey, ""),
+    useGetURLSearchQueryParam(FILTER_ADDRESS_QP_KEY, ""),
   );
 
   // Use react query hook to handle our data fetching and async state w/ caching of query results.
@@ -71,7 +71,7 @@ const PropertiesMainBody: React.FC = () => {
     if (searchIsSubmitting) {
       const filterAddressTmp = getURLSearchQueryParam(
         searchParams,
-        filterAddressQPKey,
+        FILTER_ADDRESS_QP_KEY,
         "",
       );
       setCurrentPage(0);
@@ -95,7 +95,7 @@ const PropertiesMainBody: React.FC = () => {
         <div className="flex-col flex-grow">
           <label className="label__text_input_gray">Address</label>
           <SearchBar
-            searchQueryParamKey={filterAddressQPKey}
+            searchQueryParamKey={FILTER_ADDRESS_QP_KEY}
             placeholder="Search by address."
           ></SearchBar>
         </div>

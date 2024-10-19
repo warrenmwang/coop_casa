@@ -7,9 +7,9 @@ import SearchBar from "components/input/SearchBar";
 import SubmitButton from "../buttons/SubmitButton";
 import { useSearchParams } from "react-router-dom";
 import {
-  pageQPKey,
-  filterNameQPKey,
-  filterDescriptionQPKey,
+  PAGE_QP_KEY,
+  FILTER_NAME_QP_KEY,
+  FILTER_DESCRIPTION_QP_KEY,
   MAX_NUMBER_COMMUNITIES_PER_PAGE,
 } from "appConstants";
 import FetchErrorText from "../FetchErrorText";
@@ -30,10 +30,10 @@ const CommunitiesMainBody: React.FC = () => {
 
   // Init our state from the query params
   const [name, setName] = useState<string>(
-    useGetURLSearchQueryParam(filterNameQPKey, ""),
+    useGetURLSearchQueryParam(FILTER_NAME_QP_KEY, ""),
   );
   const [description, setDescription] = useState<string>(
-    useGetURLSearchQueryParam(filterDescriptionQPKey, ""),
+    useGetURLSearchQueryParam(FILTER_DESCRIPTION_QP_KEY, ""),
   );
   const [currentPage, _setCurrentPage] = useState<number>(
     useGetPageNumSearchQueryParam(),
@@ -44,7 +44,7 @@ const CommunitiesMainBody: React.FC = () => {
     // The other filters handled by the input forms are automatically handled by
     // the binding between the input elements and the query params.
     _setCurrentPage(page);
-    updateURLSearchQueryParam(setSearchParams, pageQPKey, page.toString());
+    updateURLSearchQueryParam(setSearchParams, PAGE_QP_KEY, page.toString());
   };
 
   // Use react query hook to handle our data fetching and async state w/ caching of query results.
@@ -82,12 +82,12 @@ const CommunitiesMainBody: React.FC = () => {
     if (searchIsSubmitting) {
       const filterName = getURLSearchQueryParam(
         searchParams,
-        filterNameQPKey,
+        FILTER_NAME_QP_KEY,
         "",
       );
       const filterDescription = getURLSearchQueryParam(
         searchParams,
-        filterDescriptionQPKey,
+        FILTER_DESCRIPTION_QP_KEY,
         "",
       );
       setName(filterName);
@@ -110,14 +110,14 @@ const CommunitiesMainBody: React.FC = () => {
         <div className="flex-col flex-grow items-center">
           <label className="label__text_input_gray">Name</label>
           <SearchBar
-            searchQueryParamKey={filterNameQPKey}
+            searchQueryParamKey={FILTER_NAME_QP_KEY}
             placeholder="Name"
           ></SearchBar>
         </div>
         <div className="flex-col flex-grow">
           <label className="label__text_input_gray">Description</label>
           <SearchBar
-            searchQueryParamKey={filterDescriptionQPKey}
+            searchQueryParamKey={FILTER_DESCRIPTION_QP_KEY}
             placeholder="Description"
           ></SearchBar>
         </div>

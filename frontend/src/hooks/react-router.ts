@@ -1,5 +1,5 @@
 import { useSearchParams } from "react-router-dom";
-import { pageQPKey } from "appConstants";
+import { PAGE_QP_KEY } from "appConstants";
 
 export function useGetURLSearchQueryParam(
   searchParamName: string,
@@ -12,7 +12,7 @@ export function useGetURLSearchQueryParam(
 }
 
 export function useGetPageNumSearchQueryParam(): number {
-  const pageNumQP = useGetURLSearchQueryParam(pageQPKey, "0");
+  const pageNumQP = useGetURLSearchQueryParam(PAGE_QP_KEY, "0");
   const numberPageNumQP = Number(pageNumQP);
   if (Number.isNaN(pageNumQP)) return 0;
   if (Number(pageNumQP) < 0) return 0;

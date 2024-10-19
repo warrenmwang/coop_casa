@@ -49,13 +49,13 @@ export const USER_ROLE_OPTIONS = ["lister", "regular"];
 export const USER_ROLE_LISTER = "lister";
 export const USER_ROLE_REGULAR = "regular";
 
-export const pageQPKey = "page";
-export const limitQPKey = "limit";
+export const PAGE_QP_KEY = "page";
+export const LIMIT_QP_KEY = "limit";
 
-export const filterNameQPKey = "communityFilterName";
-export const filterDescriptionQPKey = "communityFilterDescription";
+export const FILTER_NAME_QP_KEY = "communityFilterName";
+export const FILTER_DESCRIPTION_QP_KEY = "communityFilterDescription";
 
-export const filterAddressQPKey = "filterAddress";
+export const FILTER_ADDRESS_QP_KEY = "filterAddress";
 
-export const filterFirstNameQPKey = "filterFirstName";
-export const filterLastNameQPKey = "filterLastName";
+export const FILTER_FIRST_NAME_QP_KEY = "filterFirstName";
+export const FILTER_LAST_NAME_QP_KEY = "filterLastName";

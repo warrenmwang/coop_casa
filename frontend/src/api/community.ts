@@ -6,9 +6,9 @@ import {
 } from "urls";
 import { apiFile2ClientFile } from "../utils/utils";
 import {
-  pageQPKey,
-  filterDescriptionQPKey,
-  filterNameQPKey,
+  PAGE_QP_KEY,
+  FILTER_DESCRIPTION_QP_KEY,
+  FILTER_NAME_QP_KEY,
   MAX_NUMBER_COMMUNITIES_PER_PAGE,
 } from "appConstants";
 import axios from "axios";
@@ -52,7 +52,7 @@ export const apiGetCommunities = async (
 ): Promise<string[]> => {
   return axios
     .get(
-      `${apiCommunitiesLink}?${pageQPKey}=${page}&${filterNameQPKey}=${filterName}&${filterDescriptionQPKey}=${filterDescription}&limit=${MAX_NUMBER_COMMUNITIES_PER_PAGE}`,
+      `${apiCommunitiesLink}?${PAGE_QP_KEY}=${page}&${FILTER_NAME_QP_KEY}=${filterName}&${FILTER_DESCRIPTION_QP_KEY}=${filterDescription}&limit=${MAX_NUMBER_COMMUNITIES_PER_PAGE}`,
       {
         headers: {
           Accept: "application/json",

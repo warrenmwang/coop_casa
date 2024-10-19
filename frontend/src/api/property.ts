@@ -1,8 +1,8 @@
 import { Property, OrderedFile } from "../types/Types";
 import { apiPropertiesLink } from "urls";
 import {
-  pageQPKey,
-  filterAddressQPKey,
+  PAGE_QP_KEY,
+  FILTER_ADDRESS_QP_KEY,
   MAX_NUMBER_PROPERTIES_PER_PAGE,
 } from "appConstants";
 import { apiFile2ClientFile } from "../utils/utils";
@@ -119,7 +119,7 @@ export const apiGetProperties = async (
   if (filterAddress === undefined) filterAddress = "";
   return axios
     .get(
-      `${apiPropertiesLink}?${pageQPKey}=${page}&${filterAddressQPKey}=${filterAddress}&limit=${MAX_NUMBER_PROPERTIES_PER_PAGE}`,
+      `${apiPropertiesLink}?${PAGE_QP_KEY}=${page}&${FILTER_ADDRESS_QP_KEY}=${filterAddress}&limit=${MAX_NUMBER_PROPERTIES_PER_PAGE}`,
       {
         headers: {
           Accept: "application/json",
