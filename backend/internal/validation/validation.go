@@ -1,3 +1,4 @@
+// Package validation contains functions to validate user inputs.
 package validation
 
 import (

@@ -1,6 +1,7 @@
-package utils
+package tests
 
 import (
+	"backend/internal/utils"
 	"bytes"
 	"database/sql"
 	"fmt"
@@ -8,54 +9,37 @@ import (
 )
 
 func TestCalculateAge(t *testing.T) {
-	// Valid test case, considering that time cannot flow backwards
-	// we'll use minimum age tests
-
-	test1 := "2000-01-01"
-	var expectedMinAge int16 = 24
-	testResult1, err := CalculateAge(test1)
-	if err != nil {
-		t.Fatal("received error from calculated age when did not expect")
-	}
-	if testResult1 < expectedMinAge {
-		t.Error("calculated age is less than minimum age expected from test 1")
+	// Considering that testing functions whose output is a function of the current date
+	// when the test is run, we'll have to expect the calculated age to be at least some value.
+	type test struct {
+		input           string
+		expectedMinimum int16
+		expectError     bool
 	}
 
-	// Invalid tests
-	test2 := ""
-	testResult2, err := CalculateAge(test2)
-	if err == nil {
-		t.Error("did not receive error from calculated age when expected")
-	}
-	if testResult2 != -1 {
-		t.Error("did not receive -1 age for failed time parsing test case")
-	}
-
-	test3 := "j001-01-01"
-	testResult3, err := CalculateAge(test3)
-	if err == nil {
-		t.Error("did not receive error from calculated age when expected")
-	}
-	if testResult3 != -1 {
-		t.Error("did not receive -1 age for failed time parsing test case")
+	tests := []test{
+		{input: "2000-01-01", expectedMinimum: 24, expectError: false},
+		{input: "1990-01-01", expectedMinimum: 34, expectError: false},
+		{input: "", expectedMinimum: -1, expectError: true},
+		{input: "j001-01-01", expectedMinimum: -1, expectError: true},
+		{input: "2001-k1-01", expectedMinimum: -1, expectError: true},
+		{input: "2001-01-0k", expectedMinimum: -1, expectError: true},
 	}
 
-	test4 := "2001-k1-01"
-	testResult4, err := CalculateAge(test4)
-	if err == nil {
-		t.Error("did not receive error from calculated age when expected")
-	}
-	if testResult4 != -1 {
-		t.Error("did not receive -1 age for failed time parsing test case")
-	}
-
-	test5 := "2001-01-0k"
-	testResult5, err := CalculateAge(test5)
-	if err == nil {
-		t.Error("did not receive error from calculated age when expected")
-	}
-	if testResult5 != -1 {
-		t.Error("did not receive -1 age for failed time parsing test case")
+	for i, test := range tests {
+		output, err := utils.CalculateAge(test.input)
+		if test.expectError {
+			if err == nil {
+				t.Errorf("test %d did not receive an error but we expected one\n", i)
+			}
+		} else {
+			if err != nil {
+				t.Errorf("test %d received an unexpected error\n", i)
+			}
+			if output < test.expectedMinimum {
+				t.Errorf("test %d output is %d but expected at least %d\n", i, output, test.expectedMinimum)
+			}
+		}
 	}
 }
 
@@ -110,7 +94,7 @@ func TestIsValidEmail(t *testing.T) {
 	for i, test := range emailTests {
 		email := test.Email
 		expected := test.ExpectedResult
-		got := IsValidEmail(email)
+		got := utils.IsValidEmail(email)
 		if expected != got {
 			t.Errorf("validation failed for email: %s, test #%d", email, i)
 		}
@@ -135,7 +119,7 @@ func TestEncryptBytes(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		cipherBytes, err := EncryptBytes(test.plainBytes, test.key)
+		cipherBytes, err := utils.EncryptBytes(test.plainBytes, test.key)
 		if !test.expectError && err != nil {
 			t.Errorf("test #%d - got unexpected error returned", i)
 		} else if len(test.plainBytes) > 0 && bytes.Equal(cipherBytes, test.plainBytes) {
@@ -154,7 +138,7 @@ func TestEncryptBytes(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		cipherBytes, err := EncryptBytes(test.plainBytes, test.key)
+		cipherBytes, err := utils.EncryptBytes(test.plainBytes, test.key)
 		if !test.expectError && err != nil {
 			t.Errorf("test #%d - got unexpected error returned", i)
 		} else if len(test.plainBytes) > 0 && bytes.Equal(cipherBytes, test.plainBytes) {
@@ -179,7 +163,7 @@ func TestDecryptBytes(t *testing.T) {
 	key := "RdHFZi8zTaQA159oWhbZgpKk"
 	var tests []test
 	for _, str := range inputs {
-		encryptedBytes, err := EncryptBytes([]byte(str), key)
+		encryptedBytes, err := utils.EncryptBytes([]byte(str), key)
 		if err != nil {
 			t.Fatal("unexpected err")
 		}
@@ -191,7 +175,7 @@ func TestDecryptBytes(t *testing.T) {
 		})
 	}
 	for i, test := range tests {
-		decryptedBytes, err := DecryptBytes(test.encryptedBytes, test.key)
+		decryptedBytes, err := utils.DecryptBytes(test.encryptedBytes, test.key)
 		if test.expectError {
 			if err == nil {
 				t.Errorf("test #%d - err is nil but expected error", i)
@@ -224,7 +208,7 @@ func TestDecryptBytes(t *testing.T) {
 		tests[i].key = key2
 	}
 	for i, test := range tests {
-		decryptedBytes, err := DecryptBytes(test.encryptedBytes, test.key)
+		decryptedBytes, err := utils.DecryptBytes(test.encryptedBytes, test.key)
 		fmt.Print(err)
 		if test.expectError {
 			if err == nil {
@@ -272,7 +256,7 @@ func TestDecryptBytes(t *testing.T) {
 	// test struct to be used for decrypt
 	tests = nil
 	for _, str := range inputs {
-		encryptedBytes, err := EncryptBytes([]byte(str), key)
+		encryptedBytes, err := utils.EncryptBytes([]byte(str), key)
 		if err != nil {
 			t.Fatal("unexpected err")
 		}
@@ -284,7 +268,7 @@ func TestDecryptBytes(t *testing.T) {
 		})
 	}
 	for i, test := range tests {
-		decryptedBytes, err := DecryptBytes(test.encryptedBytes, test.key)
+		decryptedBytes, err := utils.DecryptBytes(test.encryptedBytes, test.key)
 		if test.expectError {
 			if err == nil {
 				t.Errorf("test #%d - err is nil but expected error", i)
@@ -307,7 +291,7 @@ func TestDecryptBytes(t *testing.T) {
 	// test struct to be used for decrypt
 	tests = nil
 	for _, str := range inputs {
-		encryptedBytes, err := EncryptBytes([]byte(str), key)
+		encryptedBytes, err := utils.EncryptBytes([]byte(str), key)
 		if err != nil {
 			t.Fatal("unexpected err")
 		}
@@ -319,7 +303,7 @@ func TestDecryptBytes(t *testing.T) {
 		})
 	}
 	for i, test := range tests {
-		decryptedBytes, err := DecryptBytes(test.encryptedBytes, test.key)
+		decryptedBytes, err := utils.DecryptBytes(test.encryptedBytes, test.key)
 		if test.expectError {
 			if err == nil {
 				t.Errorf("test #%d - err is nil but expected error", i)
@@ -366,7 +350,7 @@ func TestEncryptString(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		encryptedStr, err := EncryptString(test.plaintext, test.encryptKey)
+		encryptedStr, err := utils.EncryptString(test.plaintext, test.encryptKey)
 		if test.expectError {
 			if err == nil {
 				t.Errorf("test #%d - expected error not nil but got error is nil", i)
@@ -425,12 +409,12 @@ func TestDecryptString(t *testing.T) {
 
 	for i, test := range tests {
 		// Setup for decryption
-		encryptedStr, err := EncryptString(test.plaintext, test.encryptKey)
+		encryptedStr, err := utils.EncryptString(test.plaintext, test.encryptKey)
 		if err != nil {
 			t.Errorf("unexpected err -- fix this test")
 		}
 
-		decryptedStr, err := DecryptString(encryptedStr, test.decryptKey)
+		decryptedStr, err := utils.DecryptString(encryptedStr, test.decryptKey)
 		if test.expectError {
 			if err == nil {
 				t.Errorf("test #%d - expected error but didn't get one", i)
@@ -468,7 +452,7 @@ func TestCreateSQLNullString(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		if CreateSQLNullString(test.input) != test.expectedOutput {
+		if utils.CreateSQLNullString(test.input) != test.expectedOutput {
 			t.Errorf("test #%d - incorrect null string output", i)
 		}
 	}

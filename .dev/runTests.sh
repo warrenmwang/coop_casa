@@ -105,7 +105,7 @@ run_backend_tests() {
 
     # note usage of -count=1 flag is only to prevent go from caching test results.
     # this is useful if we want to test the same code for different db data (WIP)
-    go test ./... -count=1 
+    go test ./tests -count=1 
     if [ $? -ne 0 ]; then
         echo "  Backend has at least one failed test"
         exit 1

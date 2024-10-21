@@ -1,3 +1,5 @@
+// Package routes creates the main router and subrouters needed to setup the HTTP endpoints.
+// It connects all of the HTTP handlers to each endpoint that will be exposed by this backend service.
 package routes
 
 import (
@@ -10,6 +12,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 )
 
+// NewAuthRouter creates a new subrouter for the auth endpoint.
 // .../auth
 func NewAuthRouter(s interfaces.Server) http.Handler {
 	r := chi.NewRouter()
@@ -23,6 +26,7 @@ func NewAuthRouter(s interfaces.Server) http.Handler {
 	return r
 }
 
+// NewAccountRouter creates a new subrouter for the account endpoint.
 // .../account
 func NewAccountRouter(s interfaces.Server) http.Handler {
 	r := chi.NewRouter()
@@ -61,6 +65,7 @@ func NewAccountRouter(s interfaces.Server) http.Handler {
 	return r
 }
 
+// NewListerRouter creates a new subrouter for the lister endpoint.
 // .../lister
 func NewListerRouter(s interfaces.Server) http.Handler {
 	r := chi.NewRouter()
@@ -73,6 +78,7 @@ func NewListerRouter(s interfaces.Server) http.Handler {
 	return r
 }
 
+// NewAdminRouter creates a new subrouter for the admin endpoint.
 // .../admin
 func NewAdminRouter(s interfaces.Server) http.Handler {
 	r := chi.NewRouter()
@@ -94,6 +100,7 @@ func NewAdminRouter(s interfaces.Server) http.Handler {
 	return r
 }
 
+// NewPropertyRouter creates a new subrouter for the property endpoint.
 // .../properties
 func NewPropertyRouter(s interfaces.Server) http.Handler {
 	r := chi.NewRouter()
@@ -111,6 +118,7 @@ func NewPropertyRouter(s interfaces.Server) http.Handler {
 	return r
 }
 
+// NewCommunityRouter creates a new subrouter for the community endpoint.
 // .../communities
 func NewCommunityRouter(s interfaces.Server) http.Handler {
 	r := chi.NewRouter()
@@ -132,6 +140,7 @@ func NewCommunityRouter(s interfaces.Server) http.Handler {
 	return r
 }
 
+// NewUserProfileHandler creates a new subrouter for the user profile endpoint.
 // .../users
 func NewUserProfileHandler(s interfaces.Server) http.Handler {
 	r := chi.NewRouter()
@@ -144,6 +153,9 @@ func NewUserProfileHandler(s interfaces.Server) http.Handler {
 	return r
 }
 
+// RegisterRoutes creates creates and returns the main router after having
+// attached global middlewares, initializing all of the 
+// subrouters, and connecting them to their endpoints.
 func RegisterRoutes(s interfaces.Server) http.Handler {
 	r := chi.NewRouter()
 

@@ -1,7 +1,8 @@
-package validation
+package tests
 
 import (
 	"backend/internal/database"
+	"backend/internal/validation"
 	"fmt"
 	"math/rand/v2"
 	"strings"
@@ -132,7 +133,7 @@ func TestValidateCommunityDetails(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		err := ValidateCommunityDetails(test.input)
+		err := validation.ValidateCommunityDetails(test.input)
 		if test.expectError {
 			if err == nil {
 				t.Errorf("test #%d - expected error but didn't get one", i)
@@ -756,7 +757,7 @@ func TestValidatePropertyDetails(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		err := ValidatePropertyDetails(test.input)
+		err := validation.ValidatePropertyDetails(test.input)
 		if test.expectError {
 			if err == nil {
 				t.Errorf("test #%d - expected error but got none", i)
@@ -975,7 +976,7 @@ func TestValidateUserDetails(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		err := ValidateUserDetails(test.input)
+		err := validation.ValidateUserDetails(test.input)
 		if test.expectError {
 			if err == nil {
 				t.Errorf("test #%d - expected error but got none", i)
