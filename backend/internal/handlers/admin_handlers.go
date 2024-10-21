@@ -188,7 +188,7 @@ func (h *AdminHandler) UpdateUserRoleHandler(w http.ResponseWriter, r *http.Requ
 				utils.RespondWithError(w, http.StatusBadRequest, errors.New("transferUserID query parameter is empty but is necessary for transferring properties to"))
 				return
 			}
-			if err := utils.EnsureValidOpenID(userToTransferTo, "transferUserID"); err != nil {
+			if err := validation.ValidateOpenID(userToTransferTo, "transferUserID"); err != nil {
 				utils.RespondWithError(w, http.StatusBadRequest, errors.New("transferUserID is not a valid user ID"))
 				return
 			}

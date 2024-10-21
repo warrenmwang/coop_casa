@@ -1,3 +1,4 @@
+// Package server contains the intialization for the sole HTTP server.
 package server
 
 import (

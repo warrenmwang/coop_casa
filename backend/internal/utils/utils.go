@@ -8,15 +8,12 @@ import (
 	"database/sql"
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
-	"net/mail"
-	"regexp"
 	"time"
 )
 
-// Handles http requests and return json
+// RespondWithJSON responds to an HTTP request with a JSON payload.
 func RespondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
@@ -27,12 +24,12 @@ func RespondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 	w.Write(response)
 }
 
-// Responds with an error
+// RespondWithError responds to an HTTP request with an error.
 func RespondWithError(w http.ResponseWriter, code int, err error) {
 	http.Error(w, err.Error(), code)
-	log.Println("responded with err:", err.Error())
 }
 
+// CalculateAge returns the age of a person in years from a birthdate string.
 func CalculateAge(birthdate string) (int16, error) {
 	// Parse the birthdate string
 	layout := "2006-01-02"
@@ -55,39 +52,7 @@ func CalculateAge(birthdate string) (int16, error) {
 	return int16(age), nil
 }
 
-func IsValidEmail(email string) bool {
-	/* Emails must pass 2 checks:
-	   1. stdlib's mail parser.
-	   2. custom regex ripped from stackoverflow.
-	*/
-	const emailRegexPattern = `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
-	re := regexp.MustCompile(emailRegexPattern)
-	regexRes := re.MatchString(email)
-
-	_, err := mail.ParseAddress(email)
-	mailParseRes := err == nil
-
-	return regexRes && mailParseRes
-}
-
-func EnsureValidOpenID(id string, idName string) error {
-	if len(id) == 0 {
-		return fmt.Errorf("%s is empty", idName)
-	}
-	isOnlyNumbers := true
-	for _, c := range id {
-		if c < '0' || c > '9' {
-			isOnlyNumbers = false
-			break
-		}
-	}
-	if !isOnlyNumbers {
-		return fmt.Errorf("%s is not only numbers, which is expected content of oauth openid id", idName)
-	}
-	return nil
-}
-
-// Encrypt bytes
+// EncryptBytes encrypts the byte slice with the given key.
 func EncryptBytes(plainBytes []byte, key string) ([]byte, error) {
 	// Prepare operation with secret key
 	block, err := aes.NewCipher([]byte(key))
@@ -106,7 +71,7 @@ func EncryptBytes(plainBytes []byte, key string) ([]byte, error) {
 	return cipherBytes, nil
 }
 
-// Decrypt bytes
+// DecryptBytes decryptes the byte slice with the given key.
 func DecryptBytes(cipherbytes []byte, key string) ([]byte, error) {
 	// Prepare operation with secret key
 	block, err := aes.NewCipher([]byte(key))
@@ -156,6 +121,8 @@ func DecryptString(ciphertext, key string) (string, error) {
 	return string(plainBytes), nil
 }
 
+// CreateSQLNullString is a utility that creates a SQL Null string and sets
+// it to invalid if string is empty.
 func CreateSQLNullString(s string) sql.NullString {
 	if s == "" {
 		return sql.NullString{

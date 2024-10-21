@@ -7,10 +7,44 @@ import (
 	"backend/internal/utils"
 	"errors"
 	"fmt"
+	"net/mail"
+	"regexp"
 
 	goaway "github.com/TwiN/go-away"
 	"github.com/google/uuid"
 )
+
+func ValidateEmail(email string) bool {
+	/* Emails must pass 2 checks:
+	   1. stdlib's mail parser.
+	   2. custom regex ripped from stackoverflow.
+	*/
+	const emailRegexPattern = `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
+	re := regexp.MustCompile(emailRegexPattern)
+	regexRes := re.MatchString(email)
+
+	_, err := mail.ParseAddress(email)
+	mailParseRes := err == nil
+
+	return regexRes && mailParseRes
+}
+
+func ValidateOpenID(id string, idName string) error {
+	if len(id) != 21 {
+		return fmt.Errorf("%s is not of the right length, expected to be 21 chars long", idName)
+	}
+	isOnlyNumbers := true
+	for _, c := range id {
+		if c < '0' || c > '9' {
+			isOnlyNumbers = false
+			break
+		}
+	}
+	if !isOnlyNumbers {
+		return fmt.Errorf("%s is not only numbers, which is expected content of oauth openid id", idName)
+	}
+	return nil
+}
 
 func ValidateCommunity(community database.CommunityFullInternal) error {
 	// Ensure that admin user id is a userid of the community
@@ -38,7 +72,7 @@ func ValidateCommunityDetails(details database.CommunityDetails) error {
 	}
 
 	// Admin user id is expected to be an oauth openid string
-	if err := utils.EnsureValidOpenID(details.AdminUserID, "admin id"); err != nil {
+	if err := ValidateOpenID(details.AdminUserID, "admin id"); err != nil {
 		return err
 	}
 
@@ -67,7 +101,7 @@ func ValidatePropertyDetails(propertyDetails database.PropertyDetails) error {
 	}
 
 	// Ensure lister id is present
-	if err := utils.EnsureValidOpenID(propertyDetails.ListerUserID, "lister id"); err != nil {
+	if err := ValidateOpenID(propertyDetails.ListerUserID, "lister id"); err != nil {
 		return err
 	}
 
@@ -167,12 +201,12 @@ func ValidatePropertyDetails(propertyDetails database.PropertyDetails) error {
 
 func ValidateUserDetails(userDetails database.UserDetails) error {
 	// Ensure id field is present and valid
-	if err := utils.EnsureValidOpenID(userDetails.UserID, "user id"); err != nil {
+	if err := ValidateOpenID(userDetails.UserID, "user id"); err != nil {
 		return err
 	}
 
 	// Ensure email is a proper email
-	if !utils.IsValidEmail(userDetails.Email) {
+	if !ValidateEmail(userDetails.Email) {
 		return errors.New("email is not valid")
 	}
 
@@ -239,12 +273,12 @@ func ValidateUserDetails(userDetails database.UserDetails) error {
 
 func ValidateUserStatusData(status database.UserStatus) error {
 	// User account id
-	if err := utils.EnsureValidOpenID(status.UserID, "user id"); err != nil {
+	if err := ValidateOpenID(status.UserID, "user id"); err != nil {
 		return err
 	}
 
 	// Setter account id
-	if err := utils.EnsureValidOpenID(status.SetterUserID, "setter user id"); err != nil {
+	if err := ValidateOpenID(status.SetterUserID, "setter user id"); err != nil {
 		return err
 	}
 

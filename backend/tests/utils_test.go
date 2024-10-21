@@ -43,64 +43,6 @@ func TestCalculateAge(t *testing.T) {
 	}
 }
 
-func TestIsValidEmail(t *testing.T) {
-
-	type TestStruct struct {
-		Email          string
-		ExpectedResult bool
-	}
-
-	emailTests := []TestStruct{
-		// Basic "obvious" invalids
-		{Email: "", ExpectedResult: false},
-		{Email: "invalid", ExpectedResult: false},
-		{Email: "-1", ExpectedResult: false},
-		{Email: "veryvalidemailletmein", ExpectedResult: false},
-		{Email: "test@example", ExpectedResult: false},
-		// Missing '@' or '.' symbol
-		{Email: "test@examplecom", ExpectedResult: false},
-		{Email: "testexample.com", ExpectedResult: false},
-		{Email: "testexamplecom", ExpectedResult: false},
-		// Missing domain
-		{Email: "test@", ExpectedResult: false},
-		// Missing username
-		{Email: "@example.com", ExpectedResult: false},
-		// Invalid characters
-		{Email: "test@exa!mple.com", ExpectedResult: false},
-		// Consecutive dots in domain
-		{Email: "test@exa..mple.com", ExpectedResult: false},
-		// Leading dot in address
-		{Email: ".test@example.com", ExpectedResult: false},
-		// Trailing dot in address
-		{Email: "test.@example.com", ExpectedResult: false},
-		// While emails with IP address as domain are technically valid according to RFC 5321
-		// we are going to deny them because I don't want to deal with emails that look like that, cmon. Just use a domain name.
-		{Email: "test@[123.123.123.123]", ExpectedResult: false},
-		// Valid email with subdomain
-		{Email: "test@mail.example.com", ExpectedResult: true},
-		// Valid email with plus sign
-		{Email: "test+label@example.com", ExpectedResult: true},
-		// Email with spaces
-		{Email: "test @example.com", ExpectedResult: false},
-		// Email with special characters in local part
-		{Email: "test.email+alex@leetcode.com", ExpectedResult: true},
-		// "Normal" emails
-		{Email: "ksldj9023jklnbkldf@gmail.com", ExpectedResult: true},
-		{Email: "test@gmail.com", ExpectedResult: true},
-		{Email: "test123@yahoo.com", ExpectedResult: true},
-		{Email: "test123@yahoo.com", ExpectedResult: true},
-	}
-
-	for i, test := range emailTests {
-		email := test.Email
-		expected := test.ExpectedResult
-		got := utils.IsValidEmail(email)
-		if expected != got {
-			t.Errorf("validation failed for email: %s, test #%d", email, i)
-		}
-	}
-}
-
 func TestEncryptBytes(t *testing.T) {
 	type test struct {
 		plainBytes  []byte

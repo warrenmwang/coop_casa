@@ -1,11 +1,6 @@
+// Package database contains the our database layer logic that heavily utilizes the SQLC generated code for running SQL
+// queries for our user and app data.
 package database
-
-/*
-	Encryption and Decryption of user data happens only in the database module.
-	Usage of NullStrings is useful to differentiate between empty values and actual null values in the db.
-	Therefore, we should check a value to see if it is Null or not before attempting encryption/decyption
-	to save time.
-*/
 
 import (
 	"backend/internal/config"
