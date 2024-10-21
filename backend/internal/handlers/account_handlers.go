@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"backend/internal/auth"
 	"backend/internal/app_middleware"
+	"backend/internal/auth"
 	"backend/internal/config"
 	"backend/internal/database"
 	"backend/internal/interfaces"
@@ -29,9 +29,10 @@ func NewAccountHandlers(s interfaces.Server) *AccountHandler {
 	return &AccountHandler{server: s, isProd: config.GlobalConfig.IS_PROD}
 }
 
-// GET .../account
-// AUTHED
-// Returns the user data based on the userId in the auth token
+// GetAccountDetailsHandler handles requests for returning personal account data for the user themself requesting it.
+// Returns the user data based on the userId in the auth token.
+//
+// AUTHED GET .../account
 func (h *AccountHandler) GetAccountDetailsHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
 	userId, ok := r.Context().Value(app_middleware.UserIDKey).(string)
@@ -59,25 +60,6 @@ func (h *AccountHandler) GetAccountDetailsHandler(w http.ResponseWriter, r *http
 		userDetails.Interests = []string{}
 	}
 
-	// // Get user liked communities, properties, and users
-	// likedCommunityIDs, err := h.server.DB().GetUserSavedCommunities(userId)
-	// if err != nil {
-	// 	utils.RespondWithError(w, http.StatusInternalServerError, err)
-	// 	return
-	// }
-
-	// likedPropertyIDs, err := h.server.DB().GetUserSavedCommunities(userId)
-	// if err != nil {
-	// 	utils.RespondWithError(w, http.StatusInternalServerError, err)
-	// 	return
-	// }
-
-	// likedUserIDs, err := h.server.DB().GetUserSavedUsers(userId)
-	// if err != nil {
-	// 	utils.RespondWithError(w, http.StatusInternalServerError, err)
-	// 	return
-	// }
-
 	// Return as JSON data, need to convert userAvatar to base64 str
 	userAvatarDataB64 := base64.StdEncoding.EncodeToString(userAvatar.Data)
 
@@ -94,8 +76,9 @@ func (h *AccountHandler) GetAccountDetailsHandler(w http.ResponseWriter, r *http
 	})
 }
 
-// POST .../account
-// AUTHED
+// UpdateAccountDetailsHandler handles requests for updating a user's account's details.
+//
+// AUTHED POST .../account
 func (h *AccountHandler) UpdateAccountDetailsHandler(w http.ResponseWriter, r *http.Request) {
 	userIdFromToken, ok := r.Context().Value(app_middleware.UserIDKey).(string)
 	if !ok {
@@ -186,8 +169,12 @@ func (h *AccountHandler) UpdateAccountDetailsHandler(w http.ResponseWriter, r *h
 	w.WriteHeader(200)
 }
 
-// DELETE .../account
-// AUTHED
+// DeleteAccountHandler handles requests to delete a user's own account.
+// Note that the expected SQL database being used to store all user and app data is a well connected
+// relational database and that all other user-specific data SHOULD be automatically dropped
+// from their corresponding tables.
+//
+// AUTHED DELETE .../account
 func (h *AccountHandler) DeleteAccountHandler(w http.ResponseWriter, r *http.Request) {
 	// Delete a user account given their userId from the token
 
@@ -198,28 +185,12 @@ func (h *AccountHandler) DeleteAccountHandler(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	// Delete user account (details, then CASCADE deletes matching role, user_avatar, user_status)
+	// Delete user account
+	// Once user is deleted SQL db SHOULD cascade deleting ther user's
+	// role, user_avatar, user_status, properties, communities, saved entities, and so on
 	err := h.server.DB().DeleteUser(userId)
 	if err != nil {
 		utils.RespondWithError(w, http.StatusUnauthorized, err)
-		return
-	}
-
-	// Delete all the properties that are listed by this user
-	err = h.server.DB().DeleteUserOwnedProperties(userId)
-	if err != nil {
-		utils.RespondWithError(w, http.StatusInternalServerError, err)
-		return
-	}
-
-	// Delete all communities owned by this user
-	// If this is not desired behavior, it is the frontend's job to warn the user
-	// that all their properties and communities will be deleted. Therefore, they
-	// should transfer ownership of their properties/communities before deleting their
-	// acount.
-	err = h.server.DB().DeleteUserOwnedCommunities(userId)
-	if err != nil {
-		utils.RespondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -230,8 +201,14 @@ func (h *AccountHandler) DeleteAccountHandler(w http.ResponseWriter, r *http.Req
 	w.WriteHeader(200)
 }
 
-// GET .../account/role
-// AUTHED
+// GetAccountRoleHandler handles requests for users to retrieve their own account "role".
+// Roles are a privilege level indicator for what they can do on the platform.
+// By default all users are initialized with a "regular" role status. Certain users can be
+// granted extra privileges to become a "lister" and be able to list properties on the app.
+// There is one special account that is designated with the "admin" role that has full control
+// over all user accounts.
+//
+// AUTHED GET .../account/role
 func (h *AccountHandler) GetAccountRoleHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
 	userId, ok := r.Context().Value(app_middleware.UserIDKey).(string)
@@ -255,8 +232,11 @@ func (h *AccountHandler) GetAccountRoleHandler(w http.ResponseWriter, r *http.Re
 	})
 }
 
-// GET .../account/communities
-// AUTHED
+// GetAccountOwnedCommunitiesHandler handles requests to return a user's communities that where they are the admin. 
+// They may or may not be communities that the user themself created, but they are the communities that the user are the sole admin of.
+// Communities returned on this endpoint include communities that were transferred to the user from another account.
+//
+// AUTHED GET .../account/communities
 func (h *AccountHandler) GetAccountOwnedCommunitiesHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
 	userId, ok := r.Context().Value(app_middleware.UserIDKey).(string)
@@ -283,8 +263,9 @@ func (h *AccountHandler) GetAccountOwnedCommunitiesHandler(w http.ResponseWriter
 	})
 }
 
-// GET .../account/properties
-// AUTHED
+// GetAccountOwnedPropertiesHandler handles requests to return a user's properties where they are the lister.
+//
+// AUTHED GET .../account/properties
 // Lister is able to retrieve the properties that they are put on the site
 func (h *AccountHandler) GetAccountOwnedPropertiesHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
@@ -312,8 +293,9 @@ func (h *AccountHandler) GetAccountOwnedPropertiesHandler(w http.ResponseWriter,
 	})
 }
 
-// GET .../account/images
-// AUTHED
+// GetAccountProfileImagesHandler handles requests to return the user uploaded images of their account.
+// 
+// AUTHED GET .../account/images
 func (h *AccountHandler) GetAccountProfileImagesHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
 	userID, ok := r.Context().Value(app_middleware.UserIDKey).(string)
@@ -348,8 +330,9 @@ func (h *AccountHandler) GetAccountProfileImagesHandler(w http.ResponseWriter, r
 	})
 }
 
-// POST ../account/images
-// AUTHED
+// UpdateAccountProfileImagesHandler handles requests to update a user's account's profile images.
+// 
+// AUTHED POST ../account/images
 func (h *AccountHandler) UpdateAccountProfileImagesHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
 	userID, ok := r.Context().Value(app_middleware.UserIDKey).(string)
@@ -442,8 +425,9 @@ func (h *AccountHandler) UpdateAccountProfileImagesHandler(w http.ResponseWriter
 
 // User saved entities
 
-// GET .../account/saved/properties
-// AUTHED
+// GetAccountSavedPropertiesHandler handles requests to return a user's liked properties.
+//
+// AUTHED GET .../account/saved/properties
 func (h *AccountHandler) GetAccountSavedPropertiesHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
 	userID, ok := r.Context().Value(app_middleware.UserIDKey).(string)
@@ -466,8 +450,9 @@ func (h *AccountHandler) GetAccountSavedPropertiesHandler(w http.ResponseWriter,
 	})
 }
 
-// POST .../account/saved/properties
-// AUTHED
+// CreateAccountSavedPropertyHandler handles a user's request to like a property.
+// 
+// AUTHED POST .../account/saved/properties
 func (h *AccountHandler) CreateAccountSavedPropertyHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
 	userID, ok := r.Context().Value(app_middleware.UserIDKey).(string)
@@ -494,8 +479,9 @@ func (h *AccountHandler) CreateAccountSavedPropertyHandler(w http.ResponseWriter
 	w.WriteHeader(http.StatusCreated)
 }
 
-// DELETE .../account/saved/properties/{id}
-// AUTHED
+// DeleteAccountSavedPropertyHandler handles requests to unlike a property from a user's account.
+// 
+// AUTHED DELETE .../account/saved/properties/{id}
 func (h *AccountHandler) DeleteAccountSavedPropertyHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
 	userID, ok := r.Context().Value(app_middleware.UserIDKey).(string)
@@ -522,8 +508,9 @@ func (h *AccountHandler) DeleteAccountSavedPropertyHandler(w http.ResponseWriter
 	w.WriteHeader(http.StatusOK)
 }
 
-// DELETE .../account/saved/properties
-// AUTHED
+// DeleteAccountSavedPropertiesHandler handles requests to delete ALL of the liked properties from a user's account.
+// 
+// AUTHED DELETE .../account/saved/properties
 func (h *AccountHandler) DeleteAccountSavedPropertiesHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
 	userID, ok := r.Context().Value(app_middleware.UserIDKey).(string)
@@ -543,8 +530,9 @@ func (h *AccountHandler) DeleteAccountSavedPropertiesHandler(w http.ResponseWrit
 	w.WriteHeader(http.StatusOK)
 }
 
-// GET .../account/saved/communities
-// AUTHED
+// GetAccountSavedCommunitiesHandler handles requests to get all of a user's like communities.
+// 
+// AUTHED GET .../account/saved/communities
 func (h *AccountHandler) GetAccountSavedCommunitiesHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
 	userID, ok := r.Context().Value(app_middleware.UserIDKey).(string)
@@ -567,8 +555,9 @@ func (h *AccountHandler) GetAccountSavedCommunitiesHandler(w http.ResponseWriter
 	})
 }
 
-// POST .../account/saved/communities
-// AUTHED
+// CreateAccountSavedCommunityHandler handles requests to like a community for a user account.
+//
+// AUTHED POST .../account/saved/communities
 func (h *AccountHandler) CreateAccountSavedCommunityHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
 	userID, ok := r.Context().Value(app_middleware.UserIDKey).(string)
@@ -595,8 +584,9 @@ func (h *AccountHandler) CreateAccountSavedCommunityHandler(w http.ResponseWrite
 	w.WriteHeader(http.StatusCreated)
 }
 
-// DELETE .../account/saved/communities/{id}
-// AUTHED
+// DeleteAccountSavedCommunityHandler handles requests to unlike a community from a user account.
+// 
+// AUTHED DELETE .../account/saved/communities/{id}
 func (h *AccountHandler) DeleteAccountSavedCommunityHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
 	userID, ok := r.Context().Value(app_middleware.UserIDKey).(string)
@@ -623,8 +613,9 @@ func (h *AccountHandler) DeleteAccountSavedCommunityHandler(w http.ResponseWrite
 	w.WriteHeader(http.StatusOK)
 }
 
-// DELETE .../account/saved/communities
-// AUTHED
+// DeleteAccountSavedCommunitiesHandler handles requests to unlike ALL of the liked communities of a user's account.
+// 
+// AUTHED DELETE .../account/saved/communities
 func (h *AccountHandler) DeleteAccountSavedCommunitiesHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
 	userID, ok := r.Context().Value(app_middleware.UserIDKey).(string)
@@ -644,8 +635,9 @@ func (h *AccountHandler) DeleteAccountSavedCommunitiesHandler(w http.ResponseWri
 	w.WriteHeader(http.StatusOK)
 }
 
-// GET ../account/saved/users
-// AUTHED
+// GetAccountSavedUsersHandler handles requests to retrieve all of the liked users from a user's account.
+// 
+// AUTHED GET ../account/saved/users
 func (h *AccountHandler) GetAccountSavedUsersHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
 	userId, ok := r.Context().Value(app_middleware.UserIDKey).(string)
@@ -668,8 +660,9 @@ func (h *AccountHandler) GetAccountSavedUsersHandler(w http.ResponseWriter, r *h
 	})
 }
 
-// POST .../account/saved/users
-// AUTHED
+// CreateAccountSavedUserHandler handles requests to like a user for a user account.
+// 
+// AUTHED POST .../account/saved/users
 func (h *AccountHandler) CreateAccountSavedUserHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
 	userId, ok := r.Context().Value(app_middleware.UserIDKey).(string)
@@ -696,8 +689,9 @@ func (h *AccountHandler) CreateAccountSavedUserHandler(w http.ResponseWriter, r 
 	w.WriteHeader(http.StatusCreated)
 }
 
-// DELETE .../account/saved/users/{id}
-// AUTHED
+// DeleteAccountSavedUserHandler handles requests to unlike a user for a user account.
+// 
+// AUTHED DELETE .../account/saved/users/{id}
 func (h *AccountHandler) DeleteAccountSavedUserHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
 	userId, ok := r.Context().Value(app_middleware.UserIDKey).(string)
@@ -724,8 +718,9 @@ func (h *AccountHandler) DeleteAccountSavedUserHandler(w http.ResponseWriter, r 
 	w.WriteHeader(http.StatusOK)
 }
 
-// DELETE .../account/saved/users
-// AUTHED
+// DeleteAccountSavedUsersHandler handles requests to unlike ALL users from a user's account of liked users.
+// 
+// AUTHED DELETE .../account/saved/users
 func (h *AccountHandler) DeleteAccountSavedUsersHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
 	userId, ok := r.Context().Value(app_middleware.UserIDKey).(string)
@@ -745,8 +740,10 @@ func (h *AccountHandler) DeleteAccountSavedUsersHandler(w http.ResponseWriter, r
 	w.WriteHeader(http.StatusOK)
 }
 
-// GET .../account/status
-// AUTHED
+// GetAccountStatusHandler handles requests to get the account's status.
+// The account status denotes whether the account is visible to other users publicly.
+// 
+// AUTHED GET .../account/status
 func (h *AccountHandler) GetAccountStatusHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id from authed context
 	authedUserId, ok := r.Context().Value(app_middleware.UserIDKey).(string)
@@ -764,9 +761,10 @@ func (h *AccountHandler) GetAccountStatusHandler(w http.ResponseWriter, r *http.
 	utils.RespondWithJSON(w, http.StatusOK, userStatus)
 }
 
-// PUT .../account/status
-// AUTHED
+// UpdateAccountStatusHandler handles requests for users to update their own account status.
 // Endpoint is for the account to be updated by the user themself
+// 
+// AUTHED PUT .../account/status
 func (h *AccountHandler) UpdateAccountStatusHandler(w http.ResponseWriter, r *http.Request) {
 	// Get authed user id
 	authedUserId, ok := r.Context().Value(app_middleware.UserIDKey).(string)

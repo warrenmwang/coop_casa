@@ -1,5 +1,6 @@
 // Package database contains the our database layer logic that heavily utilizes the SQLC generated code for running SQL
-// queries for our user and app data.
+// queries for our user and app data. It also contains the struct definitions for a lot of the data types we use
+// for user and other entity data for the app.
 package database
 
 import (
