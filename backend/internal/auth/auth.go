@@ -1,3 +1,7 @@
+// Package auth provides functions related to user authentication.
+// It contains functions for working with JWTs in cookies as well as middlewares
+// that are to be used with protecting authenticated endpoints for different
+// levels of privilege.
 package auth
 
 import (
@@ -15,8 +19,8 @@ import (
 	_ "github.com/joho/godotenv/autoload"
 )
 
-const MaxAge = 86400 * 30 // 30 days
-
+// NewAuth sets up the the Goth store for usage with Google OAuth2.0 provider
+// for user authentication.
 func NewAuth() {
 	host := config.GlobalConfig.HOST
 	isProd := config.GlobalConfig.IS_PROD
@@ -32,7 +36,7 @@ func NewAuth() {
 	}
 
 	store := sessions.NewCookieStore([]byte(key))
-	store.MaxAge(MaxAge)
+	store.MaxAge(config.MAX_TOKEN_AGE)
 	store.Options.HttpOnly = true
 	store.Options.Secure = isProd
 
@@ -44,16 +48,18 @@ func NewAuth() {
 	)
 }
 
+// UserOAuthDetails holds the information that we care about returned to us from
+// our OAuth2.0 provider. We just need the OpenID and the Email of the user.
 type UserOAuthDetails struct {
 	UserId string
 	Email  string
 }
 
-// Generates a JWT for a user attempting login
+// GenerateToken generates a JWT with a payload of the user's OAuth2.0 information
+// with a given expiration time and signs the token with a given signing key secret.
 func GenerateToken(user UserOAuthDetails, expireTime time.Time, signingKeySecret string) (string, error) {
 	// Define token claims
 	claims := jwt.MapClaims{}
-	claims["authorized"] = true
 	claims["user_id"] = user.UserId
 	claims["email"] = user.Email
 	claims["exp"] = expireTime.Unix()
@@ -70,7 +76,7 @@ func GenerateToken(user UserOAuthDetails, expireTime time.Time, signingKeySecret
 	return tokenString, nil
 }
 
-// Invalidate the token in the browser from the request
+// InvalidateToken invalidates the token in the attached cookie from the HTTP request.
 func InvalidateToken(w http.ResponseWriter, isProd bool) {
 	// Expire their JWT by by setting a new token in the http-only cookie with an expiration date
 	// in the past.
@@ -85,9 +91,9 @@ func InvalidateToken(w http.ResponseWriter, isProd bool) {
 	})
 }
 
-// Given the raw JWT as string, validate that the server signed it and return
-// the claims object (key value pairs of information put inside the token)
-// if it is good, otherwise return an error.
+// ValidateTokenAndGetClaims takes the raw JWT as a string and validates it.
+// If valid, it will return the claims object (key value pairs of information put inside the token).
+// Otherwise it returns an error.
 func ValidateTokenAndGetClaims(tokenString string, signingKeySecret string) (jwt.MapClaims, error) {
 	// Gets the JWT and validates it. If valid, return the claims.
 	// Return an error if invalid.
@@ -112,8 +118,9 @@ func ValidateTokenAndGetClaims(tokenString string, signingKeySecret string) (jwt
 	}
 }
 
-// Checks the JWT attached to the request, verify that it was properly signed
-// by the server, and if so return the claims object. Otherwise, return an error.
+// AuthCheckAndGetClaims retrieves the JWT from the cookie attached to
+// the HTTP request given and checks the JWT attached to the request, returning
+// the claims object if valid and an error otherwise.
 func AuthCheckAndGetClaims(r *http.Request, signingKeySecret string) (jwt.MapClaims, error) {
 	// Read JWT from HttpOnly Cookie
 	cookie, err := r.Cookie("token")

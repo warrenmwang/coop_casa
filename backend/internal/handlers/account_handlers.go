@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"backend/internal/auth"
+	"backend/internal/app_middleware"
 	"backend/internal/config"
 	"backend/internal/database"
 	"backend/internal/interfaces"
@@ -33,7 +34,7 @@ func NewAccountHandlers(s interfaces.Server) *AccountHandler {
 // Returns the user data based on the userId in the auth token
 func (h *AccountHandler) GetAccountDetailsHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
-	userId, ok := r.Context().Value(auth.UserIDKey).(string)
+	userId, ok := r.Context().Value(app_middleware.UserIDKey).(string)
 	if !ok {
 		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("unable to parse yolur userId"))
 		return
@@ -96,12 +97,12 @@ func (h *AccountHandler) GetAccountDetailsHandler(w http.ResponseWriter, r *http
 // POST .../account
 // AUTHED
 func (h *AccountHandler) UpdateAccountDetailsHandler(w http.ResponseWriter, r *http.Request) {
-	userIdFromToken, ok := r.Context().Value(auth.UserIDKey).(string)
+	userIdFromToken, ok := r.Context().Value(app_middleware.UserIDKey).(string)
 	if !ok {
 		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("user id blank"))
 		return
 	}
-	userEmailFromToken, ok := r.Context().Value(auth.UserEmailKey).(string)
+	userEmailFromToken, ok := r.Context().Value(app_middleware.UserEmailKey).(string)
 	if !ok {
 		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("user email blank"))
 		return
@@ -191,7 +192,7 @@ func (h *AccountHandler) DeleteAccountHandler(w http.ResponseWriter, r *http.Req
 	// Delete a user account given their userId from the token
 
 	// Get userId of current user
-	userId, ok := r.Context().Value(auth.UserIDKey).(string)
+	userId, ok := r.Context().Value(app_middleware.UserIDKey).(string)
 	if !ok {
 		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("user id blank"))
 		return
@@ -233,7 +234,7 @@ func (h *AccountHandler) DeleteAccountHandler(w http.ResponseWriter, r *http.Req
 // AUTHED
 func (h *AccountHandler) GetAccountRoleHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
-	userId, ok := r.Context().Value(auth.UserIDKey).(string)
+	userId, ok := r.Context().Value(app_middleware.UserIDKey).(string)
 	if !ok {
 		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("user id blank"))
 		return
@@ -258,7 +259,7 @@ func (h *AccountHandler) GetAccountRoleHandler(w http.ResponseWriter, r *http.Re
 // AUTHED
 func (h *AccountHandler) GetAccountOwnedCommunitiesHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
-	userId, ok := r.Context().Value(auth.UserIDKey).(string)
+	userId, ok := r.Context().Value(app_middleware.UserIDKey).(string)
 	if !ok {
 		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("user id blank"))
 		return
@@ -287,7 +288,7 @@ func (h *AccountHandler) GetAccountOwnedCommunitiesHandler(w http.ResponseWriter
 // Lister is able to retrieve the properties that they are put on the site
 func (h *AccountHandler) GetAccountOwnedPropertiesHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
-	userID, ok := r.Context().Value(auth.UserIDKey).(string)
+	userID, ok := r.Context().Value(app_middleware.UserIDKey).(string)
 	if !ok {
 		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("user id blank"))
 		return
@@ -315,7 +316,7 @@ func (h *AccountHandler) GetAccountOwnedPropertiesHandler(w http.ResponseWriter,
 // AUTHED
 func (h *AccountHandler) GetAccountProfileImagesHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
-	userID, ok := r.Context().Value(auth.UserIDKey).(string)
+	userID, ok := r.Context().Value(app_middleware.UserIDKey).(string)
 	if !ok {
 		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("user id blank"))
 		return
@@ -351,7 +352,7 @@ func (h *AccountHandler) GetAccountProfileImagesHandler(w http.ResponseWriter, r
 // AUTHED
 func (h *AccountHandler) UpdateAccountProfileImagesHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
-	userID, ok := r.Context().Value(auth.UserIDKey).(string)
+	userID, ok := r.Context().Value(app_middleware.UserIDKey).(string)
 	if !ok {
 		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("user id blank"))
 		return
@@ -445,7 +446,7 @@ func (h *AccountHandler) UpdateAccountProfileImagesHandler(w http.ResponseWriter
 // AUTHED
 func (h *AccountHandler) GetAccountSavedPropertiesHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
-	userID, ok := r.Context().Value(auth.UserIDKey).(string)
+	userID, ok := r.Context().Value(app_middleware.UserIDKey).(string)
 	if !ok {
 		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("user id blank"))
 		return
@@ -469,7 +470,7 @@ func (h *AccountHandler) GetAccountSavedPropertiesHandler(w http.ResponseWriter,
 // AUTHED
 func (h *AccountHandler) CreateAccountSavedPropertyHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
-	userID, ok := r.Context().Value(auth.UserIDKey).(string)
+	userID, ok := r.Context().Value(app_middleware.UserIDKey).(string)
 	if !ok {
 		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("user id blank"))
 		return
@@ -497,7 +498,7 @@ func (h *AccountHandler) CreateAccountSavedPropertyHandler(w http.ResponseWriter
 // AUTHED
 func (h *AccountHandler) DeleteAccountSavedPropertyHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
-	userID, ok := r.Context().Value(auth.UserIDKey).(string)
+	userID, ok := r.Context().Value(app_middleware.UserIDKey).(string)
 	if !ok {
 		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("user id blank"))
 		return
@@ -525,7 +526,7 @@ func (h *AccountHandler) DeleteAccountSavedPropertyHandler(w http.ResponseWriter
 // AUTHED
 func (h *AccountHandler) DeleteAccountSavedPropertiesHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
-	userID, ok := r.Context().Value(auth.UserIDKey).(string)
+	userID, ok := r.Context().Value(app_middleware.UserIDKey).(string)
 	if !ok {
 		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("user id blank"))
 		return
@@ -546,7 +547,7 @@ func (h *AccountHandler) DeleteAccountSavedPropertiesHandler(w http.ResponseWrit
 // AUTHED
 func (h *AccountHandler) GetAccountSavedCommunitiesHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
-	userID, ok := r.Context().Value(auth.UserIDKey).(string)
+	userID, ok := r.Context().Value(app_middleware.UserIDKey).(string)
 	if !ok {
 		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("user id blank"))
 		return
@@ -570,7 +571,7 @@ func (h *AccountHandler) GetAccountSavedCommunitiesHandler(w http.ResponseWriter
 // AUTHED
 func (h *AccountHandler) CreateAccountSavedCommunityHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
-	userID, ok := r.Context().Value(auth.UserIDKey).(string)
+	userID, ok := r.Context().Value(app_middleware.UserIDKey).(string)
 	if !ok {
 		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("user id blank"))
 		return
@@ -598,7 +599,7 @@ func (h *AccountHandler) CreateAccountSavedCommunityHandler(w http.ResponseWrite
 // AUTHED
 func (h *AccountHandler) DeleteAccountSavedCommunityHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
-	userID, ok := r.Context().Value(auth.UserIDKey).(string)
+	userID, ok := r.Context().Value(app_middleware.UserIDKey).(string)
 	if !ok {
 		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("user id blank"))
 		return
@@ -626,7 +627,7 @@ func (h *AccountHandler) DeleteAccountSavedCommunityHandler(w http.ResponseWrite
 // AUTHED
 func (h *AccountHandler) DeleteAccountSavedCommunitiesHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
-	userID, ok := r.Context().Value(auth.UserIDKey).(string)
+	userID, ok := r.Context().Value(app_middleware.UserIDKey).(string)
 	if !ok {
 		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("user id blank"))
 		return
@@ -647,7 +648,7 @@ func (h *AccountHandler) DeleteAccountSavedCommunitiesHandler(w http.ResponseWri
 // AUTHED
 func (h *AccountHandler) GetAccountSavedUsersHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
-	userId, ok := r.Context().Value(auth.UserIDKey).(string)
+	userId, ok := r.Context().Value(app_middleware.UserIDKey).(string)
 	if !ok {
 		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("userId blank"))
 		return
@@ -671,7 +672,7 @@ func (h *AccountHandler) GetAccountSavedUsersHandler(w http.ResponseWriter, r *h
 // AUTHED
 func (h *AccountHandler) CreateAccountSavedUserHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
-	userId, ok := r.Context().Value(auth.UserIDKey).(string)
+	userId, ok := r.Context().Value(app_middleware.UserIDKey).(string)
 	if !ok {
 		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("userId blank"))
 		return
@@ -699,7 +700,7 @@ func (h *AccountHandler) CreateAccountSavedUserHandler(w http.ResponseWriter, r 
 // AUTHED
 func (h *AccountHandler) DeleteAccountSavedUserHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
-	userId, ok := r.Context().Value(auth.UserIDKey).(string)
+	userId, ok := r.Context().Value(app_middleware.UserIDKey).(string)
 	if !ok {
 		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("userId blank"))
 		return
@@ -727,7 +728,7 @@ func (h *AccountHandler) DeleteAccountSavedUserHandler(w http.ResponseWriter, r 
 // AUTHED
 func (h *AccountHandler) DeleteAccountSavedUsersHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
-	userId, ok := r.Context().Value(auth.UserIDKey).(string)
+	userId, ok := r.Context().Value(app_middleware.UserIDKey).(string)
 	if !ok {
 		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("userId blank"))
 		return
@@ -748,7 +749,7 @@ func (h *AccountHandler) DeleteAccountSavedUsersHandler(w http.ResponseWriter, r
 // AUTHED
 func (h *AccountHandler) GetAccountStatusHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id from authed context
-	authedUserId, ok := r.Context().Value(auth.UserIDKey).(string)
+	authedUserId, ok := r.Context().Value(app_middleware.UserIDKey).(string)
 	if !ok {
 		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("userId blank"))
 		return
@@ -768,7 +769,7 @@ func (h *AccountHandler) GetAccountStatusHandler(w http.ResponseWriter, r *http.
 // Endpoint is for the account to be updated by the user themself
 func (h *AccountHandler) UpdateAccountStatusHandler(w http.ResponseWriter, r *http.Request) {
 	// Get authed user id
-	authedUserId, ok := r.Context().Value(auth.UserIDKey).(string)
+	authedUserId, ok := r.Context().Value(app_middleware.UserIDKey).(string)
 	if !ok {
 		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("authenticated but unknown userId"))
 		return

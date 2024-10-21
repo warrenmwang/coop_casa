@@ -1,8 +1,7 @@
 package routes
 
 import (
-	"backend/internal/auth"
-	"backend/internal/customMiddleware"
+	"backend/internal/app_middleware"
 	"backend/internal/handlers"
 	"backend/internal/interfaces"
 	"net/http"
@@ -19,7 +18,7 @@ func NewAuthRouter(s interfaces.Server) http.Handler {
 	r.Get("/{provider}/callback", authHandlers.CallbackHandler)
 	r.Post("/{provider}/logout", authHandlers.LogoutHandler)
 
-	r.With(auth.AuthMiddleware).Get("/{provider}/check", authHandlers.AuthCheckHandler)
+	r.With(app_middleware.AuthMiddleware).Get("/{provider}/check", authHandlers.AuthCheckHandler)
 
 	return r
 }
@@ -27,7 +26,7 @@ func NewAuthRouter(s interfaces.Server) http.Handler {
 // .../account
 func NewAccountRouter(s interfaces.Server) http.Handler {
 	r := chi.NewRouter()
-	r.Use(auth.AuthMiddleware)
+	r.Use(app_middleware.AuthMiddleware)
 
 	accountHandlers := handlers.NewAccountHandlers(s)
 	r.Get("/", accountHandlers.GetAccountDetailsHandler)
@@ -69,7 +68,7 @@ func NewListerRouter(s interfaces.Server) http.Handler {
 	listerHandlers := handlers.NewListerHandlers(s)
 
 	r.Get("/{id}", listerHandlers.GetListerInfoHandler)
-	r.With(auth.AuthMiddleware).Get("/", listerHandlers.GetListersFromListersHandler)
+	r.With(app_middleware.AuthMiddleware).Get("/", listerHandlers.GetListersFromListersHandler)
 
 	return r
 }
@@ -77,7 +76,7 @@ func NewListerRouter(s interfaces.Server) http.Handler {
 // .../admin
 func NewAdminRouter(s interfaces.Server) http.Handler {
 	r := chi.NewRouter()
-	r.Use(auth.AdminAuthMiddleware)
+	r.Use(app_middleware.AdminAuthMiddleware)
 
 	adminHandlers := handlers.NewAdminHandlers(s)
 	r.Get("/users", adminHandlers.AdminGetUsersHandler)
@@ -103,11 +102,11 @@ func NewPropertyRouter(s interfaces.Server) http.Handler {
 	r.Get("/{id}", propertyHandlers.GetPropertyHandler)
 	r.Get("/", propertyHandlers.GetPropertiesHandler)
 
-	r.With(auth.AuthMiddleware).Post("/", propertyHandlers.CreatePropertiesHandler)
-	r.With(auth.AuthMiddleware).Put("/{id}", propertyHandlers.UpdatePropertiesHandler)
-	r.With(auth.AuthMiddleware).Put("/transfer/ownership", propertyHandlers.TransferPropertyOwnershipHandler)
-	r.With(auth.AuthMiddleware).Post("/transfer/ownership/all", propertyHandlers.TransferAllPropertiesOwnershipHandler)
-	r.With(auth.AuthMiddleware).Delete("/{id}", propertyHandlers.DeletePropertiesHandler)
+	r.With(app_middleware.AuthMiddleware).Post("/", propertyHandlers.CreatePropertiesHandler)
+	r.With(app_middleware.AuthMiddleware).Put("/{id}", propertyHandlers.UpdatePropertiesHandler)
+	r.With(app_middleware.AuthMiddleware).Put("/transfer/ownership", propertyHandlers.TransferPropertyOwnershipHandler)
+	r.With(app_middleware.AuthMiddleware).Post("/transfer/ownership/all", propertyHandlers.TransferAllPropertiesOwnershipHandler)
+	r.With(app_middleware.AuthMiddleware).Delete("/{id}", propertyHandlers.DeletePropertiesHandler)
 
 	return r
 }
@@ -121,14 +120,14 @@ func NewCommunityRouter(s interfaces.Server) http.Handler {
 	r.Get("/{id}", communityHandlers.GetCommunityHandler)
 	r.Get("/", communityHandlers.GetCommunitiesHandler)
 
-	r.With(auth.AuthMiddleware).Post("/", communityHandlers.CreateCommunitiesHandler)
-	r.With(auth.AuthMiddleware).Post("/users", communityHandlers.CreateCommunitiesUserHandler)
-	r.With(auth.AuthMiddleware).Post("/properties", communityHandlers.CreateCommunitiesPropertyHandler)
-	r.With(auth.AuthMiddleware).Put("/{id}", communityHandlers.UpdateCommunitiesHandler)
-	r.With(auth.AuthMiddleware).Put("/transfer/ownership", communityHandlers.TransferCommunityOwnershipHandler)
-	r.With(auth.AuthMiddleware).Delete("/{id}", communityHandlers.DeleteCommunitiesHandler)
-	r.With(auth.AuthMiddleware).Delete("/users", communityHandlers.DeleteCommunitiesUserHandler)
-	r.With(auth.AuthMiddleware).Delete("/properties", communityHandlers.DeleteCommunitiesPropertiesHandler)
+	r.With(app_middleware.AuthMiddleware).Post("/", communityHandlers.CreateCommunitiesHandler)
+	r.With(app_middleware.AuthMiddleware).Post("/users", communityHandlers.CreateCommunitiesUserHandler)
+	r.With(app_middleware.AuthMiddleware).Post("/properties", communityHandlers.CreateCommunitiesPropertyHandler)
+	r.With(app_middleware.AuthMiddleware).Put("/{id}", communityHandlers.UpdateCommunitiesHandler)
+	r.With(app_middleware.AuthMiddleware).Put("/transfer/ownership", communityHandlers.TransferCommunityOwnershipHandler)
+	r.With(app_middleware.AuthMiddleware).Delete("/{id}", communityHandlers.DeleteCommunitiesHandler)
+	r.With(app_middleware.AuthMiddleware).Delete("/users", communityHandlers.DeleteCommunitiesUserHandler)
+	r.With(app_middleware.AuthMiddleware).Delete("/properties", communityHandlers.DeleteCommunitiesPropertiesHandler)
 
 	return r
 }
@@ -151,7 +150,7 @@ func RegisterRoutes(s interfaces.Server) http.Handler {
 	// Global Middlewares
 	r.Use(middleware.Logger)               // stdout logger
 	r.Use(middleware.NoCache)              // dont cache responses (especially important to get up to date api/auth responses)
-	r.Use(customMiddleware.CorsMiddleware) // set headers for CORS
+	r.Use(app_middleware.CorsMiddleware) // set headers for CORS
 
 	// Auth
 	authRouter := NewAuthRouter(s)

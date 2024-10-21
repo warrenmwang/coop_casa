@@ -4,14 +4,17 @@ import (
 	"testing"
 )
 
+// TODO:
 func TestRespondWithJSON(t *testing.T) {
 
 }
 
+// TODO:
 func TestRespondWithError(t *testing.T) {
 
 }
 
+// TODO:
 func TestGenerateToken(t *testing.T) {
 	// s := NewInternalServer()
 

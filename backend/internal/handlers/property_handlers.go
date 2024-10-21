@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"backend/internal/auth"
+	"backend/internal/app_middleware"
 	"backend/internal/config"
 	"backend/internal/database"
 	"backend/internal/interfaces"
@@ -116,7 +116,7 @@ func (h *PropertyHandler) GetPropertiesHandler(w http.ResponseWriter, r *http.Re
 // AUTHED
 func (h *PropertyHandler) CreatePropertiesHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
-	userID, ok := r.Context().Value(auth.UserIDKey).(string)
+	userID, ok := r.Context().Value(app_middleware.UserIDKey).(string)
 	if !ok {
 		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("user id blank"))
 		return
@@ -235,7 +235,7 @@ func (h *PropertyHandler) CreatePropertiesHandler(w http.ResponseWriter, r *http
 // AUTHED
 func (h *PropertyHandler) UpdatePropertiesHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
-	authedUserID, ok := r.Context().Value(auth.UserIDKey).(string)
+	authedUserID, ok := r.Context().Value(app_middleware.UserIDKey).(string)
 	if !ok {
 		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("user id blank"))
 		return
@@ -386,7 +386,7 @@ func (h *PropertyHandler) UpdatePropertiesHandler(w http.ResponseWriter, r *http
 // AUTHED
 func (h *PropertyHandler) DeletePropertiesHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user id
-	userID, ok := r.Context().Value(auth.UserIDKey).(string)
+	userID, ok := r.Context().Value(app_middleware.UserIDKey).(string)
 	if !ok {
 		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("user id blank"))
 		return
@@ -428,7 +428,7 @@ func (h *PropertyHandler) DeletePropertiesHandler(w http.ResponseWriter, r *http
 // AUTHED
 func (h *PropertyHandler) TransferAllPropertiesOwnershipHandler(w http.ResponseWriter, r *http.Request) {
 	// Get authenticated user's ID
-	authedUserID, ok := r.Context().Value(auth.UserIDKey).(string)
+	authedUserID, ok := r.Context().Value(app_middleware.UserIDKey).(string)
 	if !ok {
 		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("user id blank"))
 		return
@@ -482,7 +482,7 @@ func (h *PropertyHandler) TransferAllPropertiesOwnershipHandler(w http.ResponseW
 // Transfers a property that the caller owns to the user account specified via the query parameter.
 func (h *PropertyHandler) TransferPropertyOwnershipHandler(w http.ResponseWriter, r *http.Request) {
 	// Get authenticated user's ID
-	authedUserID, ok := r.Context().Value(auth.UserIDKey).(string)
+	authedUserID, ok := r.Context().Value(app_middleware.UserIDKey).(string)
 	if !ok {
 		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("user id blank"))
 		return

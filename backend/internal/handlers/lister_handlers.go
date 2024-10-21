@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"backend/internal/auth"
+	"backend/internal/app_middleware"
 	"backend/internal/config"
 	"backend/internal/database"
 	"backend/internal/interfaces"
@@ -26,7 +26,7 @@ func NewListerHandlers(s interfaces.Server) *ListerHandler {
 // AUTHED
 func (h *ListerHandler) GetListersFromListersHandler(w http.ResponseWriter, r *http.Request) {
 	// Get authenticated user's ID
-	authedUserID, ok := r.Context().Value(auth.UserIDKey).(string)
+	authedUserID, ok := r.Context().Value(app_middleware.UserIDKey).(string)
 	if !ok {
 		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("user id blank"))
 		return

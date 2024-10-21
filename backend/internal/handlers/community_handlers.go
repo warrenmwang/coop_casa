@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"backend/internal/auth"
+	"backend/internal/app_middleware"
 	"backend/internal/database"
 	"backend/internal/interfaces"
 	"backend/internal/utils"
@@ -130,7 +130,7 @@ func (h *CommunityHandler) GetCommunitiesHandler(w http.ResponseWriter, r *http.
 // AUTHED
 func (h *CommunityHandler) CreateCommunitiesHandler(w http.ResponseWriter, r *http.Request) {
 	// Get authenticated user's ID
-	authedUserID, ok := r.Context().Value(auth.UserIDKey).(string)
+	authedUserID, ok := r.Context().Value(app_middleware.UserIDKey).(string)
 	if !ok {
 		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("user id blank"))
 		return
@@ -220,7 +220,7 @@ func (h *CommunityHandler) CreateCommunitiesHandler(w http.ResponseWriter, r *ht
 // adds a given userId to the given communityId, where the userid in the token must be an admin (currently only one admin per group allowed)
 func (h *CommunityHandler) CreateCommunitiesUserHandler(w http.ResponseWriter, r *http.Request) {
 	// Get authenticated user's ID
-	authedUserID, ok := r.Context().Value(auth.UserIDKey).(string)
+	authedUserID, ok := r.Context().Value(app_middleware.UserIDKey).(string)
 	if !ok {
 		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("user id blank"))
 		return
@@ -277,7 +277,7 @@ func (h *CommunityHandler) CreateCommunitiesUserHandler(w http.ResponseWriter, r
 // adds a given propertyId to the given communityId, where userid in token must be an admin
 func (h *CommunityHandler) CreateCommunitiesPropertyHandler(w http.ResponseWriter, r *http.Request) {
 	// Get authenticated user's ID
-	authedUserID, ok := r.Context().Value(auth.UserIDKey).(string)
+	authedUserID, ok := r.Context().Value(app_middleware.UserIDKey).(string)
 	if !ok {
 		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("user id blank"))
 		return
@@ -333,7 +333,7 @@ func (h *CommunityHandler) CreateCommunitiesPropertyHandler(w http.ResponseWrite
 // AUTHED
 func (h *CommunityHandler) UpdateCommunitiesHandler(w http.ResponseWriter, r *http.Request) {
 	// Get authenticated user's ID
-	authedUserID, ok := r.Context().Value(auth.UserIDKey).(string)
+	authedUserID, ok := r.Context().Value(app_middleware.UserIDKey).(string)
 	if !ok {
 		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("user id blank"))
 		return
@@ -491,7 +491,7 @@ func (h *CommunityHandler) UpdateCommunitiesHandler(w http.ResponseWriter, r *ht
 // AUTHED
 func (h *CommunityHandler) DeleteCommunitiesHandler(w http.ResponseWriter, r *http.Request) {
 	// Get authenticated user's ID
-	authedUserID, ok := r.Context().Value(auth.UserIDKey).(string)
+	authedUserID, ok := r.Context().Value(app_middleware.UserIDKey).(string)
 	if !ok {
 		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("user id blank"))
 		return
@@ -530,7 +530,7 @@ func (h *CommunityHandler) DeleteCommunitiesHandler(w http.ResponseWriter, r *ht
 // AUTHED
 func (h *CommunityHandler) DeleteCommunitiesUserHandler(w http.ResponseWriter, r *http.Request) {
 	// Get authenticated user's ID
-	authedUserID, ok := r.Context().Value(auth.UserIDKey).(string)
+	authedUserID, ok := r.Context().Value(app_middleware.UserIDKey).(string)
 	if !ok {
 		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("user id blank"))
 		return
@@ -581,7 +581,7 @@ func (h *CommunityHandler) DeleteCommunitiesUserHandler(w http.ResponseWriter, r
 // AUTHED
 func (h *CommunityHandler) DeleteCommunitiesPropertiesHandler(w http.ResponseWriter, r *http.Request) {
 	// Get authenticated user's ID
-	authedUserID, ok := r.Context().Value(auth.UserIDKey).(string)
+	authedUserID, ok := r.Context().Value(app_middleware.UserIDKey).(string)
 	if !ok {
 		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("user id blank"))
 		return
@@ -628,7 +628,7 @@ func (h *CommunityHandler) DeleteCommunitiesPropertiesHandler(w http.ResponseWri
 // AUTHED
 func (h *CommunityHandler) TransferCommunityOwnershipHandler(w http.ResponseWriter, r *http.Request) {
 	// Get authenticated user's ID
-	authedUserID, ok := r.Context().Value(auth.UserIDKey).(string)
+	authedUserID, ok := r.Context().Value(app_middleware.UserIDKey).(string)
 	if !ok {
 		utils.RespondWithError(w, http.StatusMethodNotAllowed, errors.New("user id blank"))
 		return

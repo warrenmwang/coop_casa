@@ -1,3 +1,5 @@
+// Package config holds gloval constant values and contains functions
+// to load in all the environment variables used through the backend service.
 package config
 
 import (
@@ -8,6 +10,8 @@ import (
 )
 
 var GlobalConfig *Config
+
+const MAX_TOKEN_AGE = 86400 * 30 // 30 days
 
 const USER_ROLE_REGULAR = "regular"
 const USER_ROLE_LISTER = "lister"
@@ -75,6 +79,7 @@ type Config struct {
 	ADMIN_USER_ID         string
 }
 
+// Initconfig reads in and saves all the environment variables used in the backend service.
 func InitConfig() {
 	// Server config
 	backendPort, err := strconv.Atoi(os.Getenv("INTERNAL_BACKEND_PORT"))
