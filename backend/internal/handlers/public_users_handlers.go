@@ -57,11 +57,7 @@ func (h *UserProfileHandler) GetUsersHandler(w http.ResponseWriter, r *http.Requ
 	firstNameFilter := query.Get("filterFirstName")
 	lastNameFilter := query.Get("filterLastName")
 	var userIDs []string
-	if firstNameFilter != "" || lastNameFilter != "" {
-		userIDs, err = h.server.DB().GetNextPagePublicUserIDsFilterByName(limitInt, offsetInt, firstNameFilter, lastNameFilter)
-	} else {
-		userIDs, err = h.server.DB().GetNextPagePublicUserIDs(limitInt, offsetInt)
-	}
+	userIDs, err = h.server.DB().GetNextPagePublicUserIDs(limitInt, offsetInt, firstNameFilter, lastNameFilter)
 	if err != nil {
 		utils.RespondWithError(w, http.StatusInternalServerError, err)
 		return

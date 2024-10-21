@@ -113,8 +113,7 @@ type Service interface {
 	DeleteUserOwnedCommunities(userID string) error
 
 	// Public User Discovery API
-	GetNextPagePublicUserIDs(limit, offset int32) ([]string, error)
-	GetNextPagePublicUserIDsFilterByName(limit, offset int32, firstName, lastName string) ([]string, error)
+	GetNextPagePublicUserIDs(limit, offset int32, firstName, lastName string) ([]string, error)
 	GetPublicUserProfile(userID string) (PublicUserProfile, error)
 }
 
@@ -1715,12 +1714,21 @@ func (s *service) DeleteUserOwnedCommunities(userID string) error {
 	return err
 }
 
-func (s *service) GetNextPagePublicUserIDs(limit, offset int32) ([]string, error) {
+func (s *service) GetNextPagePublicUserIDs(limit, offset int32, firstName, lastName string) ([]string, error) {
 	ctx := context.Background()
 
 	// Encrypt the normal status to be used to filter out user profiles whose
 	// account statuses are not normal/public.
 	normalStatus_E, err := utils.EncryptString(config.USER_STATUS_NORMAL, s.db_encrypt_key)
+	if err != nil {
+		return []string{}, err
+	}
+
+	firstName_E, err := utils.EncryptString(firstName, s.db_encrypt_key)
+	if err != nil {
+		return []string{}, err
+	}
+	lastName_E, err := utils.EncryptString(lastName, s.db_encrypt_key)
 	if err != nil {
 		return []string{}, err
 	}
@@ -1728,50 +1736,9 @@ func (s *service) GetNextPagePublicUserIDs(limit, offset int32) ([]string, error
 	userIdsEncrypted, err := s.db_queries.GetNextPageOfPublicUsers(ctx, sqlc.GetNextPageOfPublicUsersParams{
 		Limit:  limit,
 		Offset: offset,
+		Column3: firstName_E,
+		Column4: lastName_E,
 		Status: normalStatus_E,
-	})
-	if err != nil {
-		return []string{}, err
-	}
-
-	// Decrypt userIDs
-	var userIDs []string
-	for _, userID := range userIdsEncrypted {
-		decryptedUserID, err := utils.DecryptString(userID, s.db_encrypt_key)
-		if err != nil {
-			return []string{}, err
-		}
-		userIDs = append(userIDs, decryptedUserID)
-	}
-
-	return userIDs, nil
-}
-
-func (s *service) GetNextPagePublicUserIDsFilterByName(limit, offset int32, firstName, lastName string) ([]string, error) {
-	ctx := context.Background()
-
-	encryptedFirstName, err := utils.EncryptString(firstName, s.db_encrypt_key)
-	if err != nil {
-		return []string{}, err
-	}
-	encryptedLastName, err := utils.EncryptString(lastName, s.db_encrypt_key)
-	if err != nil {
-		return []string{}, err
-	}
-
-	// Encrypt the normal status to be used to filter out user profiles whose
-	// account statuses are not normal/public.
-	normalStatus_E, err := utils.EncryptString(config.USER_STATUS_NORMAL, s.db_encrypt_key)
-	if err != nil {
-		return []string{}, err
-	}
-
-	userIdsEncrypted, err := s.db_queries.GetNextPageOfPublicUsersFilterByName(ctx, sqlc.GetNextPageOfPublicUsersFilterByNameParams{
-		Limit:        limit,
-		Offset:       offset,
-		Similarity:   encryptedFirstName,
-		Similarity_2: encryptedLastName,
-		Status:       normalStatus_E,
 	})
 	if err != nil {
 		return []string{}, err
