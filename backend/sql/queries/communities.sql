@@ -1,55 +1,22 @@
--- thinking like be able to search by 2 things: name of community and something from the description
--- the way we return an ordering of communities will be by a weighted objective function
--- like ( name_weight * name_match_score + description_weight * description_match_score )
--- where name_weight and description_weight are chosen by us.
--- and the scores are calculated using something like similarity edit distance between the search term
--- and the actual values from the db.
---
--- name: GetNextPageCommunitiesFilterByName :many
-SELECT
-    community_id
-FROM
-    communities
-ORDER BY
-    similarity ("name", $3) DESC
-LIMIT
-    $1
-OFFSET
-    $2;
-
-
--- name: GetNextPageCommunitiesFilterByDescription :many
-SELECT
-    community_id
-FROM
-    communities
-ORDER BY
-    similarity ("description", $3) DESC
-LIMIT
-    $1
-OFFSET
-    $2;
-
-
--- name: GetNextPageCommunitiesFilteredByCombination :many
-SELECT
-    community_id
-FROM
-    communities
-ORDER BY
-    0.4 * similarity ("name", $3) + 0.6 * similarity ("description", $4) DESC
-LIMIT
-    $1
-OFFSET
-    $2;
-
-
 -- name: GetNextPageCommunities :many
 SELECT
     community_id
 FROM
     communities
 ORDER BY
+    CASE
+        WHEN $3 <> ''
+        AND $4 <> '' THEN 0.4 * similarity ("name", $3) + 0.6 * similarity ("description", $4)
+        WHEN $3 <> '' THEN CASE
+            WHEN "name" <> '' THEN similarity ("name", $3)
+            ELSE 0
+        END
+        WHEN $4 <> '' THEN CASE
+            WHEN "description" <> '' THEN similarity ("description", $4)
+            ELSE 0
+        END
+        ELSE 0
+    END DESC,
     id
 LIMIT
     $1
