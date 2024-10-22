@@ -20,6 +20,8 @@ docker exec -i backend-psql-1 pg_dump -U $DB_USERNAME --column-inserts --data-on
 docker exec -i backend-psql-1 pg_dump -U $DB_USERNAME --column-inserts --data-only --table=users_saved_properties $DB_DATABASE > ./local_backups/users_saved_properties_dumpfile
 docker exec -i backend-psql-1 pg_dump -U $DB_USERNAME --column-inserts --data-only --table=users_saved_communities $DB_DATABASE > ./local_backups/users_saved_communities_dumpfile
 
+docker exec -i backend-psql-1 pg_dump -U $DB_USERNAME --column-inserts --data-only --table=users_status $DB_DATABASE > ./local_backups/users_status_dumpfile
+
 docker exec -i backend-psql-1 pg_dump -U $DB_USERNAME --column-inserts --data-only --table=properties $DB_DATABASE > ./local_backups/properties_details_dumpfile
 docker exec -i backend-psql-1 pg_dump -U $DB_USERNAME --column-inserts --data-only --table=properties_images $DB_DATABASE > ./local_backups/properties_images_dumpfile
 
