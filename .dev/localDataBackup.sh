@@ -9,7 +9,6 @@ else
     exit 1
 fi
 
-
 docker exec -i backend-psql-1 pg_dump -U $DB_USERNAME --column-inserts --data-only --table=goose_db_version $DB_DATABASE > ./local_backups/goose_db_version_dumpfile
 
 docker exec -i backend-psql-1 pg_dump -U $DB_USERNAME --column-inserts --data-only --table=users $DB_DATABASE > ./local_backups/users_details_dumpfile

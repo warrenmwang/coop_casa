@@ -1,23 +1,21 @@
-# Use Go Image
-FROM golang:1.22
-
-# Install PostgreSQL client (to ensure db is up before running migrations)
-RUN apt-get update && apt-get install -y postgresql-client
-
-# Define app directory
+# Build stage
+FROM golang:1.22-alpine AS build
 WORKDIR /app
-
-# Copy the Go modules and sum files
-COPY go.mod go.sum ./
-
-# Download Go module dependencies
+COPY . .
 RUN go mod download && go mod verify
+RUN go build -o main cmd/api/main.go
 
-# Install Goose
+# Goose stage
+FROM golang:1.22-alpine AS goose
 RUN go install github.com/pressly/goose/v3/cmd/goose@latest
 
-# Copy the rest of the application's source code
-COPY . .
-
-# Build the Application
-RUN go build -o main cmd/api/main.go
+# Deployment stage
+FROM alpine:3.19
+WORKDIR /app
+RUN apk add --no-cache bash
+COPY ./sql/schema ./sql/schema
+COPY --from=build /app/main ./
+COPY --from=goose /go/bin/goose /usr/local/bin/goose
+COPY goose_migrate.sh .
+RUN chmod +x goose_migrate.sh
+CMD [ "/bin/bash", "-c", "./goose_migrate.sh && ./main" ]
