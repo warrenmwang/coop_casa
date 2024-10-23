@@ -1,6 +1,5 @@
 import React from "react";
 import {
-  validateTextLength,
   validateDate,
   validateEmail,
 } from "../../utils/inputValidation";
@@ -36,16 +35,9 @@ const TextInput: React.FC<TextInputArgs> = ({
   classNameCustom = "",
 }) => {
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const { id, value } = e.target;
-
-    // Validate text input
-    if (type === "text") {
-      if (!validateTextLength(value)) {
-        return;
-      }
-    }
 
     // Validate date if type is date
     if (type === "date") {

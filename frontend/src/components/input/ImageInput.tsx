@@ -29,11 +29,12 @@ const ImageInput: React.FC<ImageInputArgs> = ({
       const file = files[0];
 
       // Validate avatar image upload
-      if (!validateUserAvatarInput(file)) {
+      const [errMsg, isValid] = validateUserAvatarInput(file);
+      if (!isValid) {
         if (setError) {
           setError("avatar", true);
         }
-        toast.error("Please upload a valid image file (JPEG, PNG, or GIF).");
+        toast.error(errMsg);
         e.target.value = ""; // Clear the input value to allow re-upload
         return;
       }

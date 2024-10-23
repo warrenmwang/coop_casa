@@ -20,7 +20,7 @@ const GenderInput: React.FC<GenderInputArgs> = ({
 }) => {
   // Handles changes for text fields
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    e: React.ChangeEvent<HTMLSelectElement>,
   ) => {
     const { id, value: val } = e.target;
 

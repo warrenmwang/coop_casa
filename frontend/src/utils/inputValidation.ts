@@ -1,45 +1,44 @@
-import { toast } from "react-toastify";
 import { z } from "zod";
-import { MAX_TEXT_INPUT_LENGTH, MAX_IMAGE_FILE_SIZE } from "appConstants";
-
-export const validateTextLength = (value: string): boolean => {
-  // Check if the value length exceeds our MAX_TEXT_INPUT_LENGTH characters
-  return value.length <= MAX_TEXT_INPUT_LENGTH;
-};
+import { MAX_IMAGE_FILE_SIZE } from "appConstants";
 
 export const validateDate = (value: string): boolean => {
-  // Validate the date format via regular expression
+  // First test date format via regular expression
   const datePattern = /^\d{4}-\d{2}-\d{2}$/; // YYYY-MM-DD format
-  return datePattern.test(value);
+  if (!datePattern.test(value)) return false;
+  // Second test with zod
+  const tmp = z.string().date().safeParse(value);
+  if (!tmp.success) return false;
+  // Date must be at least 1000-01-01 (arbitrary)
+  return Date.parse(tmp.data) >= Date.parse("1000-01-01");
 };
 
 export const validateEmail = (value: string): boolean => {
-  // Validate email format via regular expression
+  // First test with regular expression
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(value);
+  if (!emailRegex.test(value)) return false;
+  // Second test with zod
+  return z.string().email().safeParse(value).success;
 };
 
-export const validateUserAvatarInput = (file: File): boolean => {
+export const validateUserAvatarInput = (file: File): [string, boolean] => {
   const validImageTypes = ["image/jpeg", "image/png", "image/gif"];
 
   // Check file size
   if (file.size > MAX_IMAGE_FILE_SIZE) {
-    toast.error("File size should not exceed 5 MiB.");
-    return false;
+    return ["File size should not exceed 5 MiB.", false];
   }
 
   // Check file type is valid image
   if (!validImageTypes.includes(file.type)) {
-    return false;
+    return ["Please upload a valid image file (JPEG, PNG, or GIF).", false];
   }
 
-  return true;
+  return ["", true];
 };
 
 export const validateUUID = (uuid: string): [string, boolean] => {
   const { data, success } = z.string().uuid().safeParse(uuid);
-  if (success) return [data, success];
-  else return ["", success];
+  return success ? [data, success] : ["", success];
 };
 
 export const validateUserID = (userID: string): boolean => {
