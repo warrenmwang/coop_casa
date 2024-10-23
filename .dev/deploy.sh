@@ -21,12 +21,6 @@ runTests() {
 }
 
 deployToProd() {
-    echo "Merging current local git branch dev into main and pushing to remote."
-    git checkout main
-    git merge dev
-    git push origin main
-    git checkout dev
-
     # get env vars for prod
     if [ -f .env_prod ]; then
         set -a
@@ -90,8 +84,15 @@ deployToProd() {
 
     if [ $? -ne 0 ]; then
         echo "Someting went wrong with deployment!"
+        echo "Check the logs! Aborting merging changes to main."
         exit 1
     fi
+
+    echo "Merging current local git branch dev into main and pushing to remote."
+    git checkout main
+    git merge dev
+    git push origin main
+    git checkout dev
 
     echo "Deployed to prod successfully."
 }
