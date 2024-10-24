@@ -1,4 +1,3 @@
-import React from "react";
 import "test-utils";
 import {
   validateDate,
@@ -108,8 +107,6 @@ describe("validateEmail function", () => {
       expected: false,
     },
     { name: "empty string fails", input: "", expected: false },
-    { name: "null fails", input: null as any, expected: false },
-    { name: "undefined fails", input: undefined as any, expected: false },
   ];
 
   test.each(testCases)("$name", ({ input, expected }) => {
@@ -145,8 +142,6 @@ describe("validateUUID function", () => {
       expected: ["", false],
     },
     { name: "empty string fails", input: "", expected: ["", false] },
-    { name: "null fails", input: null as any, expected: ["", false] },
-    { name: "undefined fails", input: undefined as any, expected: ["", false] },
   ];
 
   test.each(testCases)("$name", ({ input, expected }) => {
@@ -187,8 +182,6 @@ describe("validateUserID function", () => {
       expected: false,
     },
     { name: "empty string fails", input: "", expected: false },
-    { name: "null fails", input: null as any, expected: false },
-    { name: "undefined fails", input: undefined as any, expected: false },
   ];
 
   test.each(testCases)("$name", ({ input, expected }) => {

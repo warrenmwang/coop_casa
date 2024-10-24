@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"net/mail"
 	"regexp"
+	"strings"
 
 	goaway "github.com/TwiN/go-away"
 	"github.com/google/uuid"
@@ -211,14 +212,14 @@ func ValidateUserDetails(userDetails database.UserDetails) error {
 	}
 
 	// Validate name fields
-	if len(userDetails.FirstName) == 0 {
+	if len(strings.TrimSpace(userDetails.FirstName)) == 0 {
 		return errors.New("first name is empty")
 	}
 	if goaway.IsProfane(userDetails.FirstName) {
 		return fmt.Errorf("first name cannot contain profanity: %s", goaway.ExtractProfanity(userDetails.FirstName))
 	}
 
-	if len(userDetails.LastName) == 0 {
+	if len(strings.TrimSpace(userDetails.LastName)) == 0 {
 		return errors.New("last name is empty")
 	}
 	if goaway.IsProfane(userDetails.LastName) {
@@ -246,7 +247,7 @@ func ValidateUserDetails(userDetails database.UserDetails) error {
 		return fmt.Errorf("gender is not one of our supported options: %s", userDetails.Gender)
 	}
 
-	if len(userDetails.Location) == 0 {
+	if len(strings.TrimSpace(userDetails.Location)) == 0 {
 		return errors.New("location is empty")
 	}
 	if goaway.IsProfane(userDetails.Location) {

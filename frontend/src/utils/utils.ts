@@ -46,11 +46,14 @@ export const fileArray2OrderedFileArray = (arr: File[]): OrderedFile[] => {
 };
 
 export function isAccountSetup(userDetails: UserDetails): boolean {
-  if (userDetails.firstName === "") return false;
-  if (userDetails.lastName === "") return false;
-  if (userDetails.birthDate === "") return false;
-  if (userDetails.gender === "") return false;
-  if (userDetails.location === "") return false;
+  if (userDetails.firstName.trim() === "") return false;
+  if (userDetails.lastName.trim() === "") return false;
+  if (userDetails.birthDate.trim() === "") return false;
+  if (userDetails.gender.trim() === "") return false;
+  if (userDetails.location.trim() === "") return false;
   if (userDetails.interests.length === 0) return false;
+  for (const interest of userDetails.interests) {
+    if (interest.trim().length === 0) return false;
+  }
   return true;
 }

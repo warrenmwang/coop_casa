@@ -1,4 +1,3 @@
-import React from "react";
 import "test-utils";
 import { OrderedFile, UserDetails } from "types/Types";
 import {
@@ -379,6 +378,102 @@ describe("isAccountSetup", () => {
         gender: "",
         location: "",
         interests: [],
+      },
+      expected: false,
+    },
+    {
+      name: "all fields whitespace",
+      input: {
+        firstName: "    ",
+        lastName: "    ",
+        birthDate: "    ",
+        gender: "    ",
+        location: "    ",
+        interests: "    ",
+      },
+      expected: false,
+    },
+    {
+      name: "partial set up account (firstName whitespace)",
+      input: {
+        firstName: "    ",
+        lastName: "Doe",
+        birthDate: "1990-01-01",
+        gender: "Male",
+        location: "New York",
+        interests: ["Reading", "Hiking"],
+      },
+      expected: false,
+    },
+    {
+      name: "partial set up account (lastName whitespace)",
+      input: {
+        firstName: "John",
+        lastName: "    ",
+        birthDate: "1990-01-01",
+        gender: "Male",
+        location: "New York",
+        interests: ["Reading", "Hiking"],
+      },
+      expected: false,
+    },
+    {
+      name: "partial set up account (birthDate whitespace)",
+      input: {
+        firstName: "John",
+        lastName: "Doe",
+        birthDate: "    ",
+        gender: "Male",
+        location: "New York",
+        interests: ["Reading", "Hiking"],
+      },
+      expected: false,
+    },
+    {
+      name: "partial set up account (gender whitespace)",
+      input: {
+        firstName: "John",
+        lastName: "Doe",
+        birthDate: "1990-01-01",
+        gender: "    ",
+        location: "New York",
+        interests: ["Reading", "Hiking"],
+      },
+      expected: false,
+    },
+    {
+      name: "partial set up account (location whitespace)",
+      input: {
+        firstName: "John",
+        lastName: "Doe",
+        birthDate: "1990-01-01",
+        gender: "Male",
+        location: "    ",
+        interests: ["Reading", "Hiking"],
+      },
+      expected: false,
+    },
+    {
+      name: "partial set up account (interests whitespace multiple)",
+      input: {
+        firstName: "John",
+        lastName: "Doe",
+        birthDate: "1990-01-01",
+        gender: "Male",
+        location: "New York",
+        interests: ["    ", "    "],
+      },
+      expected: false,
+    },
+    {
+      name: "partial set up account (interests whitespace single)",
+      input: {
+        firstName: "John",
+        lastName: "Doe",
+        birthDate: "1990-01-01",
+        gender: "Male",
+        location: "New York",
+        interests: ["    "],
       },
       expected: false,
     },

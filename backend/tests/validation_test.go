@@ -865,6 +865,7 @@ func TestValidatePropertyDetails(t *testing.T) {
 
 func TestValidateUserDetails(t *testing.T) {
 	type test struct {
+		name        string
 		input       database.UserDetails
 		expectError bool
 	}
@@ -872,7 +873,8 @@ func TestValidateUserDetails(t *testing.T) {
 	userID1 := "109237874690123193857"
 	tests := []test{
 		{
-			database.UserDetails{
+			name: "regular input 1",
+			input: database.UserDetails{
 				UserID:    userID1,
 				Email:     "example@example.com",
 				FirstName: "santa",
@@ -882,10 +884,11 @@ func TestValidateUserDetails(t *testing.T) {
 				Location:  "North Pole, Arctic",
 				Interests: []string{"Reading", "Traveling", "History"},
 			},
-			false,
+			expectError: false,
 		},
 		{
-			database.UserDetails{
+			name: "regular input 2",
+			input: database.UserDetails{
 				UserID:    userID1,
 				Email:     "example@example.com",
 				FirstName: "frosty",
@@ -895,10 +898,11 @@ func TestValidateUserDetails(t *testing.T) {
 				Location:  "Siberia",
 				Interests: []string{"Reading", "Traveling", "History"},
 			},
-			false,
+			expectError: false,
 		},
 		{
-			database.UserDetails{
+			name: "no user id",
+			input: database.UserDetails{
 				UserID:    "", // empty user id
 				Email:     "example@example.com",
 				FirstName: "santa",
@@ -908,10 +912,11 @@ func TestValidateUserDetails(t *testing.T) {
 				Location:  "North Pole, Arctic",
 				Interests: []string{"Reading", "Traveling", "History"},
 			},
-			true,
+			expectError: true,
 		},
 		{
-			database.UserDetails{
+			name: "no email",
+			input: database.UserDetails{
 				UserID:    userID1,
 				Email:     "", // empty email
 				FirstName: "santa",
@@ -921,10 +926,11 @@ func TestValidateUserDetails(t *testing.T) {
 				Location:  "North Pole, Arctic",
 				Interests: []string{"Reading", "Traveling", "History"},
 			},
-			true,
+			expectError: true,
 		},
 		{
-			database.UserDetails{
+			name: "no first name",
+			input: database.UserDetails{
 				UserID:    userID1,
 				Email:     "example@example.com",
 				FirstName: "", // empty first name
@@ -934,10 +940,11 @@ func TestValidateUserDetails(t *testing.T) {
 				Location:  "North Pole, Arctic",
 				Interests: []string{"Reading", "Traveling", "History"},
 			},
-			true,
+			expectError: true,
 		},
 		{
-			database.UserDetails{
+			name: "no last name",
+			input: database.UserDetails{
 				UserID:    userID1,
 				Email:     "example@example.com",
 				FirstName: "santa",
@@ -947,10 +954,11 @@ func TestValidateUserDetails(t *testing.T) {
 				Location:  "North Pole, Arctic",
 				Interests: []string{"Reading", "Traveling", "History"},
 			},
-			true,
+			expectError: true,
 		},
 		{
-			database.UserDetails{
+			name: "no birthdate",
+			input: database.UserDetails{
 				UserID:    userID1,
 				Email:     "example@example.com",
 				FirstName: "santa",
@@ -960,10 +968,11 @@ func TestValidateUserDetails(t *testing.T) {
 				Location:  "North Pole, Arctic",
 				Interests: []string{"Reading", "Traveling", "History"},
 			},
-			true,
+			expectError: true,
 		},
 		{
-			database.UserDetails{
+			name: "user is too young (below 18, 0 years old)",
+			input: database.UserDetails{
 				UserID:    userID1,
 				Email:     "example@example.com",
 				FirstName: "santa",
@@ -973,10 +982,11 @@ func TestValidateUserDetails(t *testing.T) {
 				Location:  "North Pole, Arctic",
 				Interests: []string{"Reading", "Traveling", "History"},
 			},
-			true,
+			expectError: true,
 		},
 		{
-			database.UserDetails{
+			name: "no gender",
+			input: database.UserDetails{
 				UserID:    userID1,
 				Email:     "example@example.com",
 				FirstName: "santa",
@@ -986,10 +996,11 @@ func TestValidateUserDetails(t *testing.T) {
 				Location:  "North Pole, Arctic",
 				Interests: []string{"Reading", "Traveling", "History"},
 			},
-			true,
+			expectError: true,
 		},
 		{
-			database.UserDetails{
+			name: "no location",
+			input: database.UserDetails{
 				UserID:    userID1,
 				Email:     "example@example.com",
 				FirstName: "santa",
@@ -999,10 +1010,11 @@ func TestValidateUserDetails(t *testing.T) {
 				Location:  "", // empty location
 				Interests: []string{"Reading", "Traveling", "History"},
 			},
-			true,
+			expectError: true,
 		},
 		{
-			database.UserDetails{
+			name: "no interests",
+			input: database.UserDetails{
 				UserID:    userID1,
 				Email:     "example@example.com",
 				FirstName: "santa",
@@ -1012,10 +1024,11 @@ func TestValidateUserDetails(t *testing.T) {
 				Location:  "North Pole, Arctic",
 				Interests: []string{}, // empty interests
 			},
-			true,
+			expectError: true,
 		},
 		{
-			database.UserDetails{
+			name: "invalid interest",
+			input: database.UserDetails{
 				UserID:    userID1,
 				Email:     "example@example.com",
 				FirstName: "santa",
@@ -1025,10 +1038,11 @@ func TestValidateUserDetails(t *testing.T) {
 				Location:  "North Pole, Arctic",
 				Interests: []string{"making love to santa claus"}, // invalid interest
 			},
-			true,
+			expectError: true,
 		},
 		{
-			database.UserDetails{
+			name: "first name contains profanity",
+			input: database.UserDetails{
 				UserID:    userID1,
 				Email:     "example@example.com",
 				FirstName: "fuck you", // profanity
@@ -1038,10 +1052,11 @@ func TestValidateUserDetails(t *testing.T) {
 				Location:  "North Pole, Arctic",
 				Interests: []string{"Reading", "Traveling", "History"},
 			},
-			true,
+			expectError: true,
 		},
 		{
-			database.UserDetails{
+			name: "last name contains profanity",
+			input: database.UserDetails{
 				UserID:    userID1,
 				Email:     "example@example.com",
 				FirstName: "firstname",
@@ -1051,10 +1066,11 @@ func TestValidateUserDetails(t *testing.T) {
 				Location:  "North Pole, Arctic",
 				Interests: []string{"Reading", "Traveling", "History"},
 			},
-			true,
+			expectError: true,
 		},
 		{
-			database.UserDetails{
+			name: "both name fields contain profanity",
+			input: database.UserDetails{
 				UserID:    userID1,
 				Email:     "example@example.com",
 				FirstName: "fuck you",      // profanity
@@ -1064,19 +1080,145 @@ func TestValidateUserDetails(t *testing.T) {
 				Location:  "North Pole, Arctic",
 				Interests: []string{"Reading", "Traveling", "History"},
 			},
-			true,
+			expectError: true,
+		},
+		{
+			name: "user id contains only whitespace",
+			input: database.UserDetails{
+				UserID:    "    ",
+				Email:     "example@example.com",
+				FirstName: "santa",
+				LastName:  "claus",
+				BirthDate: "    ",
+				Gender:    "Man",
+				Location:  "North Pole, Arctic",
+				Interests: []string{"Reading", "Traveling", "History"},
+			},
+			expectError: true,
+		},
+		{
+			name: "email contains only whitespace",
+			input: database.UserDetails{
+				UserID:    userID1,
+				Email:     "    ",
+				FirstName: "santa",
+				LastName:  "claus",
+				BirthDate: "    ",
+				Gender:    "Man",
+				Location:  "North Pole, Arctic",
+				Interests: []string{"Reading", "Traveling", "History"},
+			},
+			expectError: true,
+		},
+		{
+			name: "first name contains only whitespace",
+			input: database.UserDetails{
+				UserID:    userID1,
+				Email:     "example@example.com",
+				FirstName: "    ",
+				LastName:  "claus",
+				BirthDate: "0280-12-25",
+				Gender:    "Man",
+				Location:  "North Pole, Arctic",
+				Interests: []string{"Reading", "Traveling", "History"},
+			},
+			expectError: true,
+		},
+		{
+			name: "last name contains only whitespace",
+			input: database.UserDetails{
+				UserID:    userID1,
+				Email:     "example@example.com",
+				FirstName: "santa",
+				LastName:  "    ",
+				BirthDate: "0280-12-25",
+				Gender:    "Man",
+				Location:  "North Pole, Arctic",
+				Interests: []string{"Reading", "Traveling", "History"},
+			},
+			expectError: true,
+		},
+		{
+			name: "birth date contains only whitespace",
+			input: database.UserDetails{
+				UserID:    userID1,
+				Email:     "example@example.com",
+				FirstName: "santa",
+				LastName:  "claus",
+				BirthDate: "    ",
+				Gender:    "Man",
+				Location:  "North Pole, Arctic",
+				Interests: []string{"Reading", "Traveling", "History"},
+			},
+			expectError: true,
+		},
+		{
+			name: "gender contains only whitespace",
+			input: database.UserDetails{
+				UserID:    userID1,
+				Email:     "example@example.com",
+				FirstName: "santa",
+				LastName:  "claus",
+				BirthDate: "1990-01-01",
+				Gender:    "    ",
+				Location:  "North Pole, Arctic",
+				Interests: []string{"Reading", "Traveling", "History"},
+			},
+			expectError: true,
+		},
+		{
+			name: "location contains only whitespace",
+			input: database.UserDetails{
+				UserID:    userID1,
+				Email:     "example@example.com",
+				FirstName: "santa",
+				LastName:  "claus",
+				BirthDate: "0280-12-25",
+				Gender:    "Man",
+				Location:  "    ",
+				Interests: []string{"Reading", "Traveling", "History"},
+			},
+			expectError: true,
+		},
+		{
+			name: "interests contains multiple values with only whitespace",
+			input: database.UserDetails{
+				UserID:    userID1,
+				Email:     "example@example.com",
+				FirstName: "santa",
+				LastName:  "claus",
+				BirthDate: "0280-12-25",
+				Gender:    "Man",
+				Location:  "    ",
+				Interests: []string{"    ", "    "},
+			},
+			expectError: true,
+		},
+		{
+			name: "interests contains one value with only whitespace",
+			input: database.UserDetails{
+				UserID:    userID1,
+				Email:     "example@example.com",
+				FirstName: "santa",
+				LastName:  "claus",
+				BirthDate: "0280-12-25",
+				Gender:    "Man",
+				Location:  "    ",
+				Interests: []string{"    "},
+			},
+			expectError: true,
 		},
 	}
 
-	for i, test := range tests {
+	for _, test := range tests {
 		err := validation.ValidateUserDetails(test.input)
 		if test.expectError {
 			if err == nil {
-				t.Errorf("test #%d - expected error but got none", i)
+				t.Errorf("%s - expected error but got none", test.name)
 			}
 		} else {
 			if err != nil {
-				t.Errorf("test #%d - didn't expect error but got one: %s", i, err)
+				t.Errorf("%s - didn't expect error but got one: %s", test.name, err)
 			}
 		}
 	}
