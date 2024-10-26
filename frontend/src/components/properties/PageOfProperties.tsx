@@ -1,8 +1,8 @@
 import React from "react";
-import PropertyCard from "./PropertyCard";
+import PropertyCard from "@app/components/properties/PropertyCard";
 
-import { Property } from "../../types/Types";
-import { useGetProperties } from "hooks/properties";
+import { Property } from "@app/types/Types";
+import { useGetProperties } from "@app/hooks/properties";
 
 type PageOfPropertiesProps = {
   propertyIDs: string[];

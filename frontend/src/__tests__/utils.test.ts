@@ -1,11 +1,11 @@
-import "test-utils";
-import { OrderedFile, UserDetails } from "types/Types";
+import "@app/test-utils";
+import { OrderedFile, UserDetails } from "@app/types/Types";
 import {
   apiFile2ClientFile,
   fileArray2OrderedFileArray,
   isAccountSetup,
   orderedFileArray2FileArray,
-} from "utils/utils";
+} from "@app/utils/utils";
 
 describe("apiFile2ClientFile", () => {
   const testCases = [

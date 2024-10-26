@@ -1,6 +1,6 @@
 import React from "react";
-import UserProfilesMainBody from "components/users/UserProfilesMainBody";
-import Title from "components/Title";
+import UserProfilesMainBody from "@app/components/users/UserProfilesMainBody";
+import Title from "@app/components/Title";
 
 const UsersPage: React.FC = () => {
   return (

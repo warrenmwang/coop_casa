@@ -1,10 +1,10 @@
 import React from "react";
-import { Community } from "../../types/Types";
-import { communitiesPageLink } from "urls";
+import { Community } from "@app/types/Types";
+import { communitiesPageLink } from "@app/urls";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardMedia } from "@mui/material";
 
-import MemoizedImageElement from "../MemoizedImageElement";
+import MemoizedImageElement from "@app/components/MemoizedImageElement";
 
 type CommunityCardProps = {
   community: Community;

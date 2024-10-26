@@ -1,10 +1,10 @@
 import React from "react";
 import { useParams } from "react-router-dom";
-import { Property } from "types/Types";
-import CardSkeleton from "components/skeleton/CardSkeleton";
-import FetchErrorText from "components/FetchErrorText";
-import PropertyDetailContent from "components/properties/PropertyDetailContent";
-import { useGetProperty } from "hooks/properties";
+import { Property } from "@app/types/Types";
+import CardSkeleton from "@app/components/skeleton/CardSkeleton";
+import FetchErrorText from "@app/components/FetchErrorText";
+import PropertyDetailContent from "@app/components/properties/PropertyDetailContent";
+import { useGetProperty } from "@app/hooks/properties";
 
 const PropertyDetailPage: React.FC = () => {
   const { propertyID } = useParams<{ propertyID: string }>();

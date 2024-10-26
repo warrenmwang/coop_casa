@@ -13,9 +13,9 @@ import {
   apiTransferAllProperties,
   apiTransferProperty,
   apiUpdateProperty,
-} from "../api/property";
-import { Property } from "../types/Types";
-import { propertiesKey, propertiesPageKey } from "../reactQueryKeys";
+} from "@app/api/property";
+import { Property } from "@app/types/Types";
+import { propertiesKey, propertiesPageKey } from "@app/reactQueryKeys";
 
 export const useGetPageOfPropertyIDs = (
   currentPage: number,

@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
-import TextInput from "../input/TextInput";
-import SubmitButton from "../buttons/SubmitButton";
-import MultipleImageUploader from "../input/MultipleImageUploader";
-import { MAX_COMMUNITY_IMGS_ALLOWED } from "appConstants";
-import { OrderedFile, CommunityDetails, Community } from "../../types/Types";
-import TextSkeleton from "components/skeleton/TextSkeleton";
+import TextInput from "@app/components/input/TextInput";
+import SubmitButton from "@app/components/buttons/SubmitButton";
+import MultipleImageUploader from "@app/components/input/MultipleImageUploader";
+import { MAX_COMMUNITY_IMGS_ALLOWED } from "@app/appConstants";
+import { OrderedFile, CommunityDetails, Community } from "@app/types/Types";
+import TextSkeleton from "@app/components/skeleton/TextSkeleton";
 
 import { toast } from "react-toastify";
-import { useGetUserAccountDetails } from "hooks/account";
-import { useCreateCommunity } from "hooks/communities";
-import FetchErrorText from "../FetchErrorText";
-import { mutationErrorCallbackCreator } from "utils/callbacks";
+import { useGetUserAccountDetails } from "@app/hooks/account";
+import { useCreateCommunity } from "@app/hooks/communities";
+import FetchErrorText from "@app/components/FetchErrorText";
+import { mutationErrorCallbackCreator } from "@app/utils/callbacks";
 
 type TextFieldsConstruct = {
   id: string;

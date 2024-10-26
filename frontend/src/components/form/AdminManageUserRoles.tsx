@@ -1,15 +1,15 @@
 import React, { useState } from "react";
-import SubmitButton from "../buttons/SubmitButton";
+import SubmitButton from "@app/components/buttons/SubmitButton";
 
 import { toast } from "react-toastify";
-import { useAdminGetUserRoles, useAdminUpdateUserRole } from "hooks/admin";
-import { mutationErrorCallbackCreator } from "utils/callbacks";
+import { useAdminGetUserRoles, useAdminUpdateUserRole } from "@app/hooks/admin";
+import { mutationErrorCallbackCreator } from "@app/utils/callbacks";
 import {
   USER_ROLE_LISTER,
   USER_ROLE_OPTIONS,
   USER_ROLE_REGULAR,
-} from "appConstants";
-import { validateUserID } from "utils/inputValidation";
+} from "@app/appConstants";
+import { validateUserID } from "@app/utils/inputValidation";
 
 const AdminManageUserRoles: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);

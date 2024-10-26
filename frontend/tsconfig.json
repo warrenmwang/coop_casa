@@ -1,6 +1,18 @@
 {
   "compilerOptions": {
-    "baseUrl": "src"
+    "baseUrl": ".",
+    "paths": {
+      "@app/*": ["src/*"],
+      "@app/api/*": ["src/api/*"],
+      "@app/assets/*": ["src/assets/*"],
+      "@app/components/*": ["src/components/*"],
+      "@app/fonts/*": ["src/fonts/*"],
+      "@app/types/*": ["src/types/*"],
+      "@app/hooks/*": ["src/hooks/*"],
+      "@app/utils/*": ["src/utils/*"],
+      "@app/react-router/*": ["src/react-router/*"],
+      "@app/styles/*": ["src/styles/*"]
+    },
     "target": "ES6",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
@@ -15,7 +27,8 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "types": ["jest", "node"]
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*", "src/global.d.ts"]
 }

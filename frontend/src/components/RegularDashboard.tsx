@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 
-import Title from "./Title";
-import AllLikedEntitiesSection from "./AllLikedEntitiesSection";
-import UserOwnedCommunitiesTable from "./communities/UserOwnedCommunitiesTable";
-import TransferCommunityForm from "./communities/TransferCommunityForm";
-import CreateCommunityForm from "components/form/CreateCommunityForm";
-import UpdateCommunityManager from "components/form/UpdateCommunityManager";
-import WizardNavigationButtons from "./buttons/WizardNavigationButtons";
+import Title from "@app/components/Title";
+import AllLikedEntitiesSection from "@app/components/AllLikedEntitiesSection";
+import UserOwnedCommunitiesTable from "@app/components/communities/UserOwnedCommunitiesTable";
+import TransferCommunityForm from "@app/components/communities/TransferCommunityForm";
+import CreateCommunityForm from "@app/components/form/CreateCommunityForm";
+import UpdateCommunityManager from "@app/components/form/UpdateCommunityManager";
+import WizardNavigationButtons from "@app/components/buttons/WizardNavigationButtons";
 
 const RegularDashboard: React.FC = () => {
   const sections: string[] = ["Your Liked", "Community"];

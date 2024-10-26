@@ -1,23 +1,23 @@
 import React from "react";
 import { Box } from "@mui/material";
-import { communitiesPageLink } from "urls";
-import ShareLinkButton from "../buttons/ShareLinkButton";
+import { communitiesPageLink } from "@app/urls";
+import ShareLinkButton from "@app/components/buttons/ShareLinkButton";
 import CustomImageGallery, {
   ImageGalleryItemsInput,
-} from "../CustomImageGallery";
-import { Community } from "../../types/Types";
-import LayoutSectionUsersProfilesWithModal from "../LayoutSectionUsersProfilesWithModal";
-import LayoutSectionPropertiesWithModal from "../LayoutSectionProperiesWithModal";
-import BackButton from "../buttons/BackButton";
-import BrowsePageButton from "../users/BrowsePageButton";
-import LikeButton from "../buttons/LikeButton";
+} from "@app/components/CustomImageGallery";
+import { Community } from "@app/types/Types";
+import LayoutSectionUsersProfilesWithModal from "@app/components/LayoutSectionUsersProfilesWithModal";
+import LayoutSectionPropertiesWithModal from "@app/components/LayoutSectionProperiesWithModal";
+import BackButton from "@app/components/buttons/BackButton";
+import BrowsePageButton from "@app/components/users/BrowsePageButton";
+import LikeButton from "@app/components/buttons/LikeButton";
 import {
   useGetLikedCommunities,
   useLikeCommunity,
   useUnlikeCommunity,
-} from "hooks/account";
+} from "@app/hooks/account";
 import debounce from "lodash.debounce";
-import { mutationErrorCallbackCreator } from "utils/callbacks";
+import { mutationErrorCallbackCreator } from "@app/utils/callbacks";
 
 const CommunityDetailContent: React.FC<{ community: Community }> = ({
   community,

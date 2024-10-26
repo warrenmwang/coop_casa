@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { toast } from "react-toastify";
-import { useTransferCommunity } from "hooks/communities";
-import { validateUserID, validateUUID } from "../../utils/inputValidation";
-import SubmitButton from "../buttons/SubmitButton";
-import Title from "../Title";
-import FormButton from "../buttons/FormButton";
-import { mutationErrorCallbackCreator } from "utils/callbacks";
+import { useTransferCommunity } from "@app/hooks/communities";
+import { validateUserID, validateUUID } from "@app/utils/inputValidation";
+import SubmitButton from "@app/components/buttons/SubmitButton";
+import Title from "@app/components/Title";
+import FormButton from "@app/components/buttons/FormButton";
+import { mutationErrorCallbackCreator } from "@app/utils/callbacks";
 
 const TransferCommunityForm: React.FC = () => {
   const [communityID, setCommunityID] = useState<string>("");

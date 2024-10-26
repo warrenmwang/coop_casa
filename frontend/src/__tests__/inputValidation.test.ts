@@ -1,11 +1,11 @@
-import "test-utils";
+import "@app/test-utils";
 import {
   validateDate,
   validateEmail,
   validateUserAvatarInput,
   validateUserID,
   validateUUID,
-} from "utils/inputValidation";
+} from "@app/utils/inputValidation";
 
 describe("validateDate function", () => {
   const testCases = [

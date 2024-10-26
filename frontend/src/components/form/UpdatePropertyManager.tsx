@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
-import SubmitButton from "../buttons/SubmitButton";
+import SubmitButton from "@app/components/buttons/SubmitButton";
 import { validate as uuidValidate } from "uuid";
-import { apiGetProperty } from "../../api/property";
-import { Property } from "../../types/Types";
+import { apiGetProperty } from "@app/api/property";
+import { Property } from "@app/types/Types";
 
 import { toast } from "react-toastify";
-import UpdatePropertyForm from "./UpdatePropertyForm";
-import { useDeleteProperty } from "hooks/properties";
-import { mutationErrorCallbackCreator } from "utils/callbacks";
+import UpdatePropertyForm from "@app/components/form/UpdatePropertyForm";
+import { useDeleteProperty } from "@app/hooks/properties";
+import { mutationErrorCallbackCreator } from "@app/utils/callbacks";
 import { useQuery } from "@tanstack/react-query";
-import { propertiesKey } from "reactQueryKeys";
+import { propertiesKey } from "@app/reactQueryKeys";
 
 const UpdatePropertyManager: React.FC = () => {
   const [getPropertyDetailsIsSubmitting, setGetPropertyDetailsIsSubmitting] =

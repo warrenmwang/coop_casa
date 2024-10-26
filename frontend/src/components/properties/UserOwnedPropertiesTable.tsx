@@ -1,12 +1,12 @@
 import * as React from "react";
-import { useGetUserOwnedPropertiesIDs } from "hooks/account";
-import TextSkeleton from "components/skeleton/TextSkeleton";
-import FetchErrorText from "../FetchErrorText";
-import { useGetProperties } from "hooks/properties";
+import { useGetUserOwnedPropertiesIDs } from "@app/hooks/account";
+import TextSkeleton from "@app/components/skeleton/TextSkeleton";
+import FetchErrorText from "@app/components/FetchErrorText";
+import { useGetProperties } from "@app/hooks/properties";
 import {
   constructAddressString,
   costNumsToPresentableString,
-} from "../../utils/property";
+} from "@app/utils/property";
 
 const Table: React.FC<{ propertyIDs: string[] }> = ({ propertyIDs }) => {
   if (propertyIDs === null) {

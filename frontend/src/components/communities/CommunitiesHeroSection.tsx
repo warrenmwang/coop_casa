@@ -1,6 +1,6 @@
 import React from "react";
-import Title from "../Title";
-import communityClipArt from "../../assets/communityClipArt.png";
+import Title from "@app/components/Title";
+import communityClipArt from "@app/assets/communityClipArt.png";
 
 const CommunitiesHeroSection: React.FC = () => {
   return (

@@ -1,5 +1,5 @@
 import React from "react";
-import cartoonNeighborhood from "../../assets/cartoonNeighborhood.jpg";
+import cartoonNeighborhood from "@app/assets/cartoonNeighborhood.jpg";
 
 const stats = [
   { name: "Individual Ownership", value: "100%" },

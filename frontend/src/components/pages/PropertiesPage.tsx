@@ -1,6 +1,6 @@
 import React from "react";
-import PropertiesMainBody from "components/properties/PropertiesMainBody";
-import Title from "components/Title";
+import PropertiesMainBody from "@app/components/properties/PropertiesMainBody";
+import Title from "@app/components/Title";
 
 const PropertiesPage: React.FC = () => {
   return (

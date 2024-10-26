@@ -1,28 +1,28 @@
 import React, { useState, useEffect } from "react";
-import CardGridSkeleton from "components/skeleton/CardGridSkeleton";
-import PageOfCommunities from "./PageOfCommunities";
+import CardGridSkeleton from "@app/components/skeleton/CardGridSkeleton";
+import PageOfCommunities from "@app/components/communities/PageOfCommunities";
 
-import SearchBar from "components/input/SearchBar";
+import SearchBar from "@app/components/input/SearchBar";
 
-import SubmitButton from "../buttons/SubmitButton";
+import SubmitButton from "@app/components/buttons/SubmitButton";
 import { useSearchParams } from "react-router-dom";
 import {
   PAGE_QP_KEY,
   FILTER_NAME_QP_KEY,
   FILTER_DESCRIPTION_QP_KEY,
   MAX_NUMBER_COMMUNITIES_PER_PAGE,
-} from "appConstants";
-import FetchErrorText from "../FetchErrorText";
-import { useGetPageOfCommunityIDs } from "hooks/communities";
-import PaginationButtons from "../PaginationButtons";
+} from "@app/appConstants";
+import FetchErrorText from "@app/components/FetchErrorText";
+import { useGetPageOfCommunityIDs } from "@app/hooks/communities";
+import PaginationButtons from "@app/components/PaginationButtons";
 import {
   useGetPageNumSearchQueryParam,
   useGetURLSearchQueryParam,
-} from "hooks/react-router";
+} from "@app/hooks/react-router";
 import {
   getURLSearchQueryParam,
   updateURLSearchQueryParam,
-} from "../../react_router/react-router";
+} from "@app/react_router/react-router";
 
 const CommunitiesMainBody: React.FC = () => {
   const [searchIsSubmitting, setSearchIsSubmitting] = useState<boolean>(false);

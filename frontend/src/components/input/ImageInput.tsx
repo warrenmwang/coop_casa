@@ -1,6 +1,6 @@
 import React from "react";
-import { User } from "../../types/Types";
-import { validateUserAvatarInput } from "../../utils/inputValidation";
+import { User } from "@app/types/Types";
+import { validateUserAvatarInput } from "@app/utils/inputValidation";
 
 import { toast } from "react-toastify";
 

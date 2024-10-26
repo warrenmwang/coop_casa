@@ -1,18 +1,18 @@
 import axios from "axios";
-import { apiUsersLink } from "urls";
+import { apiUsersLink } from "@app/urls";
 import {
   FILTER_FIRST_NAME_QP_KEY,
   FILTER_LAST_NAME_QP_KEY,
   LIMIT_QP_KEY,
   PAGE_QP_KEY,
-} from "appConstants";
-import { APIFileReceived, UserProfile } from "../types/Types";
-import { apiFile2ClientFile } from "../utils/utils";
+} from "@app/appConstants";
+import { APIFileReceived, UserProfile } from "@app/types/Types";
+import { apiFile2ClientFile } from "@app/utils/utils";
 import {
   APIReceivedUserIDsSchema,
   APIReceivedUserProfileImagesSchema,
   APIUserProfileReceivedSchema,
-} from "../types/Schema";
+} from "@app/types/Schema";
 
 export const apiGetUserProfiles = async (
   page: number,

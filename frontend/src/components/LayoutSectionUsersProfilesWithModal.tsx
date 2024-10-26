@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { useGetUserProfiles } from "hooks/users";
-import UserProfileCard from "./users/UserProfileCard";
-import { UserProfile } from "../types/Types";
-import Modal from "./Modal";
+import { useGetUserProfiles } from "@app/hooks/users";
+import UserProfileCard from "@app/components/users/UserProfileCard";
+import { UserProfile } from "@app/types/Types";
+import Modal from "@app/components/Modal";
 
-import { LIKED_ENTITIES_DISPLAY_NUM_PREVIEW } from "appConstants";
+import { LIKED_ENTITIES_DISPLAY_NUM_PREVIEW } from "@app/appConstants";
 
 type LayoutSectionUsersProfilesWithModalProps = {
   userIDs: string[];

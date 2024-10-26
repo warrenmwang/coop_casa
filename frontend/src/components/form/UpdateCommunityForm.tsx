@@ -1,22 +1,22 @@
 import React, { useState, useEffect } from "react";
-import TextInput from "../input/TextInput";
-import MultipleImageUploader from "../input/MultipleImageUploader";
-import { MAX_COMMUNITY_IMGS_ALLOWED } from "appConstants";
+import TextInput from "@app/components/input/TextInput";
+import MultipleImageUploader from "@app/components/input/MultipleImageUploader";
+import { MAX_COMMUNITY_IMGS_ALLOWED } from "@app/appConstants";
 import {
   fileArray2OrderedFileArray,
   orderedFileArray2FileArray,
-} from "../../utils/utils";
-import { OrderedFile, Community, CommunityDetails } from "../../types/Types";
+} from "@app/utils/utils";
+import { OrderedFile, Community, CommunityDetails } from "@app/types/Types";
 import { toast } from "react-toastify";
-import { useGetUserProfiles } from "hooks/users";
-import { useGetProperties } from "hooks/properties";
+import { useGetUserProfiles } from "@app/hooks/users";
+import { useGetProperties } from "@app/hooks/properties";
 import {
   constructAddressString,
   costNumsToPresentableString,
-} from "../../utils/property";
-import FormButton from "../buttons/FormButton";
-import { useUpdateCommunity } from "hooks/communities";
-import { mutationErrorCallbackCreator } from "utils/callbacks";
+} from "@app/utils/property";
+import FormButton from "@app/components/buttons/FormButton";
+import { useUpdateCommunity } from "@app/hooks/communities";
+import { mutationErrorCallbackCreator } from "@app/utils/callbacks";
 
 const UpdateCommunityForm: React.FC<{
   community: Community;

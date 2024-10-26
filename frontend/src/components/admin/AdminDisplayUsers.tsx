@@ -4,9 +4,9 @@ import {
   useAdminGetUserDetails,
   useAdminGetUserRoles,
   useAdminGetUserStatuses,
-} from "hooks/admin";
-import { MAX_USERS_PER_PAGE } from "appConstants";
-import AdminDisplayUsersTable from "./AdminDisplayUsersTable";
+} from "@app/hooks/admin";
+import { MAX_USERS_PER_PAGE } from "@app/appConstants";
+import AdminDisplayUsersTable from "@app/components/admin/AdminDisplayUsersTable";
 import debounce from "lodash.debounce";
 
 const AdminDisplayUsers: React.FC = () => {

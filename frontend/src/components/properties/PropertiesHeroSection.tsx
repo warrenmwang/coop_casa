@@ -1,6 +1,6 @@
 import React from "react";
-import Title from "../Title";
-import cartoonNeighborhood from "../../assets/cartoonNeighborhood1.png";
+import Title from "@app/components/Title";
+import cartoonNeighborhood from "@app/assets/cartoonNeighborhood1.png";
 
 const PropertiesHeroSection: React.FC = () => {
   return (

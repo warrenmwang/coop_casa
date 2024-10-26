@@ -17,7 +17,7 @@ const API_HOST_TMP = IS_PROD
 const API_PORT_TMP = process.env.REACT_APP_API_PORT;
 
 if (!API_HOST_TMP || !API_PORT_TMP) {
-  throw new Error("Missing environment variables.");
+  throw new Error("Missing API_HOST or API_PORT variables.");
 }
 
 const API_HOST: string = API_HOST_TMP;

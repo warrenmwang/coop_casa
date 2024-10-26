@@ -6,20 +6,20 @@ import {
   apiUserRoleLink,
   apiAccountUserProfileImagesLink,
   apiAccountStatusLink,
-} from "urls";
-import { User, APIUserReceived, UserStatusTimeStamped } from "../types/Types";
+} from "@app/urls";
+import { User, APIUserReceived, UserStatusTimeStamped } from "@app/types/Types";
 import axios, { AxiosResponse } from "axios";
-import { DeleteUserResponse, LogoutUserResponse } from "../types/Responses";
-import { apiFile2ClientFile } from "../utils/utils";
+import { DeleteUserResponse, LogoutUserResponse } from "@app/types/Responses";
+import { apiFile2ClientFile } from "@app/utils/utils";
 import {
   APIReceivedCommunityIDsSchema,
   APIReceivedPropertyIDsSchema,
   APIReceivedUserIDsSchema,
   UserDetailsSchema,
   UserStatusSchemaTimeStamped,
-} from "../types/Schema";
+} from "@app/types/Schema";
 
-import { APIReceivedUserProfileImages } from "../types/Types";
+import { APIReceivedUserProfileImages } from "@app/types/Types";
 import { z, ZodError } from "zod";
 
 // Delete Account Function

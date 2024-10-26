@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { useGetSetOfListers } from "hooks/lister";
-import TextSkeleton from "components/skeleton/TextSkeleton";
-import SubmitButton from "./buttons/SubmitButton";
-import FetchErrorText from "./FetchErrorText";
-import PaginationButtons from "./PaginationButtons";
+import { useGetSetOfListers } from "@app/hooks/lister";
+import TextSkeleton from "@app/components/skeleton/TextSkeleton";
+import SubmitButton from "@app/components/buttons/SubmitButton";
+import FetchErrorText from "@app/components/FetchErrorText";
+import PaginationButtons from "@app/components/PaginationButtons";
 
 const BrowseListers: React.FC = () => {
   const [page, setPage] = useState<number>(0);

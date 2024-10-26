@@ -1,10 +1,10 @@
 import React from "react";
 import { useParams } from "react-router-dom";
-import CardSkeleton from "components/skeleton/CardSkeleton";
-import { Community } from "../types/Types";
-import FetchErrorText from "components/FetchErrorText";
-import CommunityDetailContent from "components/communities/CommunityDetailContent";
-import { useGetCommunity } from "hooks/communities";
+import CardSkeleton from "@app/components/skeleton/CardSkeleton";
+import { Community } from "@app/types/Types";
+import FetchErrorText from "@app/components/FetchErrorText";
+import CommunityDetailContent from "@app/components/communities/CommunityDetailContent";
+import { useGetCommunity } from "@app/hooks/communities";
 
 const CommunityDetailPage: React.FC = () => {
   const { communityID } = useParams<{ communityID: string }>();

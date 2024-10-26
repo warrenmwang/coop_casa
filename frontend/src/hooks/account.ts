@@ -25,8 +25,8 @@ import {
   apiGetUserRole,
   apiLogoutUser,
   apiUpdateUserAccountDetailsAndProfileImages,
-} from "../api/account";
-import { APIUserReceived, User } from "../types/Types";
+} from "@app/api/account";
+import { APIUserReceived, User } from "@app/types/Types";
 import {
   userImagesKey,
   userAuthKey,
@@ -40,8 +40,8 @@ import {
   userLikedPropertiesKey,
   userLikedCommunitiesKey,
   userStatusKey,
-} from "../reactQueryKeys";
-import { apiGetUserOwnedProperties } from "../api/account";
+} from "@app/reactQueryKeys";
+import { apiGetUserOwnedProperties } from "@app/api/account";
 
 export const useGetUserAccountDetails = (): UseQueryResult<
   APIUserReceived,

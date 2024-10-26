@@ -2,7 +2,7 @@ import React, { Fragment } from "react";
 import { Link } from "react-router-dom";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
-import coopImg from "../../assets/coopAlt1.svg";
+import coopImg from "@app/assets/coopAlt1.svg";
 import {
   apiAuthGoogleOAuthLink,
   accountSettingsPageLink,
@@ -10,17 +10,17 @@ import {
   usersPageLink,
   communitiesPageLink,
   propertiesPageLink,
-} from "urls";
-import { APIUserReceived } from "../../types/Types";
-import { apiFile2ClientFile } from "../../utils/utils";
-import UserProfileIcon from "components/icons/UserProfileIcon/UserProfileIcon";
-import DefaultUserProfileIcon from "components/icons/DefaultUserProfile/DefaultUserProfileIcon";
+} from "@app/urls";
+import { APIUserReceived } from "@app/types/Types";
+import { apiFile2ClientFile } from "@app/utils/utils";
+import UserProfileIcon from "@app/components/icons/UserProfileIcon";
+import DefaultUserProfileIcon from "@app/components/icons/DefaultUserProfileIcon";
 import {
   useGetUserAccountAuth,
   useGetUserAccountDetails,
   useLogoutUser,
-} from "hooks/account";
-import { mutationErrorCallbackCreator } from "utils/callbacks";
+} from "@app/hooks/account";
+import { mutationErrorCallbackCreator } from "@app/utils/callbacks";
 
 function classNames(...classes: (string | undefined | null | false)[]) {
   return classes.filter(Boolean).join(" ");

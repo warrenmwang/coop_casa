@@ -1,6 +1,6 @@
 import React from "react";
-import { render, screen } from "../test-utils";
-import App from "../App";
+import { render, screen } from "@app/test-utils";
+import App from "@app/App";
 
 beforeEach(() => render(<App />));
 
@@ -78,7 +78,6 @@ test("renders communities hero section description", () => {
 });
 
 test("renders properties hero section title", () => {
-  // expect(screen.getByText(/properties/i)).toBeInTheDocument();
   expect(
     screen.getByText(/Find the perfect place to co-own/i),
   ).toBeInTheDocument();

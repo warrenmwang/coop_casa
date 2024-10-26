@@ -1,9 +1,9 @@
 import React, { useMemo } from "react";
-import { UserProfile } from "../../types/Types";
-import { usersPageLink } from "urls";
+import { UserProfile } from "@app/types/Types";
+import { usersPageLink } from "@app/urls";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardMedia } from "@mui/material";
-import DefaultUserProfileIcon from "components/icons/DefaultUserProfile/DefaultUserProfileIcon";
+import DefaultUserProfileIcon from "@app/components/icons/DefaultUserProfileIcon";
 
 const UserProfileCard: React.FC<{ userProfile: UserProfile }> = ({
   userProfile,
@@ -12,7 +12,7 @@ const UserProfileCard: React.FC<{ userProfile: UserProfile }> = ({
   const cardImage: JSX.Element = useMemo(() => {
     // Return a default image if user account has no image
     if (userProfile.images.length === 0 || userProfile.images[0] === null) {
-      return <DefaultUserProfileIcon color="black" className="w-72 ml-5" />;
+      return <DefaultUserProfileIcon color="black" className="w-72 ml-10" />;
     }
     // O.W. return their first image for card
     return <img src={URL.createObjectURL(userProfile.images[0])} />;

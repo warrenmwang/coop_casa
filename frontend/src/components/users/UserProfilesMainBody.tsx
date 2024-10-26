@@ -5,22 +5,22 @@ import {
   FILTER_LAST_NAME_QP_KEY,
   MAX_NUMBER_USER_PROFILES_PER_PAGE,
   PAGE_QP_KEY,
-} from "appConstants";
-import FetchErrorText from "../FetchErrorText";
-import CardGridSkeleton from "components/skeleton/CardGridSkeleton";
-import SearchBar from "components/input/SearchBar";
-import SubmitButton from "../buttons/SubmitButton";
-import PageOfUserProfiles from "./PageOfUserProfiles";
-import { useGetPageOfUserProfiles } from "hooks/users";
-import PaginationButtons from "../PaginationButtons";
+} from "@app/appConstants";
+import FetchErrorText from "@app/components/FetchErrorText";
+import CardGridSkeleton from "@app/components/skeleton/CardGridSkeleton";
+import SearchBar from "@app/components/input/SearchBar";
+import SubmitButton from "@app/components/buttons/SubmitButton";
+import PageOfUserProfiles from "@app/components/users/PageOfUserProfiles";
+import { useGetPageOfUserProfiles } from "@app/hooks/users";
+import PaginationButtons from "@app/components/PaginationButtons";
 import {
   useGetPageNumSearchQueryParam,
   useGetURLSearchQueryParam,
-} from "hooks/react-router";
+} from "@app/hooks/react-router";
 import {
   getURLSearchQueryParam,
   updateURLSearchQueryParam,
-} from "../../react_router/react-router";
+} from "@app/react_router/react-router";
 
 const UserProfilesMainBody: React.FC = () => {
   const [searchIsSubmitting, setSearchIsSubmitting] = useState<boolean>(false);

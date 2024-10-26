@@ -1,20 +1,20 @@
 import * as React from "react";
-import { UserProfile } from "../../types/Types";
+import { UserProfile } from "@app/types/Types";
 import { Box } from "@mui/material";
-import { usersPageLink } from "urls";
-import ShareLinkButton from "../buttons/ShareLinkButton";
+import { usersPageLink } from "@app/urls";
+import ShareLinkButton from "@app/components/buttons/ShareLinkButton";
 import CustomImageGallery, {
   ImageGalleryItemsInput,
-} from "../CustomImageGallery";
-import defaultProfileImage from "../../assets/profile.jpg";
-import LayoutSectionCommunitiesWithModal from "../LayoutSectionCommunitiesWithModal";
-import LayoutSectionPropertiesWithModal from "../LayoutSectionProperiesWithModal";
-import LikeButton from "../buttons/LikeButton";
-import { useGetLikedUsers, useLikeUser, useUnlikeUser } from "hooks/account";
-import BackButton from "../buttons/BackButton";
-import BrowsePageButton from "./BrowsePageButton";
+} from "@app/components/CustomImageGallery";
+import defaultProfileImage from "@app/assets/profile.jpg";
+import LayoutSectionCommunitiesWithModal from "@app/components/LayoutSectionCommunitiesWithModal";
+import LayoutSectionPropertiesWithModal from "@app/components/LayoutSectionProperiesWithModal";
+import LikeButton from "@app/components/buttons/LikeButton";
+import { useGetLikedUsers, useLikeUser, useUnlikeUser } from "@app/hooks/account";
+import BackButton from "@app/components/buttons/BackButton";
+import BrowsePageButton from "@app/components/users/BrowsePageButton";
 import debounce from "lodash.debounce";
-import { mutationErrorCallbackCreator } from "utils/callbacks";
+import { mutationErrorCallbackCreator } from "@app/utils/callbacks";
 
 const UserProfileContent: React.FC<{ userProfile: UserProfile }> = ({
   userProfile,

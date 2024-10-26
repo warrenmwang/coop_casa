@@ -1,4 +1,4 @@
-import { APIFileReceived, OrderedFile, UserDetails } from "../types/Types";
+import { APIFileReceived, OrderedFile, UserDetails } from "@app/types/Types";
 
 // Takes an object that is our custom, backend representation of the actual
 // contents and some metadata of an arbitrary binary file and converts it into

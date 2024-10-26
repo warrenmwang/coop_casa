@@ -1,23 +1,23 @@
 import React, { useState, useEffect } from "react";
-import { MAX_NUMBER_PROPERTIES_PER_PAGE } from "appConstants";
-import CardGridSkeleton from "components/skeleton/CardGridSkeleton";
-import SearchBar from "components/input/SearchBar";
-import PageOfProperties from "./PageOfProperties";
+import { MAX_NUMBER_PROPERTIES_PER_PAGE } from "@app/appConstants";
+import CardGridSkeleton from "@app/components/skeleton/CardGridSkeleton";
+import SearchBar from "@app/components/input/SearchBar";
+import PageOfProperties from "@app/components/properties/PageOfProperties";
 import { useSearchParams } from "react-router-dom";
-import SubmitButton from "../buttons/SubmitButton";
-import FetchErrorText from "../FetchErrorText";
-import { PAGE_QP_KEY, FILTER_ADDRESS_QP_KEY } from "appConstants";
-import { useGetPageOfPropertyIDs } from "hooks/properties";
+import SubmitButton from "@app/components/buttons/SubmitButton";
+import FetchErrorText from "@app/components/FetchErrorText";
+import { PAGE_QP_KEY, FILTER_ADDRESS_QP_KEY } from "@app/appConstants";
+import { useGetPageOfPropertyIDs } from "@app/hooks/properties";
 
-import PaginationButtons from "../PaginationButtons";
+import PaginationButtons from "@app/components/PaginationButtons";
 import {
   useGetPageNumSearchQueryParam,
   useGetURLSearchQueryParam,
-} from "hooks/react-router";
+} from "@app/hooks/react-router";
 import {
   getURLSearchQueryParam,
   updateURLSearchQueryParam,
-} from "../../react_router/react-router";
+} from "@app/react_router/react-router";
 
 const PropertiesMainBody: React.FC = () => {
   const [searchIsSubmitting, setSearchIsSubmitting] = useState(false);

@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from "react";
-import Title from "components/Title";
-import Modal from "components/Modal";
-import UpdateAccountDetailsForm from "components/form/UpdateAccountDetailsForm";
+import Title from "@app/components/Title";
+import Modal from "@app/components/Modal";
+import UpdateAccountDetailsForm from "@app/components/form/UpdateAccountDetailsForm";
 import { useNavigate } from "react-router-dom";
-import { dashboardPageLink, homePageLink } from "urls";
-import TextSkeleton from "components/skeleton/TextSkeleton";
+import { dashboardPageLink, homePageLink } from "@app/urls";
+import TextSkeleton from "@app/components/skeleton/TextSkeleton";
 import {
   useDeleteUserAccount,
   useGetUserAccountAuth,
   useGetUserOwnedCommunitiesIDs,
   useGetUserOwnedPropertiesIDs,
-} from "hooks/account";
-import UpdateAccountStatusForm from "components/form/UpdateAccountStatusForm";
-import WizardNavigationButtons from "components/buttons/WizardNavigationButtons";
-import { mutationErrorCallbackCreator } from "utils/callbacks";
+} from "@app/hooks/account";
+import UpdateAccountStatusForm from "@app/components/form/UpdateAccountStatusForm";
+import WizardNavigationButtons from "@app/components/buttons/WizardNavigationButtons";
+import { mutationErrorCallbackCreator } from "@app/utils/callbacks";
 
 // Authenticated Endpoint
 const AccountSettingsPage: React.FC = () => {

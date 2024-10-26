@@ -1,29 +1,29 @@
 import React, { useState, useEffect } from "react";
-import InterestsInput from "../input/InterestsInput";
-import LocationInput from "../input/LocationInput";
-import GenderInput from "../input/GenderInput";
-import TextInput from "../input/TextInput";
-import ImageInput from "../input/ImageInput";
-import { apiFile2ClientFile, isAccountSetup } from "../../utils/utils";
+import InterestsInput from "@app/components/input/InterestsInput";
+import LocationInput from "@app/components/input/LocationInput";
+import GenderInput from "@app/components/input/GenderInput";
+import TextInput from "@app/components/input/TextInput";
+import ImageInput from "@app/components/input/ImageInput";
+import { apiFile2ClientFile, isAccountSetup } from "@app/utils/utils";
 import {
   APIUserReceived,
   OrderedFile,
   User,
   UserDetails,
-} from "../../types/Types";
+} from "@app/types/Types";
 
-import TextSkeleton from "components/skeleton/TextSkeleton";
-import { EmptyUser } from "types/Objects";
-import FetchErrorText from "../FetchErrorText";
-import FormButton from "../buttons/FormButton";
-import MultipleImageUploader from "../input/MultipleImageUploader";
+import TextSkeleton from "@app/components/skeleton/TextSkeleton";
+import { EmptyUser } from "@app/types/Objects";
+import FetchErrorText from "@app/components/FetchErrorText";
+import FormButton from "@app/components/buttons/FormButton";
+import MultipleImageUploader from "@app/components/input/MultipleImageUploader";
 import {
   useGetAccountUserProfileImages,
   useGetUserAccountDetails,
   useGetUserAccountRole,
   useUpdateAccountSettings,
-} from "hooks/account";
-import { mutationErrorCallbackCreator } from "utils/callbacks";
+} from "@app/hooks/account";
+import { mutationErrorCallbackCreator } from "@app/utils/callbacks";
 
 const UpdateAccountDetailsForm: React.FC = () => {
   const [user, setUser] = useState<User>(EmptyUser);

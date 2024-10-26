@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Autosuggest from "react-autosuggest";
-import { User } from "../../types/Types";
+import { User } from "@app/types/Types";
 
 interface LocationInputArgs {
   formData: User;

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
-import SubmitButton from "../buttons/SubmitButton";
-import MultipleImageUploader from "../input/MultipleImageUploader";
-import { MAX_PROPERTY_IMGS_ALLOWED } from "appConstants";
+import SubmitButton from "@app/components/buttons/SubmitButton";
+import MultipleImageUploader from "@app/components/input/MultipleImageUploader";
+import { MAX_PROPERTY_IMGS_ALLOWED } from "@app/appConstants";
 import {
   APIUserReceived,
   FormPropertyDetails,
@@ -10,14 +10,14 @@ import {
   Property,
   PropertyDetails,
   UserDetails,
-} from "../../types/Types";
-import TextSkeleton from "components/skeleton/TextSkeleton";
+} from "@app/types/Types";
+import TextSkeleton from "@app/components/skeleton/TextSkeleton";
 
 import { toast } from "react-toastify";
-import { useGetUserAccountDetails } from "hooks/account";
-import { useCreateProperty } from "hooks/properties";
-import { mutationErrorCallbackCreator } from "utils/callbacks";
-import { PropertyDetailsSchema } from "types/Schema";
+import { useGetUserAccountDetails } from "@app/hooks/account";
+import { useCreateProperty } from "@app/hooks/properties";
+import { mutationErrorCallbackCreator } from "@app/utils/callbacks";
+import { PropertyDetailsSchema } from "@app/types/Schema";
 
 export const EmptyPropertyDetails: FormPropertyDetails = {
   propertyId: "",

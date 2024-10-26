@@ -1,10 +1,10 @@
 import { useQuery, UseQueryResult } from "@tanstack/react-query";
-import { PublicListerBasicInfo } from "../types/Types";
-import { listerKey } from "../reactQueryKeys";
+import { PublicListerBasicInfo } from "@app/types/Types";
+import { listerKey } from "@app/reactQueryKeys";
 import {
   apiGetListerInfo,
   apiListerGetPageOfListersDetails,
-} from "../api/lister";
+} from "@app/api/lister";
 
 export const useGetLister = (
   listerID: string,

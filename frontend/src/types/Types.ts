@@ -20,7 +20,7 @@ import {
   UserSchema,
   UserStatusSchemaTimeStamped,
   UserStatusSchema,
-} from "./Schema";
+} from "@app/types/Schema";
 
 export type User = z.infer<typeof UserSchema>;
 

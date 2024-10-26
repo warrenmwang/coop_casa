@@ -1,10 +1,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Property } from "../../types/Types";
+import { Property } from "@app/types/Types";
 import { Card, CardContent, CardMedia } from "@mui/material";
-import { propertiesPageLink } from "urls";
+import { propertiesPageLink } from "@app/urls";
 
-import MemoizedImageElement from "../MemoizedImageElement";
+import MemoizedImageElement from "@app/components/MemoizedImageElement";
 
 interface PropertyCardProps {
   property: Property;

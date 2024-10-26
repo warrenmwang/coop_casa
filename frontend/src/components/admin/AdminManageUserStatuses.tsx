@@ -1,13 +1,13 @@
-import { USER_STATUS_FLAGGED, USER_STATUS_OPTIONS } from "appConstants";
-import SubmitButton from "components/buttons/SubmitButton";
-import Title from "components/Title";
+import { USER_STATUS_FLAGGED, USER_STATUS_OPTIONS } from "@app/appConstants";
+import SubmitButton from "@app/components/buttons/SubmitButton";
+import Title from "@app/components/Title";
 import {
   useAdminUpdateUserStatus,
-} from "hooks/admin";
+} from "@app/hooks/admin";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
-import { mutationErrorCallbackCreator } from "utils/callbacks";
-import { validateUserID } from "utils/inputValidation";
+import { mutationErrorCallbackCreator } from "@app/utils/callbacks";
+import { validateUserID } from "@app/utils/inputValidation";
 
 const AdminManageUserStatuses: React.FC = () => {
   const [userID, setUserID] = useState<string>("");

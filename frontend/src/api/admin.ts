@@ -2,15 +2,15 @@ import {
   apiAdminTotalsLink,
   apiAdminUsersLink,
   apiAdminUsersRolesLink,
-} from "urls";
-import { UserDetails, UserStatusTimeStamped } from "../types/Types";
+} from "@app/urls";
+import { UserDetails, UserStatusTimeStamped } from "@app/types/Types";
 import axios, { AxiosResponse } from "axios";
-import { AdminUpdateUserRoleResponse } from "../types/Responses";
+import { AdminUpdateUserRoleResponse } from "@app/types/Responses";
 import {
   APIReceivedUserDetailsSchema,
   APIReceivedUserRolesSchema,
   UserStatusSchemaTimeStamped,
-} from "../types/Schema";
+} from "@app/types/Schema";
 import { z } from "zod";
 
 export const apiAdminGetUsersDetails = async (

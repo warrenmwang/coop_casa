@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import HeartIcon from "components/icons/HeartIcon";
+import HeartIcon from "@app/components/icons/HeartIcon";
 
 type LikeButtonProps = {
   initState: boolean;

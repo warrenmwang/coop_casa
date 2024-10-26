@@ -1,21 +1,21 @@
-import { Community, CommunityDetails } from "../types/Types";
+import { Community, CommunityDetails } from "@app/types/Types";
 import {
   apiCommunitiesLink,
   apiCommunitiesPropertiesLink,
   apiCommunitiesUsersLink,
-} from "urls";
-import { apiFile2ClientFile } from "../utils/utils";
+} from "@app/urls";
+import { apiFile2ClientFile } from "@app/utils/utils";
 import {
   PAGE_QP_KEY,
   FILTER_DESCRIPTION_QP_KEY,
   FILTER_NAME_QP_KEY,
   MAX_NUMBER_COMMUNITIES_PER_PAGE,
-} from "appConstants";
+} from "@app/appConstants";
 import axios from "axios";
 import {
   APICommunityReceivedSchema,
   APIReceivedCommunityIDsSchema,
-} from "../types/Schema";
+} from "@app/types/Schema";
 
 export const apiGetCommunity = async (
   communityID: string,

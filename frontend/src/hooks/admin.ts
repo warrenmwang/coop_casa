@@ -15,14 +15,14 @@ import {
   apiAdminGetUsersRoles,
   apiAdminUpdateUserRole,
   apiAdminUpdateUserStatus,
-} from "../api/admin";
-import { UserDetails } from "../types/Types";
+} from "@app/api/admin";
+import { UserDetails } from "@app/types/Types";
 import {
   adminTotalsKey,
   adminUserDetailsKey,
   adminUserRolesKey,
   adminUserStatusesKey,
-} from "../reactQueryKeys";
+} from "@app/reactQueryKeys";
 
 export const useAdminGetUserDetails = (
   limit: number,

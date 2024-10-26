@@ -1,16 +1,16 @@
 import React, { useState } from "react";
-import CreatePropertyForm from "components/form/CreatePropertyForm";
-import UpdatePropertyManager from "components/form/UpdatePropertyManager";
-import CreateCommunityForm from "components/form/CreateCommunityForm";
-import UpdateCommunityManager from "components/form/UpdateCommunityManager";
-import UserOwnedPropertiesTable from "./properties/UserOwnedPropertiesTable";
-import UserOwnedCommunitiesTable from "./communities/UserOwnedCommunitiesTable";
-import AllLikedEntitiesSection from "./AllLikedEntitiesSection";
-import Title from "./Title";
-import TransferPropertyForm from "./properties/TransferPropertyForm";
-import TransferCommunityForm from "./communities/TransferCommunityForm";
-import BrowseListers from "./BrowseListers";
-import WizardNavigationButtons from "./buttons/WizardNavigationButtons";
+import CreatePropertyForm from "@app/components/form/CreatePropertyForm";
+import UpdatePropertyManager from "@app/components/form/UpdatePropertyManager";
+import CreateCommunityForm from "@app/components/form/CreateCommunityForm";
+import UpdateCommunityManager from "@app/components/form/UpdateCommunityManager";
+import UserOwnedPropertiesTable from "@app/components/properties/UserOwnedPropertiesTable";
+import UserOwnedCommunitiesTable from "@app/components/communities/UserOwnedCommunitiesTable";
+import AllLikedEntitiesSection from "@app/components/AllLikedEntitiesSection";
+import Title from "@app/components/Title";
+import TransferPropertyForm from "@app/components/properties/TransferPropertyForm";
+import TransferCommunityForm from "@app/components/communities/TransferCommunityForm";
+import BrowseListers from "@app/components/BrowseListers";
+import WizardNavigationButtons from "@app/components/buttons/WizardNavigationButtons";
 
 const ListerDashboard: React.FC = () => {
   const sections: string[] = ["Lister", "Your Liked", "Property", "Community"];

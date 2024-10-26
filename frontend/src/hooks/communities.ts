@@ -12,9 +12,9 @@ import {
   apiGetCommunity,
   apiTransferCommunity,
   apiUpdateCommunity,
-} from "../api/community";
-import { Community } from "../types/Types";
-import { communitiesKey, communitiesPageKey } from "../reactQueryKeys";
+} from "@app/api/community";
+import { Community } from "@app/types/Types";
+import { communitiesKey, communitiesPageKey } from "@app/reactQueryKeys";
 
 export const useGetPageOfCommunityIDs = (
   currentPage: number,

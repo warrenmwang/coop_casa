@@ -1,4 +1,4 @@
-import { User } from "./Types";
+import { User } from "@app/types/Types";
 
 export const EmptyUser: User = {
   userId: "",

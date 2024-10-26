@@ -1,16 +1,16 @@
 import { useQueries, useQuery, UseQueryResult } from "@tanstack/react-query";
-import { MAX_NUMBER_USER_PROFILES_PER_PAGE } from "appConstants";
+import { MAX_NUMBER_USER_PROFILES_PER_PAGE } from "@app/appConstants";
 import {
   apiGetUserProfile,
   apiGetUserProfileImages,
   apiGetUserProfiles,
-} from "../api/user";
-import { UserProfile } from "../types/Types";
+} from "@app/api/user";
+import { UserProfile } from "@app/types/Types";
 import {
   publicUserProfileImagesKey,
   publicUserProfileKey,
   publicUserProfilesPageKey,
-} from "../reactQueryKeys";
+} from "@app/reactQueryKeys";
 
 export const useGetPageOfUserProfiles = (
   currentPage: number,

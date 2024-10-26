@@ -1,16 +1,16 @@
 import React from "react";
-import { useGetLikedEntities } from "hooks/account";
-import TextSkeleton from "components/skeleton/TextSkeleton";
-import FetchErrorText from "./FetchErrorText";
-import LayoutSectionUsersProfilesWithModal from "./LayoutSectionUsersProfilesWithModal";
-import LayoutSectionCommunitiesWithModal from "./LayoutSectionCommunitiesWithModal";
-import LayoutSectionPropertiesWithModal from "./LayoutSectionProperiesWithModal";
-import BrowsePageButton from "./users/BrowsePageButton";
+import { useGetLikedEntities } from "@app/hooks/account";
+import TextSkeleton from "@app/components/skeleton/TextSkeleton";
+import FetchErrorText from "@app/components/FetchErrorText";
+import LayoutSectionUsersProfilesWithModal from "@app/components/LayoutSectionUsersProfilesWithModal";
+import LayoutSectionCommunitiesWithModal from "@app/components/LayoutSectionCommunitiesWithModal";
+import LayoutSectionPropertiesWithModal from "@app/components/LayoutSectionProperiesWithModal";
+import BrowsePageButton from "@app/components/users/BrowsePageButton";
 import {
   communitiesPageLink,
   propertiesPageLink,
   usersPageLink,
-} from "urls";
+} from "@app/urls";
 
 const AllLikedEntitiesSection: React.FC = () => {
   const likedEntities = useGetLikedEntities();

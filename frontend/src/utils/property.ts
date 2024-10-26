@@ -1,4 +1,4 @@
-import { PropertyDetails } from "../types/Types";
+import { PropertyDetails } from "@app/types/Types";
 
 export const costNumsToPresentableString = (
   costDollars: number,
