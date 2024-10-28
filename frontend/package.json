@@ -27,9 +27,11 @@
     "zod": "^3.23.8"
   },
   "scripts": {
+    "start:playwright": "npx webpack serve --mode development",
     "start": "echo \"Starting development server...\" && npx webpack serve --mode development --open",
     "build": "echo \"Building for production...\" && npx webpack --mode production",
     "build:analyze": "echo \"Building for production...\" && cross-env ANALYZE=true npx webpack --mode production",
+    "e2e": "npx playwright test --reporter=line",
     "test": "jest",
     "test:watch": "jest --watch",
     "lint": "eslint ."
