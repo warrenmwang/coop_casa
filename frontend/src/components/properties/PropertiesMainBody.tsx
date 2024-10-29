@@ -81,7 +81,8 @@ const PropertiesMainBody: React.FC = () => {
   }, [searchIsSubmitting]);
 
   const currentPageEmpty: boolean =
-    query.status === "success" && query.data.length === 0;
+    query.status === "error" ||
+    (query.status === "success" && query.data.length === 0);
 
   const currentPagePropertyIDs = query.data ? query.data : [];
 
@@ -93,8 +94,11 @@ const PropertiesMainBody: React.FC = () => {
         onSubmit={searchPropertiesWithFilter}
       >
         <div className="flex-col flex-grow">
-          <label className="label__text_input_gray">Address</label>
+          <label htmlFor="address-input" className="label__text_input_gray">
+            Address
+          </label>
           <SearchBar
+            id="address-input"
             searchQueryParamKey={FILTER_ADDRESS_QP_KEY}
             placeholder="Search by address."
           ></SearchBar>

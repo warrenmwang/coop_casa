@@ -97,7 +97,8 @@ const CommunitiesMainBody: React.FC = () => {
   }, [searchIsSubmitting]);
 
   const currentPageEmpty: boolean =
-    query.status === "success" && query.data.length === 0;
+    query.status === "error" ||
+    (query.status === "success" && query.data.length === 0);
   const currentPageCommunityIDs = query.data ? query.data : [];
 
   return (
@@ -108,15 +109,21 @@ const CommunitiesMainBody: React.FC = () => {
         onSubmit={searchCommunitiesWithFilters}
       >
         <div className="flex-col flex-grow items-center">
-          <label className="label__text_input_gray">Name</label>
+          <label htmlFor="name-input" className="label__text_input_gray">
+            Name
+          </label>
           <SearchBar
+            id="name-input"
             searchQueryParamKey={FILTER_NAME_QP_KEY}
             placeholder="Name"
           ></SearchBar>
         </div>
         <div className="flex-col flex-grow">
-          <label className="label__text_input_gray">Description</label>
+          <label htmlFor="description-input" className="label__text_input_gray">
+            Description
+          </label>
           <SearchBar
+            id="description-input"
             searchQueryParamKey={FILTER_DESCRIPTION_QP_KEY}
             placeholder="Description"
           ></SearchBar>

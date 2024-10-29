@@ -96,7 +96,8 @@ const UserProfilesMainBody: React.FC = () => {
   }, [searchIsSubmitting]);
 
   const noUserProfilesOnPlatform: boolean =
-    query.status === "success" && query.data.length === 0;
+    query.status === "error" ||
+    (query.status === "success" && query.data.length === 0);
 
   const currentPageUserIDs = query.data ? query.data : [];
 
@@ -105,15 +106,21 @@ const UserProfilesMainBody: React.FC = () => {
       {/* Input form for applying filters to search */}
       <form className="form__searchUserProfiles" onSubmit={handleFormSubmit}>
         <div className="flex-col flex-grow items-center">
-          <label className="label__text_input_gray">First Name</label>
+          <label htmlFor="first-name-input" className="label__text_input_gray">
+            First Name
+          </label>
           <SearchBar
+            id="first-name-input"
             searchQueryParamKey={FILTER_FIRST_NAME_QP_KEY}
             placeholder="First Name"
           ></SearchBar>
         </div>
         <div className="flex-col flex-grow">
-          <label className="label__text_input_gray">Last Name</label>
+          <label htmlFor="last-name-input" className="label__text_input_gray">
+            Last Name
+          </label>
           <SearchBar
+            id="last-name-input"
             searchQueryParamKey={FILTER_LAST_NAME_QP_KEY}
             placeholder="Last Name"
           ></SearchBar>

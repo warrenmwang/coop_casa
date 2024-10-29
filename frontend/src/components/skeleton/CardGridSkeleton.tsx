@@ -15,7 +15,7 @@ const CardGridSkeleton: React.FC<CardGridSkeletonProps> = ({
 
   return (
     <>
-      <Grid container spacing={2}>
+      <Grid container spacing={2} id="card-grid-skeleton">
         {foo.map((index) => (
           <Grid
             key={index}
