@@ -1,4 +1,3 @@
-import path from "path";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -7,7 +6,6 @@ export default {
   preset: "ts-jest",
   testEnvironment: "jsdom",
   roots: ["<rootDir>/src"],
-  modulePaths: [path.resolve(__dirname, "src")],
   moduleNameMapper: {
     "^@app/(.*)$": "<rootDir>/src/$1",
   },
