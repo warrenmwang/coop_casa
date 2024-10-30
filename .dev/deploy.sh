@@ -71,8 +71,8 @@ deployToProd() {
 
     # Frontend
     export VITE_IS_PROD=true
-    export VITE_API_PROD_HOST=${REACT_APP_API_PROD_HOST}
-    export VITE_API_PORT=${REACT_APP_API_PORT}
+    export VITE_API_PROD_HOST=${VITE_API_PROD_HOST}
+    export VITE_API_PORT=${VITE_API_PORT}
 
     # Change into the src dir
     cd /home/${USER}/deployment_repos/coop/coop_casa
