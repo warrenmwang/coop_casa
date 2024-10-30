@@ -31,6 +31,12 @@ deployToProd() {
       exit 1
     fi
 
+    echo "Merging current local git branch dev into main and pushing to remote."
+    git checkout main
+    git merge dev
+    git push origin main
+    git checkout dev
+
     # prepare script to run on deploy server
     SCRIPT="
     # SET ENV VARS
@@ -88,12 +94,6 @@ deployToProd() {
         exit 1
     fi
 
-    echo "Merging current local git branch dev into main and pushing to remote."
-    git checkout main
-    git merge dev
-    git push origin main
-    git checkout dev
-
     echo "Deployed to prod successfully."
 }
 
@@ -134,8 +134,9 @@ main() {
     case "$target" in 
         "prod")
             # Check on dev branch with no unstaged changes
-            if [$(git rev-parse --abbrev-ref HEAD) != "dev"]; then
+            if [ "$(git rev-parse --abbrev-ref HEAD)" != "dev" ]; then
                 echo "Not on dev branch, exiting"
+                exit 1
             fi
 
             # Check for unstaged changes
