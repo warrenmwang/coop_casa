@@ -64,9 +64,9 @@ deployToProd() {
     export GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
 
     # Frontend
-    export REACT_APP_IS_PROD=true
-    export REACT_APP_API_PROD_HOST=${REACT_APP_API_PROD_HOST}
-    export REACT_APP_API_PORT=${REACT_APP_API_PORT}
+    export VITE_IS_PROD=true
+    export VITE_API_PROD_HOST=${REACT_APP_API_PROD_HOST}
+    export VITE_API_PORT=${REACT_APP_API_PORT}
 
     # Change into the src dir
     cd /home/${USER}/deployment_repos/coop/coop_casa
@@ -97,6 +97,8 @@ deployToProd() {
     echo "Deployed to prod successfully."
 }
 
+# TODO: need to use a self-signed cert for enabling HTTPS on localhost
+# if we want to do this kind of testing right.
 deployToLocal() {
     # source env vars
     if [ -f .env_local_docker ]; then
