@@ -1,6 +1,6 @@
 // Read in Environment variables
 
-const IS_PROD_TMP = process.env.REACT_APP_IS_PROD;
+const IS_PROD_TMP = import.meta.env.VITE_IS_PROD;
 if (!IS_PROD_TMP) {
   throw new Error("Missing environment variables.");
 }
@@ -12,9 +12,9 @@ if (IS_PROD_TMP.trim().toLowerCase() === "true") {
 }
 
 const API_HOST_TMP = IS_PROD
-  ? process.env.REACT_APP_API_PROD_HOST
-  : process.env.REACT_APP_API_DEV_HOST;
-const API_PORT_TMP = process.env.REACT_APP_API_PORT;
+  ? import.meta.env.VITE_API_PROD_HOST
+  : import.meta.env.VITE_API_DEV_HOST;
+const API_PORT_TMP = import.meta.env.VITE_API_PORT;
 
 if (!API_HOST_TMP || !API_PORT_TMP) {
   throw new Error("Missing API_HOST or API_PORT variables.");

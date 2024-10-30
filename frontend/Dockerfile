@@ -1,9 +1,8 @@
 # Build stage
 FROM node:21.6.1-alpine AS build
 WORKDIR /app
-COPY package.json package-lock.json ./
-RUN npm install && npm install -g serve
 COPY . .
+RUN npm install
 ARG REACT_APP_IS_PROD
 ARG REACT_APP_API_PROD_HOST
 ARG REACT_APP_API_PORT
