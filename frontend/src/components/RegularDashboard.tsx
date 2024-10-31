@@ -7,13 +7,28 @@ import TransferCommunityForm from "@app/components/communities/TransferCommunity
 import CreateCommunityForm from "@app/components/form/CreateCommunityForm";
 import UpdateCommunityManager from "@app/components/form/UpdateCommunityManager";
 import WizardNavigationButtons from "@app/components/buttons/WizardNavigationButtons";
+import { REGULAR_DASHBOARD_SECTION_LOCALSTORAGE_KEY } from "@app/appConstants";
 
 const RegularDashboard: React.FC = () => {
   const sections: string[] = ["Your Liked", "Community"];
-  const [currentSection, setCurrentSection] = useState<string>(sections[0]);
+
+  const sectionSaved =
+    localStorage.getItem(REGULAR_DASHBOARD_SECTION_LOCALSTORAGE_KEY) !== null
+      ? (localStorage.getItem(
+          REGULAR_DASHBOARD_SECTION_LOCALSTORAGE_KEY,
+        ) as string)
+      : "";
+  const [currentSection, setCurrentSection] = useState<string>(
+    sections.includes(sectionSaved) ? sectionSaved : sections[0],
+  );
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    setCurrentSection(e.currentTarget.textContent as string);
+    const newSection = e.currentTarget.textContent as string;
+    setCurrentSection(newSection);
+    localStorage.setItem(
+      REGULAR_DASHBOARD_SECTION_LOCALSTORAGE_KEY,
+      newSection,
+    );
   };
 
   return (

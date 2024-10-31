@@ -15,6 +15,7 @@ import BrowseListers from "@app/components/BrowseListers";
 import AdminManageUserStatuses from "@app/components/admin/AdminManageUserStatuses";
 import WizardNavigationButtons from "@app/components/buttons/WizardNavigationButtons";
 import AdminTotalCounters from "@app/components/admin/AdminTotalCounters";
+import { ADMIN_DASHBOARD_SECTION_LOCALSTORAGE_KEY } from "@app/appConstants";
 
 const AdminDashboard: React.FC = () => {
   const sections: string[] = [
@@ -24,10 +25,21 @@ const AdminDashboard: React.FC = () => {
     "Property",
     "Community",
   ];
-  const [currentSection, setCurrentSection] = useState<string>(sections[0]);
+
+  const sectionSaved =
+    localStorage.getItem(ADMIN_DASHBOARD_SECTION_LOCALSTORAGE_KEY) !== null
+      ? (localStorage.getItem(
+          ADMIN_DASHBOARD_SECTION_LOCALSTORAGE_KEY,
+        ) as string)
+      : "";
+  const [currentSection, setCurrentSection] = useState<string>(
+    sections.includes(sectionSaved) ? sectionSaved : sections[0],
+  );
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    setCurrentSection(e.currentTarget.textContent as string);
+    const newSection = e.currentTarget.textContent as string;
+    setCurrentSection(newSection);
+    localStorage.setItem(ADMIN_DASHBOARD_SECTION_LOCALSTORAGE_KEY, newSection);
   };
 
   return (

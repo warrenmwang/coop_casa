@@ -11,13 +11,24 @@ import TransferPropertyForm from "@app/components/properties/TransferPropertyFor
 import TransferCommunityForm from "@app/components/communities/TransferCommunityForm";
 import BrowseListers from "@app/components/BrowseListers";
 import WizardNavigationButtons from "@app/components/buttons/WizardNavigationButtons";
+import { LISTER_DASHBOARD_SECTION_LOCALSTORAGE_KEY } from "@app/appConstants";
 
 const ListerDashboard: React.FC = () => {
   const sections: string[] = ["Lister", "Your Liked", "Property", "Community"];
-  const [currentSection, setCurrentSection] = useState<string>(sections[0]);
+  const sectionSaved =
+    localStorage.getItem(LISTER_DASHBOARD_SECTION_LOCALSTORAGE_KEY) !== null
+      ? (localStorage.getItem(
+          LISTER_DASHBOARD_SECTION_LOCALSTORAGE_KEY,
+        ) as string)
+      : "";
+  const [currentSection, setCurrentSection] = useState<string>(
+    sections.includes(sectionSaved) ? sectionSaved : sections[0],
+  );
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    setCurrentSection(e.currentTarget.textContent as string);
+    const newSection = e.currentTarget.textContent as string;
+    setCurrentSection(newSection);
+    localStorage.setItem(LISTER_DASHBOARD_SECTION_LOCALSTORAGE_KEY, newSection);
   };
 
   return (

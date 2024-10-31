@@ -14,6 +14,7 @@ import {
 import UpdateAccountStatusForm from "@app/components/form/UpdateAccountStatusForm";
 import WizardNavigationButtons from "@app/components/buttons/WizardNavigationButtons";
 import { mutationErrorCallbackCreator } from "@app/utils/callbacks";
+import { ACCOUNT_SETTINGS_SECTION_LOCALSTORAGE_KEY } from "@app/appConstants";
 
 // Authenticated Endpoint
 const AccountSettingsPage: React.FC = () => {
@@ -21,7 +22,15 @@ const AccountSettingsPage: React.FC = () => {
   const navigate = useNavigate();
 
   const sections = ["Details", "Status", "Delete"];
-  const [currentSection, setCurrentSection] = useState<string>(sections[0]);
+  const sectionSaved =
+    localStorage.getItem(ACCOUNT_SETTINGS_SECTION_LOCALSTORAGE_KEY) !== null
+      ? (localStorage.getItem(
+          ACCOUNT_SETTINGS_SECTION_LOCALSTORAGE_KEY,
+        ) as string)
+      : "";
+  const [currentSection, setCurrentSection] = useState<string>(
+    sections.includes(sectionSaved) ? sectionSaved : sections[0],
+  );
 
   const authQuery = useGetUserAccountAuth(); // for loading account is logged in
 
@@ -53,7 +62,9 @@ const AccountSettingsPage: React.FC = () => {
   }
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    setCurrentSection(e.currentTarget.textContent as string);
+    const newSection = e.currentTarget.textContent as string;
+    setCurrentSection(newSection);
+    localStorage.setItem(ACCOUNT_SETTINGS_SECTION_LOCALSTORAGE_KEY, newSection);
   };
 
   const ready: boolean =
@@ -109,9 +120,9 @@ const AccountSettingsPage: React.FC = () => {
                 <b>{numCommunities}</b> communities where you are the admin on
                 Coop. Any properties or communities that you have listed will be
                 automatically taken down. Properties can be transferred to
-                another lister. Communities&apos; admin position can be transferred
-                to any other user on Coop. If you want to transfer any of these
-                now, head over to the
+                another lister. Communities&apos; admin position can be
+                transferred to any other user on Coop. If you want to transfer
+                any of these now, head over to the
                 <button
                   onClick={() => navigate(dashboardPageLink)}
                   className="button__gray"
