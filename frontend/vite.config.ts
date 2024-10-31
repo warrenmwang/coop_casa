@@ -23,6 +23,8 @@ export default defineConfig({
   },
   build: {
     outDir: "build",
+    target: "modules",
+    modulePreload: true,
     sourcemap: true,
   },
 });

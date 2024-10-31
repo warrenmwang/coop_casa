@@ -71,8 +71,6 @@ services:
       - backend
     networks:
       - frontend
-    command: >
-      serve -s build -l ${INTERNAL_FRONTEND_PORT}
 
 volumes:
   psql_volume:

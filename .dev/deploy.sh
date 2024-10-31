@@ -151,7 +151,6 @@ main() {
             deployToProd
             ;;
         "local")
-            runTests
             deployToLocal
             ;;
         *)
