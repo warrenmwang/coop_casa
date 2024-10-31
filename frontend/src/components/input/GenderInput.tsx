@@ -19,9 +19,7 @@ const GenderInput: React.FC<GenderInputArgs> = ({
   classNameCustom = "",
 }) => {
   // Handles changes for text fields
-  const handleChange = (
-    e: React.ChangeEvent<HTMLSelectElement>,
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { id, value: val } = e.target;
 
     setValue(val);

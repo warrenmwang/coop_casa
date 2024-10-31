@@ -1,6 +1,9 @@
 import React, { useEffect, useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { MAX_IMAGE_FILE_SIZE, MAX_PROPERTY_IMGS_ALLOWED } from "@app/appConstants";
+import {
+  MAX_IMAGE_FILE_SIZE,
+  MAX_PROPERTY_IMGS_ALLOWED,
+} from "@app/appConstants";
 import { OrderedFile } from "@app/types/Types";
 import {
   orderedFileArray2FileArray,

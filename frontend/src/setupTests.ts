@@ -5,7 +5,7 @@
 import "@testing-library/jest-dom";
 
 // Needed for React 18+ createRoot usage.
-jest.mock('react-dom/client', () => ({
+jest.mock("react-dom/client", () => ({
   createRoot: jest.fn().mockImplementation(() => ({
     render: jest.fn(),
   })),

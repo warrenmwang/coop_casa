@@ -10,7 +10,11 @@ import defaultProfileImage from "@app/assets/profile.jpg";
 import LayoutSectionCommunitiesWithModal from "@app/components/LayoutSectionCommunitiesWithModal";
 import LayoutSectionPropertiesWithModal from "@app/components/LayoutSectionProperiesWithModal";
 import LikeButton from "@app/components/buttons/LikeButton";
-import { useGetLikedUsers, useLikeUser, useUnlikeUser } from "@app/hooks/account";
+import {
+  useGetLikedUsers,
+  useLikeUser,
+  useUnlikeUser,
+} from "@app/hooks/account";
 import BackButton from "@app/components/buttons/BackButton";
 import BrowsePageButton from "@app/components/users/BrowsePageButton";
 import debounce from "lodash.debounce";

@@ -3,7 +3,12 @@ import { useNavigate } from "react-router-dom";
 
 // Components
 import Title from "@app/components/Title";
-import { APIUserReceived, OrderedFile, User, UserDetails } from "@app/types/Types";
+import {
+  APIUserReceived,
+  OrderedFile,
+  User,
+  UserDetails,
+} from "@app/types/Types";
 import LocationInput from "@app/components/input/LocationInput";
 import InterestsInput from "@app/components/input/InterestsInput";
 import GenderInput from "@app/components/input/GenderInput";

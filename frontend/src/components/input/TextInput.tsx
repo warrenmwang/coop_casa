@@ -1,8 +1,5 @@
 import React from "react";
-import {
-  validateDate,
-  validateEmail,
-} from "@app/utils/inputValidation";
+import { validateDate, validateEmail } from "@app/utils/inputValidation";
 import { MAX_TEXT_INPUT_LENGTH } from "@app/appConstants";
 
 interface TextInputArgs {
@@ -34,9 +31,7 @@ const TextInput: React.FC<TextInputArgs> = ({
   max = "",
   classNameCustom = "",
 }) => {
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
 
     // Validate date if type is date

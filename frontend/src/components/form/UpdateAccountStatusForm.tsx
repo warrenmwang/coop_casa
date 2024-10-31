@@ -2,7 +2,10 @@ import SubmitButton from "@app/components/buttons/SubmitButton";
 import FetchErrorText from "@app/components/FetchErrorText";
 import TextSkeleton from "@app/components/skeleton/TextSkeleton";
 import Title from "@app/components/Title";
-import { useGetAccountStatus, useUpdateAccountStatus } from "@app/hooks/account";
+import {
+  useGetAccountStatus,
+  useUpdateAccountStatus,
+} from "@app/hooks/account";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { mutationErrorCallbackCreator } from "@app/utils/callbacks";

@@ -60,9 +60,11 @@ export const FILTER_ADDRESS_QP_KEY = "filterAddress";
 export const FILTER_FIRST_NAME_QP_KEY = "filterFirstName";
 export const FILTER_LAST_NAME_QP_KEY = "filterLastName";
 
-export const ACCOUNT_SETTINGS_SECTION_LOCALSTORAGE_KEY = "account-settings-section";
-export const REGULAR_DASHBOARD_SECTION_LOCALSTORAGE_KEY = "regular-dashboard-section";
-export const LISTER_DASHBOARD_SECTION_LOCALSTORAGE_KEY = "lister-dashboard-section";
-export const ADMIN_DASHBOARD_SECTION_LOCALSTORAGE_KEY = "admin-dashboard-section";
-
-
+export const ACCOUNT_SETTINGS_SECTION_LOCALSTORAGE_KEY =
+  "account-settings-section";
+export const REGULAR_DASHBOARD_SECTION_LOCALSTORAGE_KEY =
+  "regular-dashboard-section";
+export const LISTER_DASHBOARD_SECTION_LOCALSTORAGE_KEY =
+  "lister-dashboard-section";
+export const ADMIN_DASHBOARD_SECTION_LOCALSTORAGE_KEY =
+  "admin-dashboard-section";

@@ -1,19 +1,19 @@
 .h1_custom {
-    @apply text-3xl font-bold mb-4;
+  @apply text-3xl font-bold mb-4;
 }
 
 .h2_custom {
-    @apply text-2xl font-semibold mb-4;
+  @apply text-2xl font-semibold mb-4;
 }
 
 .h3_custom {
-    @apply text-xl font-semibold mb-2;
+  @apply text-xl font-semibold mb-2;
 }
 
 .font__paragraph_1 {
-    @apply text-5xl text-gray-800;
+  @apply text-5xl text-gray-800;
 }
 
 .pretty_font_1 {
-    font-family: "RemachineScript";
+  font-family: "RemachineScript";
 }
