@@ -1,7 +1,6 @@
 import React from "react";
 
 import Title from "@app/components/Title";
-import { Typography } from "@mui/material";
 
 const AttributionsPage: React.FC = () => {
   return (
@@ -11,7 +10,7 @@ const AttributionsPage: React.FC = () => {
         description="For usage of third party services or data the require public attribution of their usage on our website, we give them their due credit here."
       ></Title>
 
-      <Typography variant="body1">
+      <div>
         For city and state location data we used the{" "}
         <b>
           <a href="https://simplemaps.com/data/us-cities">
@@ -19,7 +18,7 @@ const AttributionsPage: React.FC = () => {
           </a>
         </b>{" "}
         from simplemaps.
-      </Typography>
+      </div>
     </div>
   );
 };

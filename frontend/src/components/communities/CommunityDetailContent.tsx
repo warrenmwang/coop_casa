@@ -17,7 +17,6 @@ import {
 import { Community } from "@app/types/Types";
 import { communitiesPageLink } from "@app/urls";
 import { mutationErrorCallbackCreator } from "@app/utils/callbacks";
-import { Box } from "@mui/material";
 import debounce from "lodash.debounce";
 
 const CommunityDetailContent: React.FC<{ community: Community }> = ({
@@ -62,7 +61,7 @@ const CommunityDetailContent: React.FC<{ community: Community }> = ({
   }
 
   return (
-    <Box className="detail-page-body">
+    <div className="detail-page-body">
       {/* Top row of buttons */}
       <div className="flex">
         <BackButton />
@@ -115,7 +114,7 @@ const CommunityDetailContent: React.FC<{ community: Community }> = ({
           </>
         )}
       </div>
-    </Box>
+    </div>
   );
 };
 

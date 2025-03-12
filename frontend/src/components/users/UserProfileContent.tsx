@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 
 import defaultProfileImage from "@app/assets/profile.jpg";
 import CustomImageGallery, {
@@ -18,7 +18,6 @@ import {
 import { UserProfile } from "@app/types/Types";
 import { usersPageLink } from "@app/urls";
 import { mutationErrorCallbackCreator } from "@app/utils/callbacks";
-import { Box } from "@mui/material";
 import debounce from "lodash.debounce";
 
 const UserProfileContent: React.FC<{ userProfile: UserProfile }> = ({
@@ -66,7 +65,7 @@ const UserProfileContent: React.FC<{ userProfile: UserProfile }> = ({
   }
 
   return (
-    <Box className="detail-page-body">
+    <div className="detail-page-body">
       {/* Top row of buttons */}
       <div className="flex">
         <BackButton />
@@ -119,7 +118,7 @@ const UserProfileContent: React.FC<{ userProfile: UserProfile }> = ({
           />
         </>
       )}
-    </Box>
+    </div>
   );
 };
 

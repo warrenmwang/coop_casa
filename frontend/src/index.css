@@ -12,11 +12,6 @@ code {
     monospace;
 }
 
-@font-face {
-  font-family: "RemachineScript";
-  src: url("./fonts/RemachineScript_Personal_Use.woff2") format("woff2");
-}
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

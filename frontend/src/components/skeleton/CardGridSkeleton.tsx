@@ -1,10 +1,9 @@
 import React from "react";
 
 import CardSkeleton from "@app/components/skeleton/CardSkeleton";
-import { Grid } from "@mui/material";
 
 interface CardGridSkeletonProps {
-  numPerRow?: number; // Note: this should divide 12, where 12 is the default number of entities to align things in the Grid comp.
+  numPerRow?: number;
   numRows?: number;
 }
 
@@ -12,27 +11,22 @@ const CardGridSkeleton: React.FC<CardGridSkeletonProps> = ({
   numPerRow = 3,
   numRows = 3,
 }) => {
-  const foo = Array.from({ length: numPerRow * numRows }, (_, index) => index);
+  const items = Array.from(
+    { length: numPerRow * numRows },
+    (_, index) => index,
+  );
 
   return (
-    <>
-      <Grid container spacing={2} id="card-grid-skeleton">
-        {foo.map((index) => (
-          <Grid
-            key={index}
-            item
-            xs={12}
-            sm={12}
-            md={6}
-            lg={6}
-            xl={12 / numPerRow}
-            style={{ gap: "0 24px" }}
-          >
-            <CardSkeleton />
-          </Grid>
-        ))}
-      </Grid>
-    </>
+    <div
+      className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6"
+      id="card-grid-skeleton"
+    >
+      {items.map((index) => (
+        <div key={index}>
+          <CardSkeleton />
+        </div>
+      ))}
+    </div>
   );
 };
 

@@ -13,7 +13,3 @@
 .font__paragraph_1 {
   @apply text-5xl text-gray-800;
 }
-
-.pretty_font_1 {
-  font-family: "RemachineScript";
-}

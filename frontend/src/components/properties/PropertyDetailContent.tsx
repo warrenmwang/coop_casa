@@ -20,7 +20,6 @@ import {
   constructAddressString,
   costNumsToPresentableString,
 } from "@app/utils/property";
-import { Box } from "@mui/material";
 import debounce from "lodash.debounce";
 
 type PropertyDetailContentProps = {
@@ -98,7 +97,7 @@ const PropertyDetailContent: React.FC<PropertyDetailContentProps> = ({
   // ------ LIKE BUTTON ------
 
   return (
-    <Box className="detail-page-body">
+    <div className="detail-page-body">
       {/* Top row of buttons */}
       <div className="flex">
         <BackButton />
@@ -141,7 +140,7 @@ const PropertyDetailContent: React.FC<PropertyDetailContentProps> = ({
           Property ID: {property.details.propertyId}
         </div>
       </div>
-    </Box>
+    </div>
   );
 };
 
