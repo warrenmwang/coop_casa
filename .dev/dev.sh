@@ -50,9 +50,9 @@ db() {
 frontend() {
     cd ../frontend
     if [ $1 = "playwright" ]; then
-        /home/wang/.nvm/versions/node/v21.6.1/bin/npm run start:playwright
+        /home/wang/.nvm/versions/node/v21.6.1/bin/npm run dev:playwright
     else 
-        /home/wang/.nvm/versions/node/v21.6.1/bin/npm run start
+        /home/wang/.nvm/versions/node/v21.6.1/bin/npm run dev
     fi
 }
 

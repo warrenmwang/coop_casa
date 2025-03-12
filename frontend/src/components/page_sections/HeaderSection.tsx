@@ -1,5 +1,6 @@
 import React from "react";
 import cartoonNeighborhood from "@app/assets/cartoonNeighborhood.jpg";
+import "@app/styles/animations.css";
 
 const stats = [
   { name: "Individual Ownership", value: "100%" },
@@ -9,51 +10,56 @@ const stats = [
 ];
 
 const HeaderSection: React.FC = () => {
-  const textColor1 = "black";
-  const block1ClassName = `text-4xl font-bold tracking-tight text-${textColor1} sm:text-6xl`;
-  const textColor2 = "black";
-  const block2ClassName = `mt-6 text-lg leading-8 text-${textColor2}-300`;
-
   return (
-    <div className="relative isolate overflow-hidden bg-gray-900 py-24 sm:py-32">
-      {/* background image */}
-      <img
-        src={cartoonNeighborhood}
-        alt="Image of a friendly cartoon neighborhood"
-        className="absolute inset-0 -z-10 h-full w-full object-cover object-right md:object-center"
-      />
+    <div className="relative isolate min-h-screen flex items-center pointer-events-none">
+      {/* Background with overlay */}
+      <div className="absolute inset-0">
+        <img
+          src={cartoonNeighborhood}
+          alt="Image of a friendly cartoon neighborhood"
+          className="h-full w-full object-cover object-center"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/30 to-green-500/30 mix-blend-multiply" />
+      </div>
 
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        {/* main text */}
-        <div className="mx-auto max-w-2xl lg:mx-0 bg-white/30 backdrop-blur-md p-6 rounded-lg">
-          <h2 className={block1ClassName}>
-            Connecting Communities, Empowering Ownership
-          </h2>
-          <p className={block2ClassName}>
+      {/* Content */}
+      <div className="relative mx-auto max-w-7xl px-6 py-24 lg:px-8 pointer-events-auto">
+        <div className="backdrop-blur-lg bg-white/10 rounded-2xl p-8 border border-white/20 shadow-2xl transform hover:scale-[1.02] transition-transform duration-300">
+          <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl mb-6 font-sans animate-fade-in">
+            <span className="bg-clip-text text-gray-900">
+              Connecting Communities, Empowering Ownership
+            </span>
+          </h1>
+          <p className="mt-6 text-xl leading-8 text-gray-900 max-w-3xl animate-fade-in-delayed">
             Your Pivotal Platform for Shared Land Ownership, Alternative
             Housing, Legal Guidance, and Collaborative Home Solutions in the
             Face of the Housing Crisis
           </p>
         </div>
 
-        {/* stats */}
-        <div className="mx-auto mt-10 max-w-2xl lg:mx-0 lg:max-w-none">
-          <dl className="mt-16 grid grid-cols-1 gap-8 sm:mt-20 sm:grid-cols-2 lg:grid-cols-4">
-            {stats.map((stat) => (
-              <div
-                key={stat.name}
-                className="flex flex-col-reverse backdrop-blur-md p-2 rounded-lg"
-              >
-                <dt className="text-base leading-7 text-black-300 ">
-                  {stat.name}
-                </dt>
-                <dd className="text-2xl font-bold leading-9 tracking-tight text-black">
-                  {stat.value}
-                </dd>
-              </div>
-            ))}
-          </dl>
+        {/* Stats */}
+        <div className="mt-16 grid grid-cols-1 gap-8 sm:mt-20 sm:grid-cols-2 lg:grid-cols-3">
+          {stats.map((stat, index) => (
+            <div
+              key={stat.name}
+              className="backdrop-blur-md bg-white/10 rounded-xl p-6 border border-white/20 shadow-xl transform hover:scale-105 transition-all duration-300"
+              style={{ animationDelay: `${index * 200}ms` }}
+            >
+              <dt className="text-lg font-medium text-gray-900">{stat.name}</dt>
+              <dd className="text-3xl font-bold tracking-tight text-gray-900 mt-2">
+                {stat.value}
+              </dd>
+            </div>
+          ))}
         </div>
+      </div>
+
+      {/* Decorative blur circles */}
+      <div
+        className="absolute -top-40 transform-gpu blur-3xl sm:-top-80"
+        aria-hidden="true"
+      >
+        <div className="aspect-[1097/845] w-[68.5625rem] bg-gradient-to-r from-[#ff4694]/20 to-[#776fff]/20 opacity-20" />
       </div>
     </div>
   );
