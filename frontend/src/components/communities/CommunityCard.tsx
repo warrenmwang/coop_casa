@@ -2,9 +2,7 @@ import React from "react";
 import { Community } from "@app/types/Types";
 import { communitiesPageLink } from "@app/urls";
 import { Link } from "react-router-dom";
-import { Card, CardContent, CardMedia } from "@mui/material";
-
-import MemoizedImageElement from "@app/components/MemoizedImageElement";
+import Card from "@app/components/Card";
 
 type CommunityCardProps = {
   community: Community;
@@ -13,23 +11,26 @@ type CommunityCardProps = {
 const CommunityCard: React.FC<CommunityCardProps> = ({ community }) => {
   const communityDetailPage = `${communitiesPageLink}/${community.details.communityId}`;
 
+  const description = (
+    <div className="mt-2">
+      <p className="text-gray-600 line-clamp-2">
+        {community.details.description}
+      </p>
+    </div>
+  );
+
   return (
-    <>
-      <Link to={communityDetailPage}>
-        <Card className="mui__card">
-          <CardMedia title="Community first image" className="mui__card_media">
-            <MemoizedImageElement
-              image={community.images[0]}
-              className="mui__card_media"
-            />
-          </CardMedia>
-          <CardContent className="mui__card_content">
-            <div className="text-3xl font-bold">{community.details.name}</div>
-            <div className="text-2xl">{community.details.description}</div>
-          </CardContent>
-        </Card>
-      </Link>
-    </>
+    <Link
+      to={communityDetailPage}
+      className="block transition-transform hover:scale-102 duration-200"
+    >
+      <Card
+        title={community.details.name}
+        imageUrl={community.images[0]}
+        description={description}
+        imageSize="lg"
+      />
+    </Link>
   );
 };
 

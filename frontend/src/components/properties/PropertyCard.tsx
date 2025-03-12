@@ -1,10 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Property } from "@app/types/Types";
-import { Card, CardContent, CardMedia } from "@mui/material";
 import { propertiesPageLink } from "@app/urls";
-
-import MemoizedImageElement from "@app/components/MemoizedImageElement";
+import Card from "@app/components/Card";
 
 interface PropertyCardProps {
   property: Property;
@@ -32,50 +30,55 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
     return "$" + res + "." + String(costCents).padStart(2, "0");
   };
 
-  const basicInfoConstructor = (property: Property) => {
-    return (
-      <div className="flex">
-        <div className="font-bold mx-1">{property.details.numBedrooms}</div>
-        <div> beds | </div>
-        <div className="font-bold mx-1">{property.details.numShowersBaths}</div>
-        <div> ba | </div>
-        <div className="font-bold mx-1">{property.details.numToilets}</div>
-        <div> toil | </div>
-        <div className="font-bold mx-1">{property.details.squareFeet}</div>
-        <div> sqft </div>
-      </div>
-    );
-  };
-
   const costString = costNumsToPresentableString(
     property.details.costDollars,
     property.details.costCents,
   );
+
   const addressString =
     property.details.address2 === ""
       ? `${property.details.address1}, ${property.details.city}, ${property.details.state} ${property.details.zipcode}, ${property.details.country}`
       : `${property.details.address1}, ${property.details.address2}, ${property.details.city}, ${property.details.state} ${property.details.zipcode}, ${property.details.country}`;
 
-  const basicInfoElement = basicInfoConstructor(property);
+  const description = (
+    <div className="space-y-3">
+      <div>
+        <p className="text-2xl sm:text-3xl font-bold text-gray-900">{costString}</p>
+        <p className="mt-1 text-gray-600 line-clamp-1">{addressString}</p>
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-gray-600">
+        <div className="flex items-center">
+          <span className="text-lg font-semibold">{property.details.numBedrooms}</span>
+          <span className="ml-1.5">beds</span>
+        </div>
+        <div className="flex items-center">
+          <span className="text-lg font-semibold">{property.details.numShowersBaths}</span>
+          <span className="ml-1.5">ba</span>
+        </div>
+        <div className="flex items-center">
+          <span className="text-lg font-semibold">{property.details.numToilets}</span>
+          <span className="ml-1.5">toil</span>
+        </div>
+        <div className="flex items-center">
+          <span className="text-lg font-semibold">{property.details.squareFeet}</span>
+          <span className="ml-1.5">sqft</span>
+        </div>
+      </div>
+    </div>
+  );
 
   return (
-    <>
-      <Link to={propertyDetailPage}>
-        <Card className="mui__card">
-          <CardMedia title="Property first image" className="mui__card_media">
-            <MemoizedImageElement
-              image={property.images[0].file}
-              className="mui__card_media"
-            />
-          </CardMedia>
-          <CardContent className="mui__card_content">
-            <div className="text-3xl font-bold">{costString}</div>
-            <div className="text-2xl">{addressString}</div>
-            {basicInfoElement}
-          </CardContent>
-        </Card>
-      </Link>
-    </>
+    <Link
+      to={propertyDetailPage}
+      className="block transition-transform hover:scale-102 duration-200"
+    >
+      <Card
+        title=""
+        imageUrl={property.images[0].file}
+        description={description}
+        imageSize="lg"
+      />
+    </Link>
   );
 };
 

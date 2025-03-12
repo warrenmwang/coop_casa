@@ -9,27 +9,21 @@ const UserProfilePage: React.FC = () => {
   const { userID } = useParams<{ userID: string }>();
   const userIDStr: string = userID as string;
 
-  const { data: userProfile, status } = useGetUserProfile(userIDStr);
+  const { data, status } = useGetUserProfile(userIDStr);
 
   if (status === "pending") {
+    return <CardSkeleton />;
+  }
+
+  if (status === "error") {
     return (
-      <div className="flex justify-center">
-        <CardSkeleton />
-      </div>
+      <FetchErrorText>
+        Sorry, we are unable to find that user{"'"}s profile.
+      </FetchErrorText>
     );
   }
 
-  return (
-    <>
-      {status === "error" && (
-        <FetchErrorText>
-          Sorry, we are unable to find that user{"'"}s profile.
-        </FetchErrorText>
-      )}
-
-      {status === "success" && <UserProfileContent userProfile={userProfile} />}
-    </>
-  );
+  return <UserProfileContent userProfile={data} />;
 };
 
 export default UserProfilePage;

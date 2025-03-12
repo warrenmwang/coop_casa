@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { useGetProperties } from "@app/hooks/properties";
-import { Property } from "@app/types/Types";
-import PropertyCard from "@app/components/properties/PropertyCard";
-import Modal from "@app/components/Modal";
 
 import { LIKED_ENTITIES_DISPLAY_NUM_PREVIEW } from "@app/appConstants";
+import Modal from "@app/components/Modal";
+import ShowMoreButton from "@app/components/buttons/ShowMoreButton";
+import PropertyCard from "@app/components/properties/PropertyCard";
+import { useGetProperties } from "@app/hooks/properties";
+import { Property } from "@app/types/Types";
 
 type LayoutSectionPropertiesWithModalProps = {
   propertyIDs: string[];
@@ -33,9 +34,7 @@ const LayoutSectionPropertiesWithModal: React.FC<
               <PropertyCard key={value.details.propertyId} property={value} />
             );
           })}
-        <button className="text-9xl" onClick={() => setIsModalOpen(true)}>
-          ...
-        </button>
+        <ShowMoreButton onClick={() => setIsModalOpen(true)} />
       </div>
       <Modal
         isOpen={isModalOpen}

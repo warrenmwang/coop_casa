@@ -65,64 +65,60 @@ const UserProfileContent: React.FC<{ userProfile: UserProfile }> = ({
   }
 
   return (
-    <>
-      <Box className="bg-white p-4 shadow-lg rounded-lg mx-auto w-11/12 md:w-3/5 lg:w-1/2 z-50">
-        {/* Top row of buttons */}
-        <div className="flex">
-          <BackButton />
-          <BrowsePageButton
-            pageLink={usersPageLink}
-            displayText="Browse User Profiles"
+    <Box className="detail-page-body">
+      {/* Top row of buttons */}
+      <div className="flex">
+        <BackButton />
+        <BrowsePageButton
+          pageLink={usersPageLink}
+          displayText="Browse User Profiles"
+        />
+        <ShareLinkButton />
+        {showLikedButton && (
+          <LikeButton
+            initState={isLiked}
+            onClick={() => debounceToggleLikeUser(isLiked)}
           />
-          <ShareLinkButton />
-          {showLikedButton && (
-            <LikeButton
-              initState={isLiked}
-              onClick={() => debounceToggleLikeUser(isLiked)}
-            />
-          )}
-        </div>
-
-        {/* Images */}
-        <CustomImageGallery imageData={imageData} />
-        {/* Cost, Address, core property details */}
-        <div id="transition-modal-title">
-          <div className="text-3xl font-bold">{`${userProfile.details.firstName} ${userProfile.details.lastName}, ${userProfile.details.ageInYears}`}</div>
-          <div className="text-2xl">Gender: {userProfile.details.gender}</div>
-          <div className="text-2xl">
-            Location: {userProfile.details.location}
-          </div>
-          <div className="text-2xl">
-            Interests: {userProfile.details.interests.join(", ")}
-          </div>
-          <div className="text-sm pt-5">
-            User ID: {userProfile.details.userId}
-          </div>
-        </div>
-
-        {/* User's communities */}
-        {userProfile.communityIDs.length > 0 && (
-          <>
-            <h1 className="h1_custom mt-3">User&apos;s Liked Communities</h1>
-            <LayoutSectionCommunitiesWithModal
-              communityIDs={userProfile.communityIDs}
-              modalTitle="User's Liked Communities"
-            />
-          </>
         )}
+      </div>
 
-        {/* User's properties */}
-        {userProfile.propertyIDs.length > 0 && (
-          <>
-            <h1 className="h1_custom mt-3">User&apos;s Liked Properties</h1>
-            <LayoutSectionPropertiesWithModal
-              propertyIDs={userProfile.propertyIDs}
-              modalTitle="User's Liked Properties"
-            />
-          </>
-        )}
-      </Box>
-    </>
+      {/* Images */}
+      <CustomImageGallery imageData={imageData} />
+      {/* Cost, Address, core property details */}
+      <div id="transition-modal-title">
+        <div className="text-3xl font-bold">{`${userProfile.details.firstName} ${userProfile.details.lastName}, ${userProfile.details.ageInYears}`}</div>
+        <div className="text-2xl">Gender: {userProfile.details.gender}</div>
+        <div className="text-2xl">Location: {userProfile.details.location}</div>
+        <div className="text-2xl">
+          Interests: {userProfile.details.interests.join(", ")}
+        </div>
+        <div className="text-sm pt-5">
+          User ID: {userProfile.details.userId}
+        </div>
+      </div>
+
+      {/* User's communities */}
+      {userProfile.communityIDs.length > 0 && (
+        <>
+          <h1 className="h1_custom mt-3">User&apos;s Liked Communities</h1>
+          <LayoutSectionCommunitiesWithModal
+            communityIDs={userProfile.communityIDs}
+            modalTitle="User's Liked Communities"
+          />
+        </>
+      )}
+
+      {/* User's properties */}
+      {userProfile.propertyIDs.length > 0 && (
+        <>
+          <h1 className="h1_custom mt-3">User&apos;s Liked Properties</h1>
+          <LayoutSectionPropertiesWithModal
+            propertyIDs={userProfile.propertyIDs}
+            modalTitle="User's Liked Properties"
+          />
+        </>
+      )}
+    </Box>
   );
 };
 

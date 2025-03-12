@@ -1,28 +1,49 @@
+import js from "@eslint/js";
 import globals from "globals";
-import pluginJs from "@eslint/js";
-import tseslint from "typescript-eslint";
-import pluginReact from "eslint-plugin-react";
+import typescript from "@typescript-eslint/parser";
+import reactPlugin from "eslint-plugin-react";
+import tanstackPlugin from "@tanstack/eslint-plugin-query";
 
 export default [
-  { files: ["**/*.{js,mjs,cjs,ts,jsx,tsx}"] },
-  { languageOptions: { globals: globals.browser } },
-  pluginJs.configs.recommended,
-  ...tseslint.configs.recommended,
-  pluginReact.configs.flat.recommended,
   {
-    ignores: [
-      "build/",
-      "node_modules",
-      "**/*.config.js",
-      "playwright-report/",
-      "fileTransformer.mjs",
-    ],
-  },
-  {
+    files: ["**/*.{js,jsx,ts,tsx}"],
+    plugins: {
+      react: reactPlugin,
+      "@tanstack/query": tanstackPlugin,
+    },
+    languageOptions: {
+      parser: typescript,
+      parserOptions: {
+        ecmaFeatures: { jsx: true },
+        ecmaVersion: "latest",
+        sourceType: "module",
+      },
+      globals: {
+        ...globals.browser,
+        ...globals.es2021,
+        ...globals.node,
+      },
+    },
     settings: {
       react: {
         version: "detect",
       },
+    },
+    rules: {
+      "prefer-const": "error",
+      "no-unused-vars": "warn",
+      "no-console": "warn",
+      // Import organization rules
+      "sort-imports": [
+        "error",
+        {
+          ignoreCase: true,
+          ignoreDeclarationSort: true,
+          ignoreMemberSort: false,
+          memberSyntaxSortOrder: ["none", "all", "multiple", "single"],
+        },
+      ],
+      // Add other rules as needed
     },
   },
 ];

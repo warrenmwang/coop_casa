@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import { useGetCommunities } from "@app/hooks/communities";
-import { Community } from "@app/types/Types";
 import CommunityCard from "@app/components/communities/CommunityCard";
 import Modal from "@app/components/Modal";
-
+import ShowMoreButton from "@app/components/buttons/ShowMoreButton";
 import { LIKED_ENTITIES_DISPLAY_NUM_PREVIEW } from "@app/appConstants";
 
 type LayoutSectionCommunitiesWithModalProps = {
@@ -17,11 +16,11 @@ const LayoutSectionCommunitiesWithModal: React.FC<
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const CommunityQueries = useGetCommunities(communityIDs);
 
-  const Communities: Community[] = CommunityQueries.map(
-    (value) => value.data,
-  ).filter((value) => {
-    return value !== undefined;
-  }) as Community[];
+  const Communities = CommunityQueries.map((value) => value.data).filter(
+    (value) => {
+      return value !== undefined;
+    },
+  );
 
   return (
     <>
@@ -36,9 +35,7 @@ const LayoutSectionCommunitiesWithModal: React.FC<
             );
           },
         )}
-        <button className="text-9xl" onClick={() => setIsModalOpen(true)}>
-          ...
-        </button>
+        <ShowMoreButton onClick={() => setIsModalOpen(true)} />
       </div>
       <Modal
         isOpen={isModalOpen}

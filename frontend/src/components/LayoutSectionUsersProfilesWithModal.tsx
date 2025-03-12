@@ -3,7 +3,7 @@ import { useGetUserProfiles } from "@app/hooks/users";
 import UserProfileCard from "@app/components/users/UserProfileCard";
 import { UserProfile } from "@app/types/Types";
 import Modal from "@app/components/Modal";
-
+import ShowMoreButton from "@app/components/buttons/ShowMoreButton";
 import { LIKED_ENTITIES_DISPLAY_NUM_PREVIEW } from "@app/appConstants";
 
 type LayoutSectionUsersProfilesWithModalProps = {
@@ -33,9 +33,7 @@ const LayoutSectionUsersProfilesWithModal: React.FC<
               <UserProfileCard key={value.details.userId} userProfile={value} />
             );
           })}
-        <button className="text-9xl" onClick={() => setIsModalOpen(true)}>
-          ...
-        </button>
+        <ShowMoreButton onClick={() => setIsModalOpen(true)} />
       </div>
       <Modal
         isOpen={isModalOpen}

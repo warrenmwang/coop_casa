@@ -1,10 +1,12 @@
 import React from "react";
+import MemoizedImageElement from "@app/components/MemoizedImageElement";
 
 interface CardProps {
   title: string;
-  imageUrl: string;
+  imageUrl: string | File | React.ReactNode;
   description: React.ReactNode;
   reverse?: boolean;
+  imageSize?: "sm" | "md" | "lg";
 }
 
 const Card: React.FC<CardProps> = ({
@@ -12,23 +14,57 @@ const Card: React.FC<CardProps> = ({
   imageUrl,
   description,
   reverse = false,
+  imageSize = "md",
 }) => {
-  const flexDirection = reverse ? "flex-row-reverse" : "flex-row";
+  const imageSizeClasses = {
+    sm: "h-48 sm:h-56",
+    md: "h-56 sm:h-64",
+    lg: "h-64 sm:h-72 md:h-80",
+  };
 
-  return (
-    <div
-      className={`flex ${flexDirection} p-4 border border-gray-200 rounded-lg shadow-md`}
-    >
-      <div className="flex-none">
-        <img
-          src={imageUrl}
-          alt=""
-          className="w-32 h-32 object-cover rounded-lg"
+  const renderImage = () => {
+    if (React.isValidElement(imageUrl)) {
+      return (
+        <div
+          className={`${imageSizeClasses[imageSize]} w-full flex items-center justify-center overflow-hidden rounded-t-lg bg-gray-50`}
+        >
+          {imageUrl}
+        </div>
+      );
+    }
+
+    if (typeof imageUrl === "string") {
+      return (
+        <div className={`${imageSizeClasses[imageSize]} w-full`}>
+          <img
+            src={imageUrl}
+            alt={title}
+            className="w-full h-full object-cover rounded-t-lg"
+          />
+        </div>
+      );
+    }
+
+    return (
+      <div className={`${imageSizeClasses[imageSize]} w-full`}>
+        <MemoizedImageElement
+          image={imageUrl as File}
+          className="w-full h-full object-cover rounded-t-lg"
         />
       </div>
-      <div className="flex-grow ml-4">
-        <h2 className="text-lg font-bold">{title}</h2>
-        {description}
+    );
+  };
+
+  return (
+    <div className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow overflow-hidden">
+      {renderImage()}
+      <div className="p-4 sm:p-5">
+        {title && (
+          <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">
+            {title}
+          </h2>
+        )}
+        <div>{description}</div>
       </div>
     </div>
   );

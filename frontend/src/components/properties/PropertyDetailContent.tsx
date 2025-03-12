@@ -97,7 +97,7 @@ const PropertyDetailContent: React.FC<PropertyDetailContentProps> = ({
   // ------ LIKE BUTTON ------
 
   return (
-    <Box className="bg-white p-4 shadow-lg rounded-lg mx-auto w-11/12 md:w-3/5 lg:w-1/2 z-50">
+    <Box className="detail-page-body">
       {/* Top row of buttons */}
       <div className="flex">
         <BackButton />

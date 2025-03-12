@@ -4,3 +4,7 @@
 .content-body {
   @apply px-2 w-full sm:w-4/5 md:w-10/12 lg:w-9/12 xl:w-8/12 mx-auto;
 }
+
+.detail-page-body {
+  @apply bg-white p-4 shadow-lg rounded-lg mx-auto w-11/12 md:w-3/5 lg:w-4/5;
+}

@@ -61,7 +61,7 @@ const CommunityDetailContent: React.FC<{ community: Community }> = ({
   }
 
   return (
-    <Box className="bg-white p-4 shadow-lg rounded-lg mx-auto w-11/12 md:w-3/5 lg:w-4/5">
+    <Box className="detail-page-body">
       {/* Top row of buttons */}
       <div className="flex">
         <BackButton />
