@@ -1,17 +1,16 @@
-import { Property, OrderedFile } from "@app/types/Types";
-import { apiPropertiesLink } from "@app/urls";
 import {
-  PAGE_QP_KEY,
   FILTER_ADDRESS_QP_KEY,
   MAX_NUMBER_PROPERTIES_PER_PAGE,
+  PAGE_QP_KEY,
 } from "@app/appConstants";
-import { apiFile2ClientFile } from "@app/utils/utils";
-
-import axios from "axios";
 import {
   APIPropertyReceivedSchema,
   APIReceivedPropertyIDsSchema,
 } from "@app/types/Schema";
+import { OrderedFile, Property } from "@app/types/Types";
+import { apiPropertiesLink } from "@app/urls";
+import { apiFile2ClientFile } from "@app/utils/utils";
+import axios from "axios";
 
 export const apiCreateNewProperty = async (
   property: Property,

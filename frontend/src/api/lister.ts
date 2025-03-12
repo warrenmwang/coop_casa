@@ -1,8 +1,8 @@
-import axios from "axios";
-import { z } from "zod";
 import { PublicListerBasicInfoSchema } from "@app/types/Schema";
 import { PublicListerBasicInfo } from "@app/types/Types";
 import { apiListerLink } from "@app/urls";
+import axios from "axios";
+import { z } from "zod";
 
 // Get public, basic lister info
 export const apiGetListerInfo = async (

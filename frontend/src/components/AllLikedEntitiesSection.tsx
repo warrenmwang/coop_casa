@@ -1,11 +1,12 @@
 import React from "react";
-import { useGetLikedEntities } from "@app/hooks/account";
-import TextSkeleton from "@app/components/skeleton/TextSkeleton";
+
 import FetchErrorText from "@app/components/FetchErrorText";
-import LayoutSectionUsersProfilesWithModal from "@app/components/LayoutSectionUsersProfilesWithModal";
 import LayoutSectionCommunitiesWithModal from "@app/components/LayoutSectionCommunitiesWithModal";
 import LayoutSectionPropertiesWithModal from "@app/components/LayoutSectionProperiesWithModal";
+import LayoutSectionUsersProfilesWithModal from "@app/components/LayoutSectionUsersProfilesWithModal";
+import TextSkeleton from "@app/components/skeleton/TextSkeleton";
 import BrowsePageButton from "@app/components/users/BrowsePageButton";
+import { useGetLikedEntities } from "@app/hooks/account";
 import {
   communitiesPageLink,
   propertiesPageLink,

@@ -1,12 +1,13 @@
 import React from "react";
 import { Link } from "react-router-dom";
+
 import {
-  homePageLink,
   aboutPageLink,
-  privacypolicyPageLink,
-  termsOfServicePageLink,
   attributionsPageLink,
   contactPageLink,
+  homePageLink,
+  privacypolicyPageLink,
+  termsOfServicePageLink,
 } from "@app/urls";
 
 const Footer: React.FC = () => {

@@ -1,9 +1,10 @@
 import React, { useMemo } from "react";
-import { UserProfile } from "@app/types/Types";
-import { usersPageLink } from "@app/urls";
 import { Link } from "react-router-dom";
+
 import Card from "@app/components/Card";
 import DefaultUserProfileIcon from "@app/components/icons/DefaultUserProfileIcon";
+import { UserProfile } from "@app/types/Types";
+import { usersPageLink } from "@app/urls";
 
 const UserProfileCard: React.FC<{ userProfile: UserProfile }> = ({
   userProfile,

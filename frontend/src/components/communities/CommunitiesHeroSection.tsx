@@ -1,7 +1,8 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import Title from "@app/components/Title";
+
 import communityClipArt from "@app/assets/communityClipArt.png";
+import Title from "@app/components/Title";
 import "@app/styles/animations.css";
 import { communitiesPageLink } from "@app/urls";
 

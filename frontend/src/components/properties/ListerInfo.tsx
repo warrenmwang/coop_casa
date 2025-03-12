@@ -1,7 +1,8 @@
 import React from "react";
-import { PublicListerBasicInfo } from "@app/types/Types";
+
 import FetchErrorText from "@app/components/FetchErrorText";
 import { useGetLister } from "@app/hooks/lister";
+import { PublicListerBasicInfo } from "@app/types/Types";
 
 type ListerInfoProps = {
   listerID: string;

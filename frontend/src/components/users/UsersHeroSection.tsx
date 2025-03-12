@@ -1,7 +1,8 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import Title from "@app/components/Title";
+
 import peopleCircleImage from "@app/assets/people_circle.webp";
+import Title from "@app/components/Title";
 import "@app/styles/animations.css";
 import { usersPageLink } from "@app/urls";
 

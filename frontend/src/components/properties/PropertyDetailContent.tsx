@@ -1,26 +1,27 @@
 import React from "react";
-import { propertiesPageLink } from "@app/urls";
-import { Box } from "@mui/material";
+
 import CustomImageGallery, {
   ImageGalleryItemsInput,
 } from "@app/components/CustomImageGallery";
+import BackButton from "@app/components/buttons/BackButton";
+import LikeButton from "@app/components/buttons/LikeButton";
 import ShareLinkButton from "@app/components/buttons/ShareLinkButton";
 import ListerInfo from "@app/components/properties/ListerInfo";
-import { Property } from "@app/types/Types";
-import {
-  constructAddressString,
-  costNumsToPresentableString,
-} from "@app/utils/property";
+import BrowsePageButton from "@app/components/users/BrowsePageButton";
 import {
   useGetLikedProperties,
   useLikeProperty,
   useUnlikeProperty,
 } from "@app/hooks/account";
-import debounce from "lodash.debounce";
-import LikeButton from "@app/components/buttons/LikeButton";
-import BackButton from "@app/components/buttons/BackButton";
-import BrowsePageButton from "@app/components/users/BrowsePageButton";
+import { Property } from "@app/types/Types";
+import { propertiesPageLink } from "@app/urls";
 import { mutationErrorCallbackCreator } from "@app/utils/callbacks";
+import {
+  constructAddressString,
+  costNumsToPresentableString,
+} from "@app/utils/property";
+import { Box } from "@mui/material";
+import debounce from "lodash.debounce";
 
 type PropertyDetailContentProps = {
   property: Property;

@@ -1,7 +1,8 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import Title from "@app/components/Title";
+
 import cartoonNeighborhood from "@app/assets/cartoonNeighborhood1.png";
+import Title from "@app/components/Title";
 import "@app/styles/animations.css";
 import { propertiesPageLink } from "@app/urls";
 

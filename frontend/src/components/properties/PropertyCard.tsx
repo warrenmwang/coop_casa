@@ -1,8 +1,9 @@
 import React from "react";
 import { Link } from "react-router-dom";
+
+import Card from "@app/components/Card";
 import { Property } from "@app/types/Types";
 import { propertiesPageLink } from "@app/urls";
-import Card from "@app/components/Card";
 
 interface PropertyCardProps {
   property: Property;
@@ -43,24 +44,34 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
   const description = (
     <div className="space-y-3">
       <div>
-        <p className="text-2xl sm:text-3xl font-bold text-gray-900">{costString}</p>
+        <p className="text-2xl sm:text-3xl font-bold text-gray-900">
+          {costString}
+        </p>
         <p className="mt-1 text-gray-600 line-clamp-1">{addressString}</p>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-gray-600">
         <div className="flex items-center">
-          <span className="text-lg font-semibold">{property.details.numBedrooms}</span>
+          <span className="text-lg font-semibold">
+            {property.details.numBedrooms}
+          </span>
           <span className="ml-1.5">beds</span>
         </div>
         <div className="flex items-center">
-          <span className="text-lg font-semibold">{property.details.numShowersBaths}</span>
+          <span className="text-lg font-semibold">
+            {property.details.numShowersBaths}
+          </span>
           <span className="ml-1.5">ba</span>
         </div>
         <div className="flex items-center">
-          <span className="text-lg font-semibold">{property.details.numToilets}</span>
+          <span className="text-lg font-semibold">
+            {property.details.numToilets}
+          </span>
           <span className="ml-1.5">toil</span>
         </div>
         <div className="flex items-center">
-          <span className="text-lg font-semibold">{property.details.squareFeet}</span>
+          <span className="text-lg font-semibold">
+            {property.details.squareFeet}
+          </span>
           <span className="ml-1.5">sqft</span>
         </div>
       </div>

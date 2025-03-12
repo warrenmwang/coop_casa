@@ -1,38 +1,36 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
+import { MAX_USER_PROFILE_IMGS_ALLOWED } from "@app/appConstants";
 // Components
 import Title from "@app/components/Title";
+import FormButton from "@app/components/buttons/FormButton";
+// Styles
+
+import SubmitButton from "@app/components/buttons/SubmitButton";
+import GenderInput from "@app/components/input/GenderInput";
+import ImageInput from "@app/components/input/ImageInput";
+import InterestsInput from "@app/components/input/InterestsInput";
+import LocationInput from "@app/components/input/LocationInput";
+import MultipleImageUploader from "@app/components/input/MultipleImageUploader";
+import TextInput from "@app/components/input/TextInput";
+import TextSkeleton from "@app/components/skeleton/TextSkeleton";
+import {
+  useGetUserAccountAuth,
+  useGetUserAccountDetails,
+  useUpdateAccountSettings,
+} from "@app/hooks/account";
+import { EmptyUser } from "@app/types/Objects";
 import {
   APIUserReceived,
   OrderedFile,
   User,
   UserDetails,
 } from "@app/types/Types";
-import LocationInput from "@app/components/input/LocationInput";
-import InterestsInput from "@app/components/input/InterestsInput";
-import GenderInput from "@app/components/input/GenderInput";
-import TextInput from "@app/components/input/TextInput";
-import ImageInput from "@app/components/input/ImageInput";
-import { EmptyUser } from "@app/types/Objects";
-
-// Styles
-
-import SubmitButton from "@app/components/buttons/SubmitButton";
 import { dashboardPageLink, homePageLink } from "@app/urls";
-import TextSkeleton from "@app/components/skeleton/TextSkeleton";
-import { apiFile2ClientFile, isAccountSetup } from "@app/utils/utils";
-
-import { toast } from "react-toastify";
-import MultipleImageUploader from "@app/components/input/MultipleImageUploader";
-import { MAX_USER_PROFILE_IMGS_ALLOWED } from "@app/appConstants";
-import FormButton from "@app/components/buttons/FormButton";
-import {
-  useGetUserAccountAuth,
-  useGetUserAccountDetails,
-  useUpdateAccountSettings,
-} from "@app/hooks/account";
 import { mutationErrorCallbackCreator } from "@app/utils/callbacks";
+import { apiFile2ClientFile, isAccountSetup } from "@app/utils/utils";
 
 const AccountSetupPage: React.FC = () => {
   const [formData, setFormData] = useState<User>(EmptyUser);

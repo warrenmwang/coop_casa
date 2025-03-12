@@ -1,4 +1,4 @@
-import { test, expect } from "playwright/test";
+import { expect, test } from "playwright/test";
 
 test.describe("landing page renders like normal", () => {
   test.beforeEach(async ({ page }) => {

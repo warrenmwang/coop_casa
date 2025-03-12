@@ -1,8 +1,9 @@
 import React from "react";
 import { useParams } from "react-router-dom";
-import CardSkeleton from "@app/components/skeleton/CardSkeleton";
+
 import FetchErrorText from "@app/components/FetchErrorText";
 import PropertyDetailContent from "@app/components/properties/PropertyDetailContent";
+import CardSkeleton from "@app/components/skeleton/CardSkeleton";
 import { useGetProperty } from "@app/hooks/properties";
 
 const PropertyDetailPage: React.FC = () => {

@@ -1,24 +1,25 @@
 import * as React from "react";
-import { UserProfile } from "@app/types/Types";
-import { Box } from "@mui/material";
-import { usersPageLink } from "@app/urls";
-import ShareLinkButton from "@app/components/buttons/ShareLinkButton";
+
+import defaultProfileImage from "@app/assets/profile.jpg";
 import CustomImageGallery, {
   ImageGalleryItemsInput,
 } from "@app/components/CustomImageGallery";
-import defaultProfileImage from "@app/assets/profile.jpg";
 import LayoutSectionCommunitiesWithModal from "@app/components/LayoutSectionCommunitiesWithModal";
 import LayoutSectionPropertiesWithModal from "@app/components/LayoutSectionProperiesWithModal";
+import BackButton from "@app/components/buttons/BackButton";
 import LikeButton from "@app/components/buttons/LikeButton";
+import ShareLinkButton from "@app/components/buttons/ShareLinkButton";
+import BrowsePageButton from "@app/components/users/BrowsePageButton";
 import {
   useGetLikedUsers,
   useLikeUser,
   useUnlikeUser,
 } from "@app/hooks/account";
-import BackButton from "@app/components/buttons/BackButton";
-import BrowsePageButton from "@app/components/users/BrowsePageButton";
-import debounce from "lodash.debounce";
+import { UserProfile } from "@app/types/Types";
+import { usersPageLink } from "@app/urls";
 import { mutationErrorCallbackCreator } from "@app/utils/callbacks";
+import { Box } from "@mui/material";
+import debounce from "lodash.debounce";
 
 const UserProfileContent: React.FC<{ userProfile: UserProfile }> = ({
   userProfile,

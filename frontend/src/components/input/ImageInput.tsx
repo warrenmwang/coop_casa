@@ -1,8 +1,8 @@
 import React from "react";
+import { toast } from "react-toastify";
+
 import { User } from "@app/types/Types";
 import { validateUserAvatarInput } from "@app/utils/inputValidation";
-
-import { toast } from "react-toastify";
 
 interface ImageInputArgs {
   setFormData: React.Dispatch<React.SetStateAction<User>>;

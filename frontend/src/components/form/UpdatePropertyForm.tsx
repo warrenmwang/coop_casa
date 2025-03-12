@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { OrderedFile, Property, PropertyDetails } from "@app/types/Types";
-import TextInput from "@app/components/input/TextInput";
-import MultipleImageUploader from "@app/components/input/MultipleImageUploader";
-import { MAX_PROPERTY_IMGS_ALLOWED } from "@app/appConstants";
 import { toast } from "react-toastify";
+
+import { MAX_PROPERTY_IMGS_ALLOWED } from "@app/appConstants";
+import MultipleImageUploader from "@app/components/input/MultipleImageUploader";
+import TextInput from "@app/components/input/TextInput";
 import { useUpdateProperty } from "@app/hooks/properties";
+import { OrderedFile, Property, PropertyDetails } from "@app/types/Types";
 import { mutationErrorCallbackCreator } from "@app/utils/callbacks";
 
 const UpdatePropertyForm: React.FC<{

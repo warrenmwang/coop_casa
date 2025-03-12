@@ -1,14 +1,14 @@
 import React, { useState } from "react";
-import SubmitButton from "@app/components/buttons/SubmitButton";
-
 import { toast } from "react-toastify";
-import { useAdminGetUserRoles, useAdminUpdateUserRole } from "@app/hooks/admin";
-import { mutationErrorCallbackCreator } from "@app/utils/callbacks";
+
 import {
   USER_ROLE_LISTER,
   USER_ROLE_OPTIONS,
   USER_ROLE_REGULAR,
 } from "@app/appConstants";
+import SubmitButton from "@app/components/buttons/SubmitButton";
+import { useAdminGetUserRoles, useAdminUpdateUserRole } from "@app/hooks/admin";
+import { mutationErrorCallbackCreator } from "@app/utils/callbacks";
 import { validateUserID } from "@app/utils/inputValidation";
 
 const AdminManageUserRoles: React.FC = () => {

@@ -1,7 +1,8 @@
-import { UseQueryResult } from "@tanstack/react-query";
-import TextSkeleton from "@app/components/skeleton/TextSkeleton";
 import React from "react";
+
+import TextSkeleton from "@app/components/skeleton/TextSkeleton";
 import { UserDetails, UserStatusTimeStamped } from "@app/types/Types";
+import { UseQueryResult } from "@tanstack/react-query";
 
 type props = {
   userDetailsQueries: UseQueryResult<UserDetails[], Error>;

@@ -1,6 +1,7 @@
 import React from "react";
-import Title from "@app/components/Title";
+
 import coopLogo from "@app/assets/coopAlt1.svg";
+import Title from "@app/components/Title";
 
 const AboutPage: React.FC = () => {
   return (

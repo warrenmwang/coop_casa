@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import ImageGallery, { ReactImageGalleryItem } from "react-image-gallery";
+
 import { createThumbnail } from "@app/components/Thumbnail";
 
 export type ImageGalleryItemsInput = {

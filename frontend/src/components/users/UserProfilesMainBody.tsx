@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+
 import {
   FILTER_FIRST_NAME_QP_KEY,
   FILTER_LAST_NAME_QP_KEY,
@@ -7,16 +8,16 @@ import {
   PAGE_QP_KEY,
 } from "@app/appConstants";
 import FetchErrorText from "@app/components/FetchErrorText";
-import CardGridSkeleton from "@app/components/skeleton/CardGridSkeleton";
-import SearchBar from "@app/components/input/SearchBar";
-import SubmitButton from "@app/components/buttons/SubmitButton";
-import PageOfUserProfiles from "@app/components/users/PageOfUserProfiles";
-import { useGetPageOfUserProfiles } from "@app/hooks/users";
 import PaginationButtons from "@app/components/PaginationButtons";
+import SubmitButton from "@app/components/buttons/SubmitButton";
+import SearchBar from "@app/components/input/SearchBar";
+import CardGridSkeleton from "@app/components/skeleton/CardGridSkeleton";
+import PageOfUserProfiles from "@app/components/users/PageOfUserProfiles";
 import {
   useGetPageNumSearchQueryParam,
   useGetURLSearchQueryParam,
 } from "@app/hooks/react-router";
+import { useGetPageOfUserProfiles } from "@app/hooks/users";
 import {
   getURLSearchQueryParam,
   updateURLSearchQueryParam,

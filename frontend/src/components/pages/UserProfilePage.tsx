@@ -1,7 +1,8 @@
 import React from "react";
 import { useParams } from "react-router-dom";
-import CardSkeleton from "@app/components/skeleton/CardSkeleton";
+
 import FetchErrorText from "@app/components/FetchErrorText";
+import CardSkeleton from "@app/components/skeleton/CardSkeleton";
 import UserProfileContent from "@app/components/users/UserProfileContent";
 import { useGetUserProfile } from "@app/hooks/users";
 

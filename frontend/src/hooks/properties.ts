@@ -1,11 +1,4 @@
 import {
-  useMutation,
-  useQueries,
-  useQuery,
-  useQueryClient,
-  UseQueryResult,
-} from "@tanstack/react-query";
-import {
   apiCreateNewProperty,
   apiDeleteProperty,
   apiGetProperties,
@@ -14,8 +7,15 @@ import {
   apiTransferProperty,
   apiUpdateProperty,
 } from "@app/api/property";
-import { Property } from "@app/types/Types";
 import { propertiesKey, propertiesPageKey } from "@app/reactQueryKeys";
+import { Property } from "@app/types/Types";
+import {
+  UseQueryResult,
+  useMutation,
+  useQueries,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 
 export const useGetPageOfPropertyIDs = (
   currentPage: number,

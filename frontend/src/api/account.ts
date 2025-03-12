@@ -1,16 +1,4 @@
-import {
-  apiAccountLink,
-  apiAccountUpdateLink,
-  apiAuthLogoutLink,
-  apiAuthCheckLink,
-  apiUserRoleLink,
-  apiAccountUserProfileImagesLink,
-  apiAccountStatusLink,
-} from "@app/urls";
-import { User, APIUserReceived, UserStatusTimeStamped } from "@app/types/Types";
-import axios, { AxiosResponse } from "axios";
 import { DeleteUserResponse, LogoutUserResponse } from "@app/types/Responses";
-import { apiFile2ClientFile } from "@app/utils/utils";
 import {
   APIReceivedCommunityIDsSchema,
   APIReceivedPropertyIDsSchema,
@@ -18,9 +6,20 @@ import {
   UserDetailsSchema,
   UserStatusSchemaTimeStamped,
 } from "@app/types/Schema";
-
+import { APIUserReceived, User, UserStatusTimeStamped } from "@app/types/Types";
 import { APIReceivedUserProfileImages } from "@app/types/Types";
-import { z, ZodError } from "zod";
+import {
+  apiAccountLink,
+  apiAccountStatusLink,
+  apiAccountUpdateLink,
+  apiAccountUserProfileImagesLink,
+  apiAuthCheckLink,
+  apiAuthLogoutLink,
+  apiUserRoleLink,
+} from "@app/urls";
+import { apiFile2ClientFile } from "@app/utils/utils";
+import axios, { AxiosResponse } from "axios";
+import { ZodError, z } from "zod";
 
 // Delete Account Function
 export const apiAccountDelete = async (): Promise<

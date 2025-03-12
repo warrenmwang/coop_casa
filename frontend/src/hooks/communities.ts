@@ -1,11 +1,4 @@
 import {
-  useMutation,
-  useQueries,
-  useQuery,
-  useQueryClient,
-  UseQueryResult,
-} from "@tanstack/react-query";
-import {
   apiCreateCommunity,
   apiDeleteCommunity,
   apiGetCommunities,
@@ -13,8 +6,15 @@ import {
   apiTransferCommunity,
   apiUpdateCommunity,
 } from "@app/api/community";
-import { Community } from "@app/types/Types";
 import { communitiesKey, communitiesPageKey } from "@app/reactQueryKeys";
+import { Community } from "@app/types/Types";
+import {
+  UseQueryResult,
+  useMutation,
+  useQueries,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 
 export const useGetPageOfCommunityIDs = (
   currentPage: number,

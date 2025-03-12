@@ -1,7 +1,8 @@
 import * as React from "react";
-import { useGetUserOwnedPropertiesIDs } from "@app/hooks/account";
-import TextSkeleton from "@app/components/skeleton/TextSkeleton";
+
 import FetchErrorText from "@app/components/FetchErrorText";
+import TextSkeleton from "@app/components/skeleton/TextSkeleton";
+import { useGetUserOwnedPropertiesIDs } from "@app/hooks/account";
 import { useGetProperties } from "@app/hooks/properties";
 import {
   constructAddressString,

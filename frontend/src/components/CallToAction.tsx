@@ -1,11 +1,12 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+
+import Title from "@app/components/Title";
 import {
   communitiesPageLink,
   propertiesPageLink,
   usersPageLink,
 } from "@app/urls";
-import Title from "@app/components/Title";
 
 const CallToAction: React.FC = () => {
   const navigate = useNavigate();

@@ -1,23 +1,24 @@
 import React from "react";
-import { Box } from "@mui/material";
-import { communitiesPageLink } from "@app/urls";
-import ShareLinkButton from "@app/components/buttons/ShareLinkButton";
+
 import CustomImageGallery, {
   ImageGalleryItemsInput,
 } from "@app/components/CustomImageGallery";
-import { Community } from "@app/types/Types";
-import LayoutSectionUsersProfilesWithModal from "@app/components/LayoutSectionUsersProfilesWithModal";
 import LayoutSectionPropertiesWithModal from "@app/components/LayoutSectionProperiesWithModal";
+import LayoutSectionUsersProfilesWithModal from "@app/components/LayoutSectionUsersProfilesWithModal";
 import BackButton from "@app/components/buttons/BackButton";
-import BrowsePageButton from "@app/components/users/BrowsePageButton";
 import LikeButton from "@app/components/buttons/LikeButton";
+import ShareLinkButton from "@app/components/buttons/ShareLinkButton";
+import BrowsePageButton from "@app/components/users/BrowsePageButton";
 import {
   useGetLikedCommunities,
   useLikeCommunity,
   useUnlikeCommunity,
 } from "@app/hooks/account";
-import debounce from "lodash.debounce";
+import { Community } from "@app/types/Types";
+import { communitiesPageLink } from "@app/urls";
 import { mutationErrorCallbackCreator } from "@app/utils/callbacks";
+import { Box } from "@mui/material";
+import debounce from "lodash.debounce";
 
 const CommunityDetailContent: React.FC<{ community: Community }> = ({
   community,

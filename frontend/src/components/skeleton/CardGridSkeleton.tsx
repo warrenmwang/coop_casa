@@ -1,6 +1,7 @@
-import { Grid } from "@mui/material";
 import React from "react";
+
 import CardSkeleton from "@app/components/skeleton/CardSkeleton";
+import { Grid } from "@mui/material";
 
 interface CardGridSkeletonProps {
   numPerRow?: number; // Note: this should divide 12, where 12 is the default number of entities to align things in the Grid comp.

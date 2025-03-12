@@ -1,11 +1,4 @@
 import {
-  useMutation,
-  useQueries,
-  useQuery,
-  useQueryClient,
-  UseQueryResult,
-} from "@tanstack/react-query";
-import {
   apiAdminCreateUserStatus,
   apiAdminGetAccountStatus,
   apiAdminGetTotalCountCommunities,
@@ -16,13 +9,20 @@ import {
   apiAdminUpdateUserRole,
   apiAdminUpdateUserStatus,
 } from "@app/api/admin";
-import { UserDetails } from "@app/types/Types";
 import {
   adminTotalsKey,
   adminUserDetailsKey,
   adminUserRolesKey,
   adminUserStatusesKey,
 } from "@app/reactQueryKeys";
+import { UserDetails } from "@app/types/Types";
+import {
+  UseQueryResult,
+  useMutation,
+  useQueries,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 
 export const useAdminGetUserDetails = (
   limit: number,

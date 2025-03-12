@@ -1,8 +1,8 @@
 import js from "@eslint/js";
-import globals from "globals";
+import tanstackPlugin from "@tanstack/eslint-plugin-query";
 import typescript from "@typescript-eslint/parser";
 import reactPlugin from "eslint-plugin-react";
-import tanstackPlugin from "@tanstack/eslint-plugin-query";
+import globals from "globals";
 
 export default [
   {

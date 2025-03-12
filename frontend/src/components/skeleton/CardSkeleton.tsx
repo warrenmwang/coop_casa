@@ -1,4 +1,5 @@
 import React from "react";
+
 import { Card, Skeleton } from "@mui/material";
 
 const CardSkeleton: React.FC = () => {

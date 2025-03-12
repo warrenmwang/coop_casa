@@ -1,9 +1,10 @@
 import React from "react";
-import HeaderSection from "@app/components/page_sections/HeaderSection";
+
+import CallToAction from "@app/components/CallToAction";
 import CommunitiesHeroSection from "@app/components/communities/CommunitiesHeroSection";
+import HeaderSection from "@app/components/page_sections/HeaderSection";
 import PropertiesHeroSection from "@app/components/properties/PropertiesHeroSection";
 import UsersHeroSection from "@app/components/users/UsersHeroSection";
-import CallToAction from "@app/components/CallToAction";
 
 const LandingPage: React.FC = () => {
   return (

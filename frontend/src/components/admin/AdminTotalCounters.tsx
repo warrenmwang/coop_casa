@@ -1,11 +1,12 @@
-import TextSkeleton from "@app/components/skeleton/TextSkeleton";
+import React from "react";
+
 import Title from "@app/components/Title";
+import TextSkeleton from "@app/components/skeleton/TextSkeleton";
 import {
   useAdminGetTotalNumberCommunities,
   useAdminGetTotalNumberProperties,
   useAdminGetTotalNumberUsers,
 } from "@app/hooks/admin";
-import React from "react";
 
 const AdminTotalCounters: React.FC = () => {
   const numUsers = useAdminGetTotalNumberUsers();

@@ -2,9 +2,9 @@ import "@app/test-utils";
 import {
   validateDate,
   validateEmail,
+  validateUUID,
   validateUserAvatarInput,
   validateUserID,
-  validateUUID,
 } from "@app/utils/inputValidation";
 
 describe("validateDate function", () => {

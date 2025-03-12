@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import { useGetCommunities } from "@app/hooks/communities";
-import CommunityCard from "@app/components/communities/CommunityCard";
+
+import { LIKED_ENTITIES_DISPLAY_NUM_PREVIEW } from "@app/appConstants";
 import Modal from "@app/components/Modal";
 import ShowMoreButton from "@app/components/buttons/ShowMoreButton";
-import { LIKED_ENTITIES_DISPLAY_NUM_PREVIEW } from "@app/appConstants";
+import CommunityCard from "@app/components/communities/CommunityCard";
+import { useGetCommunities } from "@app/hooks/communities";
 
 type LayoutSectionCommunitiesWithModalProps = {
   communityIDs: string[];

@@ -1,8 +1,9 @@
 import React from "react";
 import { useParams } from "react-router-dom";
-import CardSkeleton from "@app/components/skeleton/CardSkeleton";
+
 import FetchErrorText from "@app/components/FetchErrorText";
 import CommunityDetailContent from "@app/components/communities/CommunityDetailContent";
+import CardSkeleton from "@app/components/skeleton/CardSkeleton";
 import { useGetCommunity } from "@app/hooks/communities";
 
 const CommunityDetailPage: React.FC = () => {

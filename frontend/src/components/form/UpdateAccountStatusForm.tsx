@@ -1,13 +1,14 @@
-import SubmitButton from "@app/components/buttons/SubmitButton";
+import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
+
 import FetchErrorText from "@app/components/FetchErrorText";
-import TextSkeleton from "@app/components/skeleton/TextSkeleton";
 import Title from "@app/components/Title";
+import SubmitButton from "@app/components/buttons/SubmitButton";
+import TextSkeleton from "@app/components/skeleton/TextSkeleton";
 import {
   useGetAccountStatus,
   useUpdateAccountStatus,
 } from "@app/hooks/account";
-import React, { useEffect, useState } from "react";
-import { toast } from "react-toastify";
 import { mutationErrorCallbackCreator } from "@app/utils/callbacks";
 
 // add account status and conditional text of a comment if the account status was set by an admin

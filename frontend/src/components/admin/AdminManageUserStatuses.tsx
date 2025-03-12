@@ -1,9 +1,10 @@
-import { USER_STATUS_FLAGGED, USER_STATUS_OPTIONS } from "@app/appConstants";
-import SubmitButton from "@app/components/buttons/SubmitButton";
-import Title from "@app/components/Title";
-import { useAdminUpdateUserStatus } from "@app/hooks/admin";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
+
+import { USER_STATUS_FLAGGED, USER_STATUS_OPTIONS } from "@app/appConstants";
+import Title from "@app/components/Title";
+import SubmitButton from "@app/components/buttons/SubmitButton";
+import { useAdminUpdateUserStatus } from "@app/hooks/admin";
 import { mutationErrorCallbackCreator } from "@app/utils/callbacks";
 import { validateUserID } from "@app/utils/inputValidation";
 

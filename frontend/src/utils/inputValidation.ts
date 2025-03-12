@@ -1,5 +1,5 @@
-import { z } from "zod";
 import { MAX_IMAGE_FILE_SIZE } from "@app/appConstants";
+import { z } from "zod";
 
 export const validateDate = (value: string): boolean => {
   // First test date format via regular expression

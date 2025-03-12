@@ -1,6 +1,4 @@
-import { z } from "zod";
 import {
-  AccountSetupPageFormDataSchema,
   APICommunityReceivedSchema,
   APIFileReceivedSchema,
   APIOrderedFileSchema,
@@ -8,19 +6,21 @@ import {
   APIReceivedUserProfileImagesSchema,
   APIUserProfileReceivedSchema,
   APIUserReceivedSchema,
+  AccountSetupPageFormDataSchema,
   CommunityDetailsSchema,
   CommunitySchema,
-  PublicListerBasicInfoSchema,
   OrderedFileSchema,
   PropertyDetailsSchema,
   PropertySchema,
+  PublicListerBasicInfoSchema,
   UserDetailsSchema,
   UserProfileDetailsSchema,
   UserProfileSchema,
   UserSchema,
-  UserStatusSchemaTimeStamped,
   UserStatusSchema,
+  UserStatusSchemaTimeStamped,
 } from "@app/types/Schema";
+import { z } from "zod";
 
 export type User = z.infer<typeof UserSchema>;
 

@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from "react";
-import SubmitButton from "@app/components/buttons/SubmitButton";
-import { validate as uuidValidate } from "uuid";
-import { Community } from "@app/types/Types";
-
+import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+
+import { apiGetCommunity } from "@app/api/community";
+import SubmitButton from "@app/components/buttons/SubmitButton";
 import UpdateCommunityForm from "@app/components/form/UpdateCommunityForm";
 import { useDeleteCommunity } from "@app/hooks/communities";
-import { apiGetCommunity } from "@app/api/community";
+import { communitiesKey } from "@app/reactQueryKeys";
+import { Community } from "@app/types/Types";
 import { mutationErrorCallbackCreator } from "@app/utils/callbacks";
 import { useQuery } from "@tanstack/react-query";
-import { communitiesKey } from "@app/reactQueryKeys";
+import { validate as uuidValidate } from "uuid";
 
 const UpdateCommunityManager: React.FC = () => {
   // ------------ For Getting the community details

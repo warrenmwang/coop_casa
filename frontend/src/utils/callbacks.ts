@@ -1,5 +1,6 @@
-import axios, { AxiosError } from "axios";
 import { toast } from "react-toastify";
+
+import axios, { AxiosError } from "axios";
 
 export const mutationErrorCallbackCreator = (prefixErrStr: string) => {
   return (error: Error | AxiosError) => {

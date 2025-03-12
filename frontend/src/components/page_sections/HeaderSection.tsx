@@ -1,4 +1,5 @@
 import React from "react";
+
 import cartoonNeighborhood from "@app/assets/cartoonNeighborhood.jpg";
 import "@app/styles/animations.css";
 

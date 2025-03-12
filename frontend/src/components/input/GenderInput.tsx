@@ -1,4 +1,5 @@
 import React from "react";
+
 import { GENDER_OPTIONS } from "@app/appConstants";
 
 interface GenderInputArgs {

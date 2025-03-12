@@ -1,21 +1,22 @@
 import React, { useState } from "react";
-import CreatePropertyForm from "@app/components/form/CreatePropertyForm";
-import AdminManageUserRoles from "@app/components/form/AdminManageUserRoles";
-import UpdatePropertyManager from "@app/components/form/UpdatePropertyManager";
-import CreateCommunityForm from "@app/components/form/CreateCommunityForm";
-import UpdateCommunityManager from "@app/components/form/UpdateCommunityManager";
-import AdminDisplayUsers from "@app/components/admin/AdminDisplayUsers";
-import UserOwnedPropertiesTable from "@app/components/properties/UserOwnedPropertiesTable";
-import UserOwnedCommunitiesTable from "@app/components/communities/UserOwnedCommunitiesTable";
-import AllLikedEntitiesSection from "@app/components/AllLikedEntitiesSection";
-import Title from "@app/components/Title";
-import TransferPropertyForm from "@app/components/properties/TransferPropertyForm";
-import TransferCommunityForm from "@app/components/communities/TransferCommunityForm";
-import BrowseListers from "@app/components/BrowseListers";
-import AdminManageUserStatuses from "@app/components/admin/AdminManageUserStatuses";
-import WizardNavigationButtons from "@app/components/buttons/WizardNavigationButtons";
-import AdminTotalCounters from "@app/components/admin/AdminTotalCounters";
+
 import { ADMIN_DASHBOARD_SECTION_LOCALSTORAGE_KEY } from "@app/appConstants";
+import AllLikedEntitiesSection from "@app/components/AllLikedEntitiesSection";
+import BrowseListers from "@app/components/BrowseListers";
+import Title from "@app/components/Title";
+import AdminDisplayUsers from "@app/components/admin/AdminDisplayUsers";
+import AdminManageUserStatuses from "@app/components/admin/AdminManageUserStatuses";
+import AdminTotalCounters from "@app/components/admin/AdminTotalCounters";
+import WizardNavigationButtons from "@app/components/buttons/WizardNavigationButtons";
+import TransferCommunityForm from "@app/components/communities/TransferCommunityForm";
+import UserOwnedCommunitiesTable from "@app/components/communities/UserOwnedCommunitiesTable";
+import AdminManageUserRoles from "@app/components/form/AdminManageUserRoles";
+import CreateCommunityForm from "@app/components/form/CreateCommunityForm";
+import CreatePropertyForm from "@app/components/form/CreatePropertyForm";
+import UpdateCommunityManager from "@app/components/form/UpdateCommunityManager";
+import UpdatePropertyManager from "@app/components/form/UpdatePropertyManager";
+import TransferPropertyForm from "@app/components/properties/TransferPropertyForm";
+import UserOwnedPropertiesTable from "@app/components/properties/UserOwnedPropertiesTable";
 
 const AdminDashboard: React.FC = () => {
   const sections: string[] = [

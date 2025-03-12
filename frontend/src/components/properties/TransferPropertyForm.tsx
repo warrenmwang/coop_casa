@@ -1,15 +1,16 @@
 import React, { useState } from "react";
 import { toast } from "react-toastify";
+
+import Title from "@app/components/Title";
+import FormButton from "@app/components/buttons/FormButton";
+import SubmitButton from "@app/components/buttons/SubmitButton";
+import WizardNavigationButtons from "@app/components/buttons/WizardNavigationButtons";
 import {
   useTransferAllProperties,
   useTransferProperty,
 } from "@app/hooks/properties";
-import { validateUserID, validateUUID } from "@app/utils/inputValidation";
-import FormButton from "@app/components/buttons/FormButton";
-import SubmitButton from "@app/components/buttons/SubmitButton";
-import Title from "@app/components/Title";
 import { mutationErrorCallbackCreator } from "@app/utils/callbacks";
-import WizardNavigationButtons from "@app/components/buttons/WizardNavigationButtons";
+import { validateUUID, validateUserID } from "@app/utils/inputValidation";
 
 const TransferPropertyForm: React.FC = () => {
   const [propertyID, setPropertyID] = useState<string>("");

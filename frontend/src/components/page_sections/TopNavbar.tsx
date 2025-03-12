@@ -1,26 +1,27 @@
 import React, { Fragment } from "react";
 import { Link } from "react-router-dom";
-import { Disclosure, Menu, Transition } from "@headlessui/react";
-import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+
 import coopImg from "@app/assets/coopAlt1.svg";
-import {
-  apiAuthGoogleOAuthLink,
-  accountSettingsPageLink,
-  dashboardPageLink,
-  usersPageLink,
-  communitiesPageLink,
-  propertiesPageLink,
-} from "@app/urls";
-import { APIUserReceived } from "@app/types/Types";
-import { apiFile2ClientFile } from "@app/utils/utils";
-import UserProfileIcon from "@app/components/icons/UserProfileIcon";
 import DefaultUserProfileIcon from "@app/components/icons/DefaultUserProfileIcon";
+import UserProfileIcon from "@app/components/icons/UserProfileIcon";
 import {
   useGetUserAccountAuth,
   useGetUserAccountDetails,
   useLogoutUser,
 } from "@app/hooks/account";
+import { APIUserReceived } from "@app/types/Types";
+import {
+  accountSettingsPageLink,
+  apiAuthGoogleOAuthLink,
+  communitiesPageLink,
+  dashboardPageLink,
+  propertiesPageLink,
+  usersPageLink,
+} from "@app/urls";
 import { mutationErrorCallbackCreator } from "@app/utils/callbacks";
+import { apiFile2ClientFile } from "@app/utils/utils";
+import { Disclosure, Menu, Transition } from "@headlessui/react";
+import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 
 function classNames(...classes: (string | undefined | null | false)[]) {
   return classes.filter(Boolean).join(" ");

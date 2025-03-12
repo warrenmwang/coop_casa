@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from "react";
-import Title from "@app/components/Title";
-import Modal from "@app/components/Modal";
-import UpdateAccountDetailsForm from "@app/components/form/UpdateAccountDetailsForm";
 import { useNavigate } from "react-router-dom";
-import { dashboardPageLink, homePageLink } from "@app/urls";
+
+import { ACCOUNT_SETTINGS_SECTION_LOCALSTORAGE_KEY } from "@app/appConstants";
+import Modal from "@app/components/Modal";
+import Title from "@app/components/Title";
+import WizardNavigationButtons from "@app/components/buttons/WizardNavigationButtons";
+import UpdateAccountDetailsForm from "@app/components/form/UpdateAccountDetailsForm";
+import UpdateAccountStatusForm from "@app/components/form/UpdateAccountStatusForm";
 import TextSkeleton from "@app/components/skeleton/TextSkeleton";
 import {
   useDeleteUserAccount,
@@ -11,10 +14,8 @@ import {
   useGetUserOwnedCommunitiesIDs,
   useGetUserOwnedPropertiesIDs,
 } from "@app/hooks/account";
-import UpdateAccountStatusForm from "@app/components/form/UpdateAccountStatusForm";
-import WizardNavigationButtons from "@app/components/buttons/WizardNavigationButtons";
+import { dashboardPageLink, homePageLink } from "@app/urls";
 import { mutationErrorCallbackCreator } from "@app/utils/callbacks";
-import { ACCOUNT_SETTINGS_SECTION_LOCALSTORAGE_KEY } from "@app/appConstants";
 
 // Authenticated Endpoint
 const AccountSettingsPage: React.FC = () => {

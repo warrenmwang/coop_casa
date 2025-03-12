@@ -1,11 +1,4 @@
 import {
-  useMutation,
-  useQueries,
-  useQuery,
-  useQueryClient,
-  UseQueryResult,
-} from "@tanstack/react-query";
-import {
   apiAccountDelete,
   apiAccountGetStatus,
   apiAccountGetUserLikedCommunities,
@@ -26,22 +19,29 @@ import {
   apiLogoutUser,
   apiUpdateUserAccountDetailsAndProfileImages,
 } from "@app/api/account";
-import { APIUserReceived, User } from "@app/types/Types";
+import { apiGetUserOwnedProperties } from "@app/api/account";
 import {
-  userImagesKey,
-  userAuthKey,
-  userRoleKey,
-  userDetailsKey,
-  userPropertiesKey,
-  userCommunitiesKey,
   userAccountKey,
+  userAuthKey,
+  userCommunitiesKey,
+  userDetailsKey,
+  userImagesKey,
   userKey,
-  userLikedUsersKey,
-  userLikedPropertiesKey,
   userLikedCommunitiesKey,
+  userLikedPropertiesKey,
+  userLikedUsersKey,
+  userPropertiesKey,
+  userRoleKey,
   userStatusKey,
 } from "@app/reactQueryKeys";
-import { apiGetUserOwnedProperties } from "@app/api/account";
+import { APIUserReceived, User } from "@app/types/Types";
+import {
+  UseQueryResult,
+  useMutation,
+  useQueries,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 
 export const useGetUserAccountDetails = (): UseQueryResult<
   APIUserReceived,

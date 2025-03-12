@@ -1,8 +1,9 @@
 import React from "react";
+import { Link } from "react-router-dom";
+
+import Card from "@app/components/Card";
 import { Community } from "@app/types/Types";
 import { communitiesPageLink } from "@app/urls";
-import { Link } from "react-router-dom";
-import Card from "@app/components/Card";
 
 type CommunityCardProps = {
   community: Community;

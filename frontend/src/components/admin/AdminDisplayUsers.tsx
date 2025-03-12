@@ -1,12 +1,13 @@
 import React, { useCallback, useState } from "react";
 import { toast } from "react-toastify";
+
+import { MAX_USERS_PER_PAGE } from "@app/appConstants";
+import AdminDisplayUsersTable from "@app/components/admin/AdminDisplayUsersTable";
 import {
   useAdminGetUserDetails,
   useAdminGetUserRoles,
   useAdminGetUserStatuses,
 } from "@app/hooks/admin";
-import { MAX_USERS_PER_PAGE } from "@app/appConstants";
-import AdminDisplayUsersTable from "@app/components/admin/AdminDisplayUsersTable";
 import debounce from "lodash.debounce";
 
 const AdminDisplayUsers: React.FC = () => {

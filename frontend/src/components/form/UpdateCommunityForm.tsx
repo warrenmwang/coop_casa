@@ -1,22 +1,23 @@
-import React, { useState, useEffect } from "react";
-import TextInput from "@app/components/input/TextInput";
-import MultipleImageUploader from "@app/components/input/MultipleImageUploader";
-import { MAX_COMMUNITY_IMGS_ALLOWED } from "@app/appConstants";
-import {
-  fileArray2OrderedFileArray,
-  orderedFileArray2FileArray,
-} from "@app/utils/utils";
-import { OrderedFile, Community, CommunityDetails } from "@app/types/Types";
+import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { useGetUserProfiles } from "@app/hooks/users";
+
+import { MAX_COMMUNITY_IMGS_ALLOWED } from "@app/appConstants";
+import FormButton from "@app/components/buttons/FormButton";
+import MultipleImageUploader from "@app/components/input/MultipleImageUploader";
+import TextInput from "@app/components/input/TextInput";
+import { useUpdateCommunity } from "@app/hooks/communities";
 import { useGetProperties } from "@app/hooks/properties";
+import { useGetUserProfiles } from "@app/hooks/users";
+import { Community, CommunityDetails, OrderedFile } from "@app/types/Types";
+import { mutationErrorCallbackCreator } from "@app/utils/callbacks";
 import {
   constructAddressString,
   costNumsToPresentableString,
 } from "@app/utils/property";
-import FormButton from "@app/components/buttons/FormButton";
-import { useUpdateCommunity } from "@app/hooks/communities";
-import { mutationErrorCallbackCreator } from "@app/utils/callbacks";
+import {
+  fileArray2OrderedFileArray,
+  orderedFileArray2FileArray,
+} from "@app/utils/utils";
 
 const UpdateCommunityForm: React.FC<{
   community: Community;

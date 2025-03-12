@@ -1,4 +1,4 @@
-import { test, expect } from "playwright/test";
+import { expect, test } from "playwright/test";
 
 test.describe("properties page tests -- mocked no network", () => {
   test.beforeEach(async ({ page }) => {

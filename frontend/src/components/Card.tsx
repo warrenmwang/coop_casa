@@ -1,4 +1,5 @@
 import React from "react";
+
 import MemoizedImageElement from "@app/components/MemoizedImageElement";
 
 interface CardProps {

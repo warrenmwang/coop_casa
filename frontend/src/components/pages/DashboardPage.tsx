@@ -1,21 +1,19 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Title from "@app/components/Title";
-
-import TextSkeleton from "@app/components/skeleton/TextSkeleton";
-import RegularDashboard from "@app/components/RegularDashboard";
-import AdminDashboard from "@app/components/admin/AdminDashboard";
-import { accountSetupPageLink, homePageLink } from "@app/urls";
-import { APIUserReceived, UserDetails } from "@app/types/Types";
 
 import ListerDashboard from "@app/components/ListerDashboard";
-import { EmptyUser } from "@app/types/Objects";
-
+import RegularDashboard from "@app/components/RegularDashboard";
+import Title from "@app/components/Title";
+import AdminDashboard from "@app/components/admin/AdminDashboard";
+import TextSkeleton from "@app/components/skeleton/TextSkeleton";
 import {
   useGetUserAccountAuth,
   useGetUserAccountDetails,
   useGetUserAccountRole,
 } from "@app/hooks/account";
+import { EmptyUser } from "@app/types/Objects";
+import { APIUserReceived, UserDetails } from "@app/types/Types";
+import { accountSetupPageLink, homePageLink } from "@app/urls";
 
 // Authenticated Endpoint
 const DashboardPage: React.FC = () => {

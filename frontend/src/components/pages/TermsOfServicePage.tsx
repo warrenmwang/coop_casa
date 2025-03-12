@@ -1,4 +1,5 @@
 import React from "react";
+
 const TermsOfServicePage: React.FC = () => {
   return (
     <div className="content-body px-4 py-8">
