@@ -14,7 +14,6 @@ const Card: React.FC<CardProps> = ({
   title,
   imageUrl,
   description,
-  reverse = false,
   imageSize = "md",
 }) => {
   const imageSizeClasses = {
