@@ -7,6 +7,13 @@ import globals from "globals";
 export default [
   {
     files: ["**/*.{js,jsx,ts,tsx}"],
+    ignores: [
+      "build/",
+      "node_modules",
+      "**/*.config.js",
+      "playwright-report/",
+      "fileTransformer.mjs",
+    ],
     plugins: {
       react: reactPlugin,
       "@tanstack/query": tanstackPlugin,
@@ -33,16 +40,16 @@ export default [
       "prefer-const": "error",
       "no-unused-vars": "warn",
       "no-console": "warn",
-      // Import organization rules
-      "sort-imports": [
-        "error",
-        {
-          ignoreCase: true,
-          ignoreDeclarationSort: true,
-          ignoreMemberSort: false,
-          memberSyntaxSortOrder: ["none", "all", "multiple", "single"],
-        },
-      ],
+      // // Import organization rules
+      // "sort-imports": [
+      //   "error",
+      //   {
+      //     ignoreCase: true,
+      //     ignoreDeclarationSort: true,
+      //     ignoreMemberSort: false,
+      //     memberSyntaxSortOrder: ["none", "all", "multiple", "single"],
+      //   },
+      // ],
       // Add other rules as needed
     },
   },
