@@ -11,6 +11,9 @@
 # production
 /build
 
+# bundle analysis
+/analyze
+
 # misc
 .DS_Store
 .env.local
