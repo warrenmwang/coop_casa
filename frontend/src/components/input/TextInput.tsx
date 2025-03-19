@@ -1,7 +1,6 @@
 import React from "react";
 
 import { MAX_TEXT_INPUT_LENGTH } from "@app/appConstants";
-import { validateDate, validateEmail } from "@app/utils/inputValidation";
 
 interface TextInputArgs {
   setFormData: (id: string, value: string) => void;
@@ -34,20 +33,6 @@ const TextInput: React.FC<TextInputArgs> = ({
 }) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
-
-    // Validate date if type is date
-    if (type === "date") {
-      if (!validateDate(value)) {
-        return;
-      }
-    }
-
-    // Validate email type
-    if (type === "email") {
-      if (!validateEmail(value)) {
-        return;
-      }
-    }
 
     // Save state function
     setFormData(id, value);

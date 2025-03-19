@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 import FetchErrorText from "@app/components/FetchErrorText";
 import FormButton from "@app/components/buttons/FormButton";
@@ -23,6 +24,7 @@ import {
   UserDetails,
 } from "@app/types/Types";
 import { mutationErrorCallbackCreator } from "@app/utils/callbacks";
+import { validateDate } from "@app/utils/inputValidation";
 import { apiFile2ClientFile, isAccountSetup } from "@app/utils/utils";
 
 const UpdateAccountDetailsForm: React.FC = () => {
@@ -50,6 +52,11 @@ const UpdateAccountDetailsForm: React.FC = () => {
   };
 
   const handleSaveChanges = () => {
+    if (!validateDate(formData.birthDate)) {
+      toast.error("Please enter a valid birthdate.");
+      return;
+    }
+
     setIsSubmitting(true);
     updateAccount.mutate(
       { formData, images: formProfileImages.map((image) => image.file) },
@@ -58,9 +65,9 @@ const UpdateAccountDetailsForm: React.FC = () => {
           setUser({ ...formData, interests: [...formData.interests] });
           setUserProfileImages(formProfileImages);
           setIsChanged(false);
-          setIsSubmitting(false);
         },
         onError: mutationErrorCallbackCreator("Failed to update"),
+        onSettled: () => setIsSubmitting(false),
       },
     );
   };

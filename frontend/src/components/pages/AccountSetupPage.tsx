@@ -30,6 +30,7 @@ import {
 } from "@app/types/Types";
 import { dashboardPageLink, homePageLink } from "@app/urls";
 import { mutationErrorCallbackCreator } from "@app/utils/callbacks";
+import { validateDate } from "@app/utils/inputValidation";
 import { apiFile2ClientFile, isAccountSetup } from "@app/utils/utils";
 
 const AccountSetupPage: React.FC = () => {
@@ -86,6 +87,12 @@ const AccountSetupPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!validateDate(formData.birthDate)) {
+      toast.error("Please enter a valid birthdate.");
+      return;
+    }
+
     // Check for errors
     const hasErrors = Array.from(errors.values()).some((value) => value);
     if (hasErrors) {
@@ -97,8 +104,13 @@ const AccountSetupPage: React.FC = () => {
     updateUserAccount.mutate(
       { formData, images: userProfileImages.map((image) => image.file) },
       {
-        onSuccess: () => navigate(dashboardPageLink),
-        onError: mutationErrorCallbackCreator("Unable to setup account"),
+        onSuccess: () => {
+          toast.success("Account created successfully.");
+          navigate(dashboardPageLink);
+        },
+        onError: mutationErrorCallbackCreator(
+          "Unable to setup account, please try again.",
+        ),
         onSettled: () => setIsSubmitting(false),
       },
     );
