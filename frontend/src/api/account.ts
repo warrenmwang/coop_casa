@@ -1,4 +1,3 @@
-import { DeleteUserResponse, LogoutUserResponse } from "@app/types/Responses";
 import {
   APIReceivedCommunityIDsSchema,
   APIReceivedPropertyIDsSchema,
@@ -18,20 +17,18 @@ import {
   apiUserRoleLink,
 } from "@app/urls";
 import { apiFile2ClientFile } from "@app/utils/utils";
-import axios, { AxiosResponse } from "axios";
 import { ZodError, z } from "zod";
 
 // Delete Account Function
-export const apiAccountDelete = async (): Promise<
-  AxiosResponse<DeleteUserResponse>
-> => {
-  return axios.delete<DeleteUserResponse>(apiAccountLink, {
-    withCredentials: true,
-  });
-};
+export async function apiAccountDelete(): Promise<Response> {
+  return fetch(apiAccountLink, {
+    method: "DELETE",
+    credentials: "include",
+  }).then((res) => res);
+}
 
 // Update Account Details
-export const apiUpdateUserAccountDetails = async (newUserData: User) => {
+export async function apiUpdateUserAccountDetails(newUserData: User) {
   const formData = new FormData();
 
   // User details
@@ -54,12 +51,14 @@ export const apiUpdateUserAccountDetails = async (newUserData: User) => {
     formData.append("avatar", newUserData.avatar);
   }
 
-  return axios.post(apiAccountUpdateLink, formData, {
-    withCredentials: true,
+  return fetch(apiAccountUpdateLink, {
+    method: "POST",
+    credentials: "include",
+    body: formData,
   });
-};
+}
 
-export const apiUpdateUserProfileImages = async (images: File[]) => {
+export async function apiUpdateUserProfileImages(images: File[]) {
   const formData = new FormData();
 
   const numImages: number = images.length;
@@ -69,81 +68,69 @@ export const apiUpdateUserProfileImages = async (images: File[]) => {
     formData.append(`image${i}`, images[i]);
   }
 
-  return axios.post(apiAccountUserProfileImagesLink, formData, {
-    withCredentials: true,
+  return fetch(apiAccountUserProfileImagesLink, {
+    method: "POST",
+    credentials: "include",
+    body: formData,
   });
-};
+}
 
-export const apiUpdateUserAccountDetailsAndProfileImages = async (
+export async function apiUpdateUserAccountDetailsAndProfileImages(
   newUserData: User,
   images: File[],
-) => {
+) {
   const updateDetailsPromise = apiUpdateUserAccountDetails(newUserData);
   const updateImagesPromise = apiUpdateUserProfileImages(images);
   return Promise.all([updateDetailsPromise, updateImagesPromise]);
-};
+}
 
-export const apiAccountGetUserProfileImages = async (): Promise<File[]> => {
-  return (
-    axios
-      .get(apiAccountUserProfileImagesLink, {
-        headers: {
-          Accept: "application/json",
-        },
-        withCredentials: true,
-      })
-      .then((res) => res.data)
-      // no validation here bc images can be too large when encoded as strings and make zod hang
-      // need backend service to be correct.
-      .then((data) => data as APIReceivedUserProfileImages)
-      .then((data) => data.images)
-      .then((images) => {
-        // convert images to binary
-        let imagesTmp: File[] = [];
-        if (images !== null) {
-          imagesTmp = images.map((image) =>
-            apiFile2ClientFile(image),
-          ) as File[];
-        }
-        return imagesTmp;
-      })
-  );
-};
+export async function apiAccountGetUserProfileImages(): Promise<File[]> {
+  return fetch(apiAccountUserProfileImagesLink, {
+    headers: {
+      Accept: "application/json",
+    },
+    credentials: "include",
+  })
+    .then((res) => res.json())
+    .then((data) => data as APIReceivedUserProfileImages)
+    .then((data) => data.images)
+    .then((images) => {
+      // convert images to binary
+      let imagesTmp: File[] = [];
+      if (images !== null) {
+        imagesTmp = images.map((image) => apiFile2ClientFile(image)) as File[];
+      }
+      return imagesTmp;
+    });
+}
 
 // Log out user from system, end session by invalidating the client side token
-export const apiLogoutUser = async (): Promise<
-  AxiosResponse<LogoutUserResponse>
-> => {
-  return axios.post<LogoutUserResponse>(
-    apiAuthLogoutLink,
-    {},
-    {
-      withCredentials: true,
-    },
-  );
-};
+export async function apiLogoutUser(): Promise<Response> {
+  return fetch(apiAuthLogoutLink, {
+    method: "POST",
+    credentials: "include",
+  });
+}
 
-export const apiGetUserAuth = async (): Promise<boolean> => {
-  return axios
-    .get(apiAuthCheckLink, {
-      headers: {
-        Accept: "application/json",
-      },
-      withCredentials: true,
-    })
-    .then((res) => res.data)
+export async function apiGetUserAuth(): Promise<boolean> {
+  return fetch(apiAuthCheckLink, {
+    headers: {
+      Accept: "application/json",
+    },
+    credentials: "include",
+  })
+    .then((res) => res.json())
     .then((data) => data.authed as boolean)
     .catch(() => false);
-};
+}
 
 // Function from before user profile images
 // Returns user details and avatar image
-export const apiGetUser = async (): Promise<APIUserReceived> => {
-  return axios
-    .get(apiAccountLink, {
-      withCredentials: true,
-    })
-    .then((res) => res.data)
+export async function apiGetUser(): Promise<APIUserReceived> {
+  return fetch(apiAccountLink, {
+    credentials: "include",
+  })
+    .then((res) => res.json())
     .then((data) => ({
       userDetails: UserDetailsSchema.parse(data.userDetails),
       avatarImageB64: data.avatarImageB64, // zod cannot parse images encoded as b64 strings
@@ -157,17 +144,16 @@ export const apiGetUser = async (): Promise<APIUserReceived> => {
       }
       throw err;
     });
-};
+}
 
-export const apiGetUserRole = async (): Promise<string> => {
-  return axios
-    .get(apiUserRoleLink, {
-      headers: {
-        Accept: "application/json",
-      },
-      withCredentials: true,
-    })
-    .then((res) => res.data)
+export async function apiGetUserRole(): Promise<string> {
+  return fetch(apiUserRoleLink, {
+    headers: {
+      Accept: "application/json",
+    },
+    credentials: "include",
+  })
+    .then((res) => res.json())
     .then((data) => {
       const res = z.object({ role: z.string().min(1) }).safeParse(data);
       if (res.success) return res.data.role;
@@ -175,17 +161,16 @@ export const apiGetUserRole = async (): Promise<string> => {
         "Validation failed: received user role does not match expected schema",
       );
     });
-};
+}
 
-export const apiGetUserOwnedProperties = async (): Promise<string[]> => {
-  return axios
-    .get(`${apiAccountLink}/properties`, {
-      headers: {
-        Accept: "application/json,",
-      },
-      withCredentials: true,
-    })
-    .then((res) => res.data)
+export async function apiGetUserOwnedProperties(): Promise<string[]> {
+  return fetch(`${apiAccountLink}/properties`, {
+    headers: {
+      Accept: "application/json,",
+    },
+    credentials: "include",
+  })
+    .then((res) => res.json())
     .then((data) => {
       const res = APIReceivedPropertyIDsSchema.safeParse(data);
       if (res.success) return res.data.propertyIDs;
@@ -193,17 +178,16 @@ export const apiGetUserOwnedProperties = async (): Promise<string[]> => {
         "Validation failed: received user owned properties does not match expected schema",
       );
     });
-};
+}
 
-export const apiGetUserOwnedCommunities = async (): Promise<string[]> => {
-  return axios
-    .get(`${apiAccountLink}/communities`, {
-      headers: {
-        Accept: "application/json,",
-      },
-      withCredentials: true,
-    })
-    .then((res) => res.data)
+export async function apiGetUserOwnedCommunities(): Promise<string[]> {
+  return fetch(`${apiAccountLink}/communities`, {
+    headers: {
+      Accept: "application/json,",
+    },
+    credentials: "include",
+  })
+    .then((res) => res.json())
     .then((data) => {
       const res = APIReceivedCommunityIDsSchema.safeParse(data);
       if (res.success) return res.data.communityIDs;
@@ -211,17 +195,16 @@ export const apiGetUserOwnedCommunities = async (): Promise<string[]> => {
         "Validation failed: received user owned communities does not match expected schema",
       );
     });
-};
+}
 
 // saved/liked entities
 
 // users
-export const apiAccountGetUserLikedUsers = async () => {
-  return axios
-    .get(`${apiAccountLink}/saved/users`, {
-      withCredentials: true,
-    })
-    .then((res) => res.data)
+export async function apiAccountGetUserLikedUsers() {
+  return fetch(`${apiAccountLink}/saved/users`, {
+    credentials: "include",
+  })
+    .then((res) => res.json())
     .then((data) => {
       const res = APIReceivedUserIDsSchema.safeParse(data);
       if (res.success) return res.data.userIDs;
@@ -229,29 +212,31 @@ export const apiAccountGetUserLikedUsers = async () => {
         "Validation failed: received account's liked users does not match expected schema",
       );
     });
-};
+}
 
-export const apiAccountLikeUser = async (userID: string) => {
+export async function apiAccountLikeUser(userID: string) {
   const formData = new FormData();
   formData.set("userID", userID);
-  return axios.post(`${apiAccountLink}/saved/users`, formData, {
-    withCredentials: true,
+  return fetch(`${apiAccountLink}/saved/users`, {
+    method: "POST",
+    credentials: "include",
+    body: formData,
   });
-};
+}
 
-export const apiAccountUnlikeUser = async (userID: string) => {
-  return axios.delete(`${apiAccountLink}/saved/users/${userID}`, {
-    withCredentials: true,
+export async function apiAccountUnlikeUser(userID: string) {
+  return fetch(`${apiAccountLink}/saved/users/${userID}`, {
+    method: "DELETE",
+    credentials: "include",
   });
-};
+}
 
 // properties
-export const apiAccountGetUserLikedProperties = async () => {
-  return axios
-    .get(`${apiAccountLink}/saved/properties`, {
-      withCredentials: true,
-    })
-    .then((res) => res.data)
+export async function apiAccountGetUserLikedProperties() {
+  return fetch(`${apiAccountLink}/saved/properties`, {
+    credentials: "include",
+  })
+    .then((res) => res.json())
     .then((data) => {
       const res = APIReceivedPropertyIDsSchema.safeParse(data);
       if (res.success) return res.data.propertyIDs;
@@ -259,29 +244,31 @@ export const apiAccountGetUserLikedProperties = async () => {
         "Validation failed: received property ids does not match expected schema",
       );
     });
-};
+}
 
-export const apiAccountLikeProperty = async (propertyID: string) => {
+export async function apiAccountLikeProperty(propertyID: string) {
   const formData = new FormData();
   formData.set("propertyID", propertyID);
-  return axios.post(`${apiAccountLink}/saved/properties`, formData, {
-    withCredentials: true,
+  return fetch(`${apiAccountLink}/saved/properties`, {
+    method: "POST",
+    credentials: "include",
+    body: formData,
   });
-};
+}
 
-export const apiAccountUnlikeProperty = async (propertyID: string) => {
-  return axios.delete(`${apiAccountLink}/saved/properties/${propertyID}`, {
-    withCredentials: true,
+export async function apiAccountUnlikeProperty(propertyID: string) {
+  return fetch(`${apiAccountLink}/saved/properties/${propertyID}`, {
+    method: "DELETE",
+    credentials: "include",
   });
-};
+}
 
 // communities
-export const apiAccountGetUserLikedCommunities = async () => {
-  return axios
-    .get(`${apiAccountLink}/saved/communities`, {
-      withCredentials: true,
-    })
-    .then((res) => res.data)
+export async function apiAccountGetUserLikedCommunities() {
+  return fetch(`${apiAccountLink}/saved/communities`, {
+    credentials: "include",
+  })
+    .then((res) => res.json())
     .then((data) => {
       const res = APIReceivedCommunityIDsSchema.safeParse(data);
       if (res.success) return res.data.communityIDs;
@@ -289,40 +276,44 @@ export const apiAccountGetUserLikedCommunities = async () => {
         "Validation failed: received user owned communities does not match expected schema",
       );
     });
-};
+}
 
-export const apiAccountLikeCommunity = async (communityID: string) => {
+export async function apiAccountLikeCommunity(communityID: string) {
   const formData = new FormData();
   formData.set("communityID", communityID);
-  return axios.post(`${apiAccountLink}/saved/communities`, formData, {
-    withCredentials: true,
+  return fetch(`${apiAccountLink}/saved/communities`, {
+    method: "POST",
+    credentials: "include",
+    body: formData,
   });
-};
+}
 
-export const apiAccountUnlikeCommunity = async (communityID: string) => {
-  return axios.delete(`${apiAccountLink}/saved/communities/${communityID}`, {
-    withCredentials: true,
+export async function apiAccountUnlikeCommunity(communityID: string) {
+  return fetch(`${apiAccountLink}/saved/communities/${communityID}`, {
+    method: "DELETE",
+    credentials: "include",
   });
-};
+}
 
-export const apiAccountUpdateStatus = async (status: string) => {
-  return axios.put(apiAccountStatusLink, JSON.stringify({ status }), {
+export async function apiAccountUpdateStatus(status: string) {
+  return fetch(apiAccountStatusLink, {
+    method: "PUT",
     headers: {
       "Content-Type": "application/json",
     },
-    withCredentials: true,
+    credentials: "include",
+    body: JSON.stringify({ status }),
   });
-};
+}
 
-export const apiAccountGetStatus = async (): Promise<UserStatusTimeStamped> => {
-  return axios
-    .get(`${apiAccountStatusLink}`, {
-      headers: {
-        Accept: "application/json",
-      },
-      withCredentials: true,
-    })
-    .then((res) => res.data)
+export async function apiAccountGetStatus(): Promise<UserStatusTimeStamped> {
+  return fetch(`${apiAccountStatusLink}`, {
+    headers: {
+      Accept: "application/json",
+    },
+    credentials: "include",
+  })
+    .then((res) => res.json())
     .then((data) => {
       const res = UserStatusSchemaTimeStamped.safeParse(data);
       if (res.success) return res.data;
@@ -330,4 +321,4 @@ export const apiAccountGetStatus = async (): Promise<UserStatusTimeStamped> => {
         "Validation failed: received user status does not match expected schema",
       );
     });
-};
+}

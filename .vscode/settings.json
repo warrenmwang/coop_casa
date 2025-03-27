@@ -1,8 +1,16 @@
 {
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
   "typescript.preferences.importModuleSpecifier": "non-relative",
   "javascript.preferences.importModuleSpecifier": "non-relative",
   "typescript.updateImportsOnFileMove.enabled": "always",
   "javascript.updateImportsOnFileMove.enabled": "always",
   "typescript.preferences.importModuleSpecifierEnding": "minimal",
-  "javascript.preferences.importModuleSpecifierEnding": "minimal"
-} 
+  "javascript.preferences.importModuleSpecifierEnding": "minimal",
+  "[go]": {
+    "editor.defaultFormatter": "golang.go"
+  },
+  "[sql]": {
+    "editor.defaultFormatter": "bradymholt.pgformatter"
+  }
+}

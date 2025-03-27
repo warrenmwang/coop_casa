@@ -12,24 +12,22 @@ import {
 import { APIFileReceived, UserProfile } from "@app/types/Types";
 import { apiUsersLink } from "@app/urls";
 import { apiFile2ClientFile } from "@app/utils/utils";
-import axios from "axios";
 
-export const apiGetUserProfiles = async (
+export async function apiGetUserProfiles(
   page: number,
   limit: number,
   filterFirstName: string,
   filterLastName: string,
-): Promise<string[]> => {
-  return axios
-    .get(
-      `${apiUsersLink}?${PAGE_QP_KEY}=${page}&${LIMIT_QP_KEY}=${limit}&${FILTER_FIRST_NAME_QP_KEY}=${filterFirstName}&${FILTER_LAST_NAME_QP_KEY}=${filterLastName}`,
-      {
-        headers: {
-          Accept: "application/json",
-        },
+): Promise<string[]> {
+  return fetch(
+    `${apiUsersLink}?${PAGE_QP_KEY}=${page}&${LIMIT_QP_KEY}=${limit}&${FILTER_FIRST_NAME_QP_KEY}=${filterFirstName}&${FILTER_LAST_NAME_QP_KEY}=${filterLastName}`,
+    {
+      headers: {
+        Accept: "application/json",
       },
-    )
-    .then((res) => res.data)
+    },
+  )
+    .then((res) => res.json())
     .then((data) => {
       const res = APIReceivedUserIDsSchema.safeParse(data);
       if (res.success) return res.data.userIDs;
@@ -37,18 +35,15 @@ export const apiGetUserProfiles = async (
         "Validation failed: received user ids does not match expected schema",
       );
     });
-};
+}
 
-export const apiGetUserProfile = async (
-  userID: string,
-): Promise<UserProfile> => {
-  return axios
-    .get(`${apiUsersLink}/${userID}`, {
-      headers: {
-        Accept: "application/json",
-      },
-    })
-    .then((res) => res.data)
+export async function apiGetUserProfile(userID: string): Promise<UserProfile> {
+  return fetch(`${apiUsersLink}/${userID}`, {
+    headers: {
+      Accept: "application/json",
+    },
+  })
+    .then((res) => res.json())
     .then((data) => {
       // NOTE: not parsing the images array because it can contain
       // very large b64 strings (encoded binary image data of up to 5Mib)
@@ -75,18 +70,15 @@ export const apiGetUserProfile = async (
         propertyIDs: data.propertyIDs,
       } as UserProfile;
     });
-};
+}
 
-export const apiGetUserProfileImages = async (
-  userID: string,
-): Promise<File[]> => {
-  return axios
-    .get(`${apiUsersLink}/${userID}/images`, {
-      headers: {
-        Accept: "application/json",
-      },
-    })
-    .then((res) => res.data)
+export async function apiGetUserProfileImages(userID: string): Promise<File[]> {
+  return fetch(`${apiUsersLink}/${userID}/images`, {
+    headers: {
+      Accept: "application/json",
+    },
+  })
+    .then((res) => res.json())
     .then((data) => {
       const res = APIReceivedUserProfileImagesSchema.safeParse(data);
       if (res.success) return res.data.images;
@@ -98,4 +90,4 @@ export const apiGetUserProfileImages = async (
       // convert images to binary
       return images.map((image) => apiFile2ClientFile(image)) as File[];
     });
-};
+}

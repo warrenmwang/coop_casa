@@ -7,7 +7,7 @@ import {
   apiTransferProperty,
   apiUpdateProperty,
 } from "@app/api/property";
-import { propertiesKey, propertiesPageKey } from "@app/reactQueryKeys";
+import { propertiesKey, propertiesPageKey, userPropertiesKey } from "@app/reactQueryKeys";
 import { Property } from "@app/types/Types";
 import {
   UseQueryResult,
@@ -60,8 +60,11 @@ export const useUpdateProperty = () => {
     mutationFn: ({ property }: { property: Property }) =>
       apiUpdateProperty(property).then(() => property.details.propertyId),
     onSuccess: (propertyID: string) => {
-      return queryClient.invalidateQueries({
+      queryClient.invalidateQueries({
         queryKey: [...propertiesKey, propertyID],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [...userPropertiesKey],
       });
     },
   });
@@ -73,8 +76,11 @@ export const useDeleteProperty = () => {
     mutationFn: ({ propertyID }: { propertyID: string }) =>
       apiDeleteProperty(propertyID),
     onSuccess: (propertyID) => {
-      return queryClient.invalidateQueries({
+      queryClient.invalidateQueries({
         queryKey: [...propertiesKey, propertyID],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [...userPropertiesKey],
       });
     },
   });

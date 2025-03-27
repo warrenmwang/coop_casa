@@ -6,7 +6,11 @@ import {
   apiTransferCommunity,
   apiUpdateCommunity,
 } from "@app/api/community";
-import { communitiesKey, communitiesPageKey } from "@app/reactQueryKeys";
+import {
+  communitiesKey,
+  communitiesPageKey,
+  userCommunitiesKey,
+} from "@app/reactQueryKeys";
 import { Community } from "@app/types/Types";
 import {
   UseQueryResult,
@@ -64,8 +68,11 @@ export const useUpdateCommunity = () => {
     mutationFn: ({ community }: { community: Community }) =>
       apiUpdateCommunity(community).then(() => community.details.communityId),
     onSuccess: (communityID: string) => {
-      return queryClient.invalidateQueries({
+      queryClient.invalidateQueries({
         queryKey: [...communitiesKey, communityID],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [...userCommunitiesKey],
       });
     },
   });
@@ -77,8 +84,11 @@ export const useDeleteCommunity = () => {
     mutationFn: ({ communityID }: { communityID: string }) =>
       apiDeleteCommunity(communityID).then(() => communityID),
     onSuccess: (communityID: string) => {
-      return queryClient.invalidateQueries({
+      queryClient.invalidateQueries({
         queryKey: [...communitiesKey, communityID],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [...userCommunitiesKey],
       });
     },
   });
@@ -95,8 +105,11 @@ export const useTransferCommunity = () => {
       userID: string;
     }) => apiTransferCommunity(communityID, userID),
     onSuccess: (communityID) => {
-      return queryClient.invalidateQueries({
+      queryClient.invalidateQueries({
         queryKey: [...communitiesKey, communityID],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [...userCommunitiesKey],
       });
     },
   });

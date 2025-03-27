@@ -1,4 +1,3 @@
-import { AdminUpdateUserRoleResponse } from "@app/types/Responses";
 import {
   APIReceivedUserDetailsSchema,
   APIReceivedUserRolesSchema,
@@ -10,26 +9,23 @@ import {
   apiAdminUsersLink,
   apiAdminUsersRolesLink,
 } from "@app/urls";
-import axios, { AxiosResponse } from "axios";
 import { z } from "zod";
 
-export const apiAdminGetUsersDetails = async (
+export async function apiAdminGetUsersDetails(
   limit: number,
   page: number,
   name: string,
-): Promise<UserDetails[]> => {
-  return axios
-    .get(
-      `${apiAdminUsersLink}?limit=${limit}&offset=${page * limit}&name=${name}`,
-      {
-        headers: {
-          Accept: "application/json",
-        },
-
-        withCredentials: true,
+): Promise<UserDetails[]> {
+  return fetch(
+    `${apiAdminUsersLink}?limit=${limit}&offset=${page * limit}&name=${name}`,
+    {
+      headers: {
+        Accept: "application/json",
       },
-    )
-    .then((res) => res.data)
+      credentials: "include",
+    },
+  )
+    .then((res) => res.json())
     .then((data) => {
       const res = APIReceivedUserDetailsSchema.safeParse(data);
       if (res.success) return res.data.userDetails;
@@ -37,27 +33,23 @@ export const apiAdminGetUsersDetails = async (
         "Validation failed: received users details does not match expected schema",
       );
     });
-};
+}
 
-export const apiAdminGetUsersRoles = async (
+export async function apiAdminGetUsersRoles(
   userIDs: string[],
-): Promise<string[]> => {
+): Promise<string[]> {
   // if empty input, just resolve with nothing and save on network request
   if (userIDs.length === 0) {
-    return new Promise((resolve) => {
-      resolve([]);
-    });
+    return Promise.resolve([]);
   }
 
-  // o.w. actually have some userIDs to query
-  return axios
-    .get(`${apiAdminUsersRolesLink}?userIds=${userIDs}`, {
-      headers: {
-        Accept: "application/json",
-      },
-      withCredentials: true,
-    })
-    .then((res) => res.data)
+  return fetch(`${apiAdminUsersRolesLink}?userIds=${userIDs}`, {
+    headers: {
+      Accept: "application/json",
+    },
+    credentials: "include",
+  })
+    .then((res) => res.json())
     .then((data) => {
       const res = APIReceivedUserRolesSchema.safeParse(data);
       if (res.success) return res.data.userRoles.map((v) => v.role);
@@ -65,34 +57,33 @@ export const apiAdminGetUsersRoles = async (
         "Validation failed: received users roles does not match expected schema",
       );
     });
-};
+}
 
-export const apiAdminUpdateUserRole = async (
+export async function apiAdminUpdateUserRole(
   userID: string,
   role: string,
   propertyTransfer?: boolean,
   transferUserID?: string,
-): Promise<AxiosResponse<AdminUpdateUserRoleResponse>> => {
-  return axios.post<AdminUpdateUserRoleResponse>(
+): Promise<Response> {
+  return fetch(
     `${apiAdminUsersRolesLink}?userID=${userID}&role=${role}&propertyTransfer=${propertyTransfer}&transferUserID=${transferUserID}`,
-    {},
     {
-      withCredentials: true,
+      method: "POST",
+      credentials: "include",
     },
   );
-};
+}
 
-export const apiAdminGetAccountStatus = async (
+export async function apiAdminGetAccountStatus(
   userID: string,
-): Promise<UserStatusTimeStamped> => {
-  return axios
-    .get(`${apiAdminUsersLink}/status/${userID}`, {
-      headers: {
-        Accept: "application/json",
-      },
-      withCredentials: true,
-    })
-    .then((res) => res.data)
+): Promise<UserStatusTimeStamped> {
+  return fetch(`${apiAdminUsersLink}/status/${userID}`, {
+    headers: {
+      Accept: "application/json",
+    },
+    credentials: "include",
+  })
+    .then((res) => res.json())
     .then((data) => {
       const res = UserStatusSchemaTimeStamped.safeParse(data);
       if (res.success) return res.data;
@@ -100,56 +91,51 @@ export const apiAdminGetAccountStatus = async (
         "Validation failed: received user status does not match expected schema",
       );
     });
-};
+}
 
-export const apiAdminCreateUserStatus = async (
+export async function apiAdminCreateUserStatus(
   userId: string,
   status: string,
   comment: string,
-) => {
-  return axios.post(
-    `${apiAdminUsersLink}/status`,
-    JSON.stringify({
+): Promise<Response> {
+  return fetch(`${apiAdminUsersLink}/status`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify({
       userId,
       status,
       comment,
     }),
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      withCredentials: true,
-    },
-  );
-};
+  });
+}
 
-export const apiAdminUpdateUserStatus = async (
+export async function apiAdminUpdateUserStatus(
   userId: string,
   status: string,
   comment: string,
-) => {
-  return axios.put(
-    `${apiAdminUsersLink}/status/${userId}`,
-    JSON.stringify({
+): Promise<Response> {
+  return fetch(`${apiAdminUsersLink}/status/${userId}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify({
       userId,
       status,
       comment,
     }),
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      withCredentials: true,
-    },
-  );
-};
+  });
+}
 
-export const apiAdminGetTotalCountProperties = async (): Promise<number> => {
-  return axios
-    .get(`${apiAdminTotalsLink}/properties`, {
-      withCredentials: true,
-    })
-    .then((response) => response.data)
+export async function apiAdminGetTotalCountProperties(): Promise<number> {
+  return fetch(`${apiAdminTotalsLink}/properties`, {
+    credentials: "include",
+  })
+    .then((response) => response.json())
     .then((data) => {
       const res = z.number().safeParse(data);
       if (res.success) return res.data;
@@ -157,14 +143,13 @@ export const apiAdminGetTotalCountProperties = async (): Promise<number> => {
         "Validation failed: received total count properties does not match expected schema",
       );
     });
-};
+}
 
-export const apiAdminGetTotalCountCommunities = async (): Promise<number> => {
-  return axios
-    .get(`${apiAdminTotalsLink}/communities`, {
-      withCredentials: true,
-    })
-    .then((response) => response.data)
+export async function apiAdminGetTotalCountCommunities(): Promise<number> {
+  return fetch(`${apiAdminTotalsLink}/communities`, {
+    credentials: "include",
+  })
+    .then((response) => response.json())
     .then((data) => {
       const res = z.number().safeParse(data);
       if (res.success) return res.data;
@@ -172,14 +157,13 @@ export const apiAdminGetTotalCountCommunities = async (): Promise<number> => {
         "Validation failed: received total count communities does not match expected schema",
       );
     });
-};
+}
 
-export const apiAdminGetTotalCountUsers = async (): Promise<number> => {
-  return axios
-    .get(`${apiAdminTotalsLink}/users`, {
-      withCredentials: true,
-    })
-    .then((response) => response.data)
+export async function apiAdminGetTotalCountUsers(): Promise<number> {
+  return fetch(`${apiAdminTotalsLink}/users`, {
+    credentials: "include",
+  })
+    .then((response) => response.json())
     .then((data) => {
       const res = z.number().safeParse(data);
       if (res.success) return res.data;
@@ -187,4 +171,4 @@ export const apiAdminGetTotalCountUsers = async (): Promise<number> => {
         "Validation failed: received total count users does not match expected schema",
       );
     });
-};
+}

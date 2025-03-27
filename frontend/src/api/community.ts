@@ -15,18 +15,14 @@ import {
   apiCommunitiesUsersLink,
 } from "@app/urls";
 import { apiFile2ClientFile } from "@app/utils/utils";
-import axios from "axios";
 
-export const apiGetCommunity = async (
-  communityID: string,
-): Promise<Community> => {
-  return axios
-    .get(`${apiCommunitiesLink}/${communityID}`, {
-      headers: {
-        Accept: "application/json",
-      },
-    })
-    .then((res) => res.data)
+export async function apiGetCommunity(communityID: string): Promise<Community> {
+  return fetch(`${apiCommunitiesLink}/${communityID}`, {
+    headers: {
+      Accept: "application/json",
+    },
+  })
+    .then((res) => res.json())
     .then((data) => {
       const res = APICommunityReceivedSchema.safeParse(data);
       if (res.success) return res.data;
@@ -43,23 +39,22 @@ export const apiGetCommunity = async (
         properties: data.properties,
       } as Community;
     });
-};
+}
 
-export const apiGetCommunities = async (
+export async function apiGetCommunities(
   page: number,
   filterName: string,
   filterDescription: string,
-): Promise<string[]> => {
-  return axios
-    .get(
-      `${apiCommunitiesLink}?${PAGE_QP_KEY}=${page}&${FILTER_NAME_QP_KEY}=${filterName}&${FILTER_DESCRIPTION_QP_KEY}=${filterDescription}&limit=${MAX_NUMBER_COMMUNITIES_PER_PAGE}`,
-      {
-        headers: {
-          Accept: "application/json",
-        },
+): Promise<string[]> {
+  return fetch(
+    `${apiCommunitiesLink}?${PAGE_QP_KEY}=${page}&${FILTER_NAME_QP_KEY}=${filterName}&${FILTER_DESCRIPTION_QP_KEY}=${filterDescription}&limit=${MAX_NUMBER_COMMUNITIES_PER_PAGE}`,
+    {
+      headers: {
+        Accept: "application/json",
       },
-    )
-    .then((res) => res.data)
+    },
+  )
+    .then((res) => res.json())
     .then((data) => {
       const res = APIReceivedCommunityIDsSchema.safeParse(data);
       if (res.success) return res.data.communityIDs;
@@ -67,11 +62,11 @@ export const apiGetCommunities = async (
         "Validation failed: received communities does not match expected schema",
       );
     });
-};
+}
 
-export const apiCreateCommunity = async (
+export async function apiCreateCommunity(
   community: Community,
-): Promise<Response | null> => {
+): Promise<Response | null> {
   // TODO: at creation time, allow adding users and properties
   // for now they are ignored here.
 
@@ -87,30 +82,34 @@ export const apiCreateCommunity = async (
     }
   }
 
-  return axios.post(`${apiCommunitiesLink}`, formData, {
-    withCredentials: true,
+  return fetch(`${apiCommunitiesLink}`, {
+    method: "POST",
+    credentials: "include",
+    body: formData,
   });
-};
+}
 
-export const apiCreateCommunityUser = async (
+export async function apiCreateCommunityUser(
   communityId: string,
   userId: string,
-): Promise<Response | null> => {
+): Promise<Response | null> {
   const formData = new FormData();
   formData.append(
     "data",
     JSON.stringify({ communityId: communityId, userId: userId }),
   );
 
-  return axios.post(`${apiCommunitiesUsersLink}`, formData, {
-    withCredentials: true,
+  return fetch(`${apiCommunitiesUsersLink}`, {
+    method: "POST",
+    credentials: "include",
+    body: formData,
   });
-};
+}
 
-export const apiCreateCommunityProperty = async (
+export async function apiCreateCommunityProperty(
   communityId: string,
   propertyId: string,
-): Promise<Response | null> => {
+): Promise<Response | null> {
   const formData = new FormData();
   formData.append(
     "data",
@@ -120,14 +119,16 @@ export const apiCreateCommunityProperty = async (
     }),
   );
 
-  return axios.post(`${apiCommunitiesPropertiesLink}`, formData, {
-    withCredentials: true,
+  return fetch(`${apiCommunitiesPropertiesLink}`, {
+    method: "POST",
+    credentials: "include",
+    body: formData,
   });
-};
+}
 
-export const apiUpdateCommunity = async (
+export async function apiUpdateCommunity(
   community: Community,
-): Promise<Response | null> => {
+): Promise<Response | null> {
   const details: CommunityDetails = community.details;
   const images: File[] = community.images;
 
@@ -142,52 +143,57 @@ export const apiUpdateCommunity = async (
   formData.append("userIDs", JSON.stringify(community.users));
   formData.append("propertyIDs", JSON.stringify(community.properties));
 
-  return axios.put(`${apiCommunitiesLink}/${details.communityId}`, formData, {
-    withCredentials: true,
+  return fetch(`${apiCommunitiesLink}/${details.communityId}`, {
+    method: "PUT",
+    credentials: "include",
+    body: formData,
   });
-};
+}
 
-export const apiDeleteCommunity = async (
+export async function apiDeleteCommunity(
   communityId: string,
-): Promise<Response | null> => {
-  return axios.delete(`${apiCommunitiesLink}/${communityId}`, {
-    withCredentials: true,
+): Promise<Response | null> {
+  return fetch(`${apiCommunitiesLink}/${communityId}`, {
+    method: "DELETE",
+    credentials: "include",
   });
-};
+}
 
-export const apiDeleteCommunityUser = async (
+export async function apiDeleteCommunityUser(
   communityId: string,
   userId: string,
-): Promise<Response | null> => {
-  return axios.delete(
+): Promise<Response | null> {
+  return fetch(
     `${apiCommunitiesUsersLink}?communityId=${communityId}&userId=${userId}`,
     {
-      withCredentials: true,
+      method: "DELETE",
+      credentials: "include",
     },
   );
-};
+}
 
-export const apiDeleteCommunityProperty = async (
+export async function apiDeleteCommunityProperty(
   communityId: string,
   propertyId: string,
-): Promise<Response | null> => {
-  return axios.delete(
+): Promise<Response | null> {
+  return fetch(
     `${apiCommunitiesPropertiesLink}?communityId=${communityId}&propertyId=${propertyId}`,
     {
-      withCredentials: true,
+      method: "DELETE",
+      credentials: "include",
     },
   );
-};
+}
 
-export const apiTransferCommunity = async (
+export async function apiTransferCommunity(
   communityID: string,
   userID: string,
-) => {
-  return axios.put(
+): Promise<Response> {
+  return fetch(
     `${apiCommunitiesLink}/transfer/ownership?communityId=${communityID}&userId=${userID}`,
-    {},
     {
-      withCredentials: true,
+      method: "PUT",
+      credentials: "include",
     },
   );
-};
+}

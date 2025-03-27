@@ -10,11 +10,10 @@ import {
 import { OrderedFile, Property } from "@app/types/Types";
 import { apiPropertiesLink } from "@app/urls";
 import { apiFile2ClientFile } from "@app/utils/utils";
-import axios from "axios";
 
-export const apiCreateNewProperty = async (
+export async function apiCreateNewProperty(
   property: Property,
-): Promise<Response | null> => {
+): Promise<Response | null> {
   const formData = new FormData();
   formData.append("details", JSON.stringify(property.details));
   formData.append("numImages", `${property.images.length}`);
@@ -25,14 +24,16 @@ export const apiCreateNewProperty = async (
     }
   }
 
-  return axios.post(apiPropertiesLink, formData, {
-    withCredentials: true,
+  return fetch(apiPropertiesLink, {
+    method: "POST",
+    body: formData,
+    credentials: "include",
   });
-};
+}
 
-export const apiUpdateProperty = async (
+export async function apiUpdateProperty(
   property: Property,
-): Promise<Response | null> => {
+): Promise<Response | null> {
   const formData = new FormData();
   formData.append("details", JSON.stringify(property.details));
   formData.append("numImages", `${property.images.length}`);
@@ -43,104 +44,89 @@ export const apiUpdateProperty = async (
     }
   }
 
-  return axios.put(
-    `${apiPropertiesLink}/${property.details.propertyId}`,
-    formData,
-    {
-      withCredentials: true,
-    },
-  );
-};
+  return fetch(`${apiPropertiesLink}/${property.details.propertyId}`, {
+    method: "PUT",
+    body: formData,
+    credentials: "include",
+  });
+}
 
-export const apiTransferProperty = async (
+export async function apiTransferProperty(
   propertyID: string,
   userID: string,
-): Promise<string> => {
-  return axios
-    .put(
-      `${apiPropertiesLink}/transfer/ownership?propertyId=${propertyID}&userId=${userID}`,
-      {},
-      {
-        withCredentials: true,
-      },
-    )
-    .then(() => userID);
-};
+): Promise<string> {
+  await fetch(
+    `${apiPropertiesLink}/transfer/ownership?propertyId=${propertyID}&userId=${userID}`,
+    {
+      method: "PUT",
+      credentials: "include",
+    },
+  );
+  return userID;
+}
 
-export const apiTransferAllProperties = async (
+export async function apiTransferAllProperties(
   userID: string,
-): Promise<string> => {
-  return axios
-    .post(
-      `${apiPropertiesLink}/transfer/ownership/all?userId=${userID}`,
-      {},
-      {
-        withCredentials: true,
-      },
-    )
-    .then(() => userID);
-};
+): Promise<string> {
+  await fetch(`${apiPropertiesLink}/transfer/ownership/all?userId=${userID}`, {
+    method: "POST",
+    credentials: "include",
+  });
+  return userID;
+}
 
 // Get a single property based off of id
-export const apiGetProperty = async (propertyID: string): Promise<Property> => {
-  return axios
-    .get(`${apiPropertiesLink}/${propertyID}`, {
+export async function apiGetProperty(propertyID: string): Promise<Property> {
+  const response = await fetch(`${apiPropertiesLink}/${propertyID}`, {
+    headers: {
+      Accept: "application/json",
+    },
+  });
+  const data = await response.json();
+  const res = APIPropertyReceivedSchema.safeParse(data);
+  if (!res.success) {
+    throw new Error(
+      "Validation failed: received property does not match expected schema",
+    );
+  }
+  const validatedData = res.data;
+  return {
+    details: validatedData.details,
+    images: validatedData.images.map((image) => ({
+      orderNum: image.orderNum,
+      file: apiFile2ClientFile(image.file),
+    })) as OrderedFile[],
+  } as Property;
+}
+
+// Get a page of property ids
+export async function apiGetProperties(
+  page: number,
+  filterAddress: string,
+): Promise<string[]> {
+  if (filterAddress === undefined) filterAddress = "";
+  const response = await fetch(
+    `${apiPropertiesLink}?${PAGE_QP_KEY}=${page}&${FILTER_ADDRESS_QP_KEY}=${filterAddress}&limit=${MAX_NUMBER_PROPERTIES_PER_PAGE}`,
+    {
       headers: {
         Accept: "application/json",
       },
-    })
-    .then((res) => res.data)
-    .then((data) => {
-      const res = APIPropertyReceivedSchema.safeParse(data);
-      if (res.success) return res.data;
-      throw new Error(
-        "Validation failed: received property does not match expected schema",
-      );
-    })
-    .then((data) => {
-      return {
-        details: data.details,
-        images: data.images.map((image) => {
-          return {
-            orderNum: image.orderNum,
-            file: apiFile2ClientFile(image.file),
-          };
-        }) as OrderedFile[],
-      } as Property;
-    });
-};
+    },
+  );
+  const data = await response.json();
+  const res = APIReceivedPropertyIDsSchema.safeParse(data);
+  if (!res.success) {
+    throw new Error(
+      "Validation failed: received property ids does not match expected schema",
+    );
+  }
+  return res.data.propertyIDs;
+}
 
-// Get a page of property ids
-export const apiGetProperties = async (
-  page: number,
-  filterAddress: string,
-): Promise<string[]> => {
-  if (filterAddress === undefined) filterAddress = "";
-  return axios
-    .get(
-      `${apiPropertiesLink}?${PAGE_QP_KEY}=${page}&${FILTER_ADDRESS_QP_KEY}=${filterAddress}&limit=${MAX_NUMBER_PROPERTIES_PER_PAGE}`,
-      {
-        headers: {
-          Accept: "application/json",
-        },
-      },
-    )
-    .then((res) => res.data)
-    .then((data) => {
-      const res = APIReceivedPropertyIDsSchema.safeParse(data);
-      if (res.success) return res.data.propertyIDs;
-      throw new Error(
-        "Validation failed: received property ids does not match expected schema",
-      );
-    });
-};
-
-export const apiDeleteProperty = async (
-  propertyID: string,
-): Promise<string> => {
-  return axios
-    .delete(`${apiPropertiesLink}/${propertyID}`, {
-      withCredentials: true,
-    })
-    .then(() => propertyID);
-};
+export async function apiDeleteProperty(propertyID: string): Promise<string> {
+  await fetch(`${apiPropertiesLink}/${propertyID}`, {
+    method: "DELETE",
+    credentials: "include",
+  });
+  return propertyID;
+}

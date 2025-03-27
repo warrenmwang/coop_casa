@@ -1,21 +1,17 @@
 import { PublicListerBasicInfoSchema } from "@app/types/Schema";
 import { PublicListerBasicInfo } from "@app/types/Types";
 import { apiListerLink } from "@app/urls";
-import axios from "axios";
 import { z } from "zod";
 
 // Get public, basic lister info
-export const apiGetListerInfo = async (
+export async function apiGetListerInfo(
   listerID: string,
-): Promise<PublicListerBasicInfo> => {
+): Promise<PublicListerBasicInfo> {
   return (
-    axios
-      .get(`${apiListerLink}/${listerID}`, {
-        headers: {
-          Accept: "application/json",
-        },
-      })
-      .then((res) => res.data)
+    fetch(`${apiListerLink}/${listerID}`, {
+      headers: { Accept: "application/json" },
+    })
+      .then((res) => res.json())
       // .then((data) => data as ListerBasicInfo);
       .then((data) => {
         const res = PublicListerBasicInfoSchema.safeParse(data);
@@ -25,27 +21,26 @@ export const apiGetListerInfo = async (
         );
       })
   );
-};
+}
 
 // Get list of lister's
-export const apiListerGetPageOfListersDetails = async (
+export async function apiListerGetPageOfListersDetails(
   limit: number,
   page: number,
   nameFilter: string,
-) => {
-  return axios
-    .get(
-      `${apiListerLink}?limit=${limit}&page=${page}&nameFilter=${nameFilter}`,
-      {
-        headers: {
-          Accept: "application/json",
-        },
-        withCredentials: true,
+) {
+  return fetch(
+    `${apiListerLink}?limit=${limit}&page=${page}&nameFilter=${nameFilter}`,
+    {
+      headers: {
+        Accept: "application/json",
       },
-    )
-    .then((res) => res.data)
+      credentials: "include",
+    },
+  )
+    .then((res) => res.json())
     .then((data) => {
       const res = z.array(PublicListerBasicInfoSchema).safeParse(data);
       if (res.success) return res.data;
     });
-};
+}
