@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
 import { apiGetCommunity } from "@app/api/community";
-import SubmitButton from "@app/components/buttons/SubmitButton";
 import UpdateCommunityForm from "@app/components/form/UpdateCommunityForm";
 import { useDeleteCommunity } from "@app/hooks/communities";
 import { communitiesKey } from "@app/reactQueryKeys";
@@ -105,20 +104,21 @@ const UpdateCommunityManager: React.FC = () => {
             />
           </div>
           <div className="flex gap-2">
-            {community === null && (
-              <SubmitButton isSubmitting={getCommunityDetailsIsSubmitting} />
+            {communityID && (
+              <button id="clear" className="button__gray" onClick={clearForm}>
+                Clear Form
+              </button>
             )}
-            <button id="clear" className="button__gray" onClick={clearForm}>
-              Clear Form
-            </button>
-            <button
-              id="delete"
-              className="button__red"
-              onClick={handleDelete}
-              disabled={isDeleting}
-            >
-              {isDeleting ? "Deleting..." : "Delete Community"}
-            </button>
+            {community && (
+              <button
+                id="delete"
+                className="button__red"
+                onClick={handleDelete}
+                disabled={isDeleting}
+              >
+                {isDeleting ? "Deleting..." : "Delete Community"}
+              </button>
+            )}
           </div>
         </form>
       </div>

@@ -65,7 +65,7 @@ const DashboardPage: React.FC = () => {
   }, [userQuery.status, userDetails]);
 
   return (
-    <div className="content-body">
+    <div>
       {!ready && <TextSkeleton />}
 
       {ready && (

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
 import { apiGetProperty } from "@app/api/property";
-import SubmitButton from "@app/components/buttons/SubmitButton";
 import UpdatePropertyForm from "@app/components/form/UpdatePropertyForm";
 import { useDeleteProperty } from "@app/hooks/properties";
 import { propertiesKey } from "@app/reactQueryKeys";
@@ -103,20 +102,21 @@ const UpdatePropertyManager: React.FC = () => {
             />
           </div>
           <div className="flex gap-2">
-            {property === null && (
-              <SubmitButton isSubmitting={getPropertyDetailsIsSubmitting} />
+            {propertyID && (
+              <button id="clear" className="button__gray" onClick={clearForm}>
+                Clear Form
+              </button>
             )}
-            <button id="clear" className="button__gray" onClick={clearForm}>
-              Clear Form
-            </button>
-            <button
-              id="delete"
-              className="button__red"
-              onClick={handleDelete}
-              disabled={isDeleting}
-            >
-              {isDeleting ? "Deleting..." : "Delete Property"}
-            </button>
+            {property && (
+              <button
+                id="delete"
+                className="button__red"
+                onClick={handleDelete}
+                disabled={isDeleting}
+              >
+                {isDeleting ? "Deleting..." : "Delete Property"}
+              </button>
+            )}
           </div>
         </form>
       </div>
