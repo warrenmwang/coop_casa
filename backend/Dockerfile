@@ -1,9 +1,10 @@
 # Build stage
 FROM golang:1.22-alpine AS build
 WORKDIR /app
-COPY . .
+COPY go.mod go.sum ./
 RUN go mod download && go mod verify
-RUN go build -o main cmd/api/main.go
+COPY . .
+RUN CGO_ENABLED=0 GOOS=linux go build -o main cmd/api/main.go
 
 # Goose stage
 FROM golang:1.22-alpine AS goose

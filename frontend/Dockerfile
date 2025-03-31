@@ -1,8 +1,9 @@
 # Build stage
 FROM node:22.14.0-alpine AS build
 WORKDIR /app
-COPY . .
+COPY package*.json ./
 RUN npm install
+COPY . .
 ARG VITE_IS_PROD
 ARG VITE_API_PROD_HOST
 ARG VITE_API_PORT
