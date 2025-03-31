@@ -79,7 +79,9 @@ const CommunityGrid: React.FC<{ communityIDs: string[] }> = ({
 
                 {/* Copy ID Button */}
                 <button
-                  onClick={(e) => handleCopyId(e, community.details.communityId)}
+                  onClick={(e) =>
+                    handleCopyId(e, community.details.communityId)
+                  }
                   className="absolute bottom-4 right-4 p-2 bg-blue-50 hover:bg-blue-100 rounded-full transition-colors duration-200 group"
                   title="Copy Community ID"
                 >

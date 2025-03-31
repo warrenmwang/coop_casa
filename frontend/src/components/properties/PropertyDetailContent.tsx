@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 import CustomImageGallery, {
   ImageGalleryItemsInput,
@@ -94,7 +94,9 @@ const PropertyDetailContent: React.FC<PropertyDetailContentProps> = ({
     isLiked = likedQuery.data.includes(property.details.propertyId);
   }
 
-  // ------ LIKE BUTTON ------
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <div className="detail-page-body">

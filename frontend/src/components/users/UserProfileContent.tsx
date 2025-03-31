@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 import defaultProfileImage from "@app/assets/profile.jpg";
 import CustomImageGallery, {
@@ -63,6 +63,10 @@ const UserProfileContent: React.FC<{ userProfile: UserProfile }> = ({
     showLikedButton = true;
     isLiked = likedQuery.data.includes(userProfile.details.userId);
   }
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <div className="detail-page-body">

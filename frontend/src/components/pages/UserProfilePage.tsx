@@ -1,8 +1,8 @@
 import React from "react";
 import { useParams } from "react-router-dom";
 
-import FetchErrorText from "@app/components/FetchErrorText";
 import CardSkeleton from "@app/components/skeleton/CardSkeleton";
+import UserError from "@app/components/users/UserError";
 import UserProfileContent from "@app/components/users/UserProfileContent";
 import { useGetUserProfile } from "@app/hooks/users";
 
@@ -10,21 +10,29 @@ const UserProfilePage: React.FC = () => {
   const { userID } = useParams<{ userID: string }>();
   const userIDStr: string = userID as string;
 
-  const { data, status } = useGetUserProfile(userIDStr);
+  const { data, status, refetch } = useGetUserProfile(userIDStr);
 
-  if (status === "pending") {
-    return <CardSkeleton />;
-  }
+  return (
+    <div className="min-h-screen">
+      {status === "pending" && (
+        <div className="animate-fade-in">
+          <CardSkeleton />
+        </div>
+      )}
 
-  if (status === "error") {
-    return (
-      <FetchErrorText>
-        Sorry, we are unable to find that user{"'"}s profile.
-      </FetchErrorText>
-    );
-  }
+      {status === "error" && (
+        <div className="animate-fade-in">
+          <UserError onRetry={refetch} />
+        </div>
+      )}
 
-  return <UserProfileContent userProfile={data} />;
+      {status === "success" && data && (
+        <div className="animate-fade-in">
+          <UserProfileContent userProfile={data} />
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default UserProfilePage;

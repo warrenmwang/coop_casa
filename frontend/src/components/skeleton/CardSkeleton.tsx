@@ -5,12 +5,13 @@ import "@app/styles/skeleton.css";
 interface SkeletonPulseProps {
   height: string;
   width: string;
+  className?: string;
 }
 
 function SkeletonPulse(props: SkeletonPulseProps) {
   return (
     <div
-      className="skeleton-pulse"
+      className={`skeleton-pulse ${props.className || ""}`}
       style={{ height: props.height, width: props.width }}
     ></div>
   );

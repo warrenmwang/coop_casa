@@ -7,7 +7,11 @@ import {
   apiTransferProperty,
   apiUpdateProperty,
 } from "@app/api/property";
-import { propertiesKey, propertiesPageKey, userPropertiesKey } from "@app/reactQueryKeys";
+import {
+  propertiesKey,
+  propertiesPageKey,
+  userPropertiesKey,
+} from "@app/reactQueryKeys";
 import { Property } from "@app/types/Types";
 import {
   UseQueryResult,
