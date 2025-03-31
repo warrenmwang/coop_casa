@@ -68,6 +68,15 @@ func (h *AdminHandler) AdminGetUsersHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
+	// Handle edge case of new user acconts that haven't setup their account yet
+	// making sure that no interests doesn't equate to a null and is an actual empty array
+	for i, user := range users {
+		if user.Interests == nil {
+			user.Interests = []string{}
+			users[i] = user
+		}
+	}
+
 	// Return the users
 	utils.RespondWithJSON(w, http.StatusOK, struct {
 		UserDetails []database.UserDetails `json:"userDetails"`

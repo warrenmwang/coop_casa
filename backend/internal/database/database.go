@@ -1557,10 +1557,10 @@ func (s *service) GetCommunityProperties(communityId string) ([]string, error) {
 func (s *service) GetNextPageCommunities(limit, offset int32, filterName, filterDescription string) ([]string, error) {
 	ctx := context.Background()
 	communityIds, err := s.db_queries.GetNextPageCommunities(ctx, sqlc.GetNextPageCommunitiesParams{
-		Limit   : limit,
-		Offset  : offset,
-		Column3 : filterName,
-		Column4 : filterDescription,
+		Limit:   limit,
+		Offset:  offset,
+		Column3: filterName,
+		Column4: filterDescription,
 	})
 	if err != nil {
 		return []string{}, err
@@ -1734,11 +1734,11 @@ func (s *service) GetNextPagePublicUserIDs(limit, offset int32, firstName, lastN
 	}
 
 	userIdsEncrypted, err := s.db_queries.GetNextPageOfPublicUsers(ctx, sqlc.GetNextPageOfPublicUsersParams{
-		Limit:  limit,
-		Offset: offset,
+		Limit:   limit,
+		Offset:  offset,
 		Column3: firstName_E,
 		Column4: lastName_E,
-		Status: normalStatus_E,
+		Status:  normalStatus_E,
 	})
 	if err != nil {
 		return []string{}, err
